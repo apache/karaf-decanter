@@ -34,7 +34,6 @@ public class EmbeddedNode {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(EmbeddedNode.class);
 
-    private final static String DATA_DIRECTORY = "data/elasticsearch";
     private final static String NODE_NAME = "KARAF";
     private static Node node;
 
@@ -48,7 +47,7 @@ public class EmbeddedNode {
                 .put("cluster.name", "elasticsearch")
                 .put("http.enabled", "true")
                 .put("node.data", true)
-                .put("path.data", DATA_DIRECTORY)
+                .put("path.data", "data")
                 .put("name", NODE_NAME)
                 .put("discovery.type", "zen")
                 .put("discovery.zen.multicast.enabled", false)
