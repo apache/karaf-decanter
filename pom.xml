@@ -38,6 +38,7 @@
         <elasticsearch.version>1.3.4</elasticsearch.version>
         <elasticsearch.bundle.version>1.3.4_1</elasticsearch.bundle.version>
         <karaf.version>3.0.2-SNAPSHOT</karaf.version>
+        <kibana.version>3.1.1</kibana.version>
         <slf4j.version>1.7.7</slf4j.version>
     </properties>
 
@@ -48,6 +49,7 @@
         <module>dispatcher</module>
         <module>appender</module>
         <module>elasticsearch</module>
+        <module>kibana</module>
         <!-- TODO complete command -->
         <!-- TODO add angularjs or bootstrap webconsole/kibana (embedded) -->
         <module>assembly</module>

@@ -54,6 +54,12 @@
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch/${project.version}</bundle>
     </feature>
 
+    <feature name="kibana" version="${kibana.version}" description="Embedded Kibana dashboard">
+        <feature>war</feature>
+        <feature>elasticsearch</feature>
+        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana/${project.version}</bundle>
+    </feature>
+
     <!-- TODO create webconsole/kibana feature (embedded in Karaf) -->
 
 </features>
