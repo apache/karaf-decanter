@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!--
+
+        Licensed to the Apache Software Foundation (ASF) under one or more
+        contributor license agreements.  See the NOTICE file distributed with
+        this work for additional information regarding copyright ownership.
+        The ASF licenses this file to You under the Apache License, Version 2.0
+        (the "License"); you may not use this file except in compliance with
+        the License.  You may obtain a copy of the License at
+
+           http://www.apache.org/licenses/LICENSE-2.0
+
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
+    -->
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>14</version>
+        <relativePath />
+    </parent>
+
+    <groupId>org.apache.karaf</groupId>
+    <artifactId>decanter</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Apache Karaf :: Decanter</name>
+
+    <properties>
+        <karaf.version>3.0.2-SNAPSHOT</karaf.version>
+        <slf4j.version>1.7.7</slf4j.version>
+    </properties>
+
+    <modules>
+        <module>api</module>
+        <module>scheduler</module>
+        <module>collector</module>
+        <module>dispatcher</module>
+        <module>appender</module>
+        <!-- TODO complete command -->
+        <!-- TODO add angularjs or bootstrap webconsole/kibana (embedded) -->
+        <module>assembly</module>
+    </modules>
+
+    <scm>
+        <connection>scm:git:https://git-wip-us.apache.org/repos/asf/karaf-decanter.git</connection>
+        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/karaf-decanter.git</developerConnection>
+        <url>https://git-wip-us.apache.org/repos/asf?p=karaf-decanter.git;a=summary</url>
+    </scm>
+
+    <issueManagement>
+        <system>jira</system>
+        <url>https://issues.apache.org/jira/browse/KARAF</url>
+    </issueManagement>
+
+    <mailingLists>
+        <mailingList>
+            <name>Karaf Dev</name>
+            <subscribe>dev-subscribe@karaf.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@karaf.apache.org</unsubscribe>
+            <post>-</post>
+            <archive>http://www.mail-archive.com/dev%karaf.apache.org/</archive>
+        </mailingList>
+        <mailingList>
+            <name>Karaf User</name>
+            <subscribe>user-subscribe@karaf.apache.org</subscribe>
+            <unsubscribe>user-unsubscribe@karaf.apache.org</unsubscribe>
+            <post>-</post>
+            <archive>http://www.mail-archive.com/user%40karaf.apache.org/</archive>
+        </mailingList>
+        <mailingList>
+            <name>Karaf Commits</name>
+            <subscribe>commits-subscribe@karaf.apache.org</subscribe>
+            <unsubscribe>commits-unsubscribe@karaf.apache.org</unsubscribe>
+            <post>-</post>
+            <archive>http://www.mail-archive.com/commits%40karaf.apache.org/</archive>
+        </mailingList>
+        <mailingList>
+            <name>Karaf Issues</name>
+            <subscribe>issues-subscribe@karaf.apache.org</subscribe>
+            <unsubscribe>issues-unsubscribe@karaf.apache.org</unsubscribe>
+            <post>-</post>
+            <archive>http://www.mail-archive.com/issues%40karaf.apache.org/</archive>
+        </mailingList>
+    </mailingLists>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.4.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.9</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.4.2</version>
+                    <configuration>
+                        <useReleaseProfile>false</useReleaseProfile>
+                        <preparationGoals>clean install</preparationGoals>
+                        <goals>deploy</goals>
+                        <arguments>-Prelease,deploy,manual</arguments>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.6</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.17</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-notice</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy file="NOTICE" todir="target/maven-shared-archive-resources/META-INF" failonerror="false" overwrite="true" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <configuration>
+                            <resourceBundles>
+                                <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
+                            </resourceBundles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Decanter modules -->
+            <dependency>
+                <groupId>org.apache.karaf.decanter</groupId>
+                <artifactId>org.apache.karaf.decanter.api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Karaf -->
+            <dependency>
+                <groupId>org.apache.karaf.shell</groupId>
+                <artifactId>org.apache.karaf.shell.console</artifactId>
+                <version>${karaf.version}</version>
+            </dependency>
+
+            <!-- OSGi -->
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>4.3.1</version>
+            </dependency>
+
+            <!-- SLF4J -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <!-- JUnit -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.11</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+</project>
