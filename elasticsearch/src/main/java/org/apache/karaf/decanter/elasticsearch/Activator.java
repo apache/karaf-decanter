@@ -16,23 +16,30 @@
  */
 package org.apache.karaf.decanter.elasticsearch;
 
+import org.elasticsearch.node.Node;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 public class Activator implements BundleActivator {
 
     private EmbeddedNode node;
+    private ServiceRegistration service;
 
     public void start(BundleContext bundleContext) throws Exception {
         if (node == null) {
             node = new EmbeddedNode();
         }
+        service = bundleContext.registerService(Node.class, node.getNode(), null);
         node.start();
     }
 
     public void stop(BundleContext bundleContext) throws Exception {
         if (node != null) {
             node.stop();
+        }
+        if (service != null) {
+            service.unregister();
         }
     }
 

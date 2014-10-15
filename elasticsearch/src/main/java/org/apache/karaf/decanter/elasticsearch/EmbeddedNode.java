@@ -87,4 +87,8 @@ public class EmbeddedNode {
         return false;
     }
 
+    public Node getNode() {
+        return node;
+    }
+
 }
