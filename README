@@ -1,0 +1,95 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+Welcome to Apache Karaf Decanter
+================================
+Apache Karaf Decanter is a complete monitoring platform for Apache Karaf.
+
+Apache Karaf Decanter is very extensible, flexible, easy to install and use.
+
+Apache Karaf Decanter is composed by:
+    * Collectors and SLA Policies
+      The collectors are OSGi services responsible of harvesting monitoring data.
+      Two kinds of collectors are available:
+      - the polling collectors are invoked periodically by a scheduler
+      - the event driven collectors react to some events.
+      It's very dynamic (thanks to the OSGi services), so it's possible to add
+      a new custom collector (user/custom implementations).
+      The collectors are also responsible of checking the SLA, and delegate to
+      a notifier.
+    * Scheduler
+      The scheduler service is responsible to call the Polling Collectors,
+      gather the harvested data, and delegate to the dispatcher.
+    * Dispatcher
+      The dispatcher is called by the scheduler or the event driven collectors
+      to dispatch the collected data to the appenders.
+    * Appenders
+      The appenders are responsible to send/store the collected data to target
+      systems.
+    * Notifier
+      The notifier is called by the collectors' SLA. The notifier uses external
+      system to "publish" the SLA alert.
+    * Console & Web UI
+      The console is responsible of both SLA configuration and dashboard view.
+
+Getting Started
+===============
+Apache Karaf Decanter is available as a Karaf features.
+
+You have to register the Decater features repository:
+
+karaf@root()> feature:repo-add mvn:org.apache.karaf.decanter/decanter/3.0.0-SNAPSHOT/xml/features
+
+It's up to you to choose the features to install, depending of the systems that you want:
+
+* decanter-simple-scheduler
+This feature installs a very simple Decanter Scheduler using a Thread.
+
+karaf@root()> feature:install decanter-simple-schedular
+
+* decanter-collector-log
+This feature installs a Decanter Collector listening for all log messages happening in Karaf.
+
+karaf@root()> feature:install decanter-collector-log
+
+* decanter-collector-jmx
+This feature installs a Decanter Collector harvesting the JMX MBeans metrics.
+
+karaf@root()> feature:install decanter-collector-jmx
+
+* decanter-appender-log
+This feature installs a Decanter Appender that sends the collected data as log messages.
+
+karaf@root()> feature:install decanter-appender-log
+
+* decanter-appender-elasticsearch
+This feature installs a Decanter Appender that sends the collected data to a Elasticsearch
+database.
+
+karaf@root()> feature:install decanter-appender-elasticsearch
+
+* Optional features
+For convenience, Decanter also provides elasticsearch and kibana features installing elasticsearch
+and kibana directly in the Karaf instance.
+
+
+
+Thanks for using Apache Karaf Decanter !
+
+--
+The Karaf Team
+
