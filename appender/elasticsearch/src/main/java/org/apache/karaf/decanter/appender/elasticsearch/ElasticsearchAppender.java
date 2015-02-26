@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Karaf Decanter appender which insert into Elasticsearch
@@ -36,7 +37,8 @@ public class ElasticsearchAppender implements Appender {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
     
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public void append(Map<Long, Map<String, Object>> data) throws Exception {
         LOGGER.debug("Appending into Elasticsearch");
@@ -47,8 +49,11 @@ public class ElasticsearchAppender implements Appender {
             LOGGER.debug("Connecting to Elasticsearch instance located localhost:9300");
             Settings settings = ImmutableSettings.settingsBuilder().classLoader(Settings.class.getClassLoader()).build();
             client = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
-            for (Long unit : data.keySet()) {
-                client.prepareIndex("@timestamp", dateFormat.format(new Date(unit))).setSource(data.get(unit)).execute().actionGet();
+            for(Entry<Long, Map<String, Object>> entry : data.entrySet()){
+            	Date date = new Date(entry.getKey());
+            	entry.getValue().put("@timestamp", tsFormat.format(date));
+            	String indexName = String.format("karaf_%s", dateFormat.format(date));
+            	client.prepareIndex(indexName, "karaf_event").setSource(entry.getValue()).execute().actionGet();
             }
             LOGGER.debug("Apppending done");
         } catch (Exception e) {
