@@ -25,6 +25,8 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -33,6 +35,8 @@ import java.util.Map;
 public class ElasticsearchAppender implements Appender {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
+    
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     public void append(Map<Long, Map<String, Object>> data) throws Exception {
         LOGGER.debug("Appending into Elasticsearch");
@@ -44,7 +48,7 @@ public class ElasticsearchAppender implements Appender {
             Settings settings = ImmutableSettings.settingsBuilder().classLoader(Settings.class.getClassLoader()).build();
             client = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
             for (Long unit : data.keySet()) {
-                client.prepareIndex("timestamp", unit.toString()).setSource(data.get(unit)).execute().actionGet();
+                client.prepareIndex("@timestamp", dateFormat.format(new Date(unit))).setSource(data.get(unit)).execute().actionGet();
             }
             LOGGER.debug("Apppending done");
         } catch (Exception e) {
