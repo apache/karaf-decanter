@@ -30,6 +30,11 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+
 /**
  * Karaf Decanter appender which insert into Elasticsearch
  */
@@ -53,7 +58,30 @@ public class ElasticsearchAppender implements Appender {
             	Date date = new Date(entry.getKey());
             	entry.getValue().put("@timestamp", tsFormat.format(date));
             	String indexName = String.format("karaf_%s", dateFormat.format(date));
-            	client.prepareIndex(indexName, "karaf_event").setSource(entry.getValue()).execute().actionGet();
+            	
+            	JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+            	for (Entry<String, Object> valueEntry : entry.getValue().entrySet()) {
+					if (valueEntry.getValue() instanceof String) {
+						jsonObjectBuilder.add(valueEntry.getKey(), (String) valueEntry.getValue());
+					} else if (valueEntry.getValue() instanceof Map) {
+						Map<String, Object> value = (Map<String, Object>) valueEntry.getValue();
+						JsonObjectBuilder innerBuilder = Json.createObjectBuilder();
+						for (Entry<String, Object> innerEntrySet : value.entrySet()) {
+							Object object = innerEntrySet.getValue();
+							if (object instanceof String)
+								innerBuilder.add(innerEntrySet.getKey(), (String) object);
+							else if (object instanceof Long)
+								innerBuilder.add(innerEntrySet.getKey(), (Long) object);
+							else if (object instanceof Integer)
+								innerBuilder.add(innerEntrySet.getKey(), (Integer) object);
+							else if (object instanceof Float)
+								innerBuilder.add(innerEntrySet.getKey(), (Float) object);
+						}
+						jsonObjectBuilder.add(valueEntry.getKey(), innerBuilder.build());
+					}
+				}
+            	JsonObject jsonObject = jsonObjectBuilder.build();
+            	client.prepareIndex(indexName, "karaf_event").setSource(jsonObject.toString()).execute().actionGet();
             }
             LOGGER.debug("Apppending done");
         } catch (Exception e) {

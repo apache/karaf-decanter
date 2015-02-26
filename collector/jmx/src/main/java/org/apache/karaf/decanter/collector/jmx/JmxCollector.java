@@ -16,18 +16,20 @@
  */
 package org.apache.karaf.decanter.collector.jmx;
 
-import org.apache.karaf.decanter.api.PollingCollector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import javax.management.openmbean.TabularDataSupport;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+
+import org.apache.karaf.decanter.api.PollingCollector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Decanter JMX Pooling Collector
@@ -51,7 +53,20 @@ public class JmxCollector implements PollingCollector {
             for (MBeanAttributeInfo attribute : attributes) {
                 // TODO add SLA check on attributes and filtering
                 try {
-                    data.put(attribute.getName(), server.getAttribute(name, attribute.getName()).toString());
+                    Object attributeObject = server.getAttribute(name, attribute.getName());
+                    if (attributeObject instanceof String) {
+                    	data.put(attribute.getName(), (String) attributeObject);
+                    } else if (attributeObject instanceof CompositeDataSupport) {
+                    	CompositeDataSupport cds = (CompositeDataSupport) attributeObject;
+                    	CompositeType compositeType = cds.getCompositeType();
+                    	Set<String> keySet = compositeType.keySet();
+                    	Map<String, Object> composite = new HashMap<String, Object>();
+                    	for (String key : keySet) {
+							Object cdsObject = cds.get(key);
+							composite.put(key, cdsObject);
+						}
+                    	data.put(attribute.getName(), composite);
+                    }
                 } catch (Exception e) {
                     // LOGGER.warn("Can't put MBean {} attribute {} in collected data", name.toString(), attribute.getName(), e);
                 }

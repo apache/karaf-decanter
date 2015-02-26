@@ -40,6 +40,8 @@
         <karaf.version>3.0.2</karaf.version>
         <kibana.version>3.1.1</kibana.version>
         <slf4j.version>1.7.7</slf4j.version>
+        <json-api.version>1.0</json-api.version>
+        <glassfish-json.version>1.0.4</glassfish-json.version>
     </properties>
 
     <modules>
@@ -238,6 +240,11 @@
                 <version>4.12</version>
             </dependency>
 
+            <dependency>
+            	<groupId>javax.json</groupId>
+            	<artifactId>javax.json-api</artifactId>
+            	<version>${json-api.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
