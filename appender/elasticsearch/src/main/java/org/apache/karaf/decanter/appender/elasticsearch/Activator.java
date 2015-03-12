@@ -22,22 +22,52 @@ import java.util.Hashtable;
 import org.apache.karaf.decanter.api.Appender;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 
 public class Activator implements BundleActivator {
 
     private ElasticsearchAppender appender;
+    private ServiceRegistration serviceReg;
 
-    public void start(BundleContext bundleContext) {
-        // TODO embed mode and configuration admin support for location of Elasticsearch
-        appender = new ElasticsearchAppender("localhost", 9300);
-        appender.open();
+    public void start(final BundleContext bundleContext) {
+        // TODO embed mode of Elasticsearch
         Dictionary<String, String> properties = new Hashtable<>();
         properties.put("name", "elasticsearch");
-        bundleContext.registerService(Appender.class, appender, properties);
+
+        serviceReg = bundleContext.registerService(Appender.class, appender, properties);
     }
 
     public void stop(BundleContext bundleContext) {
-        appender.close();;
+        appender.close();
+        serviceReg.unregister();
+    }
+
+    private final class ConfigUpdater implements ManagedService {
+
+        private BundleContext bundleContext;
+
+        public ConfigUpdater(BundleContext bundleContext){
+            this.bundleContext = bundleContext;
+        }
+
+        @SuppressWarnings("rawtypes")
+        @Override
+        public void updated(Dictionary config) throws ConfigurationException {
+            if (appender != null) {
+                appender.close();
+                serviceReg.unregister();
+            }
+
+            if (config == null) {
+                appender = new ElasticsearchAppender("localhost", 9300);
+            } else{
+                appender = new ElasticsearchAppender((String)config.get("host"), (Integer)config.get("port"));
+            }
+            appender.open();
+            serviceReg = bundleContext.registerService(Appender.class, appender, config);
+        }
     }
 
 }
