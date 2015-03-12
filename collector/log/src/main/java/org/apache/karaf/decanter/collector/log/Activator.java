@@ -16,31 +16,49 @@
  */
 package org.apache.karaf.decanter.collector.log;
 
-import org.apache.karaf.decanter.api.Collector;
-import org.ops4j.pax.logging.spi.PaxAppender;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-
 import java.util.Dictionary;
 import java.util.Properties;
 
+import org.apache.karaf.decanter.api.Collector;
+import org.apache.karaf.decanter.api.Dispatcher;
+import org.ops4j.pax.logging.spi.PaxAppender;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.util.tracker.ServiceTracker;
+
+@SuppressWarnings("rawtypes")
 public class Activator implements BundleActivator {
+    private ServiceTracker<Dispatcher, ServiceRegistration> tracker;
 
-    private ServiceRegistration service;
+    public void start(final BundleContext bundleContext) {
+        tracker = new ServiceTracker<Dispatcher, ServiceRegistration>(bundleContext, Dispatcher.class, null) {
 
-    public void start(BundleContext bundleContext) {
-        LogAppender appender = new LogAppender(bundleContext);
-        Properties properties = new Properties();
-        properties.put("org.ops4j.pax.logging.appender.name", "DecanterLogCollectorAppender");
-        properties.put("name", "log");
-        service = bundleContext.registerService(new String[] { PaxAppender.class.getName(), Collector.class.getName() } , appender, (Dictionary) properties);
+            @SuppressWarnings("unchecked")
+            @Override
+            public ServiceRegistration<?> addingService(ServiceReference<Dispatcher> reference) {
+                Properties properties = new Properties();
+                properties.put("org.ops4j.pax.logging.appender.name", "DecanterLogCollectorAppender");
+                properties.put("name", "log");
+                String[] ifAr = new String[] { PaxAppender.class.getName(), Collector.class.getName() };
+                Dispatcher dispatcher = bundleContext.getService(reference);
+                LogAppender appender = new LogAppender(dispatcher);
+                return bundleContext.registerService(ifAr , appender, (Dictionary) properties);
+            }
+
+            @Override
+            public void removedService(ServiceReference<Dispatcher> reference, ServiceRegistration reg) {
+                reg.unregister();
+                super.removedService(reference, reg);
+            }
+            
+        };
+        tracker.open();
     }
 
     public void stop(BundleContext bundleContext) {
-        if (service != null) {
-            service.unregister();
-        }
+        tracker.close();
     }
 
 }

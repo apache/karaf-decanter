@@ -16,32 +16,45 @@
  */
 package org.apache.karaf.decanter.collector.log;
 
-import org.apache.karaf.decanter.api.Dispatcher;
-import org.apache.karaf.decanter.api.Collector;
-import org.ops4j.pax.logging.spi.PaxAppender;
-import org.ops4j.pax.logging.spi.PaxLoggingEvent;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.karaf.decanter.api.Collector;
+import org.apache.karaf.decanter.api.Dispatcher;
+import org.apache.log4j.MDC;
+import org.ops4j.pax.logging.spi.PaxAppender;
+import org.ops4j.pax.logging.spi.PaxLoggingEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Decanter log collector, event driven implementing a PaxAppender
  */
 public class LogAppender implements PaxAppender, Collector {
-
+    private static final String MDC_IN_LOG_APPENDER = "inLogAppender";
+    private final static String[] ignoredCategories = {"org.apache.karaf.decanter"};
     private final static Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
-
-    private BundleContext bundleContext;
-
-    public LogAppender(BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
+    private Dispatcher dispatcher;
+    
+    public LogAppender(Dispatcher dispatcher) {
+        this.dispatcher = dispatcher;
     }
 
     public void doAppend(PaxLoggingEvent event) {
+        try {
+            if (MDC.get(MDC_IN_LOG_APPENDER) != null) {
+                // Avoid recursion
+                return;
+            }
+            MDC.put(MDC_IN_LOG_APPENDER, "true");
+            appendInternal(event);
+        } catch (Exception e) {
+            LOGGER.warn("Error while appending event", e);
+            MDC.remove(MDC_IN_LOG_APPENDER);
+        }
+    }
+
+    private void appendInternal(PaxLoggingEvent event) throws Exception {
         LOGGER.debug("Karaf Decanter Log Collector hooked ...");
 
         Map<Long, Map<String, Object>> collected = new HashMap<>();
@@ -52,31 +65,22 @@ public class LogAppender implements PaxAppender, Collector {
         data.put("message", event.getMessage());
         data.put("level", event.getLevel().toString());
         data.put("renderedMessage", event.getRenderedMessage());
-
+        data.put("MDC", event.getProperties());
         collected.put(event.getTimeStamp(), data);
 
-        // it's an event driven collector, calling the appender controller
-        LOGGER.debug("Calling the Karaf Decanter Appender Controller ...");
-        ServiceReference reference = bundleContext.getServiceReference(Dispatcher.class);
-        if (reference != null) {
-            Dispatcher controller = (Dispatcher) bundleContext.getService(reference);
-            if (controller != null) {
-                try {
-                    controller.dispatch(collected);
-                } catch (Exception e) {
-                    LOGGER.warn("Can't dispatch collected data", e);
-                }
-            }
-            bundleContext.ungetService(reference);
+        if (!isIgnored(event.getLoggerName())) {
+            LOGGER.debug("Calling the Karaf Decanter Appender Controller ...");
+            this.dispatcher.dispatch(collected);
         }
     }
 
-    public BundleContext getBundleContext() {
-        return bundleContext;
-    }
-
-    public void setBundleContext(BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
+    private boolean isIgnored(String loggerName) {
+        for (String cat : ignoredCategories) {
+            if (loggerName.startsWith(cat)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
