@@ -50,6 +50,7 @@ public class LogAppender implements PaxAppender, Collector {
             appendInternal(event);
         } catch (Exception e) {
             LOGGER.warn("Error while appending event", e);
+        } finally {
             MDC.remove(MDC_IN_LOG_APPENDER);
         }
     }
