@@ -16,29 +16,28 @@
  */
 package org.apache.karaf.decanter.appender.elasticsearch;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.apache.karaf.decanter.api.Appender;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-
-import java.util.Dictionary;
-import java.util.Properties;
 
 public class Activator implements BundleActivator {
 
-    private ServiceRegistration service;
+    private ElasticsearchAppender appender;
 
     public void start(BundleContext bundleContext) {
-        Appender appender = new ElasticsearchAppender();
-        Properties properties = new Properties();
+        // TODO embed mode and configuration admin support for location of Elasticsearch
+        appender = new ElasticsearchAppender("localhost", 9300);
+        appender.open();
+        Dictionary<String, String> properties = new Hashtable<>();
         properties.put("name", "elasticsearch");
-        service = bundleContext.registerService(Appender.class, appender, (Dictionary) properties);
+        bundleContext.registerService(Appender.class, appender, properties);
     }
 
     public void stop(BundleContext bundleContext) {
-        if (service != null) {
-            service.unregister();
-        }
+        appender.close();;
     }
 
 }
