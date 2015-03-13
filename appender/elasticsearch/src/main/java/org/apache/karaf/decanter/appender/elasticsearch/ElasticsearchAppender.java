@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -52,6 +53,9 @@ public class ElasticsearchAppender implements Appender {
     public ElasticsearchAppender(String host, int port) {
         this.host = host;
         this.port = port;
+        TimeZone tz = TimeZone.getTimeZone( "UTC" );
+        tsFormat.setTimeZone(tz);
+        indexDateFormat.setTimeZone(tz);
     }
 
     @SuppressWarnings("resource")
