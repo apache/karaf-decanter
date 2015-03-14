@@ -16,24 +16,15 @@
  */
 package org.apache.karaf.decanter.dispatcher;
 
-import org.apache.karaf.decanter.api.Dispatcher;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 public class Activator implements BundleActivator {
 
-    private ServiceRegistration service;
-
     public void start(BundleContext bundleContext) {
-        Dispatcher dispatcher = new DefaultDispatcher(bundleContext);
-        service = bundleContext.registerService(Dispatcher.class, dispatcher, null);
     }
 
     public void stop(BundleContext bundleContext) {
-        if (service != null) {
-            service.unregister();
-        }
     }
 
 }

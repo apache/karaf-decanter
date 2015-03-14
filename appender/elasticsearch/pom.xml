@@ -29,12 +29,6 @@
 
 	<dependencies>
 
-		<!-- Decanter -->
-		<dependency>
-			<groupId>org.apache.karaf.decanter</groupId>
-			<artifactId>org.apache.karaf.decanter.api</artifactId>
-		</dependency>
-
 		<!-- Elasticsearch -->
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
@@ -47,6 +41,11 @@
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+        </dependency>
+        
 
 		<!-- JSON builder -->
 		<dependency>

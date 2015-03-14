@@ -35,16 +35,14 @@
 
     <dependencies>
 
-        <!-- Decanter API -->
-        <dependency>
-            <groupId>org.apache.karaf.decanter</groupId>
-            <artifactId>org.apache.karaf.decanter.api</artifactId>
-        </dependency>
-
         <!-- OSGi -->
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
         </dependency>
 
         <!-- SLF4J -->

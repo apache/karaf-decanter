@@ -16,29 +16,45 @@
  */
 package org.apache.karaf.decanter.collector.jmx;
 
-import org.apache.karaf.decanter.api.PollingCollector;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.util.tracker.ServiceTracker;
 
-import java.util.Dictionary;
-import java.util.Properties;
-
+@SuppressWarnings("rawtypes")
 public class Activator implements BundleActivator {
 
-    private ServiceRegistration service;
+    private ServiceTracker<EventAdmin, ServiceRegistration> tracker;
 
-    public void start(BundleContext bundleContext) throws Exception {
-        JmxCollector collector = new JmxCollector();
-        Properties properties = new Properties();
-        properties.put("name", "jmx");
-        service = bundleContext.registerService(PollingCollector.class, collector, (Dictionary) properties);
+    public void start(final BundleContext bundleContext) throws Exception {
+        tracker = new ServiceTracker<EventAdmin, ServiceRegistration>(bundleContext, EventAdmin.class, null) {
+
+            @Override
+            public ServiceRegistration<?> addingService(ServiceReference<EventAdmin> reference) {
+                EventAdmin eventAdmin = bundleContext.getService(reference);
+                JmxCollector collector = new JmxCollector(eventAdmin);
+                Dictionary<String, String> properties = new Hashtable<String, String>();
+                properties.put("decanter.collector.name", "jmx");
+                return bundleContext.registerService(Runnable.class, collector, properties);
+            }
+
+            @Override
+            public void removedService(ServiceReference<EventAdmin> reference, ServiceRegistration reg) {
+                reg.unregister();
+                super.removedService(reference, reg);
+            }
+            
+        };
+        tracker.open();
     }
 
     public void stop(BundleContext bundleContext) throws Exception {
-        if (service != null) {
-            service.unregister();
-        }
+        tracker.close();
     }
 
 }

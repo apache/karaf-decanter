@@ -16,29 +16,25 @@
  */
 package org.apache.karaf.decanter.appender.log;
 
-import org.apache.karaf.decanter.api.Appender;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * Karaf Decanter Log Appender, logging the collected data using.
  */
-public class LogAppender implements Appender {
+public class LogAppender implements EventHandler {
 
     private final Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
 
-    public void append(Map<Long, Map<String, Object>> data) {
-        for (Long key : data.keySet()) {
-            Map<String, Object> inner = data.get(key);
-            StringBuilder builder = new StringBuilder();
-            builder.append(key).append(" - ");
-            for (String innerKey : inner.keySet()) {
-                builder.append(innerKey).append(":").append(inner.get(innerKey).toString()).append(" | ");
-            }
-            LOGGER.info(builder.toString());
+    @Override
+    public void handleEvent(Event event) {
+        StringBuilder builder = new StringBuilder();
+        for (String innerKey : event.getPropertyNames()) {
+            builder.append(innerKey).append(":").append(event.getProperty(innerKey).toString()).append(" | ");
         }
+        LOGGER.info(builder.toString());
     }
 
 }

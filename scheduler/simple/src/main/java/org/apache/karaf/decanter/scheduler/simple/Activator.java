@@ -19,25 +19,19 @@ package org.apache.karaf.decanter.scheduler.simple;
 import org.apache.karaf.decanter.api.Scheduler;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 public class Activator implements BundleActivator {
 
     private SimpleScheduler scheduler;
-    private ServiceRegistration service;
 
     public void start(BundleContext bundleContext) {
         scheduler = new SimpleScheduler(bundleContext);
-        service = bundleContext.registerService(Scheduler.class, scheduler, null);
+        scheduler.start();
+        bundleContext.registerService(Scheduler.class, scheduler, null);
     }
 
     public void stop(BundleContext bundleContext) {
-        if (scheduler != null) {
-            scheduler.stop();
-        }
-        if (service != null) {
-            service.unregister();
-        }
+        scheduler.stop();
     }
 
 }

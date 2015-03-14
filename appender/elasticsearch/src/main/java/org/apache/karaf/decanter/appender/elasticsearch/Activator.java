@@ -19,9 +19,10 @@ package org.apache.karaf.decanter.appender.elasticsearch;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.apache.karaf.decanter.api.Appender;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 
 public class Activator implements BundleActivator {
 
@@ -32,12 +33,12 @@ public class Activator implements BundleActivator {
         appender = new ElasticsearchAppender("localhost", 9300);
         appender.open();
         Dictionary<String, String> properties = new Hashtable<>();
-        properties.put("name", "elasticsearch");
-        bundleContext.registerService(Appender.class, appender, properties);
+        properties.put(EventConstants.EVENT_TOPIC, "decanter/*");
+        bundleContext.registerService(EventHandler.class, appender, properties);
     }
 
     public void stop(BundleContext bundleContext) {
-        appender.close();;
+        appender.close();
     }
 
 }

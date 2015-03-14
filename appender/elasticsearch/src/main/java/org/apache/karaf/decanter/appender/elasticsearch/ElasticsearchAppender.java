@@ -20,6 +20,7 @@ import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilde
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
@@ -28,18 +29,19 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
-import org.apache.karaf.decanter.api.Appender;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Karaf Decanter appender which inserts into Elasticsearch
  */
-public class ElasticsearchAppender implements Appender {
+public class ElasticsearchAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
 
@@ -75,27 +77,29 @@ public class ElasticsearchAppender implements Appender {
         client.close();
     }
 
-    public void append(Map<Long, Map<String, Object>> data) throws Exception {
+    @Override
+    public void handleEvent(Event event) {
         try {
-            for (Entry<Long, Map<String, Object>> entry : data.entrySet()) {
-                send(client, new Date(entry.getKey()), entry.getValue());
-            }
+            send(client, event);
         } catch (Exception e) {
             LOGGER.warn("Can't append into Elasticsearch", e);
         }
     }
 
-    private void send(Client client, Date date, Map<String, Object> props) {
-        props.put("@timestamp", tsFormat.format(date));
+    @SuppressWarnings("unchecked")
+    private void send(Client client, Event event) {
+        Map<String, Object> props = new HashMap<>();
+        Long ts = (Long)event.getProperty("timestamp");
+        Date date = ts != null ? new Date((Long)ts) : new Date();
+        
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-        for (Entry<String, Object> valueEntry : props.entrySet()) {
-            Object value = valueEntry.getValue();
+        jsonObjectBuilder.add("@timestamp", tsFormat.format(date));
+        for (String key : event.getPropertyNames()) {
+            Object value = event.getProperty(key);
             if (value instanceof String) {
-                jsonObjectBuilder.add(valueEntry.getKey(), (String)value);
+                jsonObjectBuilder.add(key, (String) value);
             } else if (value instanceof Map) {
-                @SuppressWarnings("unchecked")
-                JsonObject jsonO = asJson(jsonObjectBuilder, (Map<String, Object>)value);
-                jsonObjectBuilder.add(valueEntry.getKey(), jsonO);
+                jsonObjectBuilder.add(key, build((Map<String, Object>) value));
             }
         }
         JsonObject jsonObject = jsonObjectBuilder.build();
@@ -103,25 +107,27 @@ public class ElasticsearchAppender implements Appender {
         client.prepareIndex(indexName, "karaf_event").setSource(jsonObject.toString()).execute().actionGet();
     }
 
-    private String getIndexName(String prefix, Date date) {
-        return prefix + "-" + indexDateFormat.format(date);
-    }
-
-    private JsonObject asJson(JsonObjectBuilder jsonObjectBuilder, Map<String, Object> value) {
+    private JsonObject build(Map<String, Object> value) {
         JsonObjectBuilder innerBuilder = Json.createObjectBuilder();
         for (Entry<String, Object> innerEntrySet : value.entrySet()) {
-            String key = innerEntrySet.getKey();
-            Object object = innerEntrySet.getValue();
-            if (object instanceof String)
-                innerBuilder.add(key, (String)object);
-            else if (object instanceof Long)
-                innerBuilder.add(key, (Long)object);
-            else if (object instanceof Integer)
-                innerBuilder.add(key, (Integer)object);
-            else if (object instanceof Float)
-                innerBuilder.add(key, (Float)object);
+            addProperty(innerBuilder, innerEntrySet.getKey(), innerEntrySet.getValue());
         }
         return innerBuilder.build();
+    }
+
+    private void addProperty(JsonObjectBuilder innerBuilder, String innerKey, Object innerValue) {
+        if (innerValue instanceof String)
+            innerBuilder.add(innerKey, (String) innerValue);
+        else if (innerValue instanceof Long)
+            innerBuilder.add(innerKey, (Long) innerValue);
+        else if (innerValue instanceof Integer)
+            innerBuilder.add(innerKey, (Integer) innerValue);
+        else if (innerValue instanceof Float)
+            innerBuilder.add(innerKey, (Float) innerValue);
+    }
+
+    private String getIndexName(String prefix, Date date) {
+        return prefix + "-" + indexDateFormat.format(date);
     }
 
 }

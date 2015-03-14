@@ -14,10 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.api;
+package org.apache.karaf.decanter.scheduler.simple;
 
-/**
- * Generic decanter collector (can be event driven or polling collector)/
- */
-public interface Collector {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.apache.karaf.decanter.api.Scheduler;
+import org.apache.karaf.decanter.scheduler.simple.SimpleScheduler;
+import org.junit.Test;
+
+public class SimpleSchedulerTest {
+
+    @Test
+    public void testSimpleScheduler() throws Exception {
+        Scheduler scheduler = new SimpleScheduler();
+        scheduler.start();
+        assertTrue(scheduler.isStarted());
+        assertEquals("Started", scheduler.state());
+
+        scheduler.stop();
+        assertFalse(scheduler.isStarted());
+        assertEquals("Stopped", scheduler.state());
+    }
+
 }

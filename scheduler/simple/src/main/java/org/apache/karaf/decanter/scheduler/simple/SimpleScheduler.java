@@ -16,78 +16,52 @@
  */
 package org.apache.karaf.decanter.scheduler.simple;
 
-import org.apache.karaf.decanter.api.Dispatcher;
-import org.apache.karaf.decanter.api.PollingCollector;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.karaf.decanter.api.Scheduler;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Very simple Decanter scheduler using a single thread.
  */
 public class SimpleScheduler implements Runnable, Scheduler {
-
     private final static Logger LOGGER = LoggerFactory.getLogger(SimpleScheduler.class);
 
-    private BundleContext bundleContext;
     private AtomicBoolean running = new AtomicBoolean(false);
     private long interval = 30000L;
-
-    public SimpleScheduler() {
-        this.start();
+    ServiceTracker<Runnable, Runnable> collectors;
+    
+    SimpleScheduler() {
+    }
+    
+    public SimpleScheduler(BundleContext bundleContext) {
+        this.collectors = new ServiceTracker<>(bundleContext, collectorFilter(bundleContext), null);
+        this.collectors.open();
     }
 
-    public SimpleScheduler(BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
-        this.start();
+    private Filter collectorFilter(BundleContext bundleContext) {
+        try {
+            return bundleContext.createFilter(String.format("(&(objectClass=%s)(decanter.collector.name=*))", Runnable.class.getName()));
+        } catch (InvalidSyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void run() {
         LOGGER.debug("Decanter SimpleScheduler thread started ...");
 
         while (running.get()) {
-            Map<Long, Map<String, Object>> collected = new HashMap<>();
-            try {
-                LOGGER.debug("Calling the collectors ...");
-                Collection<ServiceReference<PollingCollector>> references = bundleContext.getServiceReferences(PollingCollector.class, null);
-                if (references != null) {
-                    for (ServiceReference<PollingCollector> reference : references) {
-                        try {
-                            if (reference != null) {
-                                PollingCollector collector = bundleContext.getService(reference);
-                                Map<Long, Map<String, Object>> data = collector.collect();
-                                collected.putAll(data);
-                            }
-                        } catch (Exception e) {
-                            LOGGER.warn("Can't collect data", e);
-                        } finally {
-                            bundleContext.ungetService(reference);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.warn("Can't get polling collector services", e);
-            }
-            ServiceReference<Dispatcher> reference = null;
-            try {
-                LOGGER.debug("Calling the dispatcher ...");
-                reference = bundleContext.getServiceReference(Dispatcher.class);
-                if (reference != null) {
-                    Dispatcher dispatcher = bundleContext.getService(reference);
-                    dispatcher.dispatch(collected);
-                }
-            } catch (Exception e) {
-                LOGGER.warn("Can't dispatch using the controller", e);
-            } finally {
-                if (reference != null) {
-                    bundleContext.ungetService(reference);
+            LOGGER.debug("Calling the collectors ...");
+            for (Runnable collector : collectors.getServices(new Runnable[] {})) {
+                try {
+                    collector.run();
+                } catch (Exception e) {
+                    LOGGER.warn("Can't collect data", e);
                 }
             }
             try {
@@ -102,6 +76,9 @@ public class SimpleScheduler implements Runnable, Scheduler {
 
     public void stop() {
         running.set(false);
+        if (collectors != null) {
+            this.collectors.close();
+        }
     }
 
     public void start() {
@@ -121,14 +98,6 @@ public class SimpleScheduler implements Runnable, Scheduler {
         } else {
             return "Stopped";
         }
-    }
-
-    public BundleContext getBundleContext() {
-        return bundleContext;
-    }
-
-    public void setBundleContext(BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
     }
 
 }

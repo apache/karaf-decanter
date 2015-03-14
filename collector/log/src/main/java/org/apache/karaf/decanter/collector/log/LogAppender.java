@@ -19,24 +19,24 @@ package org.apache.karaf.decanter.collector.log;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.karaf.decanter.api.Collector;
-import org.apache.karaf.decanter.api.Dispatcher;
 import org.apache.log4j.MDC;
 import org.ops4j.pax.logging.spi.PaxAppender;
 import org.ops4j.pax.logging.spi.PaxLoggingEvent;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Decanter log collector, event driven implementing a PaxAppender
  */
-public class LogAppender implements PaxAppender, Collector {
+public class LogAppender implements PaxAppender {
     private static final String MDC_IN_LOG_APPENDER = "inLogAppender";
     private final static String[] ignoredCategories = {"org.apache.karaf.decanter"};
     private final static Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
-    private Dispatcher dispatcher;
+    private EventAdmin dispatcher;
     
-    public LogAppender(Dispatcher dispatcher) {
+    public LogAppender(EventAdmin dispatcher) {
         this.dispatcher = dispatcher;
     }
 
@@ -58,8 +58,8 @@ public class LogAppender implements PaxAppender, Collector {
     private void appendInternal(PaxLoggingEvent event) throws Exception {
         LOGGER.debug("Karaf Decanter Log Collector hooked ...");
 
-        Map<Long, Map<String, Object>> collected = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
+        data.put("timeStamp", event.getTimeStamp());
         data.put("loggerClass", event.getFQNOfLoggerClass());
         data.put("loggerName", event.getLoggerName());
         data.put("threadName", event.getThreadName());
@@ -67,11 +67,10 @@ public class LogAppender implements PaxAppender, Collector {
         data.put("level", event.getLevel().toString());
         data.put("renderedMessage", event.getRenderedMessage());
         data.put("MDC", event.getProperties());
-        collected.put(event.getTimeStamp(), data);
 
         if (!isIgnored(event.getLoggerName())) {
-            LOGGER.debug("Calling the Karaf Decanter Appender Controller ...");
-            this.dispatcher.dispatch(collected);
+            String topic = "decanter/log/" + event.getLoggerName().replace(".", "/");
+            this.dispatcher.postEvent(new Event(topic, data));
         }
     }
 

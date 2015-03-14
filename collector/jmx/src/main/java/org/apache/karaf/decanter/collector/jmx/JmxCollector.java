@@ -27,56 +27,66 @@ import javax.management.ObjectName;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
 
-import org.apache.karaf.decanter.api.PollingCollector;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Decanter JMX Pooling Collector
  */
-public class JmxCollector implements PollingCollector {
+public class JmxCollector implements Runnable {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(JmxCollector.class);
+    private EventAdmin eventAdmin;
 
-    public Map<Long, Map<String, Object>> collect() throws Exception {
+    public JmxCollector(EventAdmin eventAdmin) {
+        this.eventAdmin = eventAdmin;
+    }
+
+    @Override
+    public void run() {
         LOGGER.debug("Karaf Decanter JMX Collector starts harvesting ...");
-
-        Map<Long, Map<String, Object>> collected = new HashMap<>();
 
         // TODO be able to pool remote JMX
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         Set<ObjectName> names = server.queryNames(null, null);
         for (ObjectName name : names) {
-            MBeanAttributeInfo[] attributes = server.getMBeanInfo(name).getAttributes();
-            Map<String, Object> data = new HashMap<>();
-            data.put("mbean", name.toString());
-            for (MBeanAttributeInfo attribute : attributes) {
-                // TODO add SLA check on attributes and filtering
-                try {
-                    Object attributeObject = server.getAttribute(name, attribute.getName());
-                    if (attributeObject instanceof String) {
-                    	data.put(attribute.getName(), (String) attributeObject);
-                    } else if (attributeObject instanceof CompositeDataSupport) {
-                    	CompositeDataSupport cds = (CompositeDataSupport) attributeObject;
-                    	CompositeType compositeType = cds.getCompositeType();
-                    	Set<String> keySet = compositeType.keySet();
-                    	Map<String, Object> composite = new HashMap<String, Object>();
-                    	for (String key : keySet) {
-							Object cdsObject = cds.get(key);
-							composite.put(key, cdsObject);
-						}
-                    	data.put(attribute.getName(), composite);
-                    }
-                } catch (Exception e) {
-                    // LOGGER.warn("Can't put MBean {} attribute {} in collected data", name.toString(), attribute.getName(), e);
-                }
+            try {
+                Map<String, Object> data = harvestBean(server, name);
+                Event event = new Event("decanter/jmx", data);
+                eventAdmin.postEvent(event);
+            } catch (Exception e) {
+                LOGGER.warn("Error reading mbean " + name, e);
             }
-            collected.put(System.currentTimeMillis(), data);
         }
 
         LOGGER.debug("Karaf Decanter JMX Collector harvesting done");
+    }
 
-        return collected;
+    private Map<String, Object> harvestBean(MBeanServer server, ObjectName name) throws Exception {
+        MBeanAttributeInfo[] attributes = server.getMBeanInfo(name).getAttributes();
+        Map<String, Object> data = new HashMap<>();
+        data.put("mbean", name.toString());
+        for (MBeanAttributeInfo attribute : attributes) {
+            // TODO add SLA check on attributes and filtering
+            Object attributeObject = server.getAttribute(name, attribute.getName());
+            if (attributeObject instanceof String) {
+                data.put(attribute.getName(), (String)attributeObject);
+            } else if (attributeObject instanceof CompositeDataSupport) {
+                CompositeDataSupport cds = (CompositeDataSupport)attributeObject;
+                CompositeType compositeType = cds.getCompositeType();
+                Set<String> keySet = compositeType.keySet();
+                Map<String, Object> composite = new HashMap<String, Object>();
+                for (String key : keySet) {
+                    Object cdsObject = cds.get(key);
+                    composite.put(key, cdsObject);
+                }
+                data.put(attribute.getName(), composite);
+            }
+
+        }
+        return data;
     }
 
 }

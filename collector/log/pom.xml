@@ -35,12 +35,6 @@
 
     <dependencies>
 
-        <!-- Decanter API -->
-        <dependency>
-            <groupId>org.apache.karaf.decanter</groupId>
-            <artifactId>org.apache.karaf.decanter.api</artifactId>
-        </dependency>
-
         <!-- Pax Logging -->
         <dependency>
             <groupId>org.ops4j.pax.logging</groupId>

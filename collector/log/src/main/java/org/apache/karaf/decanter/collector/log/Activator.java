@@ -19,36 +19,34 @@ package org.apache.karaf.decanter.collector.log;
 import java.util.Dictionary;
 import java.util.Properties;
 
-import org.apache.karaf.decanter.api.Collector;
-import org.apache.karaf.decanter.api.Dispatcher;
 import org.ops4j.pax.logging.spi.PaxAppender;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
 @SuppressWarnings("rawtypes")
 public class Activator implements BundleActivator {
-    private ServiceTracker<Dispatcher, ServiceRegistration> tracker;
+    private ServiceTracker<EventAdmin, ServiceRegistration> tracker;
 
     public void start(final BundleContext bundleContext) {
-        tracker = new ServiceTracker<Dispatcher, ServiceRegistration>(bundleContext, Dispatcher.class, null) {
+        tracker = new ServiceTracker<EventAdmin, ServiceRegistration>(bundleContext, EventAdmin.class, null) {
 
             @SuppressWarnings("unchecked")
             @Override
-            public ServiceRegistration<?> addingService(ServiceReference<Dispatcher> reference) {
+            public ServiceRegistration<?> addingService(ServiceReference<EventAdmin> reference) {
                 Properties properties = new Properties();
                 properties.put("org.ops4j.pax.logging.appender.name", "DecanterLogCollectorAppender");
                 properties.put("name", "log");
-                String[] ifAr = new String[] { PaxAppender.class.getName(), Collector.class.getName() };
-                Dispatcher dispatcher = bundleContext.getService(reference);
-                LogAppender appender = new LogAppender(dispatcher);
-                return bundleContext.registerService(ifAr , appender, (Dictionary) properties);
+                EventAdmin eventAdmin = bundleContext.getService(reference);
+                LogAppender appender = new LogAppender(eventAdmin);
+                return bundleContext.registerService(PaxAppender.class , appender, (Dictionary) properties);
             }
 
             @Override
-            public void removedService(ServiceReference<Dispatcher> reference, ServiceRegistration reg) {
+            public void removedService(ServiceReference<EventAdmin> reference, ServiceRegistration reg) {
                 reg.unregister();
                 super.removedService(reference, reg);
             }
