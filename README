@@ -52,7 +52,7 @@ Apache Karaf Decanter is available as a Karaf features.
 
 You have to register the Decater features repository:
 
-karaf@root()> feature:repo-add mvn:org.apache.karaf.decanter/decanter/3.0.0-SNAPSHOT/xml/features
+karaf@root()> feature:repo-add mvn:org.apache.karaf.decanter/apache-karaf-decanter/3.0.0-SNAPSHOT/xml/features
 
 It's up to you to choose the features to install, depending of the systems that you want:
 
