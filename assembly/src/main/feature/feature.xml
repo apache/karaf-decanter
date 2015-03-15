@@ -48,6 +48,7 @@
         <bundle>mvn:org.glassfish/javax.json/${glassfish-json.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="elasticsearch" version="${elasticsearch.version}" description="Embedded Elasticsearch node">
