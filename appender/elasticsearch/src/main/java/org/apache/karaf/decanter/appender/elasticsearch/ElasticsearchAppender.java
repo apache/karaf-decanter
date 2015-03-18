@@ -18,9 +18,10 @@ package org.apache.karaf.decanter.appender.elasticsearch;
 
 import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
@@ -88,7 +89,6 @@ public class ElasticsearchAppender implements EventHandler {
 
     @SuppressWarnings("unchecked")
     private void send(Client client, Event event) {
-        Map<String, Object> props = new HashMap<>();
         Long ts = (Long)event.getProperty("timestamp");
         Date date = ts != null ? new Date((Long)ts) : new Date();
         
@@ -96,15 +96,23 @@ public class ElasticsearchAppender implements EventHandler {
         jsonObjectBuilder.add("@timestamp", tsFormat.format(date));
         for (String key : event.getPropertyNames()) {
             Object value = event.getProperty(key);
-            if (value instanceof String) {
-                jsonObjectBuilder.add(key, (String) value);
-            } else if (value instanceof Map) {
+            if (value instanceof Map) {
                 jsonObjectBuilder.add(key, build((Map<String, Object>) value));
+            } else {
+                addProperty(jsonObjectBuilder, key, value);
             }
         }
         JsonObject jsonObject = jsonObjectBuilder.build();
         String indexName = getIndexName("karaf", date);
-        client.prepareIndex(indexName, "karaf_event").setSource(jsonObject.toString()).execute().actionGet();
+        String jsonSt = jsonObject.toString();
+        LOGGER.debug("Sending event to elastic search with content: {}", jsonSt);
+ 
+        client.prepareIndex(indexName, getType(event)).setSource(jsonSt).execute().actionGet();
+    }
+
+    private String getType(Event event) {
+        String type = (String)event.getProperty("type");
+        return type != null ? type : "karaf_event";
     }
 
     private JsonObject build(Map<String, Object> value) {
@@ -115,15 +123,24 @@ public class ElasticsearchAppender implements EventHandler {
         return innerBuilder.build();
     }
 
-    private void addProperty(JsonObjectBuilder innerBuilder, String innerKey, Object innerValue) {
-        if (innerValue instanceof String)
-            innerBuilder.add(innerKey, (String) innerValue);
-        else if (innerValue instanceof Long)
-            innerBuilder.add(innerKey, (Long) innerValue);
-        else if (innerValue instanceof Integer)
-            innerBuilder.add(innerKey, (Integer) innerValue);
-        else if (innerValue instanceof Float)
-            innerBuilder.add(innerKey, (Float) innerValue);
+    private void addProperty(JsonObjectBuilder builder, String key, Object value) {
+        if (value instanceof BigDecimal)
+            builder.add(key, (BigDecimal) value);
+        else if (value instanceof BigInteger)
+            builder.add(key, (BigInteger) value);
+        else if (value instanceof String)
+            builder.add(key, (String) value);
+        else if (value instanceof Long)
+            builder.add(key, (Long) value);
+        else if (value instanceof Integer)
+            builder.add(key, (Integer) value);
+        else if (value instanceof Float)
+            builder.add(key, (Float) value);
+        else if (value instanceof Double)
+            builder.add(key, (Double) value);
+        else if (value instanceof Boolean)
+            builder.add(key, (Boolean) value);
+
     }
 
     private String getIndexName(String prefix, Date date) {

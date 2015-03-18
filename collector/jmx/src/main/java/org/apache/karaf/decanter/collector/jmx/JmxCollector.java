@@ -54,7 +54,7 @@ public class JmxCollector implements Runnable {
         for (ObjectName name : names) {
             try {
                 Map<String, Object> data = harvestBean(server, name);
-                Event event = new Event("decanter/jmx", data);
+                Event event = new Event("decanter/jmx/" + getTopic(name), data);
                 eventAdmin.postEvent(event);
             } catch (Exception e) {
                 LOGGER.warn("Error reading mbean " + name, e);
@@ -64,25 +64,41 @@ public class JmxCollector implements Runnable {
         LOGGER.debug("Karaf Decanter JMX Collector harvesting done");
     }
 
-    private Map<String, Object> harvestBean(MBeanServer server, ObjectName name) throws Exception {
+    private String getTopic(ObjectName name) {
+        return name.getDomain().replace(".", "/");
+    }
+
+    Map<String, Object> harvestBean(MBeanServer server, ObjectName name) throws Exception {
         MBeanAttributeInfo[] attributes = server.getMBeanInfo(name).getAttributes();
         Map<String, Object> data = new HashMap<>();
-        data.put("mbean", name.toString());
+        data.put("type", "jmx");
         for (MBeanAttributeInfo attribute : attributes) {
-            // TODO add SLA check on attributes and filtering
-            Object attributeObject = server.getAttribute(name, attribute.getName());
-            if (attributeObject instanceof String) {
-                data.put(attribute.getName(), (String)attributeObject);
-            } else if (attributeObject instanceof CompositeDataSupport) {
-                CompositeDataSupport cds = (CompositeDataSupport)attributeObject;
-                CompositeType compositeType = cds.getCompositeType();
-                Set<String> keySet = compositeType.keySet();
-                Map<String, Object> composite = new HashMap<String, Object>();
-                for (String key : keySet) {
-                    Object cdsObject = cds.get(key);
-                    composite.put(key, cdsObject);
+            try {
+                // TODO add SLA check on attributes and filtering
+                Object attributeObject = server.getAttribute(name, attribute.getName());
+                if (attributeObject instanceof String) {
+                    data.put(attribute.getName(), (String)attributeObject);
+                } else if (attributeObject instanceof ObjectName) {
+                    data.put(attribute.getName(), ((ObjectName)attributeObject).toString());
+                } else if (attributeObject instanceof CompositeDataSupport) {
+                    CompositeDataSupport cds = (CompositeDataSupport)attributeObject;
+                    CompositeType compositeType = cds.getCompositeType();
+                    Set<String> keySet = compositeType.keySet();
+                    Map<String, Object> composite = new HashMap<String, Object>();
+                    for (String key : keySet) {
+                        Object cdsObject = cds.get(key);
+                        composite.put(key, cdsObject);
+                    }
+                    data.put(attribute.getName(), composite);
+                } else if (attributeObject instanceof Long 
+                    || attributeObject instanceof Integer 
+                    || attributeObject instanceof Boolean
+                    || attributeObject instanceof Float
+                    || attributeObject instanceof Double){
+                    data.put(attribute.getName(), attributeObject);
                 }
-                data.put(attribute.getName(), composite);
+            } catch (Exception e) {
+                LOGGER.debug("Could not read attribute " + name.toString() + " " + attribute.getName());
             }
 
         }
