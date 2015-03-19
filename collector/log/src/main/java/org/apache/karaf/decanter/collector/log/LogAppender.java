@@ -69,10 +69,23 @@ public class LogAppender implements PaxAppender {
         data.put("renderedMessage", event.getRenderedMessage());
         data.put("MDC", event.getProperties());
 
+        String[] throwableAr = event.getThrowableStrRep(); 
+        if (throwableAr != null) {
+            data.put("throwable", join(throwableAr));
+        }
+
         if (!isIgnored(event.getLoggerName())) {
             String topic = "decanter/log/" + event.getLoggerName().replace(".", "/");
             this.dispatcher.postEvent(new Event(topic, data));
         }
+    }
+
+    private Object join(String[] throwableAr) {
+        StringBuilder builder = new StringBuilder();
+        for (String line : throwableAr) {
+            builder.append(line).append("\n");
+        }
+        return builder.toString();
     }
 
     private boolean isIgnored(String loggerName) {
