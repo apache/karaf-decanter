@@ -18,10 +18,9 @@
 Welcome to Apache Karaf Decanter
 ================================
 Apache Karaf Decanter is a complete monitoring platform for Apache Karaf.
+It is very extensible, flexible, easy to install and use.
 
-Apache Karaf Decanter is very extensible, flexible, easy to install and use.
-
-Apache Karaf Decanter is composed by:
+Apache Karaf Decanter is composed into:
     * Collectors and SLA Policies
       The collectors are OSGi services responsible of harvesting monitoring data.
       Two kinds of collectors are available:
@@ -48,43 +47,39 @@ Apache Karaf Decanter is composed by:
 
 Getting Started
 ===============
-Apache Karaf Decanter is available as a Karaf features.
+Apache Karaf Decanter is available as a Karaf features. The commands below start 
+the jmx collector, log collector and an appender to a local elasticsearch instance
+on the default port. Prerquisite is a running elasticsearch instance.
 
-You have to register the Decater features repository:
+feature:repo-add mvn:org.apache.karaf.decanter/apache-karaf-decanter/3.0.0-SNAPSHOT/xml/features
+feature:install decanter-simple-scheduler decanter-collector-jmx decanter-collector-log decanter-appender-elasticsearch 
 
-karaf@root()> feature:repo-add mvn:org.apache.karaf.decanter/apache-karaf-decanter/3.0.0-SNAPSHOT/xml/features
+Features
+========
 
-It's up to you to choose the features to install, depending of the systems that you want:
+Alternatively you can install exactly the features you need.
 
 * decanter-simple-scheduler
-This feature installs a very simple Decanter Scheduler using a Thread.
-
-karaf@root()> feature:install decanter-simple-scheduler
+  Very simple Decanter Scheduler that polls collectors in a fixed time interval.
 
 * decanter-collector-log
-This feature installs a Decanter Collector listening for all log messages happening in Karaf.
-
-karaf@root()> feature:install decanter-collector-log
+  Collector listening for all log messages happening in Karaf.
 
 * decanter-collector-jmx
-This feature installs a Decanter Collector harvesting the JMX MBeans metrics.
-
-karaf@root()> feature:install decanter-collector-jmx
+  Collector harvesting the JMX MBeans metrics.
 
 * decanter-appender-log
-This feature installs a Decanter Appender that sends the collected data as log messages.
-
-karaf@root()> feature:install decanter-appender-log
+  Appender that sends the collected data as log messages.
 
 * decanter-appender-elasticsearch
-This feature installs a Decanter Appender that sends the collected data to a Elasticsearch
-database.
+  Appender that sends the collected data to a Elasticsearch database.
 
-karaf@root()> feature:install decanter-appender-elasticsearch
+* elasticsearch
+  Elasticsearch running inside Apache Karaf
 
-* Optional features
-For convenience, Decanter also provides elasticsearch and kibana features installing elasticsearch
-and kibana directly in the Karaf instance.
+* kibana
+  Kibana running inside Apache Karaf.
+
 
 
 
