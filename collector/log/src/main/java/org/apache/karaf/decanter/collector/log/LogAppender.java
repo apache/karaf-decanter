@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.log4j.MDC;
 import org.ops4j.pax.logging.spi.PaxAppender;
+import org.ops4j.pax.logging.spi.PaxLocationInfo;
 import org.ops4j.pax.logging.spi.PaxLoggingEvent;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -68,7 +69,7 @@ public class LogAppender implements PaxAppender {
         data.put("level", event.getLevel().toString());
         data.put("renderedMessage", event.getRenderedMessage());
         data.put("MDC", event.getProperties());
-
+        putLocation(data, event.getLocationInformation());
         String[] throwableAr = event.getThrowableStrRep(); 
         if (throwableAr != null) {
             data.put("throwable", join(throwableAr));
@@ -78,6 +79,13 @@ public class LogAppender implements PaxAppender {
             String topic = "decanter/log/" + event.getLoggerName().replace(".", "/");
             this.dispatcher.postEvent(new Event(topic, data));
         }
+    }
+
+    private void putLocation(Map<String, Object> data, PaxLocationInfo loc) {
+        data.put("loc.class", loc.getClassName());
+        data.put("loc.file", loc.getFileName());
+        data.put("loc.line", loc.getLineNumber());
+        data.put("loc.method", loc.getMethodName());
     }
 
     private Object join(String[] throwableAr) {
