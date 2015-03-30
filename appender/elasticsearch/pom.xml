@@ -48,8 +48,8 @@
 
 		<!-- JSON builder -->
 		<dependency>
-			<groupId>javax.json</groupId>
-			<artifactId>javax.json-api</artifactId>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-json_1.0_spec</artifactId>
 		</dependency>
 		<!-- SLF4J -->
 		<dependency>
