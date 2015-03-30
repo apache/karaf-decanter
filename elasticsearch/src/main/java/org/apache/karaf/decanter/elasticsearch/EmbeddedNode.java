@@ -54,7 +54,7 @@ public class EmbeddedNode {
                 .put("discovery.zen.ping.unicast.enabled", true)
                 .put("discovery.zen.unicast.hosts", "127.0.0.1")
                 .put("network.host", "127.0.0.1")
-                .put("gateway.type", "none")
+                .put("gateway.type", "local")
                 .put("cluster.routing.schedule", "50ms")
                 .put("path.plugins", pluginsFile.getAbsolutePath())
                 .build();
@@ -65,7 +65,7 @@ public class EmbeddedNode {
         builder.classLoader(Settings.class.getClassLoader());
         node = new InternalNode(builder.build(), false);
 
-        LOGGER.info("Elasticsearch node started");
+        LOGGER.info("Elasticsearch node created");
     }
 
     public void start() throws Exception {

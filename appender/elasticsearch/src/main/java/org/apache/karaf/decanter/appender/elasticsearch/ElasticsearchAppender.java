@@ -25,15 +25,23 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.LockSupport;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
+import org.elasticsearch.action.bulk.BulkProcessor;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
@@ -45,9 +53,12 @@ import org.slf4j.LoggerFactory;
 public class ElasticsearchAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
-
+    
     private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     private final SimpleDateFormat indexDateFormat = new SimpleDateFormat("yyyy.MM.dd");
+    private final AtomicLong pendingBulkItemCount = new AtomicLong();
+    private final int concurrentRequests = 1;
+    private BulkProcessor bulkProcessor;
     Client client;
 
     private String host;
@@ -67,6 +78,29 @@ public class ElasticsearchAppender implements EventHandler {
             Settings settings = settingsBuilder().classLoader(Settings.class.getClassLoader()).build();
             InetSocketTransportAddress address = new InetSocketTransportAddress(host, port);
             client = new TransportClient(settings).addTransportAddress(address);
+            bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
+                
+                @Override
+                public void beforeBulk(long executionId, BulkRequest request) {
+                    pendingBulkItemCount.addAndGet(request.numberOfActions());
+                }
+                
+                @Override
+                public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
+                    LOGGER.warn("Can't append into Elasticsearch", failure);
+                    pendingBulkItemCount.addAndGet(-request.numberOfActions());
+                }
+                
+                @Override
+                public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
+                    pendingBulkItemCount.addAndGet(-response.getItems().length);
+                }
+            })
+            .setBulkActions(1000)
+            .setConcurrentRequests(concurrentRequests)
+            .setBulkSize(ByteSizeValue.parseBytesSizeValue("5mb"))
+            .setFlushInterval(TimeValue.timeValueSeconds(5))
+            .build();
             LOGGER.info("Starting Elasticsearch appender writing to {}", address.address());
         } catch (Exception e) {
             LOGGER.error("Error connecting to elastic search", e);
@@ -75,22 +109,34 @@ public class ElasticsearchAppender implements EventHandler {
 
     public void close() {
         LOGGER.info("Stopping Elasticsearch appender");
-        client.close();
+        
+        if(bulkProcessor != null) {
+            bulkProcessor.close();
+        }
+
+        //if ConcurrentRequests > 0 we ll wait here because close() triggers a flush which is async
+        while(concurrentRequests > 0 && pendingBulkItemCount.get() > 0) {
+            LockSupport.parkNanos(1000*50);
+        }
+        
+        if(client != null) {
+            client.close();
+        }
     }
 
     @Override
     public void handleEvent(Event event) {
         try {
-            send(client, event);
+            send(event);
         } catch (Exception e) {
             LOGGER.warn("Can't append into Elasticsearch", e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void send(Client client, Event event) {
+    private void send(Event event) {
         Long ts = (Long)event.getProperty("timestamp");
-        Date date = ts != null ? new Date((Long)ts) : new Date();
+        Date date = ts != null ? new Date(ts) : new Date();
         
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
         jsonObjectBuilder.add("@timestamp", tsFormat.format(date));
@@ -105,9 +151,12 @@ public class ElasticsearchAppender implements EventHandler {
         JsonObject jsonObject = jsonObjectBuilder.build();
         String indexName = getIndexName("karaf", date);
         String jsonSt = jsonObject.toString();
-        LOGGER.debug("Sending event to elastic search with content: {}", jsonSt);
- 
-        client.prepareIndex(indexName, getType(event)).setSource(jsonSt).execute().actionGet();
+        
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Sending event to elastic search with content: {}", jsonSt);
+        }
+        
+        bulkProcessor.add(new IndexRequest(indexName, getType(event)).source(jsonSt));
     }
 
     private String getType(Event event) {
