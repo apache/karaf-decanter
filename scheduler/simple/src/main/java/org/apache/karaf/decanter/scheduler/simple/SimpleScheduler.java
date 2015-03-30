@@ -52,6 +52,7 @@ public class SimpleScheduler implements Runnable, Scheduler {
         }
     }
 
+    @Override
     public void run() {
         LOGGER.debug("Decanter SimpleScheduler thread started ...");
 
@@ -67,6 +68,7 @@ public class SimpleScheduler implements Runnable, Scheduler {
             try {
                 Thread.sleep(interval);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 running.set(false);
             }
         }
@@ -74,6 +76,7 @@ public class SimpleScheduler implements Runnable, Scheduler {
         LOGGER.debug("Decanter SimpleScheduler thread stopped ...");
     }
 
+    @Override
     public void stop() {
         running.set(false);
         if (collectors != null) {
@@ -81,6 +84,7 @@ public class SimpleScheduler implements Runnable, Scheduler {
         }
     }
 
+    @Override
     public void start() {
         if (running.compareAndSet(false, true)) {
             Thread thread = new Thread(this, "decanter-scheduler-simple");
@@ -88,10 +92,12 @@ public class SimpleScheduler implements Runnable, Scheduler {
         }
     }
 
+    @Override
     public boolean isStarted() throws Exception {
         return running.get();
     }
 
+    @Override
     public String state() {
         if (running.get()) {
             return "Started";
