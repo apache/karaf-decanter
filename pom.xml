@@ -41,7 +41,7 @@
         <kibana.version>3.1.1</kibana.version>
         <slf4j.version>1.7.7</slf4j.version>
         <json-api.version>1.0-alpha-1</json-api.version>
-        <johnzon-json.version>0.7-incubating</johnzon-json.version>
+        <johnzon-json.version>0.6-incubating</johnzon-json.version>
     </properties>
 
     <modules>
