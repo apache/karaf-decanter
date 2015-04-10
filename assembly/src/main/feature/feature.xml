@@ -45,7 +45,7 @@
 
     <feature name="decanter-appender-elasticsearch" version="${project.version}" description="Karaf Decanter Elasticsearch Appender">
         <feature version="${project.version}">decanter-common</feature>
-        <bundle>mvn:org.apache.johnzon/javax.json/${johnzon-json.version}</bundle>
+        <bundle>mvn:org.glassfish/javax.json/${glassfish-json.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch/${project.version}/cfg</configfile>
