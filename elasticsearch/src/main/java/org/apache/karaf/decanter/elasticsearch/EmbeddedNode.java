@@ -57,6 +57,8 @@ public class EmbeddedNode {
                 .put("gateway.type", "local")
                 .put("cluster.routing.schedule", "50ms")
                 .put("path.plugins", pluginsFile.getAbsolutePath())
+                .put("http.cors.enabled", true)
+                .put("http.cors.allow-origin", "/.*/")
                 .build();
 
         LOGGER.debug("Creating the elasticsearch node");
