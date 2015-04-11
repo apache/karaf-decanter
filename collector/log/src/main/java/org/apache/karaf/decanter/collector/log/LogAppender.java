@@ -61,6 +61,7 @@ public class LogAppender implements PaxAppender {
 
         Map<String, Object> data = new HashMap<>();
         data.put("type", "log");
+        data.put("karafName", System.getProperty("karaf.name"));
         data.put("timeStamp", event.getTimeStamp());
         data.put("loggerClass", event.getFQNOfLoggerClass());
         data.put("loggerName", event.getLoggerName());
