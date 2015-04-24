@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.collector.jmx;
+package org.apache.karaf.decanter.collector.camel;
 
 import java.lang.management.ManagementFactory;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
@@ -33,35 +35,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Decanter JMX Pooling Collector
+ * Decanter Camel Pooling Collector
  */
-public class JmxCollector implements Runnable {
+public class CamelCollector implements Runnable {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(JmxCollector.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(CamelCollector.class);
     private EventAdmin eventAdmin;
 
-    public JmxCollector(EventAdmin eventAdmin) {
+    public CamelCollector(EventAdmin eventAdmin) {
         this.eventAdmin = eventAdmin;
     }
 
     @Override
     public void run() {
-        LOGGER.debug("Karaf Decanter JMX Collector starts harvesting ...");
+        LOGGER.debug("Karaf Decanter Camel Collector starts harvesting ...");
 
-        // TODO be able to pool remote JMX
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        Set<ObjectName> names = server.queryNames(null, null);
+        //ObjectName: org.apache.camel:context=*,type=routes,name="*"
+        Set<ObjectName> names = Collections.emptySet();
+		try {
+			names = server.queryNames(new ObjectName("org.apache.camel:context=*,type=routes,name=\"*\""), null);
+		} catch (MalformedObjectNameException e1) {
+			LOGGER.warn("Error retrieving information from mbean-server for camel data");
+		}
         for (ObjectName name : names) {
             try {
                 Map<String, Object> data = harvestBean(server, name);
-                Event event = new Event("decanter/jmx/" + getTopic(name), data);
+                Event event = new Event("decanter/camel/" + getTopic(name), data);
                 eventAdmin.postEvent(event);
             } catch (Exception e) {
                 LOGGER.warn("Error reading mbean " + name, e);
             }
         }
 
-        LOGGER.debug("Karaf Decanter JMX Collector harvesting done");
+        LOGGER.debug("Karaf Decanter Camel Collector harvesting done");
     }
 
     private String getTopic(ObjectName name) {
@@ -71,7 +78,7 @@ public class JmxCollector implements Runnable {
     Map<String, Object> harvestBean(MBeanServer server, ObjectName name) throws Exception {
         MBeanAttributeInfo[] attributes = server.getMBeanInfo(name).getAttributes();
         Map<String, Object> data = new HashMap<>();
-        data.put("type", "jmx");
+        data.put("type", "camel");
         for (MBeanAttributeInfo attribute : attributes) {
             try {
                 // TODO add SLA check on attributes and filtering

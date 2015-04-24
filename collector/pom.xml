@@ -37,6 +37,7 @@
         <module>jmx</module>
         <module>log</module>
         <!-- TODO camel tracer <module>camel</module> -->
+        <module>camel</module>
     </modules>
 
 </project>

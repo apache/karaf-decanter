@@ -38,6 +38,11 @@
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}</bundle>
     </feature>
 
+    <feature name="decanter-collector-camel" version="${project.version}" description="Karaf Decanter Camel Collector">
+        <feature version="${project.version}">decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.camel/${project.version}</bundle>
+    </feature>
+
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature version="${project.version}">decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}</bundle>
