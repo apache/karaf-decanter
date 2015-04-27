@@ -17,7 +17,7 @@ public class TestMapAttribute {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         JmxCollector jmxCollector = new JmxCollector(null);
         Map<String, Object> data = jmxCollector.harvestBean(server, new ObjectName("java.lang:type=OperatingSystem"));
-        Assert.assertTrue(data.size() >= 17);
+        Assert.assertTrue(data.size() >= 15);
         Object freeMem = data.get("FreePhysicalMemorySize");
         Assert.assertTrue(freeMem != null);
         Assert.assertTrue(freeMem instanceof Long);
