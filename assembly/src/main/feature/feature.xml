@@ -56,6 +56,12 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-appender-jdbc" version="${project.version}" description="Karaf Decanter JDBC Appender">
+        <feature version="${project.version}">decanter-common</feature>
+        <bundle>mvn:org.apache.commons/commons-dbcp2/${commons-jdbc.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jdbc/${project.version}</bundle>
+    </feature>
+
     <feature name="elasticsearch" version="${elasticsearch.version}" description="Embedded Elasticsearch node">
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch/${project.version}</bundle>
