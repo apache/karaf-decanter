@@ -44,5 +44,8 @@ public class Activator implements BundleActivator{
     }
 
     @Override
-    public void stop(BundleContext bundleContext) throws Exception {if(tracker!=null)tracker.close();}
+    public void stop(BundleContext bundleContext) throws Exception {
+        if(tracker!=null)tracker.close();
+    }
+
 }

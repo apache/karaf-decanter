@@ -31,13 +31,14 @@ import org.osgi.service.cm.ManagedService;
 public class Activator implements BundleActivator {
 
     private ElasticsearchAppender appender;
+    private ServiceRegistration registration;
     private static final String CONFIG_PID = "org.apache.karaf.decanter.appender.elasticsearch";
 
     public void start(final BundleContext bundleContext) {
         // TODO embed mode of Elasticsearch
         Dictionary<String, String> properties = new Hashtable<>();
         properties.put(Constants.SERVICE_PID, CONFIG_PID);
-        bundleContext.registerService(ManagedService.class.getName(), new ConfigUpdater(bundleContext),
+        registration = bundleContext.registerService(ManagedService.class.getName(), new ConfigUpdater(bundleContext),
                                       properties);
     }
 
@@ -45,6 +46,9 @@ public class Activator implements BundleActivator {
         appender.close();
         if (appender != null) {
             appender.close();
+        }
+        if (registration != null) {
+            registration.unregister();
         }
     }
 

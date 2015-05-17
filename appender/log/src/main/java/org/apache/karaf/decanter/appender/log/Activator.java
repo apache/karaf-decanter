@@ -28,14 +28,19 @@ import org.osgi.service.event.EventHandler;
 
 public class Activator implements BundleActivator {
 
+    private ServiceRegistration registration;
+
     public void start(BundleContext bundleContext) {
         LogAppender appender = new LogAppender();
         Dictionary<String, String> properties = new Hashtable<>();
         properties.put(EventConstants.EVENT_TOPIC, "decanter/events/*");
-        bundleContext.registerService(EventHandler.class, appender, properties);
+        registration = bundleContext.registerService(EventHandler.class, appender, properties);
     }
 
     public void stop(BundleContext bundleContext) {
+        if (registration != null) {
+            registration.unregister();
+        }
     }
 
 }
