@@ -54,7 +54,7 @@ public class ElasticsearchAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
     
-    private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSS'Z'");
     private final SimpleDateFormat indexDateFormat = new SimpleDateFormat("yyyy.MM.dd");
     private final AtomicLong pendingBulkItemCount = new AtomicLong();
     private final int concurrentRequests = 1;
