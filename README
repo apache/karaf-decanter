@@ -66,13 +66,19 @@ Alternatively you can install exactly the features you need.
   Collector listening for all log messages happening in Karaf.
 
 * decanter-collector-jmx
-  Collector harvesting the JMX MBeans metrics.
+  Collector harvesting the JMX MBeans metrics (local or remote).
+
+* decanter-collector-camel
+  Collector based on the JMX one, but specific to Camel routes metric collection.
 
 * decanter-appender-log
   Appender that sends the collected data as log messages.
 
 * decanter-appender-elasticsearch
   Appender that sends the collected data to a Elasticsearch database.
+
+* decanter-appender-jdbc
+  Appender that sends the collected data to a JDBC database.
 
 * elasticsearch
   Elasticsearch running inside Apache Karaf

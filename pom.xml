@@ -49,12 +49,9 @@
         <module>api</module>
         <module>scheduler</module>
         <module>collector</module>
-        <module>dispatcher</module>
         <module>appender</module>
         <module>elasticsearch</module>
         <module>kibana</module>
-        <!-- TODO complete command -->
-        <!-- TODO add angularjs or bootstrap webconsole/kibana (embedded) -->
         <module>assembly</module>
     </modules>
 
