@@ -20,7 +20,6 @@ import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilde
 
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.collect.MapBuilder;
-import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.junit.Assert;
@@ -28,7 +27,6 @@ import org.junit.Test;
 import org.osgi.service.event.Event;
 
 import static org.elasticsearch.node.NodeBuilder.*;
-
 
 public class TestElasticsearchAppender {
 
@@ -40,14 +38,9 @@ public class TestElasticsearchAppender {
                .put("http.enabled", "true")
                .put("node.data", true)
                .put("path.data", "target/data")
-               .put("discovery.type", "zen")
-               .put("discovery.zen.multicast.enabled", false)
-               .put("discovery.zen.ping.unicast.enabled", true)
-               .put("discovery.zen.unicast.hosts", "127.0.0.1")
                .put("network.host", "127.0.0.1")
                .put("index.store.type", "memory")
                .put("index.store.fs.memory.enabled", "true")
-               .put("gateway.type", "none")
                .put("path.plugins", "target/plugins")
                .build();
        

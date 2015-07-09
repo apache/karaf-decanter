@@ -51,6 +51,7 @@
 			<groupId>javax.json</groupId>
 			<artifactId>javax.json-api</artifactId>
 		</dependency>
+
 		<!-- SLF4J -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -69,11 +70,11 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
          <dependency>
             <groupId>org.apache.johnzon</groupId>
             <artifactId>johnzon-mapper</artifactId>
-            <version>0.7-incubating</version>
+            <version>0.8-incubating</version>
             <scope>test</scope>
         </dependency>
 	</dependencies>
