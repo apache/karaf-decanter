@@ -35,8 +35,8 @@
     <name>Apache Karaf :: Decanter</name>
 
     <properties>
-        <elasticsearch.version>1.4.4</elasticsearch.version>
-        <elasticsearch.bundle.version>1.4.4_1</elasticsearch.bundle.version>
+        <elasticsearch.version>1.6.0</elasticsearch.version>
+        <elasticsearch.bundle.version>1.6.0_1</elasticsearch.bundle.version>
         <karaf.version>3.0.2</karaf.version>
         <kibana.version>3.1.1</kibana.version>
         <slf4j.version>1.7.7</slf4j.version>

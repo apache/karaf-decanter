@@ -34,7 +34,7 @@ public class EmbeddedNode {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(EmbeddedNode.class);
 
-    private final static String NODE_NAME = "KARAF";
+    private final static String NODE_NAME = "decanter";
     private static Node node;
 
     public EmbeddedNode() throws Exception {
@@ -49,12 +49,7 @@ public class EmbeddedNode {
                 .put("node.data", true)
                 .put("path.data", "data")
                 .put("name", NODE_NAME)
-                .put("discovery.type", "zen")
-                .put("discovery.zen.multicast.enabled", false)
-                .put("discovery.zen.ping.unicast.enabled", true)
-                .put("discovery.zen.unicast.hosts", "127.0.0.1")
                 .put("network.host", "127.0.0.1")
-                .put("gateway.type", "local")
                 .put("cluster.routing.schedule", "50ms")
                 .put("path.plugins", pluginsFile.getAbsolutePath())
                 .put("http.cors.enabled", true)
