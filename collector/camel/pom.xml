@@ -16,7 +16,7 @@
 	<parent>
 		<groupId>org.apache.karaf.decanter</groupId>
 		<artifactId>org.apache.karaf.decanter.collector</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.apache.karaf.decanter.collector</groupId>
 	<artifactId>org.apache.karaf.decanter.collector.camel</artifactId>
