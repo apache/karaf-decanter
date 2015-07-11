@@ -26,6 +26,7 @@
     <feature name="decanter-simple-scheduler" version="${project.version}" description="Karaf Decanter Simple Scheduler">
         <feature version="${project.version}">decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.scheduler/org.apache.karaf.decanter.scheduler.simple/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.scheduler.simple.cfg">mvn:org.apache.karaf.decanter.scheduler/org.apache.karaf.decanter.scheduler.simple/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="decanter-collector-log" version="${project.version}" description="Karaf Decanter Log Messages Collector">

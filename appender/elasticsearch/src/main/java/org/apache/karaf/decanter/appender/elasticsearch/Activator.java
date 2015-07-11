@@ -35,7 +35,6 @@ public class Activator implements BundleActivator {
     private static final String CONFIG_PID = "org.apache.karaf.decanter.appender.elasticsearch";
 
     public void start(final BundleContext bundleContext) {
-        // TODO embed mode of Elasticsearch
         Dictionary<String, String> properties = new Hashtable<>();
         properties.put(Constants.SERVICE_PID, CONFIG_PID);
         registration = bundleContext.registerService(ManagedService.class.getName(), new ConfigUpdater(bundleContext),
@@ -43,7 +42,6 @@ public class Activator implements BundleActivator {
     }
 
     public void stop(BundleContext bundleContext) {
-        appender.close();
         if (appender != null) {
             appender.close();
         }

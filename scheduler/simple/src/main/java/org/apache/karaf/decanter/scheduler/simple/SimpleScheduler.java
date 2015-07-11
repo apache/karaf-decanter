@@ -33,13 +33,14 @@ public class SimpleScheduler implements Runnable, Scheduler {
     private final static Logger LOGGER = LoggerFactory.getLogger(SimpleScheduler.class);
 
     private AtomicBoolean running = new AtomicBoolean(false);
-    private long interval = 30000L;
+    private long period;
     ServiceTracker<Runnable, Runnable> collectors;
     
     SimpleScheduler() {
     }
     
-    public SimpleScheduler(BundleContext bundleContext) {
+    public SimpleScheduler(int period, BundleContext bundleContext) {
+        this.period = period;
         this.collectors = new ServiceTracker<>(bundleContext, collectorFilter(bundleContext), null);
         this.collectors.open();
     }
@@ -66,7 +67,7 @@ public class SimpleScheduler implements Runnable, Scheduler {
                 }
             }
             try {
-                Thread.sleep(interval);
+                Thread.sleep(period);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 running.set(false);
