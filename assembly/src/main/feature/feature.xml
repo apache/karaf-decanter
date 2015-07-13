@@ -38,12 +38,12 @@
         <feature version="${project.version}">decanter-common</feature>
         <feature version="${project.version}">decanter-simple-scheduler</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.jmx-local.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}/cfg/local</configfile>
     </feature>
 
     <feature name="decanter-collector-camel" version="${project.version}" description="Karaf Decanter Camel Collector">
-        <feature version="${project.version}">decanter-common</feature>
-        <feature version="${project.version}">decanter-simple-scheduler</feature>
-        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.camel/${project.version}</bundle>
+        <feature version="${project.version}">decanter-collector-jmx</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.jmx-camel.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}/cfg/camel</configfile>
     </feature>
 
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">

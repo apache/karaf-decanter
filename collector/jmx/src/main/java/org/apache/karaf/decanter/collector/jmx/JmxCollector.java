@@ -17,15 +17,16 @@
 package org.apache.karaf.decanter.collector.jmx;
 
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanServer;
+import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -38,50 +39,102 @@ import org.slf4j.LoggerFactory;
 public class JmxCollector implements Runnable {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(JmxCollector.class);
+
+    private String type;
+    private String url;
+    private String username;
+    private String password;
+    private String objectName;
     private EventAdmin eventAdmin;
 
-    public JmxCollector(EventAdmin eventAdmin) {
+    public JmxCollector(String type, String url, String username, String password, String objectName, EventAdmin eventAdmin) {
+        this.type = type;
+        this.url = url;
+        this.username = username;
+        this.password = password;
         this.eventAdmin = eventAdmin;
+        this.objectName = objectName;
     }
 
     @Override
     public void run() {
-        LOGGER.debug("Karaf Decanter JMX Collector starts harvesting ...");
+        LOGGER.debug("Karaf Decanter JMX Collector starts harvesting {}...", type);
 
-        // TODO KARAF-3851 be able to pool remote JMX
-        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        Set<ObjectName> names = server.queryNames(null, null);
-        for (ObjectName name : names) {
+        MBeanServerConnection connection = null;
+
+        if (url == null || url.equalsIgnoreCase("local")) {
+            LOGGER.debug("Harvesting local MBeanServer ({})...", type);
+            connection = ManagementFactory.getPlatformMBeanServer();
+        } else {
             try {
-                Map<String, Object> data = harvestBean(server, name);
-                Event event = new Event("decanter/jmx/" + getTopic(name), data);
-                eventAdmin.postEvent(event);
+                JMXServiceURL jmxServiceURL = new JMXServiceURL(url);
+                ArrayList<String> list = new ArrayList<>();
+                if (username != null) {
+                    list.add(username);
+                }
+                if (password != null) {
+                    list.add(password);
+                }
+                HashMap env = new HashMap();
+                String[] credentials = list.toArray(new String[list.size()]);
+                env.put(JMXConnector.CREDENTIALS, credentials);
+                JMXConnector connector;
+                if (credentials.length > 0) {
+                    connector = JMXConnectorFactory.connect(jmxServiceURL, env);
+                } else {
+                    connector = JMXConnectorFactory.connect(jmxServiceURL);
+                }
+                connection = connector.getMBeanServerConnection();
             } catch (Exception e) {
-                LOGGER.warn("Error reading MBean " + name, e);
+                LOGGER.error("Can't connect to MBeanServer {} ({})", url, type, e);
             }
         }
 
-        LOGGER.debug("Karaf Decanter JMX Collector harvesting done");
+        if (connection != null) {
+            try {
+                Set<ObjectName> names;
+                if (objectName != null) {
+                    names = connection.queryNames(new ObjectName(objectName), null);
+                } else {
+                    names = connection.queryNames(null, null);
+                }
+                for (ObjectName name : names) {
+                    try {
+                        Map<String, Object> data = harvestBean(connection, name, type);
+                        Event event = new Event("decanter/jmx/" + type + "/" + getTopic(name), data);
+                        eventAdmin.postEvent(event);
+                    } catch (Exception e) {
+                        LOGGER.warn("Can't read MBean {} ({})", name, type, e);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Can't query object name from {} ({}) {}", url, type, objectName);
+            }
+        } else {
+            LOGGER.debug("MBean connection is null, nothing to do");
+        }
+
+        LOGGER.debug("Karaf Decanter JMX Collector harvesting {} done", type);
     }
 
     private String getTopic(ObjectName name) {
         return name.getDomain().replace(".", "/").replace(" ", "_");
     }
 
-    Map<String, Object> harvestBean(MBeanServer server, ObjectName name) throws Exception {
-        MBeanAttributeInfo[] attributes = server.getMBeanInfo(name).getAttributes();
+    Map<String, Object> harvestBean(MBeanServerConnection connection, ObjectName name, String type) throws Exception {
+        MBeanAttributeInfo[] attributes = connection.getMBeanInfo(name).getAttributes();
         Map<String, Object> data = new HashMap<>();
-        data.put("type", "jmx");
+        data.put("type", type);
         for (MBeanAttributeInfo attribute : attributes) {
             try {
                 // TODO add SLA check on attributes and filtering
-                Object attributeObject = server.getAttribute(name, attribute.getName());
+                Object attributeObject = connection.getAttribute(name, attribute.getName());
                 if (attributeObject instanceof String) {
-                    data.put(attribute.getName(), (String)attributeObject);
+                    data.put(attribute.getName(), (String) attributeObject);
                 } else if (attributeObject instanceof ObjectName) {
-                    data.put(attribute.getName(), ((ObjectName)attributeObject).toString());
+                    data.put(attribute.getName(), ((ObjectName) attributeObject).toString());
                 } else if (attributeObject instanceof CompositeDataSupport) {
-                    CompositeDataSupport cds = (CompositeDataSupport)attributeObject;
+                    CompositeDataSupport cds = (CompositeDataSupport) attributeObject;
                     CompositeType compositeType = cds.getCompositeType();
                     Set<String> keySet = compositeType.keySet();
                     Map<String, Object> composite = new HashMap<String, Object>();
@@ -90,15 +143,15 @@ public class JmxCollector implements Runnable {
                         composite.put(key, cdsObject);
                     }
                     data.put(attribute.getName(), composite);
-                } else if (attributeObject instanceof Long 
-                    || attributeObject instanceof Integer 
-                    || attributeObject instanceof Boolean
-                    || attributeObject instanceof Float
-                    || attributeObject instanceof Double){
+                } else if (attributeObject instanceof Long
+                        || attributeObject instanceof Integer
+                        || attributeObject instanceof Boolean
+                        || attributeObject instanceof Float
+                        || attributeObject instanceof Double){
                     data.put(attribute.getName(), attributeObject);
                 }
             } catch (SecurityException se) {
-            	LOGGER.error("SecurityException: ", se);
+                LOGGER.error("SecurityException: ", se);
             } catch (Exception e) {
                 LOGGER.debug("Could not read attribute " + name.toString() + " " + attribute.getName());
             }
