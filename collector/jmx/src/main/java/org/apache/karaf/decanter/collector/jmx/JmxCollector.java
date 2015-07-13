@@ -48,7 +48,7 @@ public class JmxCollector implements Runnable {
     public void run() {
         LOGGER.debug("Karaf Decanter JMX Collector starts harvesting ...");
 
-        // TODO be able to pool remote JMX
+        // TODO KARAF-3851 be able to pool remote JMX
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         Set<ObjectName> names = server.queryNames(null, null);
         for (ObjectName name : names) {
@@ -57,7 +57,7 @@ public class JmxCollector implements Runnable {
                 Event event = new Event("decanter/jmx/" + getTopic(name), data);
                 eventAdmin.postEvent(event);
             } catch (Exception e) {
-                LOGGER.warn("Error reading mbean " + name, e);
+                LOGGER.warn("Error reading MBean " + name, e);
             }
         }
 
@@ -65,7 +65,7 @@ public class JmxCollector implements Runnable {
     }
 
     private String getTopic(ObjectName name) {
-        return name.getDomain().replace(".", "/");
+        return name.getDomain().replace(".", "/").replace(" ", "_");
     }
 
     Map<String, Object> harvestBean(MBeanServer server, ObjectName name) throws Exception {
