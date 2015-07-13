@@ -29,7 +29,10 @@ public class TestEmbeddedNode {
 
     @Test
     public void testNode() throws Exception {
-   
+
+        System.setProperty("karaf.home", "/tmp");
+        System.setProperty("karaf.name", "decanter-test");
+
         EmbeddedNode embeddedNode = new EmbeddedNode();
         Node node = embeddedNode.getNode();
         embeddedNode.start();

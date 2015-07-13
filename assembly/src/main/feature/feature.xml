@@ -66,6 +66,7 @@
     </feature>
 
     <feature name="elasticsearch" version="${elasticsearch.version}" description="Embedded Elasticsearch node">
+        <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch/${project.version}/yml</configfile>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch/${project.version}</bundle>
     </feature>

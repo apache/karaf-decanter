@@ -16,6 +16,8 @@
  */
 package org.apache.karaf.decanter.elasticsearch;
 
+import org.elasticsearch.common.io.stream.InputStreamStreamInput;
+import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
@@ -24,8 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-
-import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
+import java.io.FileInputStream;
 
 /**
  * Start an Elasticsearch node internally to Karaf.
@@ -33,28 +34,38 @@ import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilde
 public class EmbeddedNode {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(EmbeddedNode.class);
-
-    private final static String NODE_NAME = "decanter";
     private static Node node;
 
     public EmbeddedNode() throws Exception {
         LOGGER.info("Starting Elasticsearch node ...");
 
         LOGGER.debug("Creating elasticsearch settings");
+
         String karafHome = System.getProperty("karaf.home");
-        File pluginsFile = new File("file://" + karafHome + "/elasticsearch/plugins");
-        Settings settings = settingsBuilder()
-                .put("cluster.name", "elasticsearch")
-                .put("http.enabled", "true")
-                .put("node.data", true)
-                .put("path.data", "data")
-                .put("name", NODE_NAME)
-                .put("network.host", "127.0.0.1")
-                .put("cluster.routing.schedule", "50ms")
-                .put("path.plugins", pluginsFile.getAbsolutePath())
-                .put("http.cors.enabled", true)
-                .put("http.cors.allow-origin", "/.*/")
-                .build();
+        File pluginsFile = new File(new File(karafHome), "/elasticsearch/plugins");
+        LOGGER.debug("Elasticsearch plugins folder: " + pluginsFile.getAbsolutePath());
+
+        Settings settings;
+        File ymlFile = new File(System.getProperty("karaf.etc"), "elasticsearch.yml");
+        if (ymlFile.exists()) {
+            // etc/elasticsearch.yml is provided
+            LOGGER.debug("elasticsearch.yml found for settings");
+            settings = ImmutableSettings.settingsBuilder().loadFromUrl(ymlFile.toURL()).build();
+        } else {
+            // using default
+            LOGGER.debug("Using default elasticsearch configuration");
+            settings = ImmutableSettings.settingsBuilder().put("cluster.name", "elasticsearch")
+                    .put("http.enabled", "true")
+                    .put("node.data", true)
+                    .put("path.data", "data")
+                    .put("node.name", System.getProperty("karaf.name") == null ? "decanter" : System.getProperty("karaf.name"))
+                    .put("network.host", "127.0.0.1")
+                    .put("cluster.routing.schedule", "50ms")
+                    .put("path.plugins", pluginsFile.getAbsolutePath())
+                    .put("http.cors.enabled", true)
+                    .put("http.cors.allow-origin", "/.*/")
+                    .build();
+        }
 
         LOGGER.debug("Creating the elasticsearch node");
         ImmutableSettings.Builder builder = ImmutableSettings.settingsBuilder();
