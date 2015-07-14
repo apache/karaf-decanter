@@ -42,7 +42,6 @@
         <slf4j.version>1.7.7</slf4j.version>
         <json-api.version>1.0</json-api.version>
         <glassfish-json.version>1.0.4</glassfish-json.version>
-        <commons-jdbc.version>2.1</commons-jdbc.version>
     </properties>
 
     <modules>

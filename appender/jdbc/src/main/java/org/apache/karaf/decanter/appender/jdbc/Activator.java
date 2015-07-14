@@ -6,6 +6,7 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -14,74 +15,75 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Properties;
 
-public class Activator implements BundleActivator, ManagedService {
+public class Activator implements BundleActivator {
 
-	private static Logger logger = LoggerFactory.getLogger(Activator.class);
-	private JdbcAppender appender;
+	private final static Logger LOGGER = LoggerFactory.getLogger(Activator.class);
+
 	private static final String CONFIG_PID = "org.apache.karaf.decanter.appender.jdbc";
-	private ServiceTracker<DataSource, ServiceRegistration> tracker;
-	private BundleContext bundleContext;
+
 	private ServiceRegistration serviceRegistration;
 
 	@Override
 	public void start(final BundleContext bundleContext) throws Exception {
-		this.bundleContext = bundleContext;
+		LOGGER.debug("Starting Decanter JDBC appender");
+
+		ConfigUpdater configUpdater = new ConfigUpdater(bundleContext);
 
 		Dictionary<String, String> properties = new Hashtable<>();
 		properties.put(Constants.SERVICE_PID, CONFIG_PID);
-		serviceRegistration = bundleContext.registerService(ManagedService.class.getName(), this, properties);
-
-		updated(null);
+		serviceRegistration = bundleContext.registerService(ManagedService.class.getName(), configUpdater, properties);
 	}
 
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		if (appender != null)
-			appender.close();
-		if (tracker != null)
-			tracker.close();
-		if (serviceRegistration != null)
+		LOGGER.debug("Starting Decanter JDBC appender");
+
+		if (serviceRegistration != null) {
 			serviceRegistration.unregister();
+		}
 	}
 
-	@Override
-	public void updated(final Dictionary config) throws ConfigurationException {
+	private final class ConfigUpdater implements ManagedService {
 
-		try {
-			tracker = new ServiceTracker<DataSource, ServiceRegistration>(bundleContext,
-					bundleContext.createFilter("(name=jdbc-appender)"), null) {
-				@Override
-				public ServiceRegistration<?> addingService(ServiceReference reference) {
-					Properties properties = new Properties();
+		private BundleContext bundleContext;
+		private ServiceRegistration registration;
 
-					boolean UsePoolPreparedStatement = config != null ? (boolean) config
-							.get("UsePoolPreparedStatement") : true;
-					int maxPreparedStatements = config != null ? Integer.parseInt((String) config
-							.get("maxPreparedStatements")) : 50;
-					String tableName = config != null ? (String) config.get("tableName") : "Decanter";
-					String columnName1 = config != null ? (String) config.get("columnName1") : "event_name";
-					String columnName2 = config != null ? (String) config.get("columnName2") : "event_content";
-					DataSource dataSource = (DataSource) bundleContext.getService(reference);
-
-					appender = new JdbcAppender(dataSource, UsePoolPreparedStatement, maxPreparedStatements, tableName,
-							columnName1, columnName2);
-
-					properties.put(EventConstants.EVENT_TOPIC, "decanter/*");
-
-					return bundleContext.registerService(EventHandler.class, appender, (Dictionary) properties);
-				}
-
-				@Override
-				public void removedService(ServiceReference<DataSource> reference, ServiceRegistration service) {
-					service.unregister();
-					super.removedService(reference, service);
-				}
-			};
-		} catch (InvalidSyntaxException e) {
-			logger.error(e.getMessage());
+		public ConfigUpdater(final BundleContext bundleContext) throws Exception {
+			this.bundleContext = bundleContext;
 		}
 
-		tracker.open();
+		@Override
+		public void updated(Dictionary config) throws ConfigurationException {
+			LOGGER.debug("Updating Decanter JDBC managed service");
+
+			if (registration != null) {
+				registration.unregister();
+			}
+
+			String dataSourceName = "jdbc/decanter";
+			if (config != null && config.get("datasource.name") != null) {
+				dataSourceName = (String) config.get("datasource.name");
+			}
+			String tableName = "decanter";
+			if (config != null && config.get("table.name") != null) {
+				tableName = (String) config.get("table.name");
+			}
+			String dialect = "generic";
+			if (config != null && config.get("dialect") != null) {
+				dialect = (String) config.get("dialect");
+			}
+			try {
+				JdbcAppender appender = new JdbcAppender(dataSourceName, tableName, dialect, bundleContext);
+				Dictionary<String, String> properties = new Hashtable<>();
+				properties.put(EventConstants.EVENT_TOPIC, "decanter/*");
+				this.registration = bundleContext.registerService(EventHandler.class, appender, properties);
+				LOGGER.debug("Decanter JDBC appender started ({}/{})", dataSourceName, tableName);
+			} catch (Exception e) {
+				LOGGER.error("Can't start Decanter JDBC service tracker", e);
+				throw new ConfigurationException("table.name", "Can't start Decanter JDBC service tracker: " + e.getMessage());
+			}
+		}
+
 	}
 
 }

@@ -1,109 +1,189 @@
 package org.apache.karaf.decanter.appender.jdbc;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.sql.DataSource;
+import javax.sql.XADataSource;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
-public class JdbcAppender implements EventHandler{
+public class JdbcAppender implements EventHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(JdbcAppender.class);
-    private BasicDataSource dataSource;
-    private Connection connection;
-    private PreparedStatement preparedStatement, createPreparedStatement;
-    private int maxPreparedStatements;
-    private boolean usePoolPreparedStatement;
-    private String tableName, columnName1 , columnName2;
+    private final static Logger LOGGER = LoggerFactory.getLogger(JdbcAppender.class);
 
-    private final String createTableQuery =
-            "CREATE TABLE IF NOT EXISTS `?` (" +
-            "`?` VARCHAR(255) NOT NULL," +
-            "`?` LONGBLOB NOT NULL,";
-    private final String insertQuery =
-            "INSERT INTO `?`(?,?) VALUES('?','?')";
+    private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSS'Z'");
 
-    public JdbcAppender(DataSource dataSource,boolean usePoolPreparedStatement,int maxPreparedStatements,String tableName, String columnName1, String columnName2){
-        setDataSource((BasicDataSource)dataSource);
-        getDataSource().setPoolPreparedStatements(getUsePoolPreparedStatement());
-        if(getUsePoolPreparedStatement() == true) getDataSource().setMaxOpenPreparedStatements(getMaxPreparedStatements());
-        setUsePoolPreparedStatement(usePoolPreparedStatement);
-        setMaxPreparedStatements(maxPreparedStatements);
-        setTableName(tableName);
-        setColumnName1(columnName1);
-        setColumnName2(columnName2);
+    private String dataSourceName;
+    private String tableName;
+    private String dialect;
+    private BundleContext bundleContext;
+
+    private final static String createTableQueryGenericTemplate =
+            "CREATE TABLE TABLENAME(timestamp INTEGER, content VARCHAR(8192))";
+    private final static String createTableQueryMySQLTemplate =
+            "CREATE TABLE TABLENAME(timestamp BIGINT, content CLOB)";
+    private final static String createTableQueryDerbyTemplate =
+            "CREATE TABLE TABLENAME(timestamp BIGINT, content CLOB)";
+
+    private final static String insertQueryTemplate =
+            "INSERT INTO TABLENAME(timestamp, content) VALUES(?,?)";
+
+    public JdbcAppender(String dataSourceName, String tableName, String dialect, BundleContext bundleContext) {
+        this.dataSourceName = dataSourceName;
+        this.tableName = tableName;
+        this.dialect = dialect;
+        this.bundleContext = bundleContext;
+    }
+
+    private int getRank(ServiceReference<?> reference) {
+        Object rankObj = reference.getProperty(Constants.SERVICE_RANKING);
+        // If no rank, then spec says it defaults to zero.
+        rankObj = (rankObj == null) ? new Integer(0) : rankObj;
+        // If rank is not Integer, then spec says it defaults to zero.
+        return (rankObj instanceof Integer) ? (Integer) rankObj : 0;
     }
 
     @Override
     public void handleEvent(Event event) {
+        LOGGER.trace("Looking for the JDBC datasource");
+        ServiceReference[] references;
         try {
-            connection = getDataSource().getConnection();
-            createPreparedStatement = connection.prepareStatement(createTableQuery);
-            createPreparedStatement.setString(0,getTableName());
-            createPreparedStatement.setString(1,getColumnName1());
-            createPreparedStatement.setString(2,getColumnName2());
-            createPreparedStatement.executeUpdate(createTableQuery);
-
-            logger.debug("Database table \"decanter\" has been created or already exists");
-
-            for(String name : event.getPropertyNames())
-            {
-                preparedStatement = connection.prepareStatement(insertQuery);
-                preparedStatement.setString(0,getTableName());
-                preparedStatement.setString(1,getColumnName1());
-                preparedStatement.setString(2,getColumnName2());
-                preparedStatement.setString(3,name);
-                preparedStatement.setObject(4, event.getProperty(name));
-                preparedStatement.executeUpdate();
+            references = bundleContext.getServiceReferences((String) null,
+                    "(&(|(" + Constants.OBJECTCLASS + "=" + DataSource.class.getName() + ")"
+                            + "(" + Constants.OBJECTCLASS + "=" + XADataSource.class.getName() + "))"
+                            + "(|(osgi.jndi.service.name=" + dataSourceName + ")(datasource=" + dataSourceName + ")(name=" + dataSourceName + ")(service.id=" + dataSourceName + ")))");
+        } catch (Exception e) {
+            throw new IllegalStateException("Can't lookup JDBC datasource " + dataSourceName, e);
+        }
+        if (references == null || references.length == 0) {
+            throw new IllegalArgumentException("No JDBC datasource found for " + dataSourceName);
+        }
+        if (references.length > 1) {
+            Arrays.sort(references);
+            if (getRank(references[references.length - 1]) == getRank(references[references.length - 2])) {
+                LOGGER.warn("Multiple JDBC datasources found with the same service ranking for " + dataSourceName);
             }
-            connection.commit();
-            logger.debug("Data was inserted into \"decanter\" table.");
-        } catch (SQLException e) {
+        }
+
+        ServiceReference ref = references[references.length - 1];
+
+        if (ref != null) {
+            DataSource dataSource = (DataSource) bundleContext.getService(ref);
+            Connection connection = null;
+            Statement createStatement = null;
+            PreparedStatement insertStatement = null;
             try {
-                if(connection!= null) connection.rollback();
-            } catch (SQLException e1) {
-                logger.debug("An error occured and the rollback also failed.");
-                logger.error(e.getMessage());
+                connection = dataSource.getConnection();
+
+                try {
+                    String createTableQuery;
+                    if (dialect != null && dialect.equalsIgnoreCase("mysql")) {
+                        createTableQuery = createTableQueryMySQLTemplate.replaceAll("TABLENAME", tableName);
+                    } else if (dialect != null && dialect.equalsIgnoreCase("derby")) {
+                        createTableQuery = createTableQueryDerbyTemplate.replaceAll("TABLENAME", tableName);
+                    } else {
+                        createTableQuery = createTableQueryGenericTemplate.replaceAll("TABLENAME", tableName);
+                    }
+                    createStatement = connection.createStatement();
+                    createStatement.executeUpdate(createTableQuery);
+                    LOGGER.debug("Table {} has been created", tableName);
+                } catch (SQLException e) {
+                    LOGGER.trace("Can't create table {}", e);
+                }
+
+                Long timestamp = (Long) event.getProperty("timestamp");
+                java.util.Date date = timestamp != null ? new java.util.Date(timestamp) : new java.util.Date();
+                JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+                jsonObjectBuilder.add("@timestamp", tsFormat.format(date));
+                for (String key : event.getPropertyNames()) {
+                    Object value = event.getProperty(key);
+                    if (value instanceof Map) {
+                        jsonObjectBuilder.add(key, build((Map<String, Object>) value));
+                    } else {
+                        addProperty(jsonObjectBuilder, key, value);
+                    }
+                }
+                JsonObject jsonObject = jsonObjectBuilder.build();
+                String jsonSt = jsonObject.toString();
+
+                String insertQuery = insertQueryTemplate.replaceAll("TABLENAME", tableName);
+                insertStatement = connection.prepareStatement(insertQuery);
+                if (timestamp == null) {
+                    timestamp = System.currentTimeMillis();
+                }
+                insertStatement.setLong(1, timestamp);
+                insertStatement.setString(2, jsonSt);
+                insertStatement.executeUpdate();
+
+                connection.commit();
+                LOGGER.trace("Data inserted into {} table", tableName);
+            } catch (Exception e) {
+                LOGGER.error("Can't store in the database", e);
+                try {
+                    if (connection != null) connection.rollback();
+                } catch (SQLException e1) {
+                    LOGGER.warn("Can't rollback", e1);
+                }
+            } finally {
+                try {
+                    if (createStatement != null) createStatement.close();
+                } catch (Exception e) {
+                    // nothing to do
+                }
+                try {
+                    if (insertStatement != null) insertStatement.close();
+                } catch (Exception e) {
+                    // nothing to do
+                }
+                try {
+                    if (connection != null) connection.close();
+                } catch (Exception e) {
+                    // nothing to do
+                }
+                if (ref != null) {
+                    bundleContext.ungetService(references[0]);
+                }
             }
-            logger.error("An error occured during the JDBC appending , be sure the connection from the datasource \"jdbc-appender\" provided is right.");
-        }finally {
-            try { if (createPreparedStatement != null) createPreparedStatement.close(); } catch(Exception e) {logger.error("Problem closing the database creation Statement.");}
-            try { if (preparedStatement != null) preparedStatement.close(); } catch(Exception e) {logger.error("Problem closing the PreparedStatement to insert data.");}
-            try { if (connection != null) connection.close(); } catch(Exception e) {logger.error("Problem closing the Connection.");}
         }
     }
 
-    public void close(){
-    if(!getDataSource().isClosed()) try { getDataSource().close(); } catch (SQLException e) {logger.error("Datasource could not be closed.");}
-    try { if (createPreparedStatement != null) createPreparedStatement.close(); } catch(Exception e) {logger.error("Problem closing the database creation Statement.");}
-    try { if (preparedStatement != null) preparedStatement.close(); } catch(Exception e) {logger.error("Problem closing the PreparedStatement to insert data.");}
-    try { if (connection != null) connection.close(); } catch(Exception e) {logger.error("Problem closing the Connection.");}
+    private JsonObject build(Map<String, Object> value) {
+        JsonObjectBuilder innerBuilder = Json.createObjectBuilder();
+        for (Map.Entry<String, Object> innerEntrySet : value.entrySet()) {
+            addProperty(innerBuilder, innerEntrySet.getKey(), innerEntrySet.getValue());
+        }
+        return innerBuilder.build();
     }
 
-    public void setMaxPreparedStatements(int maxPreparedStatements){ this.maxPreparedStatements = maxPreparedStatements;}
+    private void addProperty(JsonObjectBuilder builder, String key, Object value) {
+        if (value instanceof BigDecimal)
+            builder.add(key, (BigDecimal) value);
+        else if (value instanceof BigInteger)
+            builder.add(key, (BigInteger) value);
+        else if (value instanceof String)
+            builder.add(key, (String) value);
+        else if (value instanceof Long)
+            builder.add(key, (Long) value);
+        else if (value instanceof Integer)
+            builder.add(key, (Integer) value);
+        else if (value instanceof Float)
+            builder.add(key, (Float) value);
+        else if (value instanceof Double)
+            builder.add(key, (Double) value);
+        else if (value instanceof Boolean)
+            builder.add(key, (Boolean) value);
+    }
 
-    public int getMaxPreparedStatements(){return this.maxPreparedStatements;}
-
-    public void setUsePoolPreparedStatement(boolean usePoolPreparedStatement){this.usePoolPreparedStatement = usePoolPreparedStatement;}
-
-    public boolean getUsePoolPreparedStatement(){return this.usePoolPreparedStatement;}
-
-    public String getColumnName2() {return columnName2;}
-
-    public void setColumnName2(String columnName2) {this.columnName2 = columnName2;}
-
-    public String getColumnName1() {return columnName1;}
-
-    public void setColumnName1(String columnName1) {this.columnName1 = columnName1;}
-
-    public String getTableName() {return tableName;}
-
-    public void setTableName(String tableName) {this.tableName = tableName;}
-
-    public BasicDataSource getDataSource() {return dataSource;}
-
-    public void setDataSource(BasicDataSource dataSource) {this.dataSource = dataSource;}
 }

@@ -189,7 +189,6 @@ public class ElasticsearchAppender implements EventHandler {
             builder.add(key, (Double) value);
         else if (value instanceof Boolean)
             builder.add(key, (Boolean) value);
-
     }
 
     private String getIndexName(String prefix, Date date) {
