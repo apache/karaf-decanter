@@ -36,7 +36,7 @@ public class Activator implements BundleActivator {
 
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		LOGGER.debug("Starting Decanter JDBC appender");
+		LOGGER.debug("Stopping Decanter JDBC appender");
 
 		if (serviceRegistration != null) {
 			serviceRegistration.unregister();
