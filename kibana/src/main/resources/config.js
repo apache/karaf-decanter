@@ -75,7 +75,8 @@ function (Settings) {
       'terms',
       'stats',
       'sparklines',
-      'multifieldhistogram'
+      'multifieldhistogram',
+      'valuehistogram'
     ]
   });
 });
