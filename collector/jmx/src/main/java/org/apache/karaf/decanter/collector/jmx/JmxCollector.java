@@ -60,6 +60,7 @@ public class JmxCollector implements Runnable {
     public void run() {
         LOGGER.debug("Karaf Decanter JMX Collector starts harvesting {}...", type);
 
+        JMXConnector connector = null;
         MBeanServerConnection connection = null;
 
         if (url == null || url.equalsIgnoreCase("local")) {
@@ -78,7 +79,6 @@ public class JmxCollector implements Runnable {
                 HashMap env = new HashMap();
                 String[] credentials = list.toArray(new String[list.size()]);
                 env.put(JMXConnector.CREDENTIALS, credentials);
-                JMXConnector connector;
                 if (credentials.length > 0) {
                     connector = JMXConnectorFactory.connect(jmxServiceURL, env);
                 } else {
@@ -112,6 +112,14 @@ public class JmxCollector implements Runnable {
             }
         } else {
             LOGGER.debug("MBean connection is null, nothing to do");
+        }
+
+        if (connector != null) {
+            try {
+                connector.close();
+            } catch (Exception e) {
+                LOGGER.trace("Can't close JMX connector", e);
+            }
         }
 
         LOGGER.debug("Karaf Decanter JMX Collector harvesting {} done", type);
