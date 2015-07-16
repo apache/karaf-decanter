@@ -33,7 +33,7 @@ public class Activator implements BundleActivator {
     public void start(BundleContext bundleContext) {
         LogAppender appender = new LogAppender();
         Dictionary<String, String> properties = new Hashtable<>();
-        properties.put(EventConstants.EVENT_TOPIC, "decanter/events/*");
+        properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
         registration = bundleContext.registerService(EventHandler.class, appender, properties);
     }
 

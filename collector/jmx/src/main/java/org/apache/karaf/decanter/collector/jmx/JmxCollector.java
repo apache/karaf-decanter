@@ -101,7 +101,7 @@ public class JmxCollector implements Runnable {
                 for (ObjectName name : names) {
                     try {
                         Map<String, Object> data = harvestBean(connection, name, type);
-                        Event event = new Event("decanter/jmx/" + type + "/" + getTopic(name), data);
+                        Event event = new Event("decanter/collect/jmx/" + type + "/" + getTopic(name), data);
                         eventAdmin.postEvent(event);
                     } catch (Exception e) {
                         LOGGER.warn("Can't read MBean {} ({})", name, type, e);

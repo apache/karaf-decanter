@@ -71,7 +71,7 @@ public class Activator implements BundleActivator {
             appender = new ElasticsearchAppender(host, port);
             appender.open();
             Dictionary<String, String> properties = new Hashtable<>();
-            properties.put(EventConstants.EVENT_TOPIC, "decanter/*");
+            properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
         	serviceReg =  bundleContext.registerService(EventHandler.class, appender, properties);
         }
     }

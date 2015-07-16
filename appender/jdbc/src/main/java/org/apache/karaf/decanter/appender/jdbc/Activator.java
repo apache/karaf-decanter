@@ -75,7 +75,7 @@ public class Activator implements BundleActivator {
 			try {
 				JdbcAppender appender = new JdbcAppender(dataSourceName, tableName, dialect, bundleContext);
 				Dictionary<String, String> properties = new Hashtable<>();
-				properties.put(EventConstants.EVENT_TOPIC, "decanter/*");
+				properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
 				this.registration = bundleContext.registerService(EventHandler.class, appender, properties);
 				LOGGER.debug("Decanter JDBC appender started ({}/{})", dataSourceName, tableName);
 			} catch (Exception e) {
