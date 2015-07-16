@@ -1,5 +1,5 @@
 {
-  "title": "Dashboards",
+  "title": "Decanter Dashboards",
   "services": {
     "query": {
       "list": {
@@ -38,7 +38,7 @@
           ],
           "type": "text",
           "mode": "markdown",
-          "content": "### Welcome to Decanter. \n\nDecanter provides ready to use dashboards for you. You can extend and change these dashboard to match your needs. \n\n 1. [Operating System](index.html#/dashboard/file/os.json) *Provide view on the systems (disk usage, memory usage, etc)* \n 2. [Karaf](index.html#/dashboard/file/karaf.json) *Provide details about Karaf container* \n 3. [Camel](index.html#/dashboard/file/camel.json) *Provide details about Camel routes* \n 4. [ActiveMQ](index.html#/dashboard/file/activemq.json) *Provide details about ActiveMQ brokers* \n 5. [Custom](index.html#/dashboard/file/guided.json) *Sample that you can customize, allowing you to implement BAM, etc* ",
+          "content": "### Welcome to Decanter. \n\nDecanter provides ready to use dashboards. You can change and update these dashboards to match your needs. \n\n 1. [Karaf](index.html#/dashboard/file/karaf.json) *Provide details about Karaf container* \n 2. [Camel](index.html#/dashboard/file/camel.json) *Provide details about Camel routes* \n 3. [ActiveMQ](index.html#/dashboard/file/activemq.json) *Provide details about ActiveMQ brokers* \n\n You can also create your own dashboards from scratch, for monitoring of your own application, BAM, etc. \n To do this, you can start from: \n 1. [Blank dashboard](index.html#/dashboard/file/blank.json) \n 2. [Simple dashboard](index.html#/dashboard/file/guided.json)",
           "style": {},
           "status": "Stable"
         }
