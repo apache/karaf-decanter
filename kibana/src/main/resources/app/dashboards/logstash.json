@@ -135,6 +135,7 @@
           "header": true,
           "paging": true,
           "spyable": true,
+          "exportable": true,
           "queries": {
             "mode": "all",
             "ids": [

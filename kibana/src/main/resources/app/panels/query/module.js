@@ -1,4 +1,178 @@
-/*! kibana - v3.1.2 - 2014-11-07
- * Copyright (c) 2014 Rashid Khan; Licensed Apache License */
+/*
 
-define("css-embed",function(){function a(a){var b=document.getElementsByTagName("head")[0],c=document.createElement("style"),d=document.createTextNode(a);c.type="text/css",c.styleSheet?c.styleSheet.cssText=d.nodeValue:c.appendChild(d),b.appendChild(c)}return a}),define("css!panels/query/query.css",["css-embed"],function(a){return a(".short-query{display:inline-block;margin-right:10px}.short-query input.search-query{width:280px}.begin-query{position:absolute;left:10px;top:5px}.end-query{position:absolute;right:10px;top:5px}.end-query i,.begin-query i{margin:0}.panel-query{padding-left:25px!important;height:31px!important;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.query-disabled{opacity:.3}.form-search:hover .has-remove{padding-left:40px!important}.remove-query{opacity:0}.last-query{padding-right:45px!important}.form-search:hover .remove-query{opacity:1}.query-panel .pinned{margin-right:5px}"),!0}),define("panels/query/module",["angular","app","lodash","css!./query.css"],function(a,b,c){var d=a.module("kibana.panels.query",[]);b.useModule(d),d.controller("query",["$scope","querySrv","$rootScope","dashboard","$q","$modal",function(a,b,d,e,f,g){a.panelMeta={status:"Stable",description:"Manage all of the queries on the dashboard. You almost certainly need one of these somewhere. This panel allows you to add, remove, label, pin and color queries"};var h={query:"*",pinned:!0,history:[],remember:10};c.defaults(a.panel,h),a.querySrv=b,a.dashboard=e,a.queryTypes=b.types;var i=g({template:"./app/panels/query/helpModal.html",persist:!0,show:!1,scope:a});a.init=function(){},a.refresh=function(){j(c.pluck(a.dashboard.current.services.query.list,"query")),e.refresh()},a.render=function(){d.$broadcast("render")},a.toggle_pin=function(a){e.current.services.query.list[a].pin=e.current.services.query.list[a].pin?!1:!0},a.queryIcon=function(a){return b.queryTypes[a].icon},a.queryConfig=function(a){return"./app/panels/query/editors/"+(a||"lucene")+".html"},a.queryHelpPath=function(a){return"./app/panels/query/help/"+(a||"lucene")+".html"},a.queryHelp=function(b){a.help={type:b},f.when(i).then(function(a){a.modal("show")})},a.typeChange=function(a){var c={id:a.id,type:a.type,query:a.query,alias:a.alias,color:a.color};e.current.services.query.list[c.id]=b.defaults(c)};var j=function(b){if(a.panel.remember>0){a.panel.history=c.union(b.reverse(),a.panel.history);var d=a.panel.history.length;d>a.panel.remember&&(a.panel.history=a.panel.history.slice(0,a.panel.remember))}};a.init()}])});
+  ## query
+
+  ### Parameters
+  * query ::  A string or an array of querys. String if multi is off, array if it is on
+              This should be fixed, it should always be an array even if its only
+              one element
+*/
+define([
+  'angular',
+  'app',
+  'lodash',
+  'multiselect',
+
+  'css!./query.css'
+], function (angular, app, _) {
+  'use strict';
+
+  var module = angular.module('kibana.panels.query', []);
+  app.useModule(module);
+
+  module.controller('query', function($scope, querySrv, $rootScope, dashboard, $q, $modal, fields) {
+    $scope.panelMeta = {
+      status  : "Stable",
+      description : "Manage all of the queries on the dashboard. You almost certainly need one of "+
+        "these somewhere. This panel allows you to add, remove, label, pin and color queries"
+    };
+
+    $scope.typesSel = [];
+    $scope.add_cond = false;
+    $scope.defaultValue = {
+      sem        : fields.list[0],
+      comp_list  : ['ne', 'eq'],
+      select_comp: 'eq',
+      input      : ''
+    };
+
+    // Set and populate defaults
+    var _d = {
+      values  : [angular.copy($scope.defaultValue)],
+      generate: false,
+      query   : "*",
+      pinned  : true,
+      history : [],
+      remember: 10 // max: 100, angular strap can't take a variable for items param
+    };
+    _.defaults($scope.panel,_d);
+
+    $scope.querySrv = querySrv;
+    $scope.dashboard = dashboard;
+
+    // A list of query types for the query config popover
+    $scope.queryTypes = querySrv.types;
+
+    var queryHelpModal = $modal({
+      template: './app/panels/query/helpModal.html',
+      persist: true,
+      show: false,
+      scope: $scope,
+    });
+
+    $scope.showMuSelectValues = function() {
+      var queryString = createQuery();
+      var newQueryObj = _.clone($scope.dashboard.current.services.query.list[0]); 
+      var newId = _.max($scope.dashboard.current.services.query.ids) + 1;
+      newQueryObj.color = '#'+('00000'+(Math.random()*0x1000000<<0).toString(16)).slice(-6);
+      newQueryObj.query = queryString;
+      newQueryObj.id = newId;
+      $scope.dashboard.current.services.query.list[newId] = newQueryObj;
+      $scope.dashboard.current.services.query.ids.push(newId);
+      $scope.refresh();
+    };
+ 
+    var createQuery = function() {
+      var queryString = "_type:" + $scope.typesSel.join(',');
+      _.each($scope.panel.values, function(value) {
+        if( value.select_comp == 'eq' ) {
+          queryString += ' AND '+value.sem+':"'+value.input+'" ';
+        } else if( value.select_comp == 'ne' ) {
+          queryString += ' AND NOT '+value.sem+':"'+value.input+'" ';
+        } else {
+          queryString += ' AND '+value.sem+':'+value.select_comp+value.input;
+        }
+      });
+      return queryString;
+    }
+
+    $scope.selected_sem = function() {
+      var item = _.last($scope.panel.values);
+      var nodeInfo = $scope.ejs.getFieldMapping(dashboard.indices, item.sem);
+      return nodeInfo.then(function(p) {
+        var types = _.uniq(jsonPath(p, '*.*.*.*.mapping.*.type'));
+        if(_.intersection(types, ['long','float','integer','double']).length > 0) {
+          item.comp_list =  ['<', '>', '='];
+        } else {
+          item.comp_list =  ['eq', 'ne'];
+        }
+      });
+    };
+ 
+    $scope.addCond = function(){
+      if ( $scope.add_cond == false ) {
+        $scope.add_cond = true;
+        return;
+      };
+      $scope.panel.values.push(angular.copy($scope.defaultValue));
+    };
+
+    $scope.init = function() {
+      setTimeout(function(){
+        $("#sela").multiselect({
+            selectedList:50,
+            maxHeight:300
+        });
+      },50);
+    };
+
+    $scope.refresh = function() {
+      update_history(_.pluck($scope.dashboard.current.services.query.list,'query'));
+      dashboard.refresh();
+    };
+
+    $scope.render = function() {
+      $rootScope.$broadcast('render');
+    };
+
+    $scope.toggle_pin = function(id) {
+      dashboard.current.services.query.list[id].pin = dashboard.current.services.query.list[id].pin ? false : true;
+    };
+
+    $scope.queryIcon = function(type) {
+      return querySrv.queryTypes[type].icon;
+    };
+
+    $scope.queryConfig = function(type) {
+      return "./app/panels/query/editors/"+(type||'lucene')+".html";
+    };
+
+    $scope.queryHelpPath = function(type) {
+      return "./app/panels/query/help/"+(type||'lucene')+".html";
+    };
+
+    $scope.queryHelp = function(type) {
+      $scope.help = {
+        type: type
+      };
+      $q.when(queryHelpModal).then(function(modalEl) {
+        modalEl.modal('show');
+      });
+    };
+
+    $scope.typeChange = function(q) {
+      var _nq = {
+        id   : q.id,
+        type : q.type,
+        query: q.query,
+        alias: q.alias,
+        color: q.color
+      };
+      dashboard.current.services.query.list[_nq.id] = querySrv.defaults(_nq);
+    };
+
+    var update_history = function(query) {
+      if($scope.panel.remember > 0) {
+        $scope.panel.history = _.union(query.reverse(),$scope.panel.history);
+        var _length = $scope.panel.history.length;
+        if(_length > $scope.panel.remember) {
+          $scope.panel.history = $scope.panel.history.slice(0,$scope.panel.remember);
+        }
+      }
+    };
+
+    $scope.init();
+
+  });
+
+});

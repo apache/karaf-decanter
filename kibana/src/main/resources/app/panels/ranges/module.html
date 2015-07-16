@@ -1,0 +1,108 @@
+<div ng-controller='ranges' ng-init="init()">
+  <style>
+    .pieLabel { pointer-events: none }
+    .ranges-legend-range {
+      word-break: break-all;
+    }
+
+    .ranges-remaining {
+      bottom:0;
+      top:0;
+      background-color: #f00;
+    }
+
+    .ranges-wrapper {
+      display: table;
+      width: 100%;
+    }
+
+    .ranges-legend {
+      display: table-row;
+      height: 0;
+    }
+
+    .ranges-legend {
+      display: table-row;
+    }
+  </style>
+
+
+  <div class="ranges-wrapper">
+    <!-- LEGEND -->
+    <div class="ranges-legend" ng-show="panel.counter_pos == 'above' && (panel.chart == 'bar' || panel.chart == 'pie')" id='{{$id}}-legend'>
+      <!-- vertical legend above -->
+      <table class="small" ng-show="panel.arrangement == 'vertical'">
+        <tr ng-repeat="range in legend">
+          <td><i class="icon-circle" ng-style="{color:range.color}"></i></td>
+          <td class="ranges-legend-range" style="padding-right:10px;padding-left:10px;">{{range.label}}</td>
+          <td>{{range.data[0][1]}}</td>
+        </tr>
+      </table>
+
+      <!-- horizontal legend above -->
+      <span class="small" ng-show="panel.arrangement == 'horizontal'" ng-repeat="range in legend" style="float:left;padding-left: 10px;">
+        <span>
+          <i class="icon-circle" ng-style="{color:range.color}"></i>
+          <span class="ranges-legend-range">{{range.label}}</span> ({{range.data[0][1]}})
+        </span>
+      </span>
+
+      <span class="small pull-left" ng-show="panel.tmode == 'ranges_stats'">
+        &nbsp | {{ panel.tstat }} of <strong>{{ panel.valuefield }}</strong>
+      </span>
+
+    </div>
+    <!-- keep legend from over lapping -->
+    <div style="clear:both"></div>
+
+
+    <!-- CHART -->
+    <div ng-show="panel.chart == 'pie' || panel.chart == 'bar'" ranges-chart params="{{panel}}" style="position:relative" class="pointer ranges-chart">
+    </div>
+
+    <!-- LEGEND -->
+    <div class="ranges-legend" ng-show="panel.counter_pos == 'below' && (panel.chart == 'bar' || panel.chart == 'pie')" id='{{$id}}-legend'>
+      <!-- vertical legend below -->
+      <table class="small" ng-show="panel.arrangement == 'vertical'">
+        <tr ng-repeat="range in legend">
+          <td><i class="icon-circle" ng-style="{color:range.color}"></i></i></td>
+          <td class="ranges-legend-range" style="padding-right:10px;padding-left:10px;">{{range.label}}</td>
+          <td>{{range.data[0][1]}}</td>
+        </tr>
+      </table>
+
+      <!-- horizontal legend below -->
+      <span class="small" ng-show="panel.arrangement == 'horizontal'" ng-repeat="range in legend" style="float:left;padding-left: 10px;">
+        <span>
+          <i class="icon-circle" ng-style="{color:range.color}"></i>
+          <span class="ranges-legend-range">{{range.label}}</span> ({{range.data[0][1]}})
+        </span>
+      </span>
+
+      <span class="small pull-left" ng-show="panel.tmode == 'ranges_stats'">
+        &nbsp | {{ panel.tstat }} of <strong>{{ panel.valuefield }}</strong>
+      </span>
+
+      <div style="clear:both"></div>
+    </div>
+    <!-- END Pie or Bar chart -->
+
+
+  <!-- TABLE -->
+  <table ng-style="panel.style" class="table table-striped table-condensed" ng-show="panel.chart == 'table'">
+    <thead>
+      <th>Ranges</th> <th>Count</th> <th>Action</th>
+    </thead>
+    <tr ng-repeat="range in data" ng-show="showMeta(range)">
+      <td class="ranges-legend-range">{{range.label}}</td>
+      <td>{{range.data[0][1]}}</td>
+      <td>
+        <span ng-hide="range.meta == 'other'">
+          <i class='icon-search pointer' ng-click="build_search(range)"></i>
+          <i class='icon-ban-circle pointer' ng-click="build_search(range,true)"></i>
+        </span>
+      </td>
+    </tr>
+  </table>
+
+</div>

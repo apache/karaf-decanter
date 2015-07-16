@@ -1,4 +1,59 @@
-/*! kibana - v3.1.2 - 2014-11-07
- * Copyright (c) 2014 Rashid Khan; Licensed Apache License */
+define([
+  'angular',
+  'lodash'
+],
+function (angular, _) {
+  'use strict';
 
-define(["angular","lodash"],function(a,b){var c=a.module("kibana.factories");c.factory("storeFactory",function(){return function(a,c,d){if(!b.isFunction(a.$watch))throw new TypeError("Invalid scope.");if(!b.isString(c))throw new TypeError("Invalid name, expected a string that the is unique to this store.");if(d&&!b.isPlainObject(d))throw new TypeError("Invalid defaults, expected a simple object or nothing");d=d||{};var e=localStorage.getItem(c);if(null!=e)try{e=JSON.parse(e)}catch(f){e=null}if(null==e)e=b.clone(d);else{if(!b.isPlainObject(e))throw new TypeError("Invalid store value"+e);b.defaults(e,d)}return a[c]=e,a.$watch(c,function(e){void 0===e?(localStorage.removeItem(c),a[c]=b.clone(d)):localStorage.setItem(c,JSON.stringify(e))},!0),e}})});
+  var module = angular.module('kibana.factories');
+  module.factory('storeFactory', function() {
+
+    return function storeFactory($scope, name, defaults) {
+      if (!_.isFunction($scope.$watch)) {
+        throw new TypeError('Invalid scope.');
+      }
+      if (!_.isString(name)) {
+        throw new TypeError('Invalid name, expected a string that the is unique to this store.');
+      }
+      if (defaults && !_.isPlainObject(defaults)) {
+        throw new TypeError('Invalid defaults, expected a simple object or nothing');
+      }
+
+      defaults = defaults || {};
+
+      // get the current value, parse if it exists
+      var current = localStorage.getItem(name);
+      if (current != null) {
+        try {
+          current = JSON.parse(current);
+        } catch (e) {
+          current = null;
+        }
+      }
+
+      if (current == null) {
+        current = _.clone(defaults);
+      } else if (_.isPlainObject(current)) {
+        _.defaults(current, defaults);
+      } else {
+        throw new TypeError('Invalid store value' + current);
+      }
+
+      $scope[name] = current;
+
+      // listen for changes and store them in localStorage.
+      // delete the value to reset to the defaults, ie. `delete $scope[name]` -> digest cycle -> `$scope[name] == defaults`
+      $scope.$watch(name, function (val) {
+        if (val === void 0) {
+          localStorage.removeItem(name);
+          $scope[name] = _.clone(defaults);
+        } else {
+          localStorage.setItem(name, JSON.stringify(val));
+        }
+      }, true);
+
+      return current;
+    };
+  });
+
+});

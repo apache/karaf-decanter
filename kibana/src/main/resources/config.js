@@ -6,7 +6,7 @@
  */
 define(['settings'],
 function (Settings) {
-  
+  "use strict";
 
   /** @scratch /configuration/config.js/2
    *
@@ -23,13 +23,36 @@ function (Settings) {
      * the same host. By default this will attempt to reach ES at the same host you have
      * kibana installed on. You probably want to set it to the FQDN of your
      * elasticsearch host
-     *
-     * Note: this can also be an object if you want to pass options to the http client. For example:
-     *
-     *  +elasticsearch: {server: "http://localhost:9200", withCredentials: true}+
-     *
      */
     elasticsearch: "http://"+window.location.hostname+":9200",
+    
+    /** @scratch /configuration/config.js/5
+     *
+     * ==== api_version
+     *
+     * The elasticsearch api version you want to use. This must match the version of your elasticsearch server.
+     *
+     * Valid version: 0.9, 1.0, 1.1, 1.2
+     */
+    api_version: "1.0",
+    
+    /** @scratch /configuration/config.js/5
+     *
+     * ==== sniff
+     *
+     * Whether to sniff elasticsearch nodes on kibana start. kibana would send queries to nodes by round-robin. You may want to set to false if you had a proxy before elasticsearch cluster.
+     *
+     * Valid value: true, false
+     */
+    sniff: true,
+
+    /** @scratch /configuration/config.js/5
+     *
+     * ==== request_timeout
+     *
+     * The timeout in milliseconds for requests to Elasticsearch
+     */
+    request_timeout: 30000,
 
     /** @scratch /configuration/config.js/5
      *
@@ -75,6 +98,10 @@ function (Settings) {
       'terms',
       'stats',
       'sparklines',
+      'percentiles',
+      'ranges',
+      'force',
+      'statisticstrend',
       'multifieldhistogram',
       'valuehistogram'
     ]

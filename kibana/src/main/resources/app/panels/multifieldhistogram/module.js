@@ -85,6 +85,10 @@ function (angular, app, $, _, kbn, moment, timeSeries, numeral) {
       /** @scratch /panels/multifieldhistogram/3
        * derivative:: Show each point on the x-axis as the change from the previous point
        */
+      yaxisposition  : 'left',
+      /** @scratch /panels/multifieldhistogram/3
+       * yaxispostion:: Show y-axis at which position.
+       */
       derivative    : false,
       /** @scratch /panels/multifieldhistogram/5
        * queries array:: which query ids are selected.
@@ -93,7 +97,7 @@ function (angular, app, $, _, kbn, moment, timeSeries, numeral) {
       color       : null,
       alias       : null
     };
-
+    
     var _d = {
       /** @scra tch /panels/multifieldhistogram/3
        *
@@ -354,10 +358,7 @@ function (angular, app, $, _, kbn, moment, timeSeries, numeral) {
       }
 
       $scope.panelMeta.loading = true;
-      request = $scope.ejs.Request().indices(dashboard.indices[segment]);
-      if (!$scope.panel.annotate.enable) {
-        request.searchType("count");
-      }
+      request = $scope.ejs.Request();
 
       // Build the queries
       _.each($scope.panel.values, function(panel_value, panel_value_index) {
@@ -406,7 +407,7 @@ function (angular, app, $, _, kbn, moment, timeSeries, numeral) {
       $scope.populate_modal(request);
 
       // Then run it
-      results = request.doSearch();
+      results = $scope.ejs.doSearch(dashboard.indices[segment], request);
 
       // Populate scope when we have results
       return results.then(function(results) {
@@ -429,7 +430,7 @@ function (angular, app, $, _, kbn, moment, timeSeries, numeral) {
           var time_series,
             hits,
             counters; // Stores the bucketed hit counts.
-
+          
           _.each($scope.panel.values, function(panel_value, panel_value_index) {
             queries = querySrv.getQueryObjs(panel_value.queries);
             _.each(queries, function(q) {
@@ -492,11 +493,12 @@ function (angular, app, $, _, kbn, moment, timeSeries, numeral) {
                 color: panel_value.color || q.color,
                 alias: $scope.get_alias(panel_value, q),
               };
-
+              
               $scope.legend[serie_id] = {query:info,hits:hits};
 
               data[serie_id] = {
                 info: info,
+                yaxis: panel_value.yaxisposition === 'left' ? 1 : 2,
                 time_series: time_series,
                 hits: hits,
                 counters: counters
@@ -571,7 +573,7 @@ function (angular, app, $, _, kbn, moment, timeSeries, numeral) {
 
     // I really don't like this function, too much dom manip. Break out into directive?
     $scope.populate_modal = function(request) {
-      $scope.inspector = angular.toJson(JSON.parse(request.toString()),true);
+      $scope.inspector = request.toJSON();
     };
 
     $scope.set_refresh = function (state) {
@@ -589,7 +591,7 @@ function (angular, app, $, _, kbn, moment, timeSeries, numeral) {
     $scope.render = function() {
       $scope.$emit('render');
     };
-
+    
     $scope.add_new_value = function(panel) {
       panel.values.push(angular.copy($scope.defaultValue));
     };
@@ -677,11 +679,16 @@ function (angular, app, $, _, kbn, moment, timeSeries, numeral) {
                 },
                 shadowSize: 1
               },
-              yaxis: {
+              yaxes: [{
                 show: scope.panel['y-axis'],
                 min: scope.panel.grid.min,
                 max: scope.panel.percentage && scope.panel.stack ? 100 : scope.panel.grid.max
-              },
+              },{
+                show: scope.panel['y-axis'],
+                position: 'right',
+                min: scope.panel.grid.min,
+                max: scope.panel.percentage && scope.panel.stack ? 100 : scope.panel.grid.max
+              }],
               xaxis: {
                 timezone: scope.panel.timezone,
                 show: scope.panel['x-axis'],
@@ -701,14 +708,14 @@ function (angular, app, $, _, kbn, moment, timeSeries, numeral) {
             };
 
             if (scope.panel.y_format === 'bytes') {
-              options.yaxis.mode = "byte";
-              options.yaxis.tickFormatter = function (val, axis) {
+              options.yaxes[0].mode = "byte";
+              options.yaxes[0].tickFormatter = function (val, axis) {
                 return kbn.byteFormat(val, 0, axis.tickSize);
               };
             }
 
             if (scope.panel.y_format === 'short') {
-              options.yaxis.tickFormatter = function (val, axis) {
+              options.yaxis[0].tickFormatter = function (val, axis) {
                 return kbn.shortFormat(val, 0, axis.tickSize);
               };
             }

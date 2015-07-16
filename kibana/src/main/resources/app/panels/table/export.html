@@ -1,0 +1,12 @@
+  <div class="modal-body">
+    <div class="editor-option">
+      <h6>CSV filename</h6>
+      <input type="string" class="input-large" ng-model="csv.filename">
+    </div>
+    <form name="input" style="margin-bottom:0">
+    <button ng-click="exportAsCsv();" class="btn">Export</button>
+    </form>
+    <form name="input" style="margin-bottom:0">
+    <button ng-click="dismiss();" class="btn btn-danger">Close</button>
+    </form>
+  </div>
