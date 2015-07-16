@@ -105,6 +105,11 @@
                                     <type>cfg</type>
                                     <classifier>camel</classifier>
                                 </artifact>
+                                <artifact>
+                                    <file>src/main/cfg/org.apache.karaf.decanter.collector.jmx-activemq.cfg</file>
+                                    <type>cfg</type>
+                                    <classifier>activemq</classifier>
+                                </artifact>
                             </artifacts>
                         </configuration>
                     </execution>
