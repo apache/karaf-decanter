@@ -17,6 +17,8 @@
 package org.apache.karaf.decanter.collector.jmx;
 
 import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.*;
 
 import javax.management.MBeanAttributeInfo;
@@ -133,6 +135,15 @@ public class JmxCollector implements Runnable {
         Map<String, Object> data = new HashMap<>();
         data.put("type", type);
         data.put("ObjectName", name.toString());
+
+        String karafName = System.getProperty("karaf.name");
+        if (karafName != null) {
+            data.put("karafName", karafName);
+        }
+
+        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
+        data.put("hostName", InetAddress.getLocalHost().getHostName());
+
         for (MBeanAttributeInfo attribute : attributes) {
             try {
                 Object attributeObject = connection.getAttribute(name, attribute.getName());

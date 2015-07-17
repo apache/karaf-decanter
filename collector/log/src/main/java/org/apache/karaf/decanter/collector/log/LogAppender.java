@@ -16,6 +16,9 @@
  */
 package org.apache.karaf.decanter.collector.log;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,7 +64,14 @@ public class LogAppender implements PaxAppender {
 
         Map<String, Object> data = new HashMap<>();
         data.put("type", "log");
-        data.put("karafName", System.getProperty("karaf.name"));
+        String karafName = System.getProperty("karaf.name");
+        if (karafName != null) {
+            data.put("karafName", karafName);
+        }
+
+        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
+        data.put("hostName", InetAddress.getLocalHost().getHostName());
+
         data.put("timeStamp", event.getTimeStamp());
         data.put("loggerClass", event.getFQNOfLoggerClass());
         data.put("loggerName", event.getLoggerName());
