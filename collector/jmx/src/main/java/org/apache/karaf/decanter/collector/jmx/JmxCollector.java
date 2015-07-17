@@ -64,6 +64,7 @@ public class JmxCollector implements Runnable {
         JMXConnector connector = null;
         MBeanServerConnection connection = null;
 
+        String host = null;
         if (url == null || url.equalsIgnoreCase("local")) {
             LOGGER.debug("Harvesting local MBeanServer ({})...", type);
             connection = ManagementFactory.getPlatformMBeanServer();
@@ -86,6 +87,7 @@ public class JmxCollector implements Runnable {
                     connector = JMXConnectorFactory.connect(jmxServiceURL);
                 }
                 connection = connector.getMBeanServerConnection();
+                host = jmxServiceURL.toString();
             } catch (Exception e) {
                 LOGGER.error("Can't connect to MBeanServer {} ({})", url, type, e);
             }
@@ -101,7 +103,7 @@ public class JmxCollector implements Runnable {
                 }
                 for (ObjectName name : names) {
                     try {
-                        Map<String, Object> data = harvestBean(connection, name, type);
+                        Map<String, Object> data = harvestBean(connection, name, type, host);
                         Event event = new Event("decanter/collect/jmx/" + type + "/" + getTopic(name), data);
                         eventAdmin.postEvent(event);
                     } catch (Exception e) {
@@ -130,19 +132,19 @@ public class JmxCollector implements Runnable {
         return name.getDomain().replace(".", "/").replace(" ", "_");
     }
 
-    Map<String, Object> harvestBean(MBeanServerConnection connection, ObjectName name, String type) throws Exception {
+    Map<String, Object> harvestBean(MBeanServerConnection connection, ObjectName name, String type, String hostName) throws Exception {
         MBeanAttributeInfo[] attributes = connection.getMBeanInfo(name).getAttributes();
         Map<String, Object> data = new HashMap<>();
         data.put("type", type);
         data.put("ObjectName", name.toString());
 
-        String karafName = System.getProperty("karaf.name");
-        if (karafName != null) {
-            data.put("karafName", karafName);
+        if (hostName == null || hostName.isEmpty()) {
+            data.put("karafName", System.getProperty("karaf.name"));
+            data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
+            data.put("hostName", InetAddress.getLocalHost().getHostName());
+        } else {
+            data.put("hostName", hostName);
         }
-
-        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-        data.put("hostName", InetAddress.getLocalHost().getHostName());
 
         for (MBeanAttributeInfo attribute : attributes) {
             try {
