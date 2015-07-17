@@ -4,7 +4,7 @@
     "query": {
       "list": {
         "0": {
-          "query": "type:\"jmx-activemq\"",
+          "query": "ObjectName:org.apache.activemq*",
           "alias": "",
           "color": "#7EB26D",
           "id": 0,

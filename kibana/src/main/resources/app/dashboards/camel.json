@@ -28,7 +28,7 @@
           "pin": false,
           "type": "lucene",
           "enable": true,
-          "query": "MDC.bundle.name:*camel*"
+          "query": "loggerName:org.apache.camel*"
         }
       },
       "ids": [

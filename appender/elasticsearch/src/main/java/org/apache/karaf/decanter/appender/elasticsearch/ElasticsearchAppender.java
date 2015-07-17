@@ -22,15 +22,14 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.LockSupport;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import javax.json.*;
 
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -144,6 +143,36 @@ public class ElasticsearchAppender implements EventHandler {
             Object value = event.getProperty(key);
             if (value instanceof Map) {
                 jsonObjectBuilder.add(key, build((Map<String, Object>) value));
+            } else if (value instanceof List) {
+                jsonObjectBuilder.add(key, build((List) value));
+            } else if (value instanceof long[] || value instanceof Long[]) {
+                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+                long[] array = (long[]) value;
+                for (long l : array) {
+                    arrayBuilder.add(l);
+                }
+                jsonObjectBuilder.add(key, arrayBuilder.build());
+            } else if (value instanceof int[] || value instanceof Integer[]) {
+                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+                int[] array = (int[]) value;
+                for (int i : array) {
+                    arrayBuilder.add(i);
+                }
+                jsonObjectBuilder.add(key, arrayBuilder.build());
+            } else if (value instanceof String[]) {
+                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+                String[] array = (String[]) value;
+                for (String s : array) {
+                    arrayBuilder.add(s);
+                }
+                jsonObjectBuilder.add(key, arrayBuilder.build());
+            } else if (value instanceof Object[]) {
+                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+                Object[] array = (Object[]) value;
+                for (Object o : array) {
+                    arrayBuilder.add(o.toString());
+                }
+                jsonObjectBuilder.add(key, arrayBuilder.build());
             } else {
                 addProperty(jsonObjectBuilder, key, value);
             }
@@ -168,6 +197,33 @@ public class ElasticsearchAppender implements EventHandler {
         JsonObjectBuilder innerBuilder = Json.createObjectBuilder();
         for (Entry<String, Object> innerEntrySet : value.entrySet()) {
             addProperty(innerBuilder, innerEntrySet.getKey(), innerEntrySet.getValue());
+        }
+        return innerBuilder.build();
+    }
+
+    private JsonArray build(List values) {
+        JsonArrayBuilder innerBuilder = Json.createArrayBuilder();
+        for (Object value : values) {
+            if (value instanceof Map) {
+                innerBuilder.add(build((Map) value));
+            } else {
+                if (value instanceof BigDecimal)
+                    innerBuilder.add((BigDecimal) value);
+                else if (value instanceof BigInteger)
+                    innerBuilder.add((BigInteger) value);
+                else if (value instanceof String)
+                    innerBuilder.add((String) value);
+                else if (value instanceof Long)
+                    innerBuilder.add((Long) value);
+                else if (value instanceof Integer)
+                    innerBuilder.add((Integer) value);
+                else if (value instanceof Float)
+                    innerBuilder.add((Float) value);
+                else if (value instanceof Double)
+                    innerBuilder.add((Double) value);
+                else if (value instanceof Boolean)
+                    innerBuilder.add((Boolean) value);
+            }
         }
         return innerBuilder.build();
     }

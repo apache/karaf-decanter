@@ -22,8 +22,7 @@ import java.util.*;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
-import javax.management.openmbean.CompositeDataSupport;
-import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.*;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
@@ -133,16 +132,16 @@ public class JmxCollector implements Runnable {
         MBeanAttributeInfo[] attributes = connection.getMBeanInfo(name).getAttributes();
         Map<String, Object> data = new HashMap<>();
         data.put("type", type);
+        data.put("ObjectName", name.toString());
         for (MBeanAttributeInfo attribute : attributes) {
             try {
-                // TODO add SLA check on attributes and filtering
                 Object attributeObject = connection.getAttribute(name, attribute.getName());
                 if (attributeObject instanceof String) {
                     data.put(attribute.getName(), (String) attributeObject);
                 } else if (attributeObject instanceof ObjectName) {
                     data.put(attribute.getName(), ((ObjectName) attributeObject).toString());
-                } else if (attributeObject instanceof CompositeDataSupport) {
-                    CompositeDataSupport cds = (CompositeDataSupport) attributeObject;
+                } else if (attributeObject instanceof CompositeDataSupport || attributeObject instanceof CompositeData) {
+                    CompositeData cds = (CompositeData) attributeObject;
                     CompositeType compositeType = cds.getCompositeType();
                     Set<String> keySet = compositeType.keySet();
                     Map<String, Object> composite = new HashMap<String, Object>();
@@ -155,8 +154,35 @@ public class JmxCollector implements Runnable {
                         || attributeObject instanceof Integer
                         || attributeObject instanceof Boolean
                         || attributeObject instanceof Float
-                        || attributeObject instanceof Double){
+                        || attributeObject instanceof Double) {
                     data.put(attribute.getName(), attributeObject);
+                } else if (attributeObject instanceof TabularDataSupport || attributeObject instanceof TabularData) {
+                    TabularData tds = (TabularData) attributeObject;
+                    TabularType tabularType = tds.getTabularType();
+                    CompositeType compositeType = tabularType.getRowType();
+                    Collection values = tds.values();
+                    ArrayList<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+                    for (Object value : values) {
+                        CompositeDataSupport cds = (CompositeDataSupport) value;
+                        Set<String> keySet = compositeType.keySet();
+                        Map<String, Object> composite = new HashMap<String, Object>();
+                        list.add(composite);
+                        for (String key : keySet) {
+                            Object cdsObject = cds.get(key);
+                            composite.put(key, cdsObject);
+                        }
+                    }
+                    data.put(attribute.getName(), list);
+                } else if (attributeObject instanceof Object[]) {
+                    data.put(attribute.getName(), (Object[]) attributeObject);
+                } else if (attributeObject instanceof long[]) {
+                    data.put(attribute.getName(), (long[]) attributeObject);
+                } else if (attributeObject instanceof String[]) {
+                    data.put(attribute.getName(), (String[]) attributeObject);
+                } else if (attributeObject instanceof int[]) {
+                    data.put(attribute.getName(), (int[]) attributeObject);
+                } else {
+                    data.put(attribute.getName(), attributeObject.toString());
                 }
             } catch (SecurityException se) {
                 LOGGER.error("SecurityException: ", se);
