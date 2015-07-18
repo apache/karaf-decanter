@@ -5,15 +5,11 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import javax.sql.DataSource;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.Properties;
 
 public class Activator implements BundleActivator {
 
