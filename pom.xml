@@ -49,6 +49,7 @@
         <module>scheduler</module>
         <module>collector</module>
         <module>appender</module>
+        <module>sla</module>
         <module>elasticsearch</module>
         <module>kibana</module>
         <module>assembly</module>
