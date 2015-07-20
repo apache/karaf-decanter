@@ -88,9 +88,15 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.sla.checker.cfg">mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.checker/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-sla-log" version="${project.version}" description="Karaf Decanter SLA log">
+    <feature name="decanter-sla-log" version="${project.version}" description="Karaf Decanter SLA log alerter">
         <feature version="${project.version}">decanter-sla</feature>
         <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.log/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-sla-camel" version="${project.version}" description="Karaf Decanter SLA Camel alerter">
+        <feature version="${project.version}">decanter-sla</feature>
+        <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.camel/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.sla.camel.cfg">mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.camel/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="elasticsearch" version="${elasticsearch.version}" description="Embedded Elasticsearch node">
