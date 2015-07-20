@@ -76,6 +76,12 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.jdbc.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jdbc/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-appender-camel" version="${project.version}" description="Karaf Decanter Camel Appender">
+        <feature version="${project.version}">decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.camel/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.camel.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.camel/${project.version}/cfg</configfile>
+    </feature>
+
     <feature name="decanter-sla" version="${project.version}" description="Karaf Decanter SLA support">
         <feature version="${project.version}">decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.checker/${project.version}</bundle>
