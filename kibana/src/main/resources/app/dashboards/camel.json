@@ -29,12 +29,22 @@
           "type": "lucene",
           "enable": true,
           "query": "loggerName:org.apache.camel*"
+        },
+        "3": {
+          "id": 3,
+          "color": "#EF843C",
+          "alias": "tracer",
+          "pin": false,
+          "type": "lucene",
+          "enable": true,
+          "query": "type:\"camelTracer\""
         }
       },
       "ids": [
         0,
         1,
-        2
+        2,
+        3
       ]
     },
     "filter": {
@@ -42,7 +52,7 @@
         "0": {
           "type": "time",
           "field": "@timestamp",
-          "from": "now-15m",
+          "from": "now-5m",
           "to": "now",
           "mandate": "must",
           "active": true,
@@ -378,7 +388,7 @@
           },
           "auto_int": true,
           "resolution": 100,
-          "interval": "10s",
+          "interval": "1s",
           "intervals": [
             "auto",
             "1s",
@@ -503,7 +513,7 @@
       "panels": [
         {
           "error": false,
-          "span": 12,
+          "span": 6,
           "editable": true,
           "group": [
             "default"
@@ -514,7 +524,7 @@
           "offset": 0,
           "sort": [
             "ObjectName",
-            "desc"
+            "asc"
           ],
           "style": {
             "font-size": "9pt"
@@ -532,15 +542,53 @@
               2
             ]
           },
-          "field_list": true,
+          "field_list": false,
           "status": "Stable",
           "trimFactor": 300,
           "normTimes": true,
-          "title": "Documents",
+          "title": "Log Messages",
           "all_fields": false,
           "localTime": false,
           "timeField": "@timestamp",
           "exportable": true
+        },
+        {
+          "error": false,
+          "span": 6,
+          "editable": true,
+          "type": "table",
+          "loadingEditor": false,
+          "size": 100,
+          "pages": 5,
+          "offset": 0,
+          "sort": [
+            "_score",
+            "desc"
+          ],
+          "overflow": "min-height",
+          "fields": [],
+          "highlight": [],
+          "sortable": true,
+          "header": true,
+          "paging": true,
+          "field_list": false,
+          "all_fields": false,
+          "trimFactor": 300,
+          "localTime": false,
+          "timeField": "@timestamp",
+          "spyable": true,
+          "exportable": true,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              3
+            ]
+          },
+          "style": {
+            "font-size": "9pt"
+          },
+          "normTimes": true,
+          "title": "Tracer"
         }
       ],
       "notice": false
@@ -578,16 +626,16 @@
       "query": "*",
       "pinned": true,
       "history": [
-        "MDC.bundle.name:*camel*",
+        "type:\"camelTracer\"",
+        "loggerName:org.apache.camel*",
         "RouteId:\"other\"",
         "RouteId:\"test\"",
+        "type=\"camel-tracer\"",
+        "*",
+        "MDC.bundle.name:*camel*",
         "MDC.bundle.name:\"*camel*\"",
         "type:\"log\"",
-        "RouteId:\"test\" AND MeanProcessingTime:\"*\"",
-        "*",
-        "RouteId:\"*\"",
-        "ObjectName:\"org.apache.camel*\"",
-        "ObjectName:*camel*"
+        "RouteId:\"test\" AND MeanProcessingTime:\"*\""
       ],
       "remember": 10,
       "enable": true,

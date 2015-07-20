@@ -29,14 +29,14 @@
     </parent>
 
     <groupId>org.apache.karaf.decanter</groupId>
-    <artifactId>org.apache.karaf.decanter.collector</artifactId>
+    <artifactId>collector</artifactId>
     <packaging>pom</packaging>
     <name>Apache Karaf :: Decanter :: Collector</name>
 
     <modules>
         <module>jmx</module>
         <module>log</module>
-        <!-- TODO camel tracer <module>camel</module> -->
+        <module>camel-tracer</module>
     </modules>
 
 </project>

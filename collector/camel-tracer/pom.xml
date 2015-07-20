@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <!--
 
@@ -29,17 +29,17 @@
     </parent>
 
     <groupId>org.apache.karaf.decanter.collector</groupId>
-    <artifactId>org.apache.karaf.decanter.collector.log</artifactId>
+    <artifactId>org.apache.karaf.decanter.collector.camel-tracer</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Collector :: Log</name>
+    <name>Apache Karaf :: Decanter :: Collector :: Camel Tracer</name>
 
     <dependencies>
 
-        <!-- Pax Logging -->
+        <!-- Camel -->
         <dependency>
-            <groupId>org.ops4j.pax.logging</groupId>
-            <artifactId>pax-logging-service</artifactId>
-            <version>1.7.3</version>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+            <version>${camel.version}</version>
         </dependency>
 
         <!-- OSGi -->
@@ -50,12 +50,6 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
-
-        <!-- SLF4J -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
         </dependency>
 
     </dependencies>
@@ -71,12 +65,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Version>${project.version}</Bundle-Version>
-                        <Bundle-Activator>org.apache.karaf.decanter.collector.log.Activator</Bundle-Activator>
-                        <Import-Package>
-                            org.apache.karaf.decanter.api;version=${project.version},
-                            org.slf4j;version="[1.7,2)";resolution:=optional,
-                            *
-                        </Import-Package>
+                        <Export-Package>
+                            org.apache.karaf.decanter.collector.camel;version="${project.version}"
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>

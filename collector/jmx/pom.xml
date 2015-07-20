@@ -23,7 +23,7 @@
 
     <parent>
         <groupId>org.apache.karaf.decanter</groupId>
-        <artifactId>org.apache.karaf.decanter.collector</artifactId>
+        <artifactId>collector</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>

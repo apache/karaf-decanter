@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <reference id="eventAdmin" interface="org.osgi.service.event.EventAdmin"/>
+
+    <bean id="traceHandler" class="org.apache.karaf.decanter.collector.camel.DecanterTraceEventHandler">
+        <property name="eventAdmin" ref="eventAdmin"/>
+    </bean>
+
+    <bean id="tracer" class="org.apache.camel.processor.interceptor.Tracer">
+        <property name="traceHandler" ref="traceHandler"/>
+        <property name="enabled" value="true"/>
+        <property name="traceOutExchanges" value="true"/>
+        <property name="logLevel" value="OFF"/>
+    </bean>
+
+    <camelContext trace="true" xmlns="http://camel.apache.org/schema/blueprint">
+        <route id="test">
+            <from uri="timer:fire?period=10000"/>
+            <setBody><constant>Hello World</constant></setBody>
+            <to uri="log:test"/>
+        </route>
+    </camelContext>
+
+</blueprint>

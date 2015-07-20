@@ -51,6 +51,11 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.jmx-activemq.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}/cfg/activemq</configfile>
     </feature>
 
+    <feature name="decanter-collector-camel-tracer" version="${project.version}" description="Karaf Decanter Camel Tracer Collector">
+        <feature version="${project.version}">decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.camel-tracer/${project.version}</bundle>
+    </feature>
+
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature version="${project.version}">decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}</bundle>

@@ -35,6 +35,7 @@
     <name>Apache Karaf :: Decanter</name>
 
     <properties>
+        <camel.version>2.13.2</camel.version>
         <elasticsearch.version>1.6.0</elasticsearch.version>
         <elasticsearch.bundle.version>1.6.0_1</elasticsearch.bundle.version>
         <karaf.version>3.0.2</karaf.version>
