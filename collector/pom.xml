@@ -37,6 +37,7 @@
         <module>jmx</module>
         <module>log</module>
         <module>camel-tracer</module>
+        <module>system</module>
     </modules>
 
 </project>

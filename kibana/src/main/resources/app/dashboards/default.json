@@ -39,7 +39,7 @@
           "type": "text",
           "mode": "markdown",
           "title": "Decanter Kibana", 
-          "content": "### Welcome to Decanter. \n\nDecanter provides ready to use dashboards. You can change and update these dashboards to match your needs. \n\n 1. [Karaf](index.html#/dashboard/file/karaf.json) *Provide details about Karaf container* \n 2. [Camel](index.html#/dashboard/file/camel.json) *Provide details about Camel routes* \n 3. [ActiveMQ](index.html#/dashboard/file/activemq.json) *Provide details about ActiveMQ brokers* \n\n You can also create your own dashboards from scratch, for monitoring of your own application, BAM, etc. \n To do this, you can start from: \n 1. [Blank dashboard](index.html#/dashboard/file/blank.json) \n 2. [Simple dashboard](index.html#/dashboard/file/guided.json)",
+          "content": "### Welcome to Decanter. \n\nDecanter provides ready to use dashboards. You can change and update these dashboards to match your needs. \n\n 1. [Karaf](index.html#/dashboard/file/karaf.json) *Provide details about Karaf container* \n 2. [Camel](index.html#/dashboard/file/camel.json) *Provide details about Camel routes* \n 3. [ActiveMQ](index.html#/dashboard/file/activemq.json) *Provide details about ActiveMQ brokers* \n 4. [OperatingSystem](index.html#/dashboard/file/system.json) *Provide detail about Operating System using the system collector and system scripts* \n\n You can also create your own dashboards from scratch, for monitoring of your own application, BAM, etc. \n To do this, you can start from: \n 1. [Blank dashboard](index.html#/dashboard/file/blank.json) \n 2. [Simple dashboard](index.html#/dashboard/file/guided.json)",
           "style": {},
           "status": "Stable"
         }
