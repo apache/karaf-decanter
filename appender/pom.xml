@@ -37,9 +37,8 @@
         <module>log</module>
         <module>elasticsearch</module>
         <module>jdbc</module>
+        <module>jms</module>
         <module>camel</module>
-        <!-- TODO add redis appender -->
-        <!-- TODO jms/activemq appender -->
     </modules>
 
 </project>
