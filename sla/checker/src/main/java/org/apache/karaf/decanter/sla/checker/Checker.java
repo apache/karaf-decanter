@@ -52,7 +52,7 @@ public class Checker implements EventHandler {
                 String pattern = (String) config.get(name + ".error");
                 Object value = collectEvent.getProperty(name);
                 if (!validate(pattern, value)) {
-                    Event alertEvent = populateAlertEvent("error", collectEvent);
+                    Event alertEvent = populateAlertEvent("error", collectEvent, name, pattern);
                     eventAdmin.postEvent(alertEvent);
                 }
             }
@@ -62,16 +62,18 @@ public class Checker implements EventHandler {
                 String pattern = (String) config.get(name + ".warn");
                 Object value = collectEvent.getProperty(name);
                 if (!validate(pattern, value)) {
-                    Event alertEvent = populateAlertEvent("warn", collectEvent);
+                    Event alertEvent = populateAlertEvent("warn", collectEvent, name, pattern);
                     eventAdmin.postEvent(alertEvent);
                 }
             }
         }
     }
 
-    private Event populateAlertEvent(String level, Event collectEvent) {
+    private Event populateAlertEvent(String level, Event collectEvent, String attribute, String pattern) {
         Map<String, Object> data = new HashMap<>();
         data.put("alertLevel", level);
+        data.put("alertAttribute", attribute);
+        data.put("alertPattern", pattern);
         for (String name : collectEvent.getPropertyNames()) {
             data.put(name, collectEvent.getProperty(name));
         }
