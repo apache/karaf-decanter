@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.sla.camel;
+package org.apache.karaf.decanter.sla.email;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -32,8 +32,9 @@ public class Activator implements BundleActivator {
 
     private ServiceRegistration serviceRegistration;
 
-    private final static String CONFIG_PID = "org.apache.karaf.decanter.sla.camel";
+    private final static String CONFIG_PID = "org.apache.karaf.decanter.sla.email";
 
+    @Override
     public void start(BundleContext bundleContext) {
         Dictionary<String, String> properties = new Hashtable<>();
         properties.put(Constants.SERVICE_PID, CONFIG_PID);
@@ -41,36 +42,53 @@ public class Activator implements BundleActivator {
                 properties);
     }
 
+    @Override
     public void stop(BundleContext bundleContext) {
         if (serviceRegistration != null) {
             serviceRegistration.unregister();
         }
     }
 
-    private final class ConfigUpdater implements ManagedService {
+    private class ConfigUpdater implements ManagedService {
 
         private BundleContext bundleContext;
-        private ServiceRegistration serviceReg;
+        private ServiceRegistration registration;
 
         public ConfigUpdater(BundleContext bundleContext) {
             this.bundleContext = bundleContext;
         }
 
-        @Override
         public void updated(Dictionary config) throws ConfigurationException {
-            if (serviceReg != null) {
-                serviceReg.unregister();
+            if (registration != null) {
+                registration.unregister();
             }
-            if (config == null || config.get("alert.destination.uri") == null) {
-                throw new ConfigurationException("alert.destination.uri", "alert.destination.uri property is not defined");
+            if (config == null || config.get("from") == null) {
+                throw new ConfigurationException("from", "from property is not defined");
             }
-            String alertDestinationUri = (String) config.get("alert.destination.uri");
-            CamelAlerter alerter = new CamelAlerter(alertDestinationUri);
+            String from = (String) config.get("from");
+            if (config == null || config.get("to") == null) {
+                throw new ConfigurationException("to", "to property is not defined");
+            }
+            String to = (String) config.get("to");
+            if (config == null || config.get("host") == null) {
+                throw new ConfigurationException("host", "host property is not defined");
+            }
+            String host = (String) config.get("host");
+            String port = (String) config.get("port");
+            String auth = (String) config.get("auth");
+            String starttls = (String) config.get("starttls");
+            String ssl = (String) config.get("ssl");
+            String username = null;
+            String password = null;
+            if (config != null) {
+                username = (String) config.get("username");
+                password = (String) config.get("password");
+            }
+            EmailAlerter alerter = new EmailAlerter(from, to, host, port, auth, starttls, ssl, username, password);
             Dictionary<String, String> properties = new Hashtable<>();
             properties.put(EventConstants.EVENT_TOPIC, "decanter/alert/*");
-            serviceReg =  bundleContext.registerService(EventHandler.class, alerter, properties);
+            registration =  bundleContext.registerService(EventHandler.class, alerter, properties);
         }
 
     }
-
 }

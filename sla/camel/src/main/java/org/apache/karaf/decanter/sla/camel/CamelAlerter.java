@@ -23,14 +23,15 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
 import java.util.HashMap;
+import java.util.Map;
 
-public class CamelSla implements EventHandler {
+public class CamelAlerter implements EventHandler {
 
     private CamelContext camelContext;
-    private String alertDestiantionUri;
+    private String alertDestinationUri;
 
-    public CamelSla(String alertDestiantionUri) {
-        this.alertDestiantionUri = alertDestiantionUri;
+    public CamelAlerter(String alertDestinationUri) {
+        this.alertDestinationUri = alertDestinationUri;
         this.camelContext = new DefaultCamelContext();
     }
 
@@ -41,7 +42,11 @@ public class CamelSla implements EventHandler {
             data.put(name, event.getProperty(name));
         }
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
-        producerTemplate.sendBodyAndHeader(alertDestiantionUri, data, "alertLevel", event.getProperty("alertLevel"));
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("alertLevel", event.getProperty("alertLevel"));
+        headers.put("alertAttribute", event.getProperty("alertAttribute"));
+        headers.put("alertPattern", event.getProperty("alertPattern"));
+        producerTemplate.sendBodyAndHeaders(alertDestinationUri, data, headers);
     }
 
 }

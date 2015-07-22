@@ -107,6 +107,13 @@
         <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.log/${project.version}</bundle>
     </feature>
 
+    <feature name="decanter-sla-email" version="${project.version}" description="Karaf Decanter SLA email alerter">
+        <feature version="${project.version}">decanter-sla</feature>
+        <bundle>mvn:javax.mail/mail/1.4.7</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.email/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.sla.email.cfg">mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.email/${project.version}/cfg</configfile>
+    </feature>
+
     <feature name="decanter-sla-camel" version="${project.version}" description="Karaf Decanter SLA Camel alerter">
         <feature version="${project.version}">decanter-sla</feature>
         <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.camel/${project.version}</bundle>

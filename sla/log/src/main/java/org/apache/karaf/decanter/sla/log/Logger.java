@@ -31,9 +31,11 @@ public class Logger implements EventHandler {
             builder.append(innerKey).append(":").append(event.getProperty(innerKey).toString()).append(" | ");
         }
         if (event.getProperty("alertLevel") != null && ((String) event.getProperty("alertLevel")).equalsIgnoreCase("error")) {
-            LOGGER.error("DECANTER SLA ALERT: {}", builder.toString());
+            LOGGER.error("DECANTER SLA ALERT: {} out of pattern {}", event.getProperty("alertAttribute"), event.getProperty("alertPattern"));
+            LOGGER.error("DECANTER SLA ALERT: Details: {}", builder.toString());
         } else {
-            LOGGER.warn("DECANTER SLA ALERT: {}", builder.toString());
+            LOGGER.warn("DECANTER SLA ALERT: {} out of pattern {}", event.getProperty("alertAttribute"), event.getProperty("alertPattern"));
+            LOGGER.warn("DECANTER SLA ALERT: Details: {}", builder.toString());
         }
     }
 

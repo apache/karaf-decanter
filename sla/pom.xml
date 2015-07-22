@@ -36,6 +36,7 @@
     <modules>
         <module>checker</module>
         <module>log</module>
+        <module>email</module>
         <module>camel</module>
     </modules>
 
