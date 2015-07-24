@@ -14,8 +14,6 @@
 
 Apache Karaf Decanter - User Guide
 ==================================
-Apache Software Foundation
-:doctype: book
 :toc: left
 :toclevels: 3
 :toc-position: left
