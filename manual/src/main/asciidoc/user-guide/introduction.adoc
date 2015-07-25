@@ -1,0 +1,39 @@
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+== Introduction
+
+Apache Karaf Decanter is monitoring solution running in Apache Karaf.
+
+It's composed in three parts:
+
+* Collectors are responsible of harvesting monitoring data. Decanter provides collectors to harvest different kind
+of data. We have two kinds of collectors:
+** Event Driven Collectors automatically react to events and send the event data to the Decanter appenders.
+** Polled Collectors are periodically called by the Decanter Scheduler. They harvest data and send it to the Decanter
+appenders
+* Appenders receive the data from the collectors and are responsible to store the data into a given backend. Decanter
+provides appenders depending of the backend storage that you want to use.
+* SLA is a special kind of appender. It receives all harvested data and checks on it. If a check fails, an alert event
+is created and sent to alerters. Decanter provides alerters depending of the kind of notification that you want.
+
+Apache Karaf Decanter provides Karaf features for each collector, appender, SLA alerter.
+
+The first thing to do is to add the Decanter features repository in Karaf:
+
+----
+karaf@root()> feature:repo-add mvn:org.apache.karaf.decanter/apache-karaf-decanter/1.0.0/xml/features
+----
+
+Now, you have to install the collectors, appenders, and eventually SLA alerters feature to match your need.

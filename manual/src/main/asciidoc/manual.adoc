@@ -25,4 +25,11 @@ Apache Software Foundation
 User Guide
 ----------
 
-include::user-guide/index.adoc[]
+include::user-guide/introduction.adoc[]
+
+include:user-guide/collectors.adoc[]
+
+include:user-guide/appenders.adoc[]
+
+Developer Guide
+---------------
