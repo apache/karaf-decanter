@@ -68,7 +68,8 @@ public class Activator implements BundleActivator {
 
             String host = config != null ? (String)config.get("host") : "localhost";
             int port = config != null ? Integer.parseInt((String)config.get("port")) : 9300;
-            appender = new ElasticsearchAppender(host, port);
+            String clusterName = config != null ? (String)config.get("clusterName") : "elasticsearch";
+            appender = new ElasticsearchAppender(host, port, clusterName);
             appender.open();
             Dictionary<String, String> properties = new Hashtable<>();
             properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");

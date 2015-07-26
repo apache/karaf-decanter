@@ -46,7 +46,7 @@ public class TestElasticsearchAppender {
        
        Node node = nodeBuilder().settings(settings).node();
        
-       ElasticsearchAppender appender = new ElasticsearchAppender("127.0.0.1", 9300);
+       ElasticsearchAppender appender = new ElasticsearchAppender("127.0.0.1", 9300, "elasticsearch");
        appender.open();
        appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
        appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));

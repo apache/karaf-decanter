@@ -62,10 +62,12 @@ public class ElasticsearchAppender implements EventHandler {
 
     private String host;
     private int port;
+	private String cluster;
 
-    public ElasticsearchAppender(String host, int port) {
+    public ElasticsearchAppender(String host, int port, String cluster) {
         this.host = host;
         this.port = port;
+        this.cluster = cluster;
         TimeZone tz = TimeZone.getTimeZone( "UTC" );
         tsFormat.setTimeZone(tz);
         indexDateFormat.setTimeZone(tz);
@@ -74,7 +76,10 @@ public class ElasticsearchAppender implements EventHandler {
     @SuppressWarnings("resource")
     public void open() {
         try {
-            Settings settings = settingsBuilder().classLoader(Settings.class.getClassLoader()).build();
+            Settings settings = settingsBuilder()
+            						.classLoader(Settings.class.getClassLoader())
+            						.put("cluster.name", cluster)
+            						.build();
             InetSocketTransportAddress address = new InetSocketTransportAddress(host, port);
             client = new TransportClient(settings).addTransportAddress(address);
             bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
@@ -170,7 +175,8 @@ public class ElasticsearchAppender implements EventHandler {
                 JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
                 Object[] array = (Object[]) value;
                 for (Object o : array) {
-                    arrayBuilder.add(o.toString());
+                	if (o != null)
+                		arrayBuilder.add(o.toString());
                 }
                 jsonObjectBuilder.add(key, arrayBuilder.build());
             } else {
