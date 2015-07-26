@@ -35,3 +35,9 @@ include::user-guide/sla.adoc[]
 = Developer Guide
 
 include::dev-guide/architecture.adoc[]
+
+include::dev-guide/custom-collector.adoc[]
+
+include::dev-guide/custom-appender.adoc[]
+
+include::dev-guide/custom-alerter.adoc[]

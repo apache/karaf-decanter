@@ -1,0 +1,319 @@
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+== Custom Collector
+
+A Decanter collector sends an OSGi EventAdmin event to a `decanter/collect/*` topic.
+
+You can create two kinds of collector:
+
+* event driven collector automatically reacts to some internal events. It creates an event sent to a topic.
+* polled collector is a Runnable OSGi service periodically executed by the Decanter Scheduler.
+
+=== Event Driven Collector
+
+For instance, the log collector is event driven: it automatically reacts to internal log events.
+
+To illustrate an Event Driven Collector, we can create a BundleCollector. This collector will react when a bundle state
+changes (installed, started, stopped, uninstalled).
+
+The purpose is to send a monitoring event in a collect topic. This monitoring event can be consumed by the appenders.
+
+We create the following `BundleCollector` class implemetings `SynchronousBundleListener` interface:
+
+----
+package org.apache.karaf.decanter.sample.collector;
+
+import org.osgi.framework.SynchronousBundleListener;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.Event;
+import java.util.HashMap;
+
+public class BundleCollector implements SynchronousBundleListener {
+
+    private EventAdmin eventAdmin;
+
+    public BundleCollector(Event eventAdmin) {
+      this.eventAdmin = eventAdmin;
+    }
+
+    @Override
+    public void bundleChanged(BundleEvent bundleEvent) {
+      HashMap<String, Object> data = new HashMap<>();
+      data.put("type", "bundle");
+      data.put("change", bundleEvent.getType());
+      data.put("id", bundleEvent.getBundle().getId());
+      data.put("location", bundleEvent.getBundle().getLocation());
+      data.put("symbolicName", bundleEvent.getBundle().getSymbolicName());
+      Event event = new Event("decanter/collect/bundle", data);
+      eventAdmin.postEvent(event);
+    }
+
+}
+----
+
+You can see here the usage of the OSGi EventAdmin as dispatcher: the collector creates a data map, and send it to
+a `decanter/collect/bundle` topic.
+
+We just need an Activator in the collector bundle to start our BundleCollector listener:
+
+----
+package org.apache.karaf.decanter.sample.collector;
+
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.util.tracker.ServiceTracker;
+
+public class Activator implements BundleActivator {
+
+       private BundleCollector collector;
+
+       public void start(final BundleContext bundleContext) {
+           ServiceTracker tracker = new ServiceTracker(bundleContext, EventAdmin.class.getName(), null);
+           EventAdmin eventAdmin = (EventAdmin) tracker.waitForService(10000);
+           collector = new BundleCollector(eventAdmin);
+       }
+
+       public void stop(BundleContext bundleContext) {
+           collector = null;
+       }
+
+}
+----
+
+Now, we just need a Maven `pom.xml` to package the bundle with the correct OSGi headers:
+
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!--
+
+        Licensed to the Apache Software Foundation (ASF) under one or more
+        contributor license agreements.  See the NOTICE file distributed with
+        this work for additional information regarding copyright ownership.
+        The ASF licenses this file to You under the Apache License, Version 2.0
+        (the "License"); you may not use this file except in compliance with
+        the License.  You may obtain a copy of the License at
+
+           http://www.apache.org/licenses/LICENSE-2.0
+
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
+    -->
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.apache.karaf.decanter.sample.collector</groupId>
+    <artifactId>org.apache.karaf.decanter.sample.collector.bundle</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+    <name>Apache Karaf :: Decanter :: Sample :: Collector :: Bundle</name>
+
+    <dependencies>
+
+        <!-- OSGi -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.4.0</version>
+                <inherited>true</inherited>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Bundle-Activator>org.apache.karaf.decanter.sample.collector.bundle.Activator</Bundle-Activator>
+                        <Import-Package>
+                            *
+                        </Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+----
+
+You can now enable this collector, just by installing the bundle in Apache Karaf (using the deploy folder, or the
+`bundle:install` command.
+
+=== Polled Collector
+
+You can also create a polled collector.
+
+A polled collector is basically a Runnable OSGi service, periodically executed for you by the Decanter Scheduler.
+
+The run() method of the polled collector is responsible to harvest the data and send the monitoring event.
+
+For instance, we can create a very simple polled collector sending a constant `Hello World` string.
+
+We create the HelloCollector class implementing the Runnable interface:
+
+----
+package org.apache.karaf.decanter.sample.collector.hello;
+
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import java.util.HashMap;
+
+public class HelloCollector implements Runnable {
+
+  private EventAdmin eventAdmin;
+
+  public HelloCollector(EventAdmin eventAdmin) {
+    this.eventAdmin = eventAdmin;
+  }
+
+  @Override
+  public void run() {
+    HashMap<String, Object> data = new HashMap<>();
+    data.put("type", "hello");
+    data.put("message", "Hello World");
+    Event event = new Event("decanter/collect/hello", data);
+    eventAdmin.postEvent(event);
+  }
+
+}
+----
+
+You can see the `run()` method which post the monitoring event in the `decanter/collector/hello` topic.
+
+We just need a BundleActivator to register the HelloCollector as an OSGi service:
+
+----
+package org.apache.karaf.decanter.sample.collector.hello;
+
+import org.osgi.framework.*;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.util.tracker.ServiceTracker;
+
+public class Activator implements BundleActivator {
+
+    private ServiceRegistration registration;
+
+    public void start(BundleContext bundleContext) {
+       ServiceTracker tracker = new ServiceTracker(bundleContext, EventAdmin.class.getName(), null);
+       EventAdmin eventAdmin = tracker.waitForService(10000);
+       HelloCollector collector = new HelloCollector(eventAdmin);
+
+       Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
+       serviceProperties.put("decanter.collector.name", "hello");
+       registration = bundleContext.registerService(Runnable.class, collector, serviceProperties);
+    }
+
+    public void stop(BundleContext bundleContext) {
+       if (registration != null) registration.unregister();
+    }
+
+}
+----
+
+Now, we can package the bundle using the following Maven pom.xml:
+
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!--
+
+        Licensed to the Apache Software Foundation (ASF) under one or more
+        contributor license agreements.  See the NOTICE file distributed with
+        this work for additional information regarding copyright ownership.
+        The ASF licenses this file to You under the Apache License, Version 2.0
+        (the "License"); you may not use this file except in compliance with
+        the License.  You may obtain a copy of the License at
+
+           http://www.apache.org/licenses/LICENSE-2.0
+
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
+    -->
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.apache.karaf.decanter.sample.collector</groupId>
+    <artifactId>org.apache.karaf.decanter.sample.collector.hello</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+    <name>Apache Karaf :: Decanter :: Sample :: Collector :: Hello</name>
+
+    <dependencies>
+
+        <!-- OSGi -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.4.0</version>
+                <inherited>true</inherited>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Bundle-Activator>org.apache.karaf.decanter.sample.collector.hello.Activator</Bundle-Activator>
+                        <Import-Package>
+                            *
+                        </Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+----
+
+You can now enable this collector, just by installing the bundle in Apache Karaf (using the deploy folder, or the
+`bundle:install` command.
