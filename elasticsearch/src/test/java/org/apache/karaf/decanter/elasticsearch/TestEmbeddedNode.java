@@ -23,6 +23,8 @@ import org.elasticsearch.node.Node;
 
 import static org.junit.Assert.*;
 
+import java.util.Dictionary;
+
 import org.junit.Test;
 
 public class TestEmbeddedNode {
@@ -33,7 +35,9 @@ public class TestEmbeddedNode {
         System.setProperty("karaf.home", "/tmp");
         System.setProperty("karaf.name", "decanter-test");
 
-        EmbeddedNode embeddedNode = new EmbeddedNode();
+        Dictionary<String, ?> configuration = null;
+		EmbeddedNode embeddedNode = new EmbeddedNode(configuration);
+        
         Node node = embeddedNode.getNode();
         embeddedNode.start();
         ClusterHealthResponse healthResponse = node.client().admin().cluster().health(Requests.clusterHealthRequest()).actionGet();
