@@ -17,8 +17,6 @@
 package org.apache.karaf.decanter.collector.log;
 
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
