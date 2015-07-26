@@ -41,7 +41,7 @@
                 <version>1.6</version>
                 <executions>
                     <execution>
-                        <id>create-manual</id>
+                        <id>create-user-guide</id>
                         <phase>package</phase>
                         <goals>
                             <goal>run</goal>
@@ -49,16 +49,16 @@
                         <configuration>
                             <tasks>
                                 <mkdir dir="target"/>
-                                <move file="${project.build.directory}/generated-docs/manual.html" tofile="target/manual.html"/>
+                                <move file="${project.build.directory}/generated-docs/index.html" tofile="target/documentation.html"/>
                                 <echo message="Generating PDF using Prince XML (http://www.princexml.com/)"/>
                                 <exec executable="prince">
-                                    <arg value="target/manual.html"/>
-                                    <arg value="target/manual.pdf"/>
+                                    <arg value="target/documentation.html"/>
+                                    <arg value="target/documentation.pdf"/>
                                     <arg value="--log"/>
                                     <arg value="${project.build.directory}/prince.log"/>
                                 </exec>
-                                <attachartifact file="target/manual.html" type="html"/>
-                                <attachartifact file="target/manual.pdf" type="pdf"/>
+                                <attachartifact file="target/documentation.html" type="html"/>
+                                <attachartifact file="target/documentation.pdf" type="pdf"/>
                             </tasks>
                         </configuration>
                     </execution>

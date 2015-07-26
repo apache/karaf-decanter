@@ -12,18 +12,5 @@
 // limitations under the License.
 //
 
-Apache Karaf Decanter - User Guide
-==================================
-:toc: left
-:toclevels: 3
-:toc-position: left
-:toc-title: Apache Karaf Decanter - User Guide
-:numbered:
+== Architecture
 
-include::user-guide/introduction.adoc[]
-
-include::user-guide/collectors.adoc[]
-
-include::user-guide/appenders.adoc[]
-
-//include::user-guide/sla.adoc[]

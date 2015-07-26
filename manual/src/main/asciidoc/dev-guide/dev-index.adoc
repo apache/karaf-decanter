@@ -12,24 +12,12 @@
 // limitations under the License.
 //
 
-Apache Karaf Decanter - Documentation
-=====================================
-Apache Software Foundation
-:doctype: book
+Apache Karaf Decanter - Developer Guide
+==================================
 :toc: left
 :toclevels: 3
 :toc-position: left
-:toc-title: Apache Karaf Decanter - Documentation
+:toc-title: Apache Karaf Decanter - Developer Guide
 :numbered:
 
-User Guide
-----------
-
-include::user-guide/introduction.adoc[]
-
-include:user-guide/collectors.adoc[]
-
-include:user-guide/appenders.adoc[]
-
-Developer Guide
----------------
+include::dev-guide/architecture.adoc[]
