@@ -34,7 +34,18 @@
     <name>Apache Karaf :: Decanter :: Assembly</name>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/feature</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
+            <!-- In order to generate features.xml compliant with all Karaf versions, including Karaf 2 -->
+            <!-- We don't use the karaf-maven-plugin and prefer the "old style" with the resource plugin
             <plugin>
                 <groupId>org.apache.karaf.tooling</groupId>
                 <artifactId>karaf-maven-plugin</artifactId>
@@ -51,6 +62,27 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
+                    <delimiters>
+                        <delimiter>${*}</delimiter>
+                    </delimiters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>filter</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -63,7 +95,7 @@
                         <configuration>
                             <artifacts>
                                 <artifact>
-                                    <file>target/feature/feature.xml</file>
+                                    <file>target/classes/feature.xml</file>
                                     <classifier>features</classifier>
                                     <type>xml</type>
                                 </artifact>
