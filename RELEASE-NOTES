@@ -1,0 +1,65 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+                    Apache Karaf Decanter 1.0.0
+                    ===========================
+
+  Overview
+  --------
+
+Apache Karaf Decanter 1.0.0 is the first release of Decanter.
+
+Decanter is a completed monitoring and alerting solution for Apache Karaf container, and related applications
+running on it.
+
+You can use Decanter in any Karaf version.
+
+For details, see the ChangeLog:
+
+  ChangeLog
+  ---------
+** Bug
+    * [KARAF-3815] - Decanter can't retrieve metrics for ObjectName containing white spaces
+    * [KARAF-3855] - Decanter JMX collector create bunch of threads
+    * [KARAF-3884] - ElasticsearchAppender sometimes throws NullPointer Exception when adding o.toString() to arrayBuilder
+
+** Dependency upgrade
+    * [KARAF-3845] - Upgrade to elasticsearch 1.6.0
+    * [KARAF-3847] - Upgrade to kibana 3.1.2
+
+** Improvement
+    * [KARAF-3777] - Add Karaf source IP address or hostname in the collected data
+    * [KARAF-3836] - Add a configuration allowing to define the period of the simple scheduler
+    * [KARAF-3848] - Be able to define the embedded elasticsearch node by configuration
+    * [KARAF-3849] - Provide "key turn" kibana dashboards
+    * [KARAF-3851] - Be able to poll remote MBeanServer
+    * [KARAF-3883] - The elasticsearch appender uses the default clustername of Elasticsearch client, this needs to be configurable
+
+** New Feature
+    * [KARAF-3637] - Decanter: JDBC appender
+    * [KARAF-3771] - Add decanter system collector
+    * [KARAF-3772] - Add Decanter SLA support
+    * [KARAF-3861] - Add CamelAppender
+    * [KARAF-3862] - Add CamelSLA
+    * [KARAF-3863] - Add CamelTracer collector
+    * [KARAF-3865] - Add decanter documentation
+    * [KARAF-3866] - Add decanter JMS appender
+    * [KARAF-3870] - Create SLA email alerting
+    * [KARAF-3881] - The embedded ElasticSearch Node should be configurable through config-admin
+
+** Wish
+    * [KARAF-3675] - Check if recent Johnzon snapshot is OSGi ready
