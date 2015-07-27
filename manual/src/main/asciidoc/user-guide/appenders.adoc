@@ -449,6 +449,30 @@ http.cors.allow-origin: /.*/
 
 It's a "standard" elasticsearch configuration file, allowing you to configure the embedded elasticsearch instance.
 
+Warning: if you change the `etc/elasticsearch.yml` file, you have to restart (with the `bundle:restart` command) the
+Decanter elasticsearch bundle in order to load the changes.
+
+The Decanter elasticsearch node also supports loading and override of the settings using a
+`etc/org.apache.karaf.decanter.elasticsearch.cfg` configuration file.
+This file is not provided by default, as it's used for override of the default settings.
+
+You can override the following elasticsearch properties in this configuration file:
+
+* `cluster.name`
+* `http.enabled`
+* `node.data`
+* `node.name`
+* `node.master`
+* `path.data`
+* `network.host`
+* `cluster.routing.schedule`
+* `path.plugins`
+* `http.cors.enabled`
+* `http.cors.allow-origin`
+
+The advantage of using this file is that the elasticsearch node is automatically restarted in order to reload the
+settings as soon as you change the cfg file.
+
 ==== Embedding Decanter Kibana
 
 In addition of the embedded elasticsearch instance, Decanter also provides an embedded Kibana instance, containing
