@@ -54,12 +54,15 @@ configuration file containing:
 host=localhost
 # Port number of the elasticsearch instance
 port=9300
+# Name of the elasticsearch cluster
+clusterName=elasticsearch
 ----
 
 This file contains the elasticsearch instance connection properties:
 
 * the `host` property contains the hostname (or IP address) of the Elasticsearch instance
 * the `port` property contains the port number of the Elasticsearch instance
+* the `clusterName` property contains the name of the Elasticsearch cluster where to send the data
 
 ==== Embedding Decanter Elasticsearch
 
