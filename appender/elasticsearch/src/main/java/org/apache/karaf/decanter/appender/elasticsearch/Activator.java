@@ -68,7 +68,7 @@ public class Activator implements BundleActivator {
 
             String host = config != null ? (String)config.get("host") : "localhost";
             int port = config != null ? Integer.parseInt((String)config.get("port")) : 9300;
-            String clusterName = config != null ? (String)config.get("clusterName") : "elasticsearch";
+            String clusterName = (config != null && config.get("clusterName") != null) ? (String)config.get("clusterName") : "elasticsearch";
             appender = new ElasticsearchAppender(host, port, clusterName);
             appender.open();
             Dictionary<String, String> properties = new Hashtable<>();
