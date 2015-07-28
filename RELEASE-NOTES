@@ -36,6 +36,7 @@ For details, see the ChangeLog:
     * [KARAF-3815] - Decanter can't retrieve metrics for ObjectName containing white spaces
     * [KARAF-3855] - Decanter JMX collector create bunch of threads
     * [KARAF-3884] - ElasticsearchAppender sometimes throws NullPointer Exception when adding o.toString() to arrayBuilder
+    * [KARAF-3889] - The clusterName for the elasticsearch appender isn't an optional configuration as it should be. 
 
 ** Dependency upgrade
     * [KARAF-3845] - Upgrade to elasticsearch 1.6.0
