@@ -49,7 +49,7 @@
                         <configuration>
                             <tasks>
                                 <mkdir dir="target"/>
-                                <move file="${project.build.directory}/generated-docs/index.html" tofile="target/documentation.html"/>
+                                <copy file="${project.build.directory}/generated-docs/index.html" tofile="target/documentation.html"/>
                                 <echo message="Generating PDF using Prince XML (http://www.princexml.com/)"/>
                                 <exec executable="prince">
                                     <arg value="target/documentation.html"/>
