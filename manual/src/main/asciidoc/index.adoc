@@ -12,8 +12,8 @@
 // limitations under the License.
 //
 
-Apache Karaf Decanter - Documentation
-=====================================
+Apache Karaf Decanter 1.x - Documentation
+=========================================
 Apache Software Foundation
 :doctype: book
 :toc: left
