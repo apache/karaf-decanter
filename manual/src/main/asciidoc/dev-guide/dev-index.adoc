@@ -12,12 +12,12 @@
 // limitations under the License.
 //
 
-Apache Karaf Decanter - Developer Guide
-==================================
+Apache Karaf Decanter 1.x - Developer Guide
+===========================================
 :toc: left
 :toclevels: 3
 :toc-position: left
-:toc-title: Apache Karaf Decanter - Developer Guide
+:toc-title: Apache Karaf Decanter 1.x - Developer Guide
 :numbered:
 
 include::dev-guide/architecture.adoc[]
