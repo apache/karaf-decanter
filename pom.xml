@@ -38,7 +38,6 @@
         <camel.version>2.13.2</camel.version>
         <elasticsearch.version>1.6.0</elasticsearch.version>
         <elasticsearch.bundle.version>1.6.0_1</elasticsearch.bundle.version>
-        <karaf.version>3.0.2</karaf.version>
         <kibana.version>3.1.1</kibana.version>
         <slf4j.version>1.7.7</slf4j.version>
         <json-api.version>1.0</json-api.version>
@@ -205,13 +204,6 @@
                 <groupId>org.apache.karaf.decanter</groupId>
                 <artifactId>org.apache.karaf.decanter.api</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-
-            <!-- Karaf -->
-            <dependency>
-                <groupId>org.apache.karaf.shell</groupId>
-                <artifactId>org.apache.karaf.shell.console</artifactId>
-                <version>${karaf.version}</version>
             </dependency>
 
             <!-- OSGi -->
