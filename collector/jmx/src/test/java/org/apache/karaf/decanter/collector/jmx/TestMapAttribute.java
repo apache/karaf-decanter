@@ -16,7 +16,7 @@ public class TestMapAttribute {
     @Test
     public void testOperatingSystemMBean() throws MalformedObjectNameException, Exception {
         MBeanServerConnection server = ManagementFactory.getPlatformMBeanServer();
-        JmxCollector jmxCollector = new JmxCollector("local", "local", null, null, null, null);
+        JmxCollector jmxCollector = new JmxCollector("local", "local", null, null, null, null, null);
         Map<String, Object> data = jmxCollector.harvestBean(server, new ObjectName("java.lang:type=OperatingSystem"), "local", null);
         Assert.assertTrue(data.size() >= 15);
         Object freeMem = data.get("FreePhysicalMemorySize");

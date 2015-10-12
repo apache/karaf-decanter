@@ -18,7 +18,6 @@ package org.apache.karaf.decanter.collector.jmx;
 
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.util.*;
 
 import javax.management.MBeanAttributeInfo;
@@ -47,14 +46,16 @@ public class JmxCollector implements Runnable {
     private String password;
     private String objectName;
     private EventAdmin eventAdmin;
+    private Dictionary<String, String> properties;
 
-    public JmxCollector(String type, String url, String username, String password, String objectName, EventAdmin eventAdmin) {
+    public JmxCollector(String type, String url, String username, String password, String objectName, EventAdmin eventAdmin, Dictionary<String, String> properties) {
         this.type = type;
         this.url = url;
         this.username = username;
         this.password = password;
         this.eventAdmin = eventAdmin;
         this.objectName = objectName;
+        this.properties = properties;
     }
 
     @Override
@@ -104,6 +105,14 @@ public class JmxCollector implements Runnable {
                 for (ObjectName name : names) {
                     try {
                         Map<String, Object> data = harvestBean(connection, name, type, host);
+                        // add additional properties (can be provided by the user)
+                        if (properties != null) {
+                            Enumeration<String> keys = properties.keys();
+                            while (keys.hasMoreElements()) {
+                                String property = keys.nextElement();
+                                data.put(property, properties.get(property));
+                            }
+                        }
                         Event event = new Event("decanter/collect/jmx/" + type + "/" + getTopic(name), data);
                         eventAdmin.postEvent(event);
                     } catch (Exception e) {
