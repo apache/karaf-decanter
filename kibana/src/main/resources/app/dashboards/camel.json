@@ -80,9 +80,9 @@
           "type": "text",
           "loadingEditor": false,
           "mode": "markdown",
-          "content": "Don't forget to update and add the queries corresponding to the Camel RouteId that you want to monitor.",
+          "content": "Don't forget to update and add the queries corresponding to the Camel RouteId that you want to monitor in the Query panel.",
           "style": {},
-          "title": "Route Queries"
+          "title": "Warning !!"
         }
       ],
       "notice": false

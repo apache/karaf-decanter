@@ -37,6 +37,27 @@
   },
   "rows": [
     {
+      "title": "Warning",
+      "height": "50px",
+      "editable": true,
+      "collapse": false,
+      "collapsable": true,
+      "panels": [
+        {
+          "error": false,
+          "span": 12,
+          "editable": true,
+          "type": "text",
+          "loadingEditor": false,
+          "mode": "markdown",
+          "content": "In order to have some metrics about your operating system, you have to add system commands executed by the decanter-system-collector. See the Decanter documentation for details. For instance, provided sample panels use result of the df and sensor commands execution (on Unix).",
+          "style": {},
+          "title": "Warning !!"
+        }
+      ],
+      "notice": false
+    },
+    {
       "title": "System",
       "height": "250px",
       "editable": true,
