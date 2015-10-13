@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 public class ElasticsearchAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
-    
+
     private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSS'Z'");
     private final SimpleDateFormat indexDateFormat = new SimpleDateFormat("yyyy.MM.dd");
     private final AtomicLong pendingBulkItemCount = new AtomicLong();
@@ -83,18 +83,18 @@ public class ElasticsearchAppender implements EventHandler {
             InetSocketTransportAddress address = new InetSocketTransportAddress(host, port);
             client = new TransportClient(settings).addTransportAddress(address);
             bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
-                
+
                 @Override
                 public void beforeBulk(long executionId, BulkRequest request) {
                     pendingBulkItemCount.addAndGet(request.numberOfActions());
                 }
-                
+
                 @Override
                 public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
                     LOGGER.warn("Can't append into Elasticsearch", failure);
                     pendingBulkItemCount.addAndGet(-request.numberOfActions());
                 }
-                
+
                 @Override
                 public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
                     pendingBulkItemCount.addAndGet(-response.getItems().length);
@@ -113,7 +113,7 @@ public class ElasticsearchAppender implements EventHandler {
 
     public void close() {
         LOGGER.info("Stopping Elasticsearch appender");
-        
+
         if(bulkProcessor != null) {
             bulkProcessor.close();
         }
@@ -122,7 +122,7 @@ public class ElasticsearchAppender implements EventHandler {
         while(concurrentRequests > 0 && pendingBulkItemCount.get() > 0) {
             LockSupport.parkNanos(1000*50);
         }
-        
+
         if(client != null) {
             client.close();
         }
@@ -141,7 +141,7 @@ public class ElasticsearchAppender implements EventHandler {
     private void send(Event event) {
         Long ts = (Long)event.getProperty("timestamp");
         Date date = ts != null ? new Date(ts) : new Date();
-        
+
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
         jsonObjectBuilder.add("@timestamp", tsFormat.format(date));
         for (String key : event.getPropertyNames()) {
@@ -186,11 +186,11 @@ public class ElasticsearchAppender implements EventHandler {
         JsonObject jsonObject = jsonObjectBuilder.build();
         String indexName = getIndexName("karaf", date);
         String jsonSt = jsonObject.toString();
-        
+
         if(LOGGER.isDebugEnabled()) {
             LOGGER.debug("Sending event to elastic search with content: {}", jsonSt);
         }
-        
+
         bulkProcessor.add(new IndexRequest(indexName, getType(event)).source(jsonSt));
     }
 
@@ -248,7 +248,10 @@ public class ElasticsearchAppender implements EventHandler {
         else if (value instanceof Float)
             builder.add(key, (Float) value);
         else if (value instanceof Double)
-            builder.add(key, (Double) value);
+            if (Double.isNaN((Double) value))
+                builder.add(key, "NaN");
+            else
+                builder.add(key, (Double) value);
         else if (value instanceof Boolean)
             builder.add(key, (Boolean) value);
     }
