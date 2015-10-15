@@ -45,24 +45,35 @@ public class Checker implements EventHandler {
 
     @Override
     public void handleEvent(Event collectEvent) {
+        String type = (String) collectEvent.getProperty("type");
         for (String name : collectEvent.getPropertyNames()) {
+
+            // error
+            String errorPattern = null;
             if (config.get(name + ".error") != null) {
-                // an error alert is defined for the collect event property
-                // checking the alert
-                String pattern = (String) config.get(name + ".error");
+                errorPattern = (String) config.get(name + ".error");
+            } else if (config.get(type + "." + name + ".error") != null) {
+                errorPattern = (String) config.get(type + "." + name + ".error");
+            }
+            if (errorPattern != null) {
                 Object value = collectEvent.getProperty(name);
-                if (!validate(pattern, value)) {
-                    Event alertEvent = populateAlertEvent("error", collectEvent, name, pattern);
+                if (!validate(errorPattern, value)) {
+                    Event alertEvent = populateAlertEvent("error", collectEvent, name, errorPattern);
                     eventAdmin.postEvent(alertEvent);
                 }
             }
+
+            // warn
+            String warnPattern = null;
             if (config.get(name + ".warn") != null) {
-                // a warn alert is defined for the collect event property
-                // checking the alert
-                String pattern = (String) config.get(name + ".warn");
+                warnPattern = (String) config.get(name + ".warn");
+            } else if (config.get(type + "." + name + ".warn") != null) {
+                warnPattern = (String) config.get(type + "." + name + ".warn");
+            }
+            if (warnPattern != null) {
                 Object value = collectEvent.getProperty(name);
-                if (!validate(pattern, value)) {
-                    Event alertEvent = populateAlertEvent("warn", collectEvent, name, pattern);
+                if (!validate(warnPattern, value)) {
+                    Event alertEvent = populateAlertEvent("warn", collectEvent, name, warnPattern);
                     eventAdmin.postEvent(alertEvent);
                 }
             }
