@@ -28,11 +28,14 @@ This file contains the check to perform on the collected properties.
 The format of this file is:
 
 ----
-propertyName.alertLevel=checkType:value
+type.propertyName.alertLevel=checkType:value
 ----
 
 where:
 
+* `type` is optional. It allows you to filter the SLA check for a given type of collected data. It's particulary interesting
+when Decanter collects multiple JMX object names or servers. You may want to perform different checks depending of the type
+or source of the collected data.
 * `propertyName` is the data property key. For instance, `loggerName`, `message`, `HeapMemoryUsage.used`, etc.
 * `alertLevel` is the alerting level for this check. The only two possible values are `error` (critical alert), or
 `warn` (severe alert).
@@ -51,6 +54,12 @@ For instance, if you want to check that the number of threads is between 0 and 7
 
 ----
 ThreadCount.error=range:[0,70]
+----
+
+You can also filter and specify the type on which we check:
+
+----
+jmx-local.ThreadCount.error=range:[0,70]
 ----
 
 If the thread count is out of this range, Decanter will create an error alert sent to the alerters.

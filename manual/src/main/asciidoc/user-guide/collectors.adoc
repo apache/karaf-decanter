@@ -35,6 +35,51 @@ karaf@root()> feature:install decanter-collector-log
 
 The log collector doesn't need any configuration, the installation of the decanter-collector-log feature is enough.
 
+=== File
+
+The Decanter File Collector is an event driven collector. It automatically reacts when new lines are appended into
+a file (especially a log file). It acts like the tail Unix command. Basically, it's an alternative to the log collector.
+The log collector reacts for local Karaf log messages, whereas the file collector can react to any files, included log
+file from other system than Karaf. It means that you can monitor and send collected data for any system (even not Java
+base, or whatever).
+
+The file collector deals with file rotation, file not found.
+
+The `decanter-collector-file` feature installs the file collector:
+
+----
+karaf@root()> feature:install decanter-collector-file
+----
+
+Now, you have to create a configuration file for each file that you want to monitor. In the etc folder, you have to
+create a file with the following format name `etc/org.apache.karaf.decanter.collector.file-ID.cfg` where ID is an ID
+of your choice.
+
+This file contains:
+
+----
+type=my
+path=/path/to/file
+any=value
+----
+
+* `type` is an ID (mandatory) that allows you to easily identify the monitored file
+* `path` is the location of the file that you want to monitore
+* all other values (like `any`) will be part of the collected data. It means that you can add your own custom data, and
+easily create queries bases on this data.
+
+For instance, instead of the log collector, you can create the following `etc/org.apache.karaf.decanter.collector.file-karaf.cfg`
+file collector configuration file:
+
+----
+type=karaf-log-file
+path=/path/to/karaf/data/log/karaf.log
+my=stuff
+----
+
+The file collector will tail on karaf.log file, and send any new line in this log file as collected data.
+
+
 === JMX
 
 The Decanter JMX Collector is a polled collector, executed periodically by the Decanter Scheduler.
@@ -88,6 +133,8 @@ is secured.
 * the `object.name` property is optional. If this property is not specified, the collector will retrieve the attributes
 of all MBeans. You can filter to consider only some MBeans. This property contains the ObjectName filter to retrieve
 the attributes only to some MBeans.
+* any other values will be part of the collected data. It means that you can add your own property if you want to add
+additional data, and create queries based on this data.
 
 You can retrieve multiple MBean servers. For that, you just create a new configuration file using the file name format
 `etc/org.apache.karaf.decanter.collector.jmx-[ANYNAME].cfg`.
