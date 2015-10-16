@@ -506,6 +506,19 @@ You can change these dashboards to add new panels, change the existing panels, e
 
 Of course, you can create your own dashboards, starting from blank or simple dashboards.
 
+==== Elasticsearch Head console
+
+In addition of the embedded elasticsearch instance, Decanter also provides a web console allowing you to monitor and
+manage your elasticsearch cluster. It's a ready to use elastisearch-head console, directly embedded in Karaf.
+
+The `elasticsearch-head` feature installs the embedded elasticsearch-head web console:
+
+----
+karaf@root()> feature:install elasticsearch-head
+----
+
+By default, the elasticsearch-head web console is available on `http://host:8181/elasticsearch-head`.
+
 === JDBC
 
 The Decanter JDBC appender allows your to store the data (coming from the collectors) into a database.

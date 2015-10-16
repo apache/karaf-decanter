@@ -51,6 +51,7 @@
         <module>appender</module>
         <module>sla</module>
         <module>elasticsearch</module>
+        <module>elasticsearch-head</module>
         <module>kibana</module>
         <module>assembly</module>
     </modules>
