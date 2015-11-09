@@ -36,8 +36,8 @@
 
     <properties>
         <camel.version>2.13.2</camel.version>
-        <elasticsearch.version>1.7.1</elasticsearch.version>
-        <elasticsearch.bundle.version>1.7.1_1</elasticsearch.bundle.version>
+        <elasticsearch.version>1.7.3</elasticsearch.version>
+        <elasticsearch.bundle.version>1.7.3_1</elasticsearch.bundle.version>
         <kibana.version>3.1.1</kibana.version>
         <slf4j.version>1.7.7</slf4j.version>
         <json-api.version>1.0</json-api.version>
