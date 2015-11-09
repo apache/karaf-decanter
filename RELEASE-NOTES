@@ -15,6 +15,39 @@
  * limitations under the License.
  */
 
+                    Apache Karaf Decanter 1.0.1
+                    ===========================
+
+  Overview
+  --------
+
+Apache Karaf Decanter 1.0.1 is a fix version on the decanter-1.x serie. It also brings new features like the file collector.
+
+Decanter is a completed monitoring and alerting solution for Apache Karaf container, and related applications
+running on it.
+
+You can use Decanter in any Karaf version.
+
+For details, see the ChangeLog:
+
+  ChangeLog
+  ---------
+** Bug
+    * [KARAF-4061] - Decanter ElasticSearchAppender - NumberFormatException
+
+** Dependency upgrade
+    * [KARAF-4063] - Upgrade to elasticsearch 1.7.1
+    * [KARAF-4101] - Upgrade to elasticsearch 1.7.3
+
+** Improvement
+    * [KARAF-3979] - Be able to define a SLA check for a given type
+    * [KARAF-4008] - Add custom fields support in JMX collector
+    * [KARAF-4014] - Add a warning in Decanter System dashboard
+
+** New Feature
+    * [KARAF-3904] - Add elasticsearch eshead plugin in embedded instance
+    * [KARAF-3905] - Provide file collector (as in logstash)
+
                     Apache Karaf Decanter 1.0.0
                     ===========================
 

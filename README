@@ -64,6 +64,7 @@ See user guide for the details of Decanter features:
 Collectors
 -----------
 * decanter-collector-log
+* decanter-collector-file
 * decanter-collector-jmx
 * decanter-collector-activemq
 * decanter-collector-camel
