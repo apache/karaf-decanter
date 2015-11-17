@@ -506,6 +506,13 @@ You can change these dashboards to add new panels, change the existing panels, e
 
 Of course, you can create your own dashboards, starting from blank or simple dashboards.
 
+By default, Decanter Kibana uses embedded elasticsearch instance. However, it's possible to use a remote elasticsearch
+instance by providing the elasticsearch parameter on the URL like this for instance:
+
+----
+http://localhost:8181/kibana?elasticsearch=http://localhost:9400
+----
+
 ==== Elasticsearch Head console
 
 In addition of the embedded elasticsearch instance, Decanter also provides a web console allowing you to monitor and

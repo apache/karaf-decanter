@@ -8,6 +8,16 @@ define(['settings'],
 function (Settings) {
   "use strict";
 
+  var es = "http://" + window.location.hostname + ":9200";
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split("=");
+    if (pair[0] == "elasticsearch") {
+      es = pair[1];
+    }
+  }
+
   /** @scratch /configuration/config.js/2
    *
    * === Parameters
@@ -24,7 +34,7 @@ function (Settings) {
      * kibana installed on. You probably want to set it to the FQDN of your
      * elasticsearch host
      */
-    elasticsearch: "http://"+window.location.hostname+":9200",
+    elasticsearch: es,
     
     /** @scratch /configuration/config.js/5
      *
