@@ -125,10 +125,10 @@ public class EmbeddedNode {
     }
     
     private String getConfig(Dictionary<String, ?> config, Settings settings, String key, String defaultValue) {
-    	if (config == null)
-    		return defaultValue;
     	if (settings != null && settings.get(key) != null)
     		defaultValue = settings.get(key);
+        if (config == null)
+            return defaultValue;
 		String value = (String) config.get(key);
 		return value != null ? value : defaultValue;
 	}

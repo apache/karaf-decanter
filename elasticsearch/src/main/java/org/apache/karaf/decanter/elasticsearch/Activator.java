@@ -78,6 +78,7 @@ public class Activator implements BundleActivator {
 					throw new ConfigurationException(null, message, e);
 				}
                 service.unregister();
+                node = null;
             }
         	
         	if (node == null) {
