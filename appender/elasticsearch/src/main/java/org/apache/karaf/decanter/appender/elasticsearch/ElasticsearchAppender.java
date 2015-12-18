@@ -16,10 +16,11 @@
  */
 package org.apache.karaf.decanter.appender.elasticsearch;
 
-import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
+import static org.elasticsearch.common.settings.Settings.settingsBuilder;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -77,11 +78,10 @@ public class ElasticsearchAppender implements EventHandler {
     public void open() {
         try {
             Settings settings = settingsBuilder()
-            						.classLoader(Settings.class.getClassLoader())
             						.put("cluster.name", cluster)
             						.build();
-            InetSocketTransportAddress address = new InetSocketTransportAddress(host, port);
-            client = new TransportClient(settings).addTransportAddress(address);
+            InetSocketTransportAddress address = new InetSocketTransportAddress(InetAddress.getByName(host), port);
+            client = TransportClient.builder().settings(settings).build().addTransportAddress(address);
             bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
 
                 @Override
@@ -102,7 +102,7 @@ public class ElasticsearchAppender implements EventHandler {
             })
             .setBulkActions(1000)
             .setConcurrentRequests(concurrentRequests)
-            .setBulkSize(ByteSizeValue.parseBytesSizeValue("5mb"))
+            .setBulkSize(ByteSizeValue.parseBytesSizeValue("5mb","BulkSize"))
             .setFlushInterval(TimeValue.timeValueSeconds(5))
             .build();
             LOGGER.info("Starting Elasticsearch appender writing to {}", address.address());
@@ -146,6 +146,7 @@ public class ElasticsearchAppender implements EventHandler {
         jsonObjectBuilder.add("@timestamp", tsFormat.format(date));
         for (String key : event.getPropertyNames()) {
             Object value = event.getProperty(key);
+            key = normalizeProperty(key);
             if (value instanceof Map) {
                 jsonObjectBuilder.add(key, build((Map<String, Object>) value));
             } else if (value instanceof List) {
@@ -258,6 +259,14 @@ public class ElasticsearchAppender implements EventHandler {
 
     private String getIndexName(String prefix, Date date) {
         return prefix + "-" + indexDateFormat.format(date);
+    }
+    
+    private String normalizeProperty(String prop) {
+    	String result = prop;
+    	if (prop.contains(".")) {
+    		result = prop.replace(".", "_");
+    	}
+    	return result;
     }
 
 }

@@ -16,13 +16,16 @@
  */
 package org.apache.karaf.decanter.appender.elasticsearch;
 
-import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
+import static org.elasticsearch.common.settings.Settings.settingsBuilder;
 
-import org.elasticsearch.client.Requests;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.common.collect.MapBuilder;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.event.Event;
 
@@ -30,21 +33,41 @@ import static org.elasticsearch.node.NodeBuilder.*;
 
 public class TestElasticsearchAppender {
 
-   @Test
-   public void testAppender() throws Exception {
-       
+   private static Node node;
+   
+   private static Client client;
+   
+   @Before
+   public void setUpCluster() {
        Settings settings = settingsBuilder()
                .put("cluster.name", "elasticsearch")
                .put("http.enabled", "true")
                .put("node.data", true)
                .put("path.data", "target/data")
+               .put("path.home", "target/data")
                .put("network.host", "127.0.0.1")
-               .put("index.store.type", "memory")
                .put("index.store.fs.memory.enabled", "true")
                .put("path.plugins", "target/plugins")
                .build();
        
-       Node node = nodeBuilder().settings(settings).node();
+       node = nodeBuilder().settings(settings).node();
+       
+       client = node.client();
+   }
+   
+   @After
+   public void tearDownCluster() {
+	   if (client != null) {
+           client.close();
+	   }
+	   
+	   if (node != null) {
+           node.close();
+	   }
+   }
+   
+   @Test
+   public void testAppender() throws Exception {
        
        ElasticsearchAppender appender = new ElasticsearchAppender("127.0.0.1", 9300, "elasticsearch");
        appender.open();
@@ -54,12 +77,11 @@ public class TestElasticsearchAppender {
        appender.close();
        
        int maxTryCount = 10;
-       for(int i=0; node.client().count(Requests.countRequest()).actionGet().getCount() == 0 && i< maxTryCount; i++) {
-           Thread.sleep(500);
+       for(int i=0; client.prepareSearch().execute().actionGet().getHits().getTotalHits() == 0 && i< maxTryCount; i++) {
+           Thread.sleep(1000);
        }
-       
-       Assert.assertEquals(3L, node.client().count(Requests.countRequest()).actionGet().getCount());
-       node.close();
+       SearchResponse response = client.prepareSearch().execute().actionGet();
+       Assert.assertEquals(3L, response.getHits().getTotalHits());
    }
 
 }
