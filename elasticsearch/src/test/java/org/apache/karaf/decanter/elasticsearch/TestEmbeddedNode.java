@@ -40,6 +40,7 @@ public class TestEmbeddedNode {
         
         Node node = embeddedNode.getNode();
         embeddedNode.start();
+        Thread.sleep(2000);
         ClusterHealthResponse healthResponse = node.client().admin().cluster().health(Requests.clusterHealthRequest()).actionGet();
         assertEquals(ClusterHealthStatus.GREEN, healthResponse.getStatus());
         embeddedNode.stop();

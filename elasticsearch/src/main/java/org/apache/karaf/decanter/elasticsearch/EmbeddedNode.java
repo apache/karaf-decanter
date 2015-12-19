@@ -16,12 +16,9 @@
  */
 package org.apache.karaf.decanter.elasticsearch;
 
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.ImmutableSettings.Builder;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.settings.Settings.Builder;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.internal.InternalNode;
-import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +37,7 @@ public class EmbeddedNode {
 	public static String ELASTIC_YAML_FILE = "elasticsearch.yaml";
 	
 	public static String CLUSTER_NAME = "cluster.name";
+	public static String PATH_HOME = "path.home";
 	public static String HTTP_ENABLED = "http.enabled";
 	public static String NODE_DATA = "node.data";
 	public static String NODE_NAME = "node.name";
@@ -69,22 +67,24 @@ public class EmbeddedNode {
         if (ymlFile.exists()) {
             // elasticsearch.yml is provided
             LOGGER.debug("elasticsearch.yml found for settings");
-            settings = ImmutableSettings.settingsBuilder().loadFromUrl(ymlFile.toURL()).build();
+            settings = Settings.settingsBuilder().loadFromPath(ymlFile.toPath()).build();
         } 
 
         // configuration will be overridden by special configurations
         LOGGER.debug("enhancing elasticsearch configuration with given configurations");
         
+        
         Builder settingsBuilder;
-        if (settings == null) {
-        	settingsBuilder = ImmutableSettings.settingsBuilder();
+		if (settings == null) {
+        	settingsBuilder = Settings.settingsBuilder();
         } else {
-        	settingsBuilder = ImmutableSettings.settingsBuilder().put(settings);
+        	settingsBuilder = Settings.settingsBuilder().put(settings);
         }      
 
        	settingsBuilder.put(CLUSTER_NAME, getConfig(config, settings, CLUSTER_NAME, "elasticsearch"));
        	settingsBuilder.put(HTTP_ENABLED, getConfig(config, settings, HTTP_ENABLED, "true"));
        	settingsBuilder.put(PATH_DATA, getConfig(config, settings, PATH_DATA, "data"));
+       	settingsBuilder.put(PATH_HOME, getConfig(config, settings, PATH_HOME, "home"));
        	settingsBuilder.put(NODE_MASTER, getConfig(config, settings, NODE_MASTER, "true"));
        	settingsBuilder.put(NODE_DATA, getConfig(config, settings, NODE_DATA, "true"));
        	settingsBuilder.put(NODE_NAME, getConfig(config, settings, NODE_NAME, System.getProperty("karaf.name") == null ? "decanter" : System.getProperty("karaf.name")));
@@ -95,8 +95,8 @@ public class EmbeddedNode {
        	settingsBuilder.put(HTTP_CORS_ALLOW_ORIGIN, getConfig(config, settings, HTTP_CORS_ALLOW_ORIGIN, "/.*/"));
         
         LOGGER.debug("Creating the elasticsearch node");
-        settingsBuilder.classLoader(Settings.class.getClassLoader());
-        node = new InternalNode(settingsBuilder.build(), false);
+        //settingsBuilder.classLoader(Settings.class.getClassLoader());
+        node = new Node(settingsBuilder.build());
 
         LOGGER.info("Elasticsearch node created");
     }
