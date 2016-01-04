@@ -12,7 +12,7 @@
 // limitations under the License.
 //
 
-== Architecture
+=== Architecture
 
 Apache Karaf Decanter uses OSGi EventAdmin to dispatch the harvested data between the collectors and the appenders,
 and also to throw the alerts to the alerters:

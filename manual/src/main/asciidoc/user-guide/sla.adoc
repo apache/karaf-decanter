@@ -12,12 +12,12 @@
 // limitations under the License.
 //
 
-== SLA (Service Level Agreement)
+=== SLA (Service Level Agreement)
 
 Decanter provides a SLA (Service Level Agreement) layer. It allows you to check values of harvested data (coming from
 the collectors) and send alerts when the data is not in the expected state.
 
-=== Checker
+==== Checker
 
 The SLA checker is automatically installed as soon as you install a SLA alerter feature.
 
@@ -89,13 +89,13 @@ You can also use "complex" regex:
 loggerName.warn=match:(.*)my\.loggger\.name\.(.*)
 ----
 
-=== Alerters
+==== Alerters
 
 When the value doesn't verify the check in the checker configuration, an alert is created an sent to the alerters.
 
 Apache Karaf Decanter provides ready to use alerters.
 
-==== Log
+===== Log
 
 The Decanter SLA Log alerter log a message for each alert.
 
@@ -107,7 +107,7 @@ karaf@root()> feature:install decanter-sla-log
 
 This alerter doesn't need any configuration.
 
-==== E-mail
+===== E-mail
 
 The Decanter SLA e-mail alerter sends an e-mail for each alert.
 
@@ -161,7 +161,7 @@ ssl=false
 * the `username` property is optional and specifies the username to connect to the SMTP server
 * the `password` property is optional and specifies the password to connect to the SMTP server
 
-==== Camel
+===== Camel
 
 The Decanter SLA Camel alerter sends each alert to a Camel endpoint.
 

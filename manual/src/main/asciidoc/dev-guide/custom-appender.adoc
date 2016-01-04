@@ -12,7 +12,7 @@
 // limitations under the License.
 //
 
-== Custom Appender
+=== Custom Appender
 
 A Decanter Appender is an OSGi EventAdmin EventHandler: it's listening of `decanter/collect/*` EventAdmin topics, and
 receives the monitoring data coming from the collectors.

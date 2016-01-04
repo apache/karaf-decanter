@@ -12,11 +12,11 @@
 // limitations under the License.
 //
 
-== Appenders
+=== Appenders
 
 Decanter appenders receive the data from the collectors, and store the data into a storage backend.
 
-=== Log
+==== Log
 
 The Decanter Log Appender creates a log message for each event received from the collectors.
 
@@ -28,7 +28,7 @@ karaf@root()> feature:install decanter-appender-log
 
 The log appender doesn't require any configuration.
 
-=== Elasticsearch
+==== Elasticsearch
 
 The Decanter Elasticsearch Appender stores the data (coming from the collectors) into an Elasticsearch instance.
 
@@ -64,7 +64,7 @@ This file contains the elasticsearch instance connection properties:
 * the `port` property contains the port number of the Elasticsearch instance
 * the `clusterName` property contains the name of the Elasticsearch cluster where to send the data
 
-==== Embedding Decanter Elasticsearch
+===== Embedding Decanter Elasticsearch
 
 For convenience, Decanter provides an `elasticsearch` feature starting an embedded Elasticsearch instance:
 
@@ -476,7 +476,7 @@ You can override the following elasticsearch properties in this configuration fi
 The advantage of using this file is that the elasticsearch node is automatically restarted in order to reload the
 settings as soon as you change the cfg file.
 
-==== Embedding Decanter Kibana
+===== Embedding Decanter Kibana
 
 In addition of the embedded elasticsearch instance, Decanter also provides an embedded Kibana instance, containing
 ready to use Decanter dashboards.
@@ -513,7 +513,7 @@ instance by providing the elasticsearch parameter on the URL like this for insta
 http://localhost:8181/kibana?elasticsearch=http://localhost:9400
 ----
 
-==== Elasticsearch Head console
+===== Elasticsearch Head console
 
 In addition of the embedded elasticsearch instance, Decanter also provides a web console allowing you to monitor and
 manage your elasticsearch cluster. It's a ready to use elastisearch-head console, directly embedded in Karaf.
@@ -526,7 +526,7 @@ karaf@root()> feature:install elasticsearch-head
 
 By default, the elasticsearch-head web console is available on `http://host:8181/elasticsearch-head`.
 
-=== JDBC
+==== JDBC
 
 The Decanter JDBC appender allows your to store the data (coming from the collectors) into a database.
 
@@ -570,7 +570,7 @@ the table for you, but you can create the table by yourself. The table is simple
 * the `dialect` property allows you to specify the database type (generic, mysql, derby). This property is only used for
 the table creation.
 
-=== JMS
+==== JMS
 
 The Decanter JMS appender "forwards" the data (collected by the collectors) to a JMS broker.
 
@@ -614,7 +614,7 @@ factory using the `jms:create` command (provided by the `jms` feature).
 * the `username` property is optional and specifies the username to connect to the destination.
 * the `password` property is optional and specifies the username to connect to the destination.
 
-=== Camel
+==== Camel
 
 The Decanter Camel appender sends the data (collected by the collectors) to a Camel endpoint.
 

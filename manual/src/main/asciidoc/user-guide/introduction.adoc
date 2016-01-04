@@ -12,7 +12,7 @@
 // limitations under the License.
 //
 
-== Introduction
+=== Introduction
 
 Apache Karaf Decanter is monitoring solution running in Apache Karaf.
 

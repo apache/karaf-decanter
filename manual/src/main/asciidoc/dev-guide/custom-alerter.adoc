@@ -12,7 +12,7 @@
 // limitations under the License.
 //
 
-== Custom SLA Alerter
+=== Custom SLA Alerter
 
 A Decanter SLA Alerter is basically a special kind of appender.
 

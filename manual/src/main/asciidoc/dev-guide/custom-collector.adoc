@@ -12,7 +12,7 @@
 // limitations under the License.
 //
 
-== Custom Collector
+=== Custom Collector
 
 A Decanter collector sends an OSGi EventAdmin event to a `decanter/collect/*` topic.
 
@@ -21,7 +21,7 @@ You can create two kinds of collector:
 * event driven collector automatically reacts to some internal events. It creates an event sent to a topic.
 * polled collector is a Runnable OSGi service periodically executed by the Decanter Scheduler.
 
-=== Event Driven Collector
+==== Event Driven Collector
 
 For instance, the log collector is event driven: it automatically reacts to internal log events.
 
@@ -30,7 +30,7 @@ changes (installed, started, stopped, uninstalled).
 
 The purpose is to send a monitoring event in a collect topic. This monitoring event can be consumed by the appenders.
 
-We create the following `BundleCollector` class implemetings `SynchronousBundleListener` interface:
+We create the following `BundleCollector` class implementing `SynchronousBundleListener` interface:
 
 ----
 package org.apache.karaf.decanter.sample.collector;
@@ -171,7 +171,7 @@ Now, we just need a Maven `pom.xml` to package the bundle with the correct OSGi 
 You can now enable this collector, just by installing the bundle in Apache Karaf (using the deploy folder, or the
 `bundle:install` command.
 
-=== Polled Collector
+==== Polled Collector
 
 You can also create a polled collector.
 
