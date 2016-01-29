@@ -1,104 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<!-- Licensed to the Apache Software Foundation (ASF) under one or more 
-		contributor license agreements. See the NOTICE file distributed with this 
-		work for additional information regarding copyright ownership. The ASF licenses 
-		this file to You under the Apache License, Version 2.0 (the "License"); you 
-		may not use this file except in compliance with the License. You may obtain 
-		a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless 
-		required by applicable law or agreed to in writing, software distributed 
-		under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
-		OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
-		the specific language governing permissions and limitations under the License. -->
+    <!--
 
-	<modelVersion>4.0.0</modelVersion>
+        Licensed to the Apache Software Foundation (ASF) under one or more
+        contributor license agreements.  See the NOTICE file distributed with
+        this work for additional information regarding copyright ownership.
+        The ASF licenses this file to You under the Apache License, Version 2.0
+        (the "License"); you may not use this file except in compliance with
+        the License.  You may obtain a copy of the License at
 
-	<parent>
-		<groupId>org.apache.karaf.decanter</groupId>
-		<artifactId>appender</artifactId>
-		<version>1.0.2-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+           http://www.apache.org/licenses/LICENSE-2.0
 
-	<groupId>org.apache.karaf.decanter.appender</groupId>
-	<artifactId>org.apache.karaf.decanter.appender.elasticsearch</artifactId>
-	<packaging>bundle</packaging>
-	<name>Apache Karaf :: Decanter :: Appender :: Elasticsearch</name>
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
+    -->
 
-	<dependencies>
+    <modelVersion>4.0.0</modelVersion>
 
-		<!-- Elasticsearch -->
-		<dependency>
-			<groupId>org.elasticsearch</groupId>
-			<artifactId>elasticsearch</artifactId>
-			<version>${elasticsearch.version}</version>
-		</dependency>
+    <parent>
+        <groupId>org.apache.karaf.decanter</groupId>
+        <artifactId>appender</artifactId>
+        <version>1.0.2-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
-		<!-- OSGi -->
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.core</artifactId>
-		</dependency>
+    <groupId>org.apache.karaf.decanter.appender</groupId>
+    <artifactId>org.apache.karaf.decanter.appender.elasticsearch</artifactId>
+    <packaging>bundle</packaging>
+    <name>Apache Karaf :: Decanter :: Appender :: Elasticsearch</name>
+
+    <dependencies>
+        <!-- Elasticsearch -->
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch.version}</version>
         </dependency>
 
-		<!-- JSON builder -->
-		<dependency>
-			<groupId>javax.json</groupId>
-			<artifactId>javax.json-api</artifactId>
-		</dependency>
-
-		<!-- SLF4J -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-        
+        <!-- JSON builder -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.7</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
         </dependency>
 
-         <dependency>
+
+        <dependency>
             <groupId>org.apache.johnzon</groupId>
             <artifactId>johnzon-mapper</artifactId>
             <version>0.8-incubating</version>
             <scope>test</scope>
         </dependency>
-	</dependencies>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<inherited>true</inherited>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-						<Bundle-Version>${project.version}</Bundle-Version>
-						<Bundle-Activator>org.apache.karaf.decanter.appender.elasticsearch.Activator</Bundle-Activator>
-						<Import-Package>
-							org.apache.karaf.decanter.api;version=${project.version},
-							org.slf4j;version="[1.7,2)";resolution:=optional,
-							org.elasticsearch*;version="[1,2)",
-							*
-						</Import-Package>
-					</instructions>
-				</configuration>
-			</plugin>
+    <build>
+        <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -119,7 +79,7 @@
                     </execution>
                 </executions>
             </plugin>
-		</plugins>
-	</build>
+        </plugins>
+    </build>
 
 </project>

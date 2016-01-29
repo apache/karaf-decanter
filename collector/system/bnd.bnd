@@ -1,0 +1,3 @@
+Bundle-Activator: org.apache.karaf.decanter.collector.system.Activator
+Private-Package: org.apache.commons.exec*
+

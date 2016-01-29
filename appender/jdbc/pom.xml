@@ -34,57 +34,14 @@
     <name>Apache Karaf :: Decanter :: Appender :: JDBC</name>
 
     <dependencies>
-
-        <!-- Decanter API -->
-        <dependency>
-            <groupId>org.apache.karaf.decanter</groupId>
-            <artifactId>org.apache.karaf.decanter.api</artifactId>
-        </dependency>
-
-        <!-- JSON builder -->
         <dependency>
             <groupId>javax.json</groupId>
             <artifactId>javax.json-api</artifactId>
         </dependency>
-
-        <!-- OSGi -->
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
-
-        <!-- SLF4J -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <inherited>true</inherited>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Version>${project.version}</Bundle-Version>
-                        <Bundle-Activator>org.apache.karaf.decanter.appender.jdbc.Activator</Bundle-Activator>
-                        <Import-Package>
-                            org.apache.karaf.decanter.api;version=${project.version},
-                            org.slf4j;version="[1.7,2)";resolution:=optional,
-                            *
-                        </Import-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
