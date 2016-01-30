@@ -39,6 +39,7 @@
         <module>jdbc</module>
         <module>jms</module>
         <module>camel</module>
+        <module>kafka</module>
     </modules>
 
 </project>

@@ -1,0 +1,2 @@
+Bundle-Activator: org.apache.karaf.decanter.appender.kafka.Activator
+Import-Package: org.apache.kafka*,*
