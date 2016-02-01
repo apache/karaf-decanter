@@ -79,32 +79,18 @@ public class Activator implements BundleActivator {
             return "Karaf Decanter JMX collector service factory";
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void updated(String pid, Dictionary properties) throws ConfigurationException {
             LOGGER.debug("Updating JMX collector {}", pid);
             ServiceRegistration registration = null;
             try {
                 if (properties != null) {
-                    String type = "jmx-local";
-                    if (properties.get("type") != null) {
-                        type = (String) properties.get("type");
-                    }
-                    String url = "local";
-                    if (properties.get("url") != null) {
-                        url = (String) properties.get("url");
-                    }
-                    String username = null;
-                    if (properties.get("username") != null) {
-                        username = (String) properties.get("username");
-                    }
-                    String password = null;
-                    if (properties.get("password") != null) {
-                        password = (String) properties.get("password");
-                    }
-                    String objectName = null;
-                    if (properties.get("object.name") != null) {
-                        objectName = (String) properties.get("object.name");
-                    }
+                    String type = getProperty(properties, "type", "jmx-local");
+                    String url = getProperty(properties, "url", "local");
+                    String username = getProperty(properties, "username", null);
+                    String password = getProperty(properties, "password", null);
+                    String objectName = getProperty(properties, "object.name", null);
                     JmxCollector collector = new JmxCollector(type, url, username, password, objectName, eventAdmin, properties);
                     Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
                     serviceProperties.put("decanter.collector.name", type);
@@ -117,6 +103,10 @@ public class Activator implements BundleActivator {
                     oldRegistration.unregister();
                 }
             }
+        }
+
+        private String getProperty(Dictionary properties, String key, String defaultValue) {
+            return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
         }
 
         @Override
