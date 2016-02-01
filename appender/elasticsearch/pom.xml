@@ -35,24 +35,24 @@
     <name>Apache Karaf :: Decanter :: Appender :: Elasticsearch</name>
 
     <dependencies>
-        <!-- Elasticsearch -->
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>${elasticsearch.version}</version>
         </dependency>
-
-        <!-- JSON builder -->
+        <dependency>
+            <groupId>org.apache.karaf.decanter</groupId>
+            <artifactId>org.apache.karaf.decanter.api</artifactId>
+        </dependency>
         <dependency>
             <groupId>javax.json</groupId>
             <artifactId>javax.json-api</artifactId>
         </dependency>
 
-
         <dependency>
-            <groupId>org.apache.johnzon</groupId>
-            <artifactId>johnzon-mapper</artifactId>
-            <version>0.8-incubating</version>
+            <groupId>org.apache.karaf.decanter.marshaler</groupId>
+            <artifactId>org.apache.karaf.decanter.marshaller.json</artifactId>
+            <version>1.0.2-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

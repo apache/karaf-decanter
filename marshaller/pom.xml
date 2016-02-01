@@ -29,11 +29,12 @@
     </parent>
 
     <groupId>org.apache.karaf.decanter</groupId>
-    <artifactId>org.apache.karaf.decanter.api</artifactId>
-    <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: API</name>
+    <artifactId>marshaller</artifactId>
+    <packaging>pom</packaging>
+    <name>Apache Karaf :: Decanter :: Marshaller</name>
 
-    <properties>
-        <baseline.skip>false</baseline.skip>
-    </properties>
+    <modules>
+        <module>json</module>
+    </modules>
+
 </project>

@@ -1,1 +1,3 @@
-Export-Package: org.apache.karaf.decanter.api
+Export-Package: \
+	org.apache.karaf.decanter.api,\
+	org.apache.karaf.decanter.api.marshaller

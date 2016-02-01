@@ -18,22 +18,12 @@ package org.apache.karaf.decanter.appender.elasticsearch;
 
 import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.LockSupport;
 
-import javax.json.*;
-
+import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.elasticsearch.action.bulk.BulkProcessor;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -51,20 +41,24 @@ import org.slf4j.LoggerFactory;
  */
 public class ElasticsearchAppender implements EventHandler {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
+    final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
 
     private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSS'Z'");
     private final SimpleDateFormat indexDateFormat = new SimpleDateFormat("yyyy.MM.dd");
-    private final AtomicLong pendingBulkItemCount = new AtomicLong();
+
     private final int concurrentRequests = 1;
     private BulkProcessor bulkProcessor;
     Client client;
 
+    private Marshaller marshaller;
     private String host;
     private int port;
-	private String cluster;
+    private String cluster;
 
-    public ElasticsearchAppender(String host, int port, String cluster) {
+    private workFinishedListener listener;
+
+    public ElasticsearchAppender(Marshaller marshaller, String host, int port, String cluster) {
+        this.marshaller = marshaller;
         this.host = host;
         this.port = port;
         this.cluster = cluster;
@@ -77,29 +71,13 @@ public class ElasticsearchAppender implements EventHandler {
     public void open() {
         try {
             Settings settings = settingsBuilder()
-            						.classLoader(Settings.class.getClassLoader())
-            						.put("cluster.name", cluster)
-            						.build();
+                .classLoader(Settings.class.getClassLoader())
+                .put("cluster.name", cluster)
+                .build();
             InetSocketTransportAddress address = new InetSocketTransportAddress(host, port);
             client = new TransportClient(settings).addTransportAddress(address);
-            bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
-
-                @Override
-                public void beforeBulk(long executionId, BulkRequest request) {
-                    pendingBulkItemCount.addAndGet(request.numberOfActions());
-                }
-
-                @Override
-                public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
-                    LOGGER.warn("Can't append into Elasticsearch", failure);
-                    pendingBulkItemCount.addAndGet(-request.numberOfActions());
-                }
-
-                @Override
-                public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
-                    pendingBulkItemCount.addAndGet(-response.getItems().length);
-                }
-            })
+            listener = new workFinishedListener(concurrentRequests);
+            bulkProcessor = BulkProcessor.builder(client, listener)
             .setBulkActions(1000)
             .setConcurrentRequests(concurrentRequests)
             .setBulkSize(ByteSizeValue.parseBytesSizeValue("5mb"))
@@ -118,10 +96,8 @@ public class ElasticsearchAppender implements EventHandler {
             bulkProcessor.close();
         }
 
-        //if ConcurrentRequests > 0 we ll wait here because close() triggers a flush which is async
-        while(concurrentRequests > 0 && pendingBulkItemCount.get() > 0) {
-            LockSupport.parkNanos(1000*50);
-        }
+        // Need to wait till all requests are processed as close would do this asynchronously
+        listener.waitFinished();
 
         if(client != null) {
             client.close();
@@ -137,123 +113,22 @@ public class ElasticsearchAppender implements EventHandler {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void send(Event event) {
+        String indexName = getIndexName("karaf", getDate(event));
+        String jsonSt = marshaller.marshal(event);
+        LOGGER.debug("Sending event to elastic search with content: {}", jsonSt);
+        bulkProcessor.add(new IndexRequest(indexName, getType(event)).source(jsonSt));
+    }
+
+    private Date getDate(Event event) {
         Long ts = (Long)event.getProperty("timestamp");
         Date date = ts != null ? new Date(ts) : new Date();
-
-        JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-        jsonObjectBuilder.add("@timestamp", tsFormat.format(date));
-        for (String key : event.getPropertyNames()) {
-            Object value = event.getProperty(key);
-            if (value instanceof Map) {
-                jsonObjectBuilder.add(key, build((Map<String, Object>) value));
-            } else if (value instanceof List) {
-                jsonObjectBuilder.add(key, build((List) value));
-            } else if (value instanceof long[] || value instanceof Long[]) {
-                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-                long[] array = (long[]) value;
-                for (long l : array) {
-                    arrayBuilder.add(l);
-                }
-                jsonObjectBuilder.add(key, arrayBuilder.build());
-            } else if (value instanceof int[] || value instanceof Integer[]) {
-                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-                int[] array = (int[]) value;
-                for (int i : array) {
-                    arrayBuilder.add(i);
-                }
-                jsonObjectBuilder.add(key, arrayBuilder.build());
-            } else if (value instanceof String[]) {
-                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-                String[] array = (String[]) value;
-                for (String s : array) {
-                    arrayBuilder.add(s);
-                }
-                jsonObjectBuilder.add(key, arrayBuilder.build());
-            } else if (value instanceof Object[]) {
-                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-                Object[] array = (Object[]) value;
-                for (Object o : array) {
-                	if (o != null)
-                		arrayBuilder.add(o.toString());
-                }
-                jsonObjectBuilder.add(key, arrayBuilder.build());
-            } else {
-                addProperty(jsonObjectBuilder, key, value);
-            }
-        }
-        JsonObject jsonObject = jsonObjectBuilder.build();
-        String indexName = getIndexName("karaf", date);
-        String jsonSt = jsonObject.toString();
-
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Sending event to elastic search with content: {}", jsonSt);
-        }
-
-        bulkProcessor.add(new IndexRequest(indexName, getType(event)).source(jsonSt));
+        return date;
     }
 
     private String getType(Event event) {
         String type = (String)event.getProperty("type");
         return type != null ? type : "karaf_event";
-    }
-
-    private JsonObject build(Map<String, Object> value) {
-        JsonObjectBuilder innerBuilder = Json.createObjectBuilder();
-        for (Entry<String, Object> innerEntrySet : value.entrySet()) {
-            addProperty(innerBuilder, innerEntrySet.getKey(), innerEntrySet.getValue());
-        }
-        return innerBuilder.build();
-    }
-
-    private JsonArray build(List values) {
-        JsonArrayBuilder innerBuilder = Json.createArrayBuilder();
-        for (Object value : values) {
-            if (value instanceof Map) {
-                innerBuilder.add(build((Map) value));
-            } else {
-                if (value instanceof BigDecimal)
-                    innerBuilder.add((BigDecimal) value);
-                else if (value instanceof BigInteger)
-                    innerBuilder.add((BigInteger) value);
-                else if (value instanceof String)
-                    innerBuilder.add((String) value);
-                else if (value instanceof Long)
-                    innerBuilder.add((Long) value);
-                else if (value instanceof Integer)
-                    innerBuilder.add((Integer) value);
-                else if (value instanceof Float)
-                    innerBuilder.add((Float) value);
-                else if (value instanceof Double)
-                    innerBuilder.add((Double) value);
-                else if (value instanceof Boolean)
-                    innerBuilder.add((Boolean) value);
-            }
-        }
-        return innerBuilder.build();
-    }
-
-    private void addProperty(JsonObjectBuilder builder, String key, Object value) {
-        if (value instanceof BigDecimal)
-            builder.add(key, (BigDecimal) value);
-        else if (value instanceof BigInteger)
-            builder.add(key, (BigInteger) value);
-        else if (value instanceof String)
-            builder.add(key, (String) value);
-        else if (value instanceof Long)
-            builder.add(key, (Long) value);
-        else if (value instanceof Integer)
-            builder.add(key, (Integer) value);
-        else if (value instanceof Float)
-            builder.add(key, (Float) value);
-        else if (value instanceof Double)
-            if (Double.isNaN((Double) value))
-                builder.add(key, "NaN");
-            else
-                builder.add(key, (Double) value);
-        else if (value instanceof Boolean)
-            builder.add(key, (Boolean) value);
     }
 
     private String getIndexName(String prefix, Date date) {

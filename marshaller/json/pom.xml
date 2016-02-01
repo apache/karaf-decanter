@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <!--
 
         Licensed to the Apache Software Foundation (ASF) under one or more
@@ -18,22 +16,30 @@
         See the License for the specific language governing permissions and
         limitations under the License.
     -->
-
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
-        <groupId>org.apache.karaf</groupId>
-        <artifactId>decanter</artifactId>
+        <groupId>org.apache.karaf.decanter</groupId>
+        <artifactId>marshaller</artifactId>
         <version>1.0.2-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>..</relativePath>
     </parent>
-
-    <groupId>org.apache.karaf.decanter</groupId>
-    <artifactId>org.apache.karaf.decanter.api</artifactId>
+    <groupId>org.apache.karaf.decanter.marshaller</groupId>
+    <artifactId>org.apache.karaf.decanter.marshaller.json</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: API</name>
+    <name>Apache Karaf :: Decanter :: Marshaller :: Json</name>
 
-    <properties>
-        <baseline.skip>false</baseline.skip>
-    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.karaf.decanter</groupId>
+            <artifactId>org.apache.karaf.decanter.api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-mapper</artifactId>
+        </dependency>
+    </dependencies>
 </project>

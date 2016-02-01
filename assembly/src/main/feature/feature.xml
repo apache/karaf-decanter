@@ -21,6 +21,7 @@
     <feature name="decanter-common" version="${project.version}" description="Karaf Decanter API">
         <feature>eventadmin</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.api/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.json/${project.version}</bundle>
     </feature>
 
     <feature name="decanter-simple-scheduler" version="${project.version}" description="Karaf Decanter Simple Scheduler">

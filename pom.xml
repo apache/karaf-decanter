@@ -35,6 +35,9 @@
     <name>Apache Karaf :: Decanter</name>
 
     <properties>
+        <baseline>1.0.0</baseline>
+        <baseline.skip>true</baseline.skip>
+
         <camel.version>2.13.2</camel.version>
         <elasticsearch.version>1.7.3</elasticsearch.version>
         <elasticsearch.bundle.version>1.7.3_1</elasticsearch.bundle.version>
@@ -42,6 +45,7 @@
         <slf4j.version>1.7.7</slf4j.version>
         <json-api.version>1.0</json-api.version>
         <glassfish-json.version>1.0.4</glassfish-json.version>
+        
     </properties>
 
     <modules>
@@ -49,6 +53,7 @@
         <module>scheduler</module>
         <module>collector</module>
         <module>appender</module>
+        <module>marshaller</module>
         <module>sla</module>
         <module>elasticsearch</module>
         <module>elasticsearch-head</module>
@@ -205,6 +210,19 @@
                         <_include>bnd.bnd</_include>
                     </instructions>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>baseline</id>
+                        <goals>
+                            <goal>baseline</goal>
+                        </goals>
+                        <configuration>
+                            <comparisonVersion>${baseline}</comparisonVersion>
+                            <skip>${baseline.skip}</skip>
+                            <failOnError>true</failOnError>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -229,6 +247,7 @@
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.compendium</artifactId>
                 <version>4.3.1</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- SLF4J -->
@@ -236,7 +255,7 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
-                <scope>compile</scope>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -244,17 +263,20 @@
                 <version>${slf4j.version}</version>
             </dependency>
 
-            <!-- JUnit -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.12</version>
             </dependency>
-
             <dependency>
-            	<groupId>javax.json</groupId>
-            	<artifactId>javax.json-api</artifactId>
-            	<version>${json-api.version}</version>
+                <groupId>javax.json</groupId>
+                <artifactId>javax.json-api</artifactId>
+                <version>${json-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.johnzon</groupId>
+                <artifactId>johnzon-mapper</artifactId>
+                <version>0.9.2-incubating</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -263,24 +285,25 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
         </dependency>
-        
+
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.7</version>
             <scope>test</scope>
         </dependency>
-        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
