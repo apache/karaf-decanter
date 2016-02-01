@@ -21,7 +21,6 @@ import org.elasticsearch.common.settings.ImmutableSettings.Builder;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.internal.InternalNode;
-import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,20 +35,20 @@ public class EmbeddedNode {
     private final static Logger LOGGER = LoggerFactory.getLogger(EmbeddedNode.class);
     private static Node node;
     
-	public static String PLUGINS_DIRECTORY = "plugins.directory";
-	public static String ELASTIC_YAML_FILE = "elasticsearch.yaml";
-	
-	public static String CLUSTER_NAME = "cluster.name";
-	public static String HTTP_ENABLED = "http.enabled";
-	public static String NODE_DATA = "node.data";
-	public static String NODE_NAME = "node.name";
-	public static String NODE_MASTER = "node.master";
-	public static String PATH_DATA = "path.data";
-	public static String NETWORK_HOST = "network.host";
-	public static String CLUSTER_ROUTING_SCHEDULE = "cluster.routing.schedule";
-	public static String PATH_PLUGINS = "path.plugins";
-	public static String HTTP_CORS_ENABLED = "http.cors.enabled";
-	public static String HTTP_CORS_ALLOW_ORIGIN = "http.cors.allow-origin";
+    public static String PLUGINS_DIRECTORY = "plugins.directory";
+    public static String ELASTIC_YAML_FILE = "elasticsearch.yaml";
+
+    public static String CLUSTER_NAME = "cluster.name";
+    public static String HTTP_ENABLED = "http.enabled";
+    public static String NODE_DATA = "node.data";
+    public static String NODE_NAME = "node.name";
+    public static String NODE_MASTER = "node.master";
+    public static String PATH_DATA = "path.data";
+    public static String NETWORK_HOST = "network.host";
+    public static String CLUSTER_ROUTING_SCHEDULE = "cluster.routing.schedule";
+    public static String PATH_PLUGINS = "path.plugins";
+    public static String HTTP_CORS_ENABLED = "http.cors.enabled";
+    public static String HTTP_CORS_ALLOW_ORIGIN = "http.cors.allow-origin";
 
     public EmbeddedNode(Dictionary<String, ?> config) throws Exception {
         LOGGER.info("Starting Elasticsearch node ...");
@@ -69,17 +68,15 @@ public class EmbeddedNode {
         if (ymlFile.exists()) {
             // elasticsearch.yml is provided
             LOGGER.debug("elasticsearch.yml found for settings");
-            settings = ImmutableSettings.settingsBuilder().loadFromUrl(ymlFile.toURL()).build();
+            settings = ImmutableSettings.settingsBuilder().loadFromUrl(ymlFile.toURI().toURL()).build();
         } 
 
         // configuration will be overridden by special configurations
         LOGGER.debug("enhancing elasticsearch configuration with given configurations");
         
-        Builder settingsBuilder;
-        if (settings == null) {
-        	settingsBuilder = ImmutableSettings.settingsBuilder();
-        } else {
-        	settingsBuilder = ImmutableSettings.settingsBuilder().put(settings);
+        Builder settingsBuilder = ImmutableSettings.settingsBuilder();
+        if (settings != null) {
+            settingsBuilder = ImmutableSettings.settingsBuilder().put(settings);
         }      
 
        	settingsBuilder.put(CLUSTER_NAME, getConfig(config, settings, CLUSTER_NAME, "elasticsearch"));
@@ -87,7 +84,7 @@ public class EmbeddedNode {
        	settingsBuilder.put(PATH_DATA, getConfig(config, settings, PATH_DATA, "data"));
        	settingsBuilder.put(NODE_MASTER, getConfig(config, settings, NODE_MASTER, "true"));
        	settingsBuilder.put(NODE_DATA, getConfig(config, settings, NODE_DATA, "true"));
-       	settingsBuilder.put(NODE_NAME, getConfig(config, settings, NODE_NAME, System.getProperty("karaf.name") == null ? "decanter" : System.getProperty("karaf.name")));
+       	settingsBuilder.put(NODE_NAME, getConfig(config, settings, NODE_NAME, getNodeName()));
        	settingsBuilder.put(NETWORK_HOST, getConfig(config, settings, NETWORK_HOST, "127.0.0.1"));
        	settingsBuilder.put(CLUSTER_ROUTING_SCHEDULE, getConfig(config, settings, CLUSTER_ROUTING_SCHEDULE, "50ms"));
        	settingsBuilder.put(PATH_PLUGINS, getConfig(config, settings, PATH_PLUGINS, pluginsFile.getAbsolutePath()));
@@ -101,7 +98,11 @@ public class EmbeddedNode {
         LOGGER.info("Elasticsearch node created");
     }
 
-	public void start() throws Exception {
+    private String getNodeName() {
+        return System.getProperty("karaf.name") == null ? "decanter" : System.getProperty("karaf.name");
+    }
+
+    public void start() throws Exception {
         if (node != null) {
             node.start();
         }
@@ -124,13 +125,14 @@ public class EmbeddedNode {
         return node;
     }
     
-    private String getConfig(Dictionary<String, ?> config, Settings settings, String key, String defaultValue) {
-    	if (settings != null && settings.get(key) != null)
-    		defaultValue = settings.get(key);
+    private String getConfig(Dictionary<String, ?> config, Settings settings, String key,
+                             String defaultValue) {
+        if (settings != null && settings.get(key) != null)
+            defaultValue = settings.get(key);
         if (config == null)
             return defaultValue;
-		String value = (String) config.get(key);
-		return value != null ? value : defaultValue;
-	}
+        String value = (String)config.get(key);
+        return value != null ? value : defaultValue;
+    }
 
 }

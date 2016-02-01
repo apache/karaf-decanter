@@ -24,6 +24,7 @@ import org.elasticsearch.node.Node;
 import static org.junit.Assert.*;
 
 import java.util.Dictionary;
+import java.util.Hashtable;
 
 import org.junit.Test;
 
@@ -32,11 +33,12 @@ public class TestEmbeddedNode {
     @Test
     public void testNode() throws Exception {
 
-        System.setProperty("karaf.home", "/tmp");
+        System.setProperty("karaf.home", "target/karaf");
         System.setProperty("karaf.name", "decanter-test");
 
-        Dictionary<String, ?> configuration = null;
-		EmbeddedNode embeddedNode = new EmbeddedNode(configuration);
+        Dictionary<String, String> configuration = new Hashtable<>();
+        configuration.put(EmbeddedNode.PATH_DATA, "target/karaf/es");
+        EmbeddedNode embeddedNode = new EmbeddedNode(configuration);
         
         Node node = embeddedNode.getNode();
         embeddedNode.start();

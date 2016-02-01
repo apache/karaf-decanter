@@ -18,7 +18,6 @@ package org.apache.karaf.decanter.elasticsearch;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.concurrent.CancellationException;
 
 import org.elasticsearch.node.Node;
 import org.osgi.framework.BundleActivator;
@@ -27,17 +26,14 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("rawtypes")
 public class Activator implements BundleActivator {
+    private static final String CONFIG_PID = "org.apache.karaf.decanter.elasticsearch";
+    private static final Logger LOGGER = LoggerFactory.getLogger(Activator.class);
 
-	private static final String CONFIG_PID = "org.apache.karaf.decanter.elasticsearch";
-	
-	private final static Logger LOGGER = LoggerFactory.getLogger(Activator.class);
-	
     private EmbeddedNode node;
     private ServiceRegistration service;
     private ServiceRegistration registration;
@@ -45,7 +41,8 @@ public class Activator implements BundleActivator {
     public void start(BundleContext bundleContext) throws Exception {
         Dictionary<String, String> properties = new Hashtable<>();
         properties.put(Constants.SERVICE_PID, CONFIG_PID);
-        registration = bundleContext.registerService(ManagedService.class.getName(), new ConfigUpdater(bundleContext), properties);
+        registration = bundleContext.registerService(ManagedService.class.getName(),
+                                                     new ConfigUpdater(bundleContext), properties);
     }
 
     public void stop(BundleContext bundleContext) throws Exception {
@@ -59,7 +56,7 @@ public class Activator implements BundleActivator {
             registration.unregister();
         }
     }
-    
+
     private final class ConfigUpdater implements ManagedService {
         private BundleContext bundleContext;
 
@@ -71,33 +68,25 @@ public class Activator implements BundleActivator {
         public void updated(Dictionary<String, ?> config) throws ConfigurationException {
             if (node != null) {
                 try {
-					node.stop();
-				} catch (Exception e) {
-					String message = "Failed to stop embedded elasticsearch node";
-					LOGGER.error(message, e);
-					throw new ConfigurationException(null, message, e);
-				}
+                    node.stop();
+                } catch (Exception e) {
+                    String message = "Failed to stop embedded elasticsearch node";
+                    LOGGER.error(message, e);
+                    throw new ConfigurationException(null, message, e);
+                }
                 service.unregister();
                 node = null;
             }
-        	
-        	if (node == null) {
-                try {
-					node = new EmbeddedNode(config);
-				} catch (Exception e) {
-					String message = "Failed to create embedded elasticsearch node";
-					LOGGER.error(message, e);
-					throw new ConfigurationException(null, message, e);
-				}
+
+            try {
+                node = new EmbeddedNode(config);
+                node.start();
+            } catch (Exception e) {
+                String message = "Failed to start embedded elasticsearch node";
+                LOGGER.error(message, e);
+                throw new ConfigurationException(null, message, e);
             }
             service = bundleContext.registerService(Node.class, node.getNode(), null);
-            try {
-				node.start();
-			} catch (Exception e) {
-				String message = "Failed to starts embedded elasticsearch node";
-				LOGGER.error(message, e);
-				throw new ConfigurationException(null, message, e);
-			}
         }
     }
 
