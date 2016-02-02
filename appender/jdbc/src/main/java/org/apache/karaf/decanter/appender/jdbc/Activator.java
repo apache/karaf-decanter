@@ -125,10 +125,6 @@ public class Activator implements BundleActivator {
                 
             };
             dsTracker.open();
-            try {
-            } catch (Exception e) {
-                throw new ConfigurationException(null, "Can't start Decanter JDBC appender", e);
-            }
         }
 
         private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
