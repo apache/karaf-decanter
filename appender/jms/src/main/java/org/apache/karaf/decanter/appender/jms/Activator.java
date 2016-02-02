@@ -16,27 +16,30 @@
  */
 package org.apache.karaf.decanter.appender.jms;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import javax.jms.ConnectionFactory;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
+import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-
+@SuppressWarnings("rawtypes")
 public class Activator implements BundleActivator {
-
     private final static Logger LOGGER = LoggerFactory.getLogger(Activator.class);
-
     private final static String CONFIG_PID = "org.apache.karaf.decanter.appender.jms";
-
-    private ServiceRegistration serviceRegistration;
 
     @Override
     public void start(BundleContext bundleContext) throws Exception {
@@ -44,21 +47,18 @@ public class Activator implements BundleActivator {
         ConfigUpdater configUpdater = new ConfigUpdater(bundleContext);
         Dictionary<String, String> properties = new Hashtable<>();
         properties.put(Constants.SERVICE_PID, CONFIG_PID);
-        serviceRegistration = bundleContext.registerService(ManagedService.class.getName(), configUpdater, properties);
+        bundleContext.registerService(ManagedService.class.getName(), configUpdater, properties);
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
         LOGGER.debug("Stopping Decanter JMS appender");
-        if (serviceRegistration != null) {
-            serviceRegistration.unregister();
-        }
+        // Services will be unregistered automatically
     }
 
     private final class ConfigUpdater implements ManagedService {
-
         private BundleContext bundleContext;
-        private ServiceRegistration registration;
+        private ServiceTracker<ConnectionFactory, ServiceRegistration> dsTracker;
 
         public ConfigUpdater(BundleContext bundleContext) {
             this.bundleContext = bundleContext;
@@ -67,36 +67,52 @@ public class Activator implements BundleActivator {
         @Override
         public void updated(Dictionary config) throws ConfigurationException {
             LOGGER.debug("Updating Decanter JMS appender");
-            if (registration != null) {
-                registration.unregister();
+            if (dsTracker != null) {
+                dsTracker.close();
+                dsTracker = null;
             }
-            String connectionFactoryName = "jms/decanter";
-            if (config != null && config.get("connection.factory.name") != null) {
-                connectionFactoryName = (String) config.get("connection.factory.name");
+            if (config == null) {
+                return;
             }
-            String username = null;
-            if (config != null && config.get("username") != null) {
-                username = (String) config.get("username");
+            final String cfName = getProperty(config, "connection.factory.name", "jms/decanter");
+            final String username = getProperty(config, "username", null);
+            final String password = getProperty(config, "password", null);
+            final String destinationName = getProperty(config, "destination.name", "decanter");
+            final String destinationType = getProperty(config, "destination.type", "queue");
+            final String filterSt = "(&(" + Constants.OBJECTCLASS + "=" + ConnectionFactory.class.getName() + ")"
+                + "(|(osgi.jndi.service.name=" + cfName + ")(name=" + cfName + ")(service.id=" + cfName + ")))";
+            Filter filter;
+            try {
+                filter = bundleContext.createFilter(filterSt);
+            } catch (InvalidSyntaxException e) {
+                throw new ConfigurationException("connection.factory.name", "Unable to create filter " + filterSt, e);
             }
-            String password = null;
-            if (config != null && config.get("password") != null) {
-                password = (String) config.get("password");
-            }
-            String destinationName = "decanter";
-            if (config != null && config.get("destination.name") != null) {
-                destinationName = (String) config.get("destination.name");
-            }
-            String destinationType = "queue";
-            if (config != null && config.get("destination.type") != null) {
-                destinationType = (String) config.get("destination.type");
-            }
-            JmsAppender appender = new JmsAppender(bundleContext, connectionFactoryName, username, password, destinationName, destinationType);
-            Dictionary<String, String> properties = new Hashtable<>();
-            properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
-            this.registration = bundleContext.registerService(EventHandler.class, appender, properties);
-            LOGGER.debug("Decanter JMS appender started ({}/{})", connectionFactoryName, destinationName);
+            LOGGER.info("Tracking ConnectionFactory " + filterSt);
+            dsTracker = new ServiceTracker<ConnectionFactory, ServiceRegistration>(bundleContext, filter, null) {
+                
+                @Override
+                public ServiceRegistration addingService(ServiceReference<ConnectionFactory> reference) {
+                    LOGGER.info("ConnectionFactory acquired. Starting JMS appender ({} , {})", cfName, destinationName);
+                    ConnectionFactory cf = context.getService(reference);
+                    JmsAppender appender = new JmsAppender(cf, username, password, destinationName, destinationType);
+                    Dictionary<String, String> properties = new Hashtable<>();
+                    properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
+                    return bundleContext.registerService(EventHandler.class, appender, properties);
+                }
+
+                @Override
+                public void removedService(ServiceReference<ConnectionFactory> reference, ServiceRegistration serviceReg) {
+                    serviceReg.unregister();
+                    super.removedService(reference, serviceReg);
+                }
+                
+            };
+            dsTracker.open();
         }
 
+        private String getProperty(Dictionary properties, String key, String defaultValue) {
+            return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
+        }
     }
 
 }

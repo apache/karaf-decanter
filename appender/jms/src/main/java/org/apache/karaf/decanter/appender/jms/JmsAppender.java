@@ -16,88 +16,51 @@
  */
 package org.apache.karaf.decanter.appender.jms;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jms.*;
-
 public class JmsAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(JmsAppender.class);
 
-    private String connectionFactoryName;
+    private ConnectionFactory connectionFactory;
     private String username;
     private String password;
     private String destinationName;
     private String destinationType;
-    private BundleContext bundleContext;
 
-    public JmsAppender(BundleContext bundleContext, String connectionFactoryName, String username, String password, String destinationName, String destinationType) {
-        this.bundleContext = bundleContext;
-        this.connectionFactoryName = connectionFactoryName;
+    public JmsAppender(ConnectionFactory connectionFactory, String username, String password, String destinationName, String destinationType) {
+        this.connectionFactory = connectionFactory;
         this.username = username;
         this.password = password;
         this.destinationName = destinationName;
         this.destinationType = destinationType;
     }
 
-    private ServiceReference lookupConnectionFactory(String name) throws Exception {
-        ServiceReference[] references = bundleContext.getServiceReferences(ConnectionFactory.class.getName(), "(|(osgi.jndi.service.name=" + name + ")(name=" + name + ")(service.id=" + name + "))");
-        if (references == null || references.length == 0) {
-            throw new IllegalArgumentException("No JMS connection factory found for " + name);
-        }
-        if (references.length > 1) {
-            throw new IllegalArgumentException("Multiple JMS connection factories found for " + name);
-        }
-        return references[0];
-    }
-
-
     @Override
     public void handleEvent(Event event) {
-        LOGGER.debug("Looking for the JMS connection factory");
-        ServiceReference reference;
-        try {
-            reference = lookupConnectionFactory(connectionFactoryName);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Can't lookup for JMS connection for " + connectionFactoryName);
-        }
-
         Connection connection = null;
         Session session = null;
         try {
-            ConnectionFactory connectionFactory = (ConnectionFactory) bundleContext.getService(reference);
-            if (username != null) {
-                connection = connectionFactory.createConnection(username, password);
-            } else {
-                connection = connectionFactory.createConnection();
-            }
+            connection = createConnection();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination destination;
-            if (destinationType.equalsIgnoreCase("topic")) {
-                destination = session.createTopic(destinationName);
-            } else {
-                destination = session.createQueue(destinationName);
-            }
+            Destination destination = createDestination(session);
             MessageProducer producer = session.createProducer(destination);
             Message message = session.createMapMessage();
 
             for (String name : event.getPropertyNames()) {
                 Object value = event.getProperty(name);
-                if (value instanceof String)
-                    message.setStringProperty(name, (String) value);
-                else if (value instanceof Boolean)
-                    message.setBooleanProperty(name, (Boolean) value);
-                else if (value instanceof Double)
-                    message.setDoubleProperty(name, (Double) value);
-                else if (value instanceof Integer)
-                    message.setIntProperty(name, (Integer) value);
-                else message.setStringProperty(name, value.toString());
-                // we can setObject with List, Map, but they have to contain only primitives
+                setProperty(message, name, value);
             }
 
             producer.send(message);
@@ -106,24 +69,61 @@ public class JmsAppender implements EventHandler {
             LOGGER.warn("Can't send to JMS broker", e);
         }
         finally {
-            if (session != null) {
-                try {
-                    session.close();
-                } catch (Exception e) {
-                    // nothing to do
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (Exception e) {
-                    // nothing to do
-                }
-            }
-            if (reference != null) {
-                bundleContext.ungetService(reference);
-            }
+            safeClose(session);
+            safeClose(connection);
         }
     }
 
+    private void setProperty(Message message, String name, Object value) throws JMSException {
+        if (value instanceof String)
+            message.setStringProperty(name, (String) value);
+        else if (value instanceof Boolean)
+            message.setBooleanProperty(name, (Boolean) value);
+        else if (value instanceof Double)
+            message.setDoubleProperty(name, (Double) value);
+        else if (value instanceof Integer)
+            message.setIntProperty(name, (Integer) value);
+        else message.setStringProperty(name, value.toString());
+        // we can setObject with List, Map, but they have to contain only primitives
+    }
+
+    private Destination createDestination(Session session) throws JMSException {
+        Destination destination;
+        if (destinationType.equalsIgnoreCase("topic")) {
+            destination = session.createTopic(destinationName);
+        } else {
+            destination = session.createQueue(destinationName);
+        }
+        return destination;
+    }
+
+    private Connection createConnection() throws JMSException {
+        Connection connection;
+        if (username != null) {
+            connection = connectionFactory.createConnection(username, password);
+        } else {
+            connection = connectionFactory.createConnection();
+        }
+        return connection;
+    }
+
+    public void safeClose(Session sess) {
+        if (sess != null) {
+            try {
+                sess.close();
+            } catch (JMSException e) {
+                // Ignore
+            }
+        }
+    }
+    
+    public void safeClose(Connection con) {
+        if (con != null) {
+            try {
+                con.close();
+            } catch (JMSException e) {
+                // Ignore
+            }
+        }
+    }
 }
