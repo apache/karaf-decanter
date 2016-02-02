@@ -50,7 +50,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.karaf.decanter.marshaler</groupId>
+            <groupId>org.apache.karaf.decanter.marshaller</groupId>
             <artifactId>org.apache.karaf.decanter.marshaller.json</artifactId>
             <version>1.0.2-SNAPSHOT</version>
             <scope>test</scope>
