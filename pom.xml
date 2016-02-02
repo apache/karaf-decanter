@@ -236,6 +236,11 @@
                 <artifactId>org.apache.karaf.decanter.api</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.karaf.decanter.marshaller</groupId>
+                <artifactId>org.apache.karaf.decanter.marshaller.json</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- OSGi -->
             <dependency>
@@ -277,6 +282,11 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-mapper</artifactId>
                 <version>0.9.2-incubating</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>10.12.1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

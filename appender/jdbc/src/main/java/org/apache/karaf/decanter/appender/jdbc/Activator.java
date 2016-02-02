@@ -16,86 +16,125 @@
  */
 package org.apache.karaf.decanter.appender.jdbc;
 
-import org.osgi.framework.*;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import javax.sql.DataSource;
+
+import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
-import org.slf4j.LoggerFactory;
+import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-
+@SuppressWarnings("rawtypes")
 public class Activator implements BundleActivator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Activator.class);
+    private static final String CONFIG_PID = "org.apache.karaf.decanter.appender.jdbc";
+    private ServiceTracker<Marshaller, ServiceRegistration> tracker;
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(Activator.class);
+    @Override
+    public void start(final BundleContext bundleContext) throws Exception {
+        LOGGER.debug("Starting Decanter JDBC appender");
+        tracker = new ServiceTracker<Marshaller, ServiceRegistration>(bundleContext, Marshaller.class, null) {
+            @Override
+            public ServiceRegistration addingService(ServiceReference<Marshaller> reference) {
+                Dictionary<String, String> properties = new Hashtable<>();
+                properties.put(Constants.SERVICE_PID, CONFIG_PID);
+                Marshaller marshaller = context.getService(reference);
+                return bundleContext.registerService(ManagedService.class.getName(),
+                                                     new ConfigUpdater(bundleContext, marshaller),
+                                                     properties);
+            }
 
-	private static final String CONFIG_PID = "org.apache.karaf.decanter.appender.jdbc";
+            @Override
+            public void removedService(ServiceReference<Marshaller> reference, ServiceRegistration service) {
+                service.unregister();
+                super.removedService(reference, service);
+            }
+        };
+        tracker.open();
+    }
 
-	private ServiceRegistration serviceRegistration;
+    @Override
+    public void stop(BundleContext bundleContext) throws Exception {
+        LOGGER.debug("Stopping Decanter JDBC appender");
+        tracker.close();
+    }
 
-	@Override
-	public void start(final BundleContext bundleContext) throws Exception {
-		LOGGER.debug("Starting Decanter JDBC appender");
+    private final class ConfigUpdater implements ManagedService {
+        private BundleContext bundleContext;
+        private Marshaller marshaller;
+        private ServiceTracker<DataSource, ServiceRegistration> dsTracker;
 
-		ConfigUpdater configUpdater = new ConfigUpdater(bundleContext);
+        public ConfigUpdater(final BundleContext bundleContext, Marshaller marshaller) {
+            this.bundleContext = bundleContext;
+            this.marshaller = marshaller;
+        }
 
-		Dictionary<String, String> properties = new Hashtable<>();
-		properties.put(Constants.SERVICE_PID, CONFIG_PID);
-		serviceRegistration = bundleContext.registerService(ManagedService.class.getName(), configUpdater, properties);
-	}
+        @SuppressWarnings("unchecked")
+        @Override
+        public void updated(Dictionary config) throws ConfigurationException {
+            LOGGER.debug("Updating Decanter JDBC managed service");
+            if (dsTracker != null) {
+                dsTracker.close();
+                dsTracker = null;
+            }
+            if (config == null) {
+                return;
+            }
+            final String dataSourceName = getValue(config, "datasource.name", "jdbc/decanter");
+            final String tableName = getValue(config, "table.name", "decanter");
+            final String dialect = getValue(config, "dialect", "generic");
+            final String filterSt = "(&(" + Constants.OBJECTCLASS + "=" + DataSource.class.getName() + ")"
+                + "(|(osgi.jndi.service.name=" + dataSourceName + ")(datasource=" + dataSourceName + ")(name=" + dataSourceName + ")(service.id=" + dataSourceName + ")))";
+            Filter filter;
+            try {
+                filter = bundleContext.createFilter(filterSt);
+            } catch (InvalidSyntaxException e) {
+                throw new ConfigurationException("datasource.name", "Unable to create DataSource filter " + filterSt, e);
+            }
+            LOGGER.info("Tracking DataSource " + filterSt);
+            dsTracker = new ServiceTracker<DataSource, ServiceRegistration>(bundleContext, filter, null) {
+                
+                @Override
+                public ServiceRegistration addingService(ServiceReference<DataSource> reference) {
+                    LOGGER.debug("DataSource acquired. Starting JDBC appender ({}/{})", dataSourceName, tableName);
+                    DataSource dataSource = context.getService(reference);
+                    JdbcAppender appender = new JdbcAppender(tableName, dialect, marshaller, dataSource);
+                    Dictionary<String, String> properties = new Hashtable<>();
+                    properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
+                    return bundleContext.registerService(EventHandler.class, appender, properties);
+                }
 
-	@Override
-	public void stop(BundleContext bundleContext) throws Exception {
-		LOGGER.debug("Stopping Decanter JDBC appender");
+                @Override
+                public void removedService(ServiceReference reference, ServiceRegistration serviceReg) {
+                    serviceReg.unregister();
+                    super.removedService(reference, serviceReg);
+                }
+                
+            };
+            dsTracker.open();
+            try {
+            } catch (Exception e) {
+                throw new ConfigurationException(null, "Can't start Decanter JDBC appender", e);
+            }
+        }
 
-		if (serviceRegistration != null) {
-			serviceRegistration.unregister();
-		}
-	}
-
-	private final class ConfigUpdater implements ManagedService {
-
-		private BundleContext bundleContext;
-		private ServiceRegistration registration;
-
-		public ConfigUpdater(final BundleContext bundleContext) throws Exception {
-			this.bundleContext = bundleContext;
-		}
-
-		@Override
-		public void updated(Dictionary config) throws ConfigurationException {
-			LOGGER.debug("Updating Decanter JDBC managed service");
-
-			if (registration != null) {
-				registration.unregister();
-			}
-
-			String dataSourceName = "jdbc/decanter";
-			if (config != null && config.get("datasource.name") != null) {
-				dataSourceName = (String) config.get("datasource.name");
-			}
-			String tableName = "decanter";
-			if (config != null && config.get("table.name") != null) {
-				tableName = (String) config.get("table.name");
-			}
-			String dialect = "generic";
-			if (config != null && config.get("dialect") != null) {
-				dialect = (String) config.get("dialect");
-			}
-			try {
-				JdbcAppender appender = new JdbcAppender(dataSourceName, tableName, dialect, bundleContext);
-				Dictionary<String, String> properties = new Hashtable<>();
-				properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
-				this.registration = bundleContext.registerService(EventHandler.class, appender, properties);
-				LOGGER.debug("Decanter JDBC appender started ({}/{})", dataSourceName, tableName);
-			} catch (Exception e) {
-				LOGGER.error("Can't start Decanter JDBC service tracker", e);
-				throw new ConfigurationException("table.name", "Can't start Decanter JDBC service tracker: " + e.getMessage());
-			}
-		}
-
-	}
+        private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
+            String value = (String)config.get(key);
+            return (value != null) ? value :  defaultValue;
+        }
+    }
 
 }

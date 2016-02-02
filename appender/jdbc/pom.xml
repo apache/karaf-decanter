@@ -38,6 +38,21 @@
             <groupId>javax.json</groupId>
             <artifactId>javax.json-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.decanter</groupId>
+            <artifactId>org.apache.karaf.decanter.api</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.decanter.marshaller</groupId>
+            <artifactId>org.apache.karaf.decanter.marshaller.json</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
