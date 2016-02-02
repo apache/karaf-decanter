@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -36,9 +37,15 @@ import javax.json.JsonWriter;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 
 public class JsonMarshaller implements Marshaller, Unmarshaller {
-    private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSS'Z'");
+    private final SimpleDateFormat tsFormat;
+    
+    public JsonMarshaller() {
+        tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSSX");
+        tsFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     @Override
     public void marshal(Object obj, OutputStream out) {
@@ -74,7 +81,7 @@ public class JsonMarshaller implements Marshaller, Unmarshaller {
     }
 
     private void addTimestamp(Event event, JsonObjectBuilder json) {
-        Long ts = (Long)event.getProperty("timestamp");
+        Long ts = (Long)event.getProperty(EventConstants.TIMESTAMP);
         Date date = ts != null ? new Date(ts) : new Date();
         json.add("@timestamp", tsFormat.format(date));
     }
