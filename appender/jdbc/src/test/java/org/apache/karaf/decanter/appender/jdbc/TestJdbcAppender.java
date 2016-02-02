@@ -43,6 +43,7 @@ public class TestJdbcAppender {
 
     @Test
     public void testHandleEvent() throws SQLException {
+        System.setProperty("derby.stream.error.file", "target/derby.log");
         Marshaller marshaller = new JsonMarshaller();
         EmbeddedDataSource dataSource = new EmbeddedDataSource();
         dataSource.setDatabaseName("target/testDB");
