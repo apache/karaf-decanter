@@ -35,9 +35,16 @@ public class DecanterTailerListener extends TailerListenerAdapter {
     private String type;
     private String path;
     private EventAdmin eventAdmin;
-    private Dictionary properties;
+    private Dictionary<String, Object> properties;
 
-    public DecanterTailerListener(String type, String path, EventAdmin eventAdmin, Dictionary properties) {
+    /**
+     * 
+     * @param type
+     * @param path
+     * @param eventAdmin
+     * @param properties additional properties provided by the user
+     */
+    public DecanterTailerListener(String type, String path, EventAdmin eventAdmin, Dictionary<String, Object> properties) {
         this.type = type;
         this.path = path;
         this.eventAdmin = eventAdmin;
@@ -62,20 +69,21 @@ public class DecanterTailerListener extends TailerListenerAdapter {
             LOGGER.debug("Can't get host address and name", e);
         }
 
-        // add additional properties (can be provided by the user)
-        if (properties != null) {
-            Enumeration<String> keys = properties.keys();
-            while (keys.hasMoreElements()) {
-                String property = keys.nextElement();
-                data.put(property, properties.get(property));
-            }
-        }
+        addPropertiesTo(data);
 
         // TODO: try some line parsing
         data.put("line", line);
 
         Event event = new Event("decanter/collect/file/" + type, data);
         eventAdmin.postEvent(event);
+    }
+
+    private void addPropertiesTo(Map<String, Object> data) {
+        Enumeration<String> keys = properties.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            data.put(key, properties.get(key));
+        }
     }
 
     @Override
@@ -95,6 +103,5 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         super.fileRotated();
         LOGGER.debug("File {} rotated", path);
     }
-
 
 }

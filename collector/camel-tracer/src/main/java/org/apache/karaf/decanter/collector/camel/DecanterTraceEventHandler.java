@@ -75,21 +75,21 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
     }
 
     private static String extractFromNode(Exchange exchange) {
-        if (exchange.getUnitOfWork() != null) {
-            TracedRouteNodes traced = exchange.getUnitOfWork().getTracedRouteNodes();
-            RouteNode last = traced.getSecondLastNode();
-            return last != null ? last.getLabel(exchange) : null;
+        if (exchange.getUnitOfWork() == null) {
+            return null;
         }
-        return null;
+        TracedRouteNodes traced = exchange.getUnitOfWork().getTracedRouteNodes();
+        RouteNode last = traced.getSecondLastNode();
+        return last != null ? last.getLabel(exchange) : null;
     }
 
     private static String extractToNode(Exchange exchange) {
-        if (exchange.getUnitOfWork() != null) {
-            TracedRouteNodes traced = exchange.getUnitOfWork().getTracedRouteNodes();
-            RouteNode last = traced.getLastNode();
-            return last != null ? last.getLabel(exchange) : null;
+        if (exchange.getUnitOfWork() == null) {
+            return null;
         }
-        return null;
+        TracedRouteNodes traced = exchange.getUnitOfWork().getTracedRouteNodes();
+        RouteNode last = traced.getLastNode();
+        return last != null ? last.getLabel(exchange) : null;
     }
 
     private static String extractCausedByException(Exchange exchange) {
@@ -97,12 +97,7 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
         if (cause == null) {
             cause = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
         }
-
-        if (cause != null) {
-            return cause.toString();
-        } else {
-            return null;
-        }
+        return (cause != null) ? cause.toString() : null;
     }
 
 }

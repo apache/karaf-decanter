@@ -32,10 +32,10 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("rawtypes")
 public class Activator implements BundleActivator {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Activator.class);
-
     private ServiceTracker<EventAdmin, ServiceRegistration> tracker;
 
     public void start(final BundleContext bundleContext) throws Exception {
@@ -77,9 +77,10 @@ public class Activator implements BundleActivator {
 
         @Override
         public String getName() {
-            return "Karaf Decanter File collector service factory";
+            return "Karaf Decanter File collector";
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void updated(String pid, Dictionary properties) throws ConfigurationException {
             LOGGER.debug("Updating File collector {}", pid);
@@ -98,13 +99,13 @@ public class Activator implements BundleActivator {
                     LOGGER.debug("Starting tail on {}", path);
                     TailerListener tailerListener = new DecanterTailerListener(type, path, eventAdmin, properties);
                     tailer = new Tailer(new File(path), tailerListener);
-                    Thread thread = new Thread(tailer);
+                    Thread thread = new Thread(tailer, "Trailer for " + path);
                     thread.start();
                 }
             } finally {
                 Tailer oldTailer= (tailer == null) ? tailers.remove(pid) : tailers.put(pid, tailer);
                 if (oldTailer != null) {
-                    LOGGER.debug("Unregistering Decanter JMX collector {}", pid);
+                    LOGGER.debug("Unregistering Decanter File collector {}", pid);
                     oldTailer.stop();
                 }
             }
