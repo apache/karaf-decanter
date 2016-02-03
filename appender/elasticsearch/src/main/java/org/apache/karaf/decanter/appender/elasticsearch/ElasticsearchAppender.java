@@ -55,7 +55,7 @@ public class ElasticsearchAppender implements EventHandler {
     private int port;
     private String cluster;
 
-    private workFinishedListener listener;
+    private WorkFinishedListener listener;
 
     public ElasticsearchAppender(Marshaller marshaller, String host, int port, String cluster) {
         this.marshaller = marshaller;
@@ -76,7 +76,7 @@ public class ElasticsearchAppender implements EventHandler {
                 .build();
             InetSocketTransportAddress address = new InetSocketTransportAddress(host, port);
             client = new TransportClient(settings).addTransportAddress(address);
-            listener = new workFinishedListener(concurrentRequests);
+            listener = new WorkFinishedListener(concurrentRequests);
             bulkProcessor = BulkProcessor.builder(client, listener)
             .setBulkActions(1000)
             .setConcurrentRequests(concurrentRequests)
