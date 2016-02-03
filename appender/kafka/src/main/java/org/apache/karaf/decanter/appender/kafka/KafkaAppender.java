@@ -18,11 +18,14 @@ package org.apache.karaf.decanter.appender.kafka;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class KafkaAppender implements EventHandler {
@@ -31,10 +34,12 @@ public class KafkaAppender implements EventHandler {
 
     private Properties connection;
     private String topic;
+    private Marshaller marshaller;
 
-    public KafkaAppender(Properties connnection, String topic) {
+    public KafkaAppender(Properties connnection, String topic, Marshaller marshaller) {
         this.connection = connnection;
         this.topic = topic;
+        this.marshaller = marshaller;
     }
 
     @Override
@@ -42,11 +47,10 @@ public class KafkaAppender implements EventHandler {
         KafkaProducer producer = null;
         try {
             producer = new KafkaProducer(connection);
-            for (String name : event.getPropertyNames()) {
-                String value = event.getProperty(name).toString();
-                ProducerRecord record = new ProducerRecord(topic, name, value);
-                producer.send(record);
-            }
+            String type = (String) event.getProperty("type");
+            String data = marshaller.marshal(event);
+            ProducerRecord record = new ProducerRecord(topic, type, data);
+            producer.send(record);
         } finally {
             if (producer != null)
                 producer.close();

@@ -16,14 +16,13 @@
  */
 package org.apache.karaf.decanter.appender.kafka;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceRegistration;
+import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.osgi.framework.*;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
+import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,32 +36,42 @@ public class Activator implements BundleActivator {
 
     private final static String CONFIG_PID = "org.apache.karaf.decanter.appender.kafka";
 
-    private ServiceRegistration serviceRegistration;
+    private ServiceTracker tracker;
 
     @Override
-    public void start(BundleContext bundleContext) throws Exception {
-        LOGGER.debug("Starting Decanter Kafka appender");
-        ConfigUpdater configUpdater = new ConfigUpdater(bundleContext);
-        Dictionary<String, String> properties = new Hashtable<>();
-        properties.put(Constants.SERVICE_PID, CONFIG_PID);
-        serviceRegistration = bundleContext.registerService(ManagedService.class.getName(), configUpdater, properties);
+    public void start(final BundleContext bundleContext) throws Exception {
+        tracker = new ServiceTracker<Marshaller, ServiceRegistration>(bundleContext, Marshaller.class, null) {
+            @Override
+            public ServiceRegistration addingService(ServiceReference<Marshaller> reference) {
+                Dictionary<String, String> properties = new Hashtable<>();
+                properties.put(Constants.SERVICE_PID, CONFIG_PID);
+                Marshaller marshaller = context.getService(reference);
+                return bundleContext.registerService(ManagedService.class.getName(), new ConfigUpdater(bundleContext, marshaller), properties);
+            }
+            @Override
+            public void removedService(ServiceReference<Marshaller> reference, ServiceRegistration service) {
+                service.unregister();
+                super.removedService(reference, service);
+            }
+        };
+        tracker.open();
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
         LOGGER.debug("Stopping Decanter Kafka appender");
-        if (serviceRegistration != null) {
-            serviceRegistration.unregister();
-        }
+        tracker.close();
     }
 
     private final class ConfigUpdater implements ManagedService {
 
         private BundleContext bundleContext;
         private ServiceRegistration registration;
+        private Marshaller marshaller;
 
-        public ConfigUpdater(BundleContext bundleContext) {
+        public ConfigUpdater(BundleContext bundleContext, Marshaller marshaller) {
             this.bundleContext = bundleContext;
+            this.marshaller = marshaller;
         }
 
         @Override
@@ -74,55 +83,47 @@ public class Activator implements BundleActivator {
 
             Properties kafkaProperties = new Properties();
 
-            String bootstrapServers = "localhost:9092";
+            String bootstrapServers = getValue(config, "bootstrap.servers", "localhost:9092");
             kafkaProperties.put("bootstrap.servers", bootstrapServers);
-            if (config != null && config.get("bootstrap.servers") != null) {
-                bootstrapServers = (String) config.get("bootstrap.servers");
-                kafkaProperties.put("bootstrap.servers", bootstrapServers);
-            }
-            kafkaProperties.put("client.id", "");
-            if (config != null && config.get("client.id") != null) {
-                kafkaProperties.put("client.id", (String) config.get("client.id"));
-            }
-            kafkaProperties.put("compression.type", "none");
-            if (config != null && config.get("compression.type") != null) {
-                kafkaProperties.put("compression.type", (String) config.get("compression.type"));
-            }
-            kafkaProperties.put("acks", "all");
-            if (config != null && config.get("acks") != null) {
-                kafkaProperties.put("acks", (String) config.get("acks"));
-            }
-            kafkaProperties.put("retries", 0);
-            if (config != null && config.get("retries") != null) {
-                kafkaProperties.put("retries", Integer.parseInt((String) config.get("retries")));
-            }
-            kafkaProperties.put("batch.size", 16384);
-            if (config != null && config.get("batch.size") != null) {
-                kafkaProperties.put("batch.size", Integer.parseInt((String) config.get("batch.size")));
-            }
-            kafkaProperties.put("buffer.memory", 33554432);
-            if (config != null && config.get("buffer.memory") != null) {
-                kafkaProperties.put("buffer.memory", Long.parseLong((String) config.get("buffer.memory")));
-            }
-            kafkaProperties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-            if (config != null && config.get("key.serializer") != null) {
-                kafkaProperties.put("key.serializer", (String) config.get("key.serializer"));
-            }
-            kafkaProperties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-            if (config != null && config.get("value.serializer") != null) {
-                kafkaProperties.put("value.serializer", (String) config.get("value.serializer"));
-            }
-            String topic = "decanter";
-            if (config != null && config.get("topic") != null) {
-                topic = (String) config.get("topic");
-            }
-            KafkaAppender appender = new KafkaAppender(kafkaProperties, topic);
+
+            String clientId = getValue(config, "client.id", "");
+            kafkaProperties.put("client.id", clientId);
+
+            String compressionType = getValue(config, "compression.type", "none");
+            kafkaProperties.put("compression.type", compressionType);
+
+            String acks = getValue(config, "acks", "all");
+            kafkaProperties.put("acks", acks);
+
+            String retries = getValue(config, "retries", "0");
+            kafkaProperties.put("retries", Integer.parseInt(retries));
+
+            String batchSize = getValue(config, "batch.size", "16384");
+            kafkaProperties.put("batch.size", Integer.parseInt(batchSize));
+
+            String bufferMemory = getValue(config, "buffer.memory", "33554432");
+            kafkaProperties.put("buffer.memory", Long.parseLong(bufferMemory));
+
+            String keySerializer = getValue(config, "key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+            kafkaProperties.put("key.serializer", keySerializer);
+
+            String valueSerializer = getValue(config, "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+            kafkaProperties.put("value.serializer", valueSerializer);
+
+            String topic = getValue(config, "topic", "decanter");
+
+            KafkaAppender appender = new KafkaAppender(kafkaProperties, topic, marshaller);
             Dictionary<String, String> properties = new Hashtable<>();
             properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
             this.registration = bundleContext.registerService(EventHandler.class, appender, properties);
             LOGGER.debug("Decanter Kafka appender started ({}/{})", bootstrapServers, topic);
         }
 
+    }
+
+    private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
+        String value = (String)config.get(key);
+        return (value != null) ? value :  defaultValue;
     }
 
 }
