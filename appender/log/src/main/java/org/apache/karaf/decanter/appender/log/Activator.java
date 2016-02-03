@@ -18,29 +18,22 @@ package org.apache.karaf.decanter.appender.log;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.Properties;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
 public class Activator implements BundleActivator {
 
-    private ServiceRegistration registration;
-
     public void start(BundleContext bundleContext) {
         LogAppender appender = new LogAppender();
         Dictionary<String, String> properties = new Hashtable<>();
         properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
-        registration = bundleContext.registerService(EventHandler.class, appender, properties);
+        bundleContext.registerService(EventHandler.class, appender, properties);
     }
 
     public void stop(BundleContext bundleContext) {
-        if (registration != null) {
-            registration.unregister();
-        }
     }
 
 }
