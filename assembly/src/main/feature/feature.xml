@@ -20,6 +20,7 @@
 
     <feature name="decanter-common" version="${project.version}" description="Karaf Decanter API">
         <feature>eventadmin</feature>
+        <bundle>mvn:org.glassfish/javax.json/${glassfish-json.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.api/${project.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.json/${project.version}</bundle>
     </feature>
@@ -77,7 +78,6 @@
 
     <feature name="decanter-appender-elasticsearch" version="${project.version}" description="Karaf Decanter Elasticsearch Appender">
         <feature version="${project.version}">decanter-common</feature>
-        <bundle>mvn:org.glassfish/javax.json/${glassfish-json.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch/${project.version}/cfg</configfile>
@@ -85,7 +85,6 @@
 
     <feature name="decanter-appender-jdbc" version="${project.version}" description="Karaf Decanter JDBC Appender">
         <feature version="${project.version}">decanter-common</feature>
-        <bundle>mvn:org.glassfish/javax.json/${glassfish-json.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jdbc/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.jdbc.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jdbc/${project.version}/cfg</configfile>
     </feature>
@@ -105,10 +104,17 @@
 
     <feature name="decanter-appender-kafka" version="${project.version}" description="Karaf Decanter Kafka Appender">
         <feature version="${project.version}">decanter-common</feature>
-        <bundle>mvn:org.glassfish/javax.json/${glassfish-json.version}</bundle>
+
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.kafka-clients/0.8.2.2_1</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.kafka/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.kafka.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.kafka/${project.version}/cfg</configfile>
+    </feature>
+    
+    <feature name="decanter-appender-mqtt" version="${project.version}" description="Karaf Decanter MQTT Appender">
+        <feature version="${project.version}">decanter-common</feature>
+        <bundle>mvn:org.eclipse.paho/org.eclipse.paho.client.mqttv3/${paho.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.mqtt/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.mqtt.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.mqtt/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="decanter-sla" version="${project.version}" description="Karaf Decanter SLA support">

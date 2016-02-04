@@ -46,6 +46,7 @@
         <json-api.version>1.0</json-api.version>
         <glassfish-json.version>1.0.4</glassfish-json.version>
         <activemq.version>5.12.2</activemq.version>
+        <paho.version>1.0.2</paho.version>
     </properties>
 
     <modules>
@@ -270,6 +271,12 @@
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-kahadb-store</artifactId>
                 <version>${activemq.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.eclipse.paho</groupId>
+                <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+                <version>${paho.version}</version>
             </dependency>
 
             <!-- SLF4J -->

@@ -90,6 +90,7 @@ public class TestMqttAppender  {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 received.add(message);
+                System.out.println(message);
             }
             
             @Override
@@ -106,5 +107,5 @@ public class TestMqttAppender  {
         client.setCallback(callback);
         return client;
     }
-    
+
 }

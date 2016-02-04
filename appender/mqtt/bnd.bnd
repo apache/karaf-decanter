@@ -1,1 +1,1 @@
-Bundle-Activator: org.apache.karaf.decanter.appender.jdbc.Activator
+Bundle-Activator: org.apache.karaf.decanter.appender.mqtt.Activator

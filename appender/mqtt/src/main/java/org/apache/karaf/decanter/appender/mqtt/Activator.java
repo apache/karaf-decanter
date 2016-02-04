@@ -34,7 +34,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 @SuppressWarnings("rawtypes")
 public class Activator implements BundleActivator {
-    private static final String CONFIG_PID = "org.apache.karaf.decanter.appender.elasticsearch";
+    private static final String CONFIG_PID = "org.apache.karaf.decanter.appender.mqtt";
     private ServiceTracker<Marshaller, ServiceRegistration> tracker;
 
     public void start(final BundleContext bundleContext) {
@@ -93,7 +93,7 @@ public class Activator implements BundleActivator {
                 properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
                 serviceReg =  bundleContext.registerService(EventHandler.class, appender, properties);
             } catch (MqttException e) {
-                throw new ConfigurationException(null, "Error starting mqtt appender", e);
+                throw new ConfigurationException(null, "Error starting mqtt appender sending to server " + serverURI, e);
             }
         }
 
