@@ -16,6 +16,9 @@
  */
 package org.apache.karaf.decanter.appender.kafka;
 
+import java.io.Closeable;
+import java.util.Properties;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
@@ -24,37 +27,36 @@ import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
-public class KafkaAppender implements EventHandler {
+public class KafkaAppender implements EventHandler, Closeable {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaAppender.class);
 
     private Properties connection;
     private String topic;
     private Marshaller marshaller;
+    private KafkaProducer<String, String> producer;
 
     public KafkaAppender(Properties connnection, String topic, Marshaller marshaller) {
         this.connection = connnection;
         this.topic = topic;
         this.marshaller = marshaller;
+        this.producer = new KafkaProducer<>(connection);
     }
 
     @Override
     public void handleEvent(Event event) {
-        KafkaProducer producer = null;
         try {
-            producer = new KafkaProducer(connection);
-            String type = (String) event.getProperty("type");
+            String type = (String)event.getProperty("type");
             String data = marshaller.marshal(event);
-            ProducerRecord record = new ProducerRecord(topic, type, data);
-            producer.send(record);
-        } finally {
-            if (producer != null)
-                producer.close();
+            producer.send(new ProducerRecord<>(topic, type, data));
+        } catch (RuntimeException e) {
+            LOGGER.warn("Error sending event to kafka", e);
         }
+    }
+
+    @Override
+    public void close() {
+        producer.close();
     }
 
 }

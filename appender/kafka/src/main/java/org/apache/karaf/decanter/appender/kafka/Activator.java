@@ -30,13 +30,13 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Properties;
 
+@SuppressWarnings("rawtypes")
 public class Activator implements BundleActivator {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Activator.class);
-
     private final static String CONFIG_PID = "org.apache.karaf.decanter.appender.kafka";
-
-    private ServiceTracker tracker;
+    
+    private ServiceTracker<Marshaller, ServiceRegistration> tracker;
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
@@ -68,17 +68,26 @@ public class Activator implements BundleActivator {
         private BundleContext bundleContext;
         private ServiceRegistration registration;
         private Marshaller marshaller;
+        private KafkaAppender appender;
 
         public ConfigUpdater(BundleContext bundleContext, Marshaller marshaller) {
             this.bundleContext = bundleContext;
             this.marshaller = marshaller;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void updated(Dictionary config) throws ConfigurationException {
             LOGGER.debug("Updating Decanter Kafka appender");
+            if (appender != null) {
+                appender.close();
+            }
             if (registration != null) {
                 registration.unregister();
+            }
+            
+            if (config == null) {
+                return;
             }
 
             Properties kafkaProperties = new Properties();
@@ -112,7 +121,7 @@ public class Activator implements BundleActivator {
 
             String topic = getValue(config, "topic", "decanter");
 
-            KafkaAppender appender = new KafkaAppender(kafkaProperties, topic, marshaller);
+            this.appender = new KafkaAppender(kafkaProperties, topic, marshaller);
             Dictionary<String, String> properties = new Hashtable<>();
             properties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
             this.registration = bundleContext.registerService(EventHandler.class, appender, properties);
