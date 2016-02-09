@@ -41,6 +41,7 @@
         <module>camel</module>
         <module>kafka</module>
         <module>mqtt</module>
+        <module>cassandra</module>
     </modules>
 
 </project>
