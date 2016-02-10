@@ -38,15 +38,17 @@
         <baseline>1.0.0</baseline>
         <baseline.skip>true</baseline.skip>
 
+        <activemq.version>5.12.2</activemq.version>
         <camel.version>2.13.2</camel.version>
+        <cassandra.version>2.2.4</cassandra.version>
+        <cassandra.driver.version>2.2.0-rc1</cassandra.driver.version>
         <elasticsearch.version>1.7.3</elasticsearch.version>
         <elasticsearch.bundle.version>1.7.3_1</elasticsearch.bundle.version>
-        <kibana.version>3.1.1</kibana.version>
-        <slf4j.version>1.7.7</slf4j.version>
-        <json-api.version>1.0</json-api.version>
         <glassfish-json.version>1.0.4</glassfish-json.version>
-        <activemq.version>5.12.2</activemq.version>
+        <json-api.version>1.0</json-api.version>
+        <kibana.version>3.1.1</kibana.version>
         <paho.version>1.0.2</paho.version>
+        <slf4j.version>1.7.7</slf4j.version>
     </properties>
 
     <modules>

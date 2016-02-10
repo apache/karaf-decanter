@@ -39,22 +39,6 @@
             <artifactId>org.apache.karaf.decanter.api</artifactId>
         </dependency>
 
-        <!-- JSON builder -->
-        <dependency>
-            <groupId>javax.json</groupId>
-            <artifactId>javax.json-api</artifactId>
-        </dependency>
-
-        <!-- OSGi -->
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
-
         <!-- SLF4J -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -64,8 +48,7 @@
         <dependency>
 			<groupId>com.datastax.cassandra</groupId>
 			<artifactId>cassandra-driver-core</artifactId>
-			<version>2.2.0-rc1</version>
-			<scope>provided</scope>
+			<version>${cassandra.driver.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.codehaus.jackson</groupId>
@@ -85,7 +68,7 @@
 		<dependency>
 			<groupId>org.apache.cassandra</groupId>
 			<artifactId>cassandra-all</artifactId>
-			<version>2.2.4</version>
+			<version>${cassandra.version}</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>

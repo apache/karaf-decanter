@@ -16,20 +16,10 @@
  */
 package org.apache.karaf.decanter.appender.cassandra;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
-
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
@@ -47,8 +37,6 @@ import com.datastax.driver.core.exceptions.InvalidQueryException;
 public class CassandraAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CassandraAppender.class);
-
-    private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSS'Z'");
 
     private String cassandraHost;
     private Integer cassandraPort;

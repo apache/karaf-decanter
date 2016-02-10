@@ -108,7 +108,7 @@ public class Activator implements BundleActivator {
 			
 			Integer cassandraPort = 9042;
 			if (config != null && config.get("cassandra.port") != null) {
-			    cassandraPort = (Integer) config.get("cassandra.port");
+			    cassandraPort = Integer.parseInt((String) config.get("cassandra.port"));
 			}
 			
 			try {
