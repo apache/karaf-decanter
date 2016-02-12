@@ -39,6 +39,7 @@
         <module>file</module>
         <module>camel-tracer</module>
         <module>system</module>
+        <module>log4j-socket</module>
     </modules>
 
 </project>

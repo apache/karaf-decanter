@@ -1,0 +1,9 @@
+Bundle-Activator: org.apache.karaf.decanter.appender.log.socket.Activator
+Import-Package: \
+	!com.ibm.uvm.tools,\
+	*
+Private-Package: \
+	org.apache.log4j.spi,\
+	org.apache.log4j.helpers,\
+	org.apache.log4j.or,\
+	org.apache.log4j.pattern
