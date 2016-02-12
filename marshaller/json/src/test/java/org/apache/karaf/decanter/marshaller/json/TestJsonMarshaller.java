@@ -47,7 +47,7 @@ public class TestJsonMarshaller {
        Assert.assertEquals("Timestamp string", "2016-02-02T15:59:40,634Z",jsonO.getString("@timestamp"));
        long ts = jsonO.getJsonNumber(EventConstants.TIMESTAMP).longValue();
        Assert.assertEquals("timestamp long", EXPECTED_TIMESTAMP, ts);
-       Assert.assertEquals("Topic", EXPECTED_TOPIC, jsonO.getString(EventConstants.EVENT_TOPIC));
+       Assert.assertEquals("Topic", EXPECTED_TOPIC, jsonO.getString(EventConstants.EVENT_TOPIC.replace('.', '_')));
 
    }
 

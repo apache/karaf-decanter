@@ -75,7 +75,7 @@ public class JsonMarshaller implements Marshaller, Unmarshaller {
         addTimestamp(event, json);
         for (String key : event.getPropertyNames()) {
             Object value = event.getProperty(key);
-            marshalAttribute(json, key, value);
+            marshalAttribute(json, key.replace('.','_'), value);
         }
         return json.build();
     }
@@ -88,6 +88,7 @@ public class JsonMarshaller implements Marshaller, Unmarshaller {
 
     @SuppressWarnings("unchecked")
     private void marshalAttribute(JsonObjectBuilder jsonObjectBuilder, String key, Object value) {
+        key = key.replace('.', '_');
         if (value instanceof Map) {
             jsonObjectBuilder.add(key, build((Map<String, Object>)value));
         } else if (value instanceof List) {
@@ -130,7 +131,7 @@ public class JsonMarshaller implements Marshaller, Unmarshaller {
     private JsonObject build(Map<String, Object> value) {
         JsonObjectBuilder json = Json.createObjectBuilder();
         for (Entry<String, Object> entries : value.entrySet()) {
-            addProperty(json, entries.getKey(), entries.getValue());
+            addProperty(json, entries.getKey().replace('.','_'), entries.getValue());
         }
         return json.build();
     }
@@ -167,6 +168,7 @@ public class JsonMarshaller implements Marshaller, Unmarshaller {
     }
 
     private void addProperty(JsonObjectBuilder json, String key, Object value) {
+        key = key.replace('.','_');
         if (value instanceof BigDecimal) {
             json.add(key, (BigDecimal)value);
         } else if (value instanceof BigInteger) {

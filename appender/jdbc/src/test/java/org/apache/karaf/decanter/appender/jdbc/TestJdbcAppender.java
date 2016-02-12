@@ -67,7 +67,7 @@ public class TestJdbcAppender {
             Assert.assertEquals("Timestamp db", TIMESTAMP, dbTimeStamp);
             Assert.assertEquals("Timestamp string", "2016-02-02T15:59:40,634Z",jsonO.getString("@timestamp"));
             Assert.assertEquals("timestamp long", TIMESTAMP, jsonO.getJsonNumber(EventConstants.TIMESTAMP).longValue());
-            Assert.assertEquals("Topic", TOPIC, jsonO.getString(EventConstants.EVENT_TOPIC));
+            Assert.assertEquals("Topic", TOPIC, jsonO.getString(EventConstants.EVENT_TOPIC.replace('.','_')));
             Assert.assertFalse(res.next());
         }
     }

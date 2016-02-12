@@ -30,15 +30,15 @@
     </parent>
 
     <groupId>org.apache.karaf.decanter.appender</groupId>
-    <artifactId>org.apache.karaf.decanter.appender.elasticsearch</artifactId>
+    <artifactId>org.apache.karaf.decanter.appender.elasticsearch-native-2.x</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Appender :: Elasticsearch</name>
+    <name>Apache Karaf :: Decanter :: Appender :: Elasticsearch Native 2.x</name>
 
     <dependencies>
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
-            <version>${elasticsearch.version}</version>
+            <version>${elasticsearch2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter</groupId>
@@ -55,30 +55,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>src/main/cfg/org.apache.karaf.decanter.appender.elasticsearch.cfg</file>
-                                    <type>cfg</type>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

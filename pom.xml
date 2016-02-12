@@ -42,8 +42,10 @@
         <camel.version>2.13.2</camel.version>
         <cassandra.version>2.2.4</cassandra.version>
         <cassandra.driver.version>2.2.0-rc1</cassandra.driver.version>
-        <elasticsearch.version>1.7.3</elasticsearch.version>
-        <elasticsearch.bundle.version>1.7.3_1</elasticsearch.bundle.version>
+        <elasticsearch1.version>1.7.3</elasticsearch1.version>
+        <elasticsearch1.bundle.version>1.7.3_1</elasticsearch1.bundle.version>
+        <elasticsearch2.version>2.1.1</elasticsearch2.version>
+        <elasticsearch2.bundle.version>2.1.1_1</elasticsearch2.bundle.version>
         <glassfish-json.version>1.0.4</glassfish-json.version>
         <json-api.version>1.0</json-api.version>
         <kibana.version>3.1.1</kibana.version>
@@ -58,7 +60,8 @@
         <module>appender</module>
         <module>marshaller</module>
         <module>sla</module>
-        <module>elasticsearch</module>
+        <module>elasticsearch-1.x</module>
+        <module>elasticsearch-2.x</module>
         <module>elasticsearch-head</module>
         <module>kibana</module>
         <module>assembly</module>

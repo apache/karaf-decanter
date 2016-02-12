@@ -29,21 +29,41 @@
     </parent>
 
     <groupId>org.apache.karaf.decanter</groupId>
-    <artifactId>appender</artifactId>
-    <packaging>pom</packaging>
-    <name>Apache Karaf :: Decanter :: Appender</name>
+    <artifactId>org.apache.karaf.decanter.elasticsearch-1.x</artifactId>
+    <packaging>bundle</packaging>
+    <name>Apache Karaf :: Decanter :: Elasticsearch 1.x</name>
 
-    <modules>
-        <module>log</module>
-        <module>elasticsearch-native-1.x</module>
-        <module>elasticsearch-native-2.x</module>
-        <module>elasticsearch-rest</module>
-        <module>jdbc</module>
-        <module>jms</module>
-        <module>camel</module>
-        <module>kafka</module>
-        <module>mqtt</module>
-        <module>cassandra</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch1.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>src/main/cfg/elasticsearch.yml</file>
+                                    <type>yml</type>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

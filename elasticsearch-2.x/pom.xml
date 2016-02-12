@@ -29,15 +29,15 @@
     </parent>
 
     <groupId>org.apache.karaf.decanter</groupId>
-    <artifactId>org.apache.karaf.decanter.elasticsearch</artifactId>
+    <artifactId>org.apache.karaf.decanter.elasticsearch-2.x</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Elasticsearch</name>
+    <name>Apache Karaf :: Decanter :: Elasticsearch 2.x</name>
 
     <dependencies>
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
-            <version>${elasticsearch.version}</version>
+            <version>${elasticsearch2.version}</version>
         </dependency>
     </dependencies>
 
