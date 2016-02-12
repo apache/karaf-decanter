@@ -35,6 +35,12 @@
         <feature version="${project.version}">decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log/${project.version}</bundle>
     </feature>
+    
+    <feature name="decanter-collector-log-socket" version="${project.version}" description="Karaf Decanter Log4j socket Collector">
+        <feature version="${project.version}">decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log.socket/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.log.socket.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log.socket/${project.version}/cfg</configfile>
+    </feature>
 
     <feature name="decanter-collector-file" version="${project.version}" description="Karaf Decanter Log File Collector">
         <feature version="${project.version}">decanter-common</feature>
