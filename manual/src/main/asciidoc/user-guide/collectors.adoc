@@ -35,6 +35,36 @@ karaf@root()> feature:install decanter-collector-log
 
 The log collector doesn't need any configuration, the installation of the decanter-collector-log feature is enough.
 
+==== Log Socket
+
+The Decanter Log Socket Collector is an event driven collector. It creates a socket, waiting for incoming event. The expected
+events are log4j LoggingEvent. The log4j LoggingEvent is transformed as a Map containing the log details (level, logger name, message, ...).
+This Map is sent to the appenders.
+
+The collector allows you to remotely use Decanter. For instance, you can have an application running on a different platform (spring-boot,
+application servers, ...). This application can use a log4j socket appender that send the logging events to the Decanter
+log socket collector.
+
+The `decanter-collector-log-socket` feature install the log socket collector:
+
+----
+karaf@root()> feature:install decanter-collector-log-socket
+----
+
+This feature installs the collector and a default `etc/org.apache.karaf.decanter.collector.log.socket.cfg` configuration file
+containing:
+
+----
+#
+# Decanter Log/Log4j Socket collector configuration
+#
+
+#port=4560
+
+----
+
+* the `port` property defines the port number where the collector is bound and listen for incoming logging event. Default is 4560.
+
 ==== File
 
 The Decanter File Collector is an event driven collector. It automatically reacts when new lines are appended into

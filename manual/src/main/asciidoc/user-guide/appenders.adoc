@@ -30,16 +30,57 @@ The log appender doesn't require any configuration.
 
 ==== Elasticsearch
 
-The Decanter Elasticsearch Appender stores the data (coming from the collectors) into an Elasticsearch instance.
+Decanter provides three appenders for Elasticsearch:
 
-This appender transforms the data as a json object. This json object is stored in the Elasticsearch instance.
+* decanter-appender-elasticsearch-rest (recommanded) is an appender which directly uses the Elasticsearch HTTP REST API. It's compliant with any Elasticsearch version (1.x and 2.x).
+* decanter-appender-elasticsearch-native-1.x is an appender which uses the Elasticsearch 1.x Java Client API. It's compliant only with Elasticsearch 1.x versions.
+* decanter-appender-elasticsearch-native-2.x is an appender which uses the Elasticsearch 2.x Java Client API. It's compliant only with Elasticsearch 2.x versions.
 
-It's probably one of the most interesting way to use Decanter.
+These appenders store the data (coming from the collectors) into an Elasticsearch node.
+They transformm the data as a json document, stored into Elasticsearch.
 
-The `decanter-appender-elasticsearch` feature installs the elasticsearch appender:
+===== Elasticsearch HTTP REST appender
+
+The Decanter Elasticsearch HTTP REST API appender uses the Elasticsearch REST API. It works with any Elasticsearch version (1.x and 2.x).
+
+The `decanter-appender-elasticsearch-rest` feature installs this appender:
 
 ----
-karaf@root()> feature:install decanter-appender-elasticsearch
+karaf@root()> feature:install decanter-appender-elasticsearch-rest
+----
+
+This feature installs the appender and the `etc/org.apache.karaf.decanter.appender.elasticsearch.rest.cfg` configuration file
+containing:
+
+----
+#########################################################
+# Decanter Elasticsearch HTTP REST Appender Configuration
+#########################################################
+
+# HTTP address of the elasticsearch node
+# NB: the appender uses discovery via elasticsearch nodes API
+address=http://localhost:9200
+
+# Basic username and password authentication
+# username=user
+# password=password
+----
+
+The file contains the Elasticsearch node location:
+
+* the `address` is the HTTP URL of the Elasticsearch node. Default is `http://localhost:9200`.
+* the `username` is the username used for authentication (optional)
+* the `password` is the password used for authentication (optional)
+
+===== Elasticsearch 1.x Native appender
+
+The Elasticsearch 1.x Native appender uses the Elasticsearch 1.x Java Client API. It's very specific to
+Elasticsearch 1.x versions, and can't run with Elasticsearch 2.x.
+
+The `decanter-appender-elasticsearch-native-1.x` feature installs the elasticsearch appender:
+
+----
+karaf@root()> feature:install decanter-appender-elasticsearch-native-1.x
 ----
 
 This feature installs the elasticsearch appender, especially the `etc/org.apache.karaf.decanter.appender.elasticsearch.cfg`
@@ -64,17 +105,60 @@ This file contains the elasticsearch instance connection properties:
 * the `port` property contains the port number of the Elasticsearch instance
 * the `clusterName` property contains the name of the Elasticsearch cluster where to send the data
 
-===== Embedding Decanter Elasticsearch
+===== Elasticsearch 2.x Native appender
 
-For convenience, Decanter provides an `elasticsearch` feature starting an embedded Elasticsearch instance:
+The Elasticsearch 2.x Native appender uses the Elasticsearch 2.x Java Client API. It's very specific to
+Elasticsearch 2.x versions, and can't run with Elasticsearch 1.x.
+
+The `decanter-appender-elasticsearch-native-2.x` feature installs the elasticsearch appender:
+
+----
+karaf@root()> feature:install decanter-appender-elasticsearch-native-2.x
+----
+
+This feature installs the elasticsearch appender, especially the `etc/org.apache.karaf.decanter.appender.elasticsearch.cfg`
+configuration file containing:
+
+----
+################################################
+# Decanter Elasticsearch Appender Configuration
+################################################
+
+# Hostname of the elasticsearch instance
+host=localhost
+# Port number of the elasticsearch instance
+port=9300
+# Name of the elasticsearch cluster
+clusterName=elasticsearch
+----
+
+This file contains the elasticsearch instance connection properties:
+
+* the `host` property contains the hostname (or IP address) of the Elasticsearch instance
+* the `port` property contains the port number of the Elasticsearch instance
+* the `clusterName` property contains the name of the Elasticsearch cluster where to send the data
+
+===== Embedding Decanter Elasticsearch (1.x and 2.x)
+
+For convenience, Decanter provides `elasticsearch` feature starting an embedded Elasticsearch instance:
 
 ----
 karaf@root()> feature:install elasticsearch
 ----
 
-Thanks to this elasticsearch instance, by default, the decanter-appender-elasticsearch will send the data to this instance.
+Decanter provides versions of this feature, depending of the Elasticsearch version you want to use (1.x or 2.x).
 
-The feature also installs the `etc/elasticsearch.yml` configuration file:
+You can see the feature version available:
+
+----
+karaf@root()> feature:version-list elasticsearch
+----
+
+Thanks to this elasticsearch instance, by default, the decanter-appender-elasticsearch* appenders will send the data to this instance.
+
+The feature also installs the `etc/elasticsearch.yml` configuration file, different depending of the Elasticsearch version.
+
+For Elasticsearch 1.x:
 
 ----
 ###############################################################################
@@ -450,6 +534,107 @@ http.cors.allow-origin: /.*/
 #http.jsonp.enable: true
 ----
 
+For Elasticsearch 2.x:
+
+----
+# ======================== Elasticsearch Configuration =========================
+#
+# NOTE: Elasticsearch comes with reasonable defaults for most settings.
+#       Before you set out to tweak and tune the configuration, make sure you
+#       understand what are you trying to accomplish and the consequences.
+#
+# The primary way of configuring a node is via this file. This template lists
+# the most important settings you may want to configure for a production cluster.
+#
+# Please see the documentation for further information on configuration options:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html>
+#
+# ---------------------------------- Cluster -----------------------------------
+#
+# Use a descriptive name for your cluster:
+#
+cluster.name: elasticsearch
+#
+# ------------------------------------ Node ------------------------------------
+#
+# Use a descriptive name for the node:
+#
+node.name: decanter
+#
+# Add custom attributes to the node:
+#
+# node.rack: r1
+#
+# ----------------------------------- Paths ------------------------------------
+#
+# Path to directory where to store the data (separate multiple locations by comma):
+#
+# path.data: /path/to/data
+path.data: data
+path.home: data
+#
+# Path to log files:
+#
+# path.logs: /path/to/logs
+#
+# ----------------------------------- Memory -----------------------------------
+#
+# Lock the memory on startup:
+#
+# bootstrap.mlockall: true
+#
+# Make sure that the `ES_HEAP_SIZE` environment variable is set to about half the memory
+# available on the system and that the owner of the process is allowed to use this limit.
+#
+# Elasticsearch performs poorly when the system is swapping the memory.
+#
+# ---------------------------------- Network -----------------------------------
+#
+# Set the bind address to a specific IP (IPv4 or IPv6):
+#
+# network.host: 192.168.0.1
+#
+# Set a custom port for HTTP:
+#
+# http.port: 9200
+#
+# For more information, see the documentation at:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html>
+#
+# --------------------------------- Discovery ----------------------------------
+#
+# Pass an initial list of hosts to perform discovery when new node is started:
+# The default list of hosts is ["127.0.0.1", "[::1]"]
+#
+# discovery.zen.ping.unicast.hosts: ["host1", "host2"]
+#
+# Prevent the "split brain" by configuring the majority of nodes (total number of nodes / 2 + 1):
+#
+# discovery.zen.minimum_master_nodes: 3
+#
+# For more information, see the documentation at:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery.html>
+#
+# ---------------------------------- Gateway -----------------------------------
+#
+# Block initial recovery after a full cluster restart until N nodes are started:
+#
+# gateway.recover_after_nodes: 3
+#
+# For more information, see the documentation at:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-gateway.html>
+#
+# ---------------------------------- Various -----------------------------------
+#
+# Disable starting multiple nodes on a single system:
+#
+# node.max_local_storage_nodes: 1
+#
+# Require explicit names when deleting indices:
+#
+# action.destructive_requires_name: true
+----
+
 It's a "standard" elasticsearch configuration file, allowing you to configure the embedded elasticsearch instance.
 
 Warning: if you change the `etc/elasticsearch.yml` file, you have to restart (with the `bundle:restart` command) the
@@ -476,7 +661,7 @@ You can override the following elasticsearch properties in this configuration fi
 The advantage of using this file is that the elasticsearch node is automatically restarted in order to reload the
 settings as soon as you change the cfg file.
 
-===== Embedding Decanter Kibana
+===== Embedding Decanter Kibana 3.x (only working with Elasticsearch 1.x)
 
 In addition of the embedded elasticsearch instance, Decanter also provides an embedded Kibana instance, containing
 ready to use Decanter dashboards.
@@ -749,3 +934,58 @@ This file allows you to define how the messages are sent to the Kafka broker:
 
 The Decanter MQTT appender sends the data (collected by the collectors) to a MQTT broker.
 
+The `decanter-appender-mqtt` feature installs the MQTT appender:
+
+----
+karaf@root()> feature:install decanter-appender-mqtt
+----
+
+This feature installs a default `etc/org.apache.karaf.decanter.appender.mqtt.cfg` configuration file containing:
+
+----
+#server=tcp://localhost:9300
+#clientId=decanter
+#topic=decanter
+----
+
+This file allows you to configuration the location and where to send in the MQTT broker:
+
+* the `server` contains the location of the MQTT broker
+* the `clientId` identifies the appender on the MQTT broker
+* the `topic` is the name of the topic where to send the messages
+
+==== Cassandra
+
+The Decanter Cassandra appender allows your to store the data (coming from the collectors) into an Apache Cassandra database.
+
+The `decanter-appender-cassandra` feature installs this appender:
+
+----
+karaf@root()> feature:install decanter-appender-cassandra
+----
+
+This feature installs the appender and a default `etc/org.apache.karaf.decanter.appender.cassandra.cfg` configuration file
+containing:
+
+----
+###########################################
+# Decanter Cassandra Appender Configuration
+###########################################
+
+# Name of Keyspace
+keyspace.name=decanter
+
+# Name of table to write to
+table.name=decanter
+
+# Cassandra host name
+cassandra.host=
+
+# Cassandra port
+cassandra.port=9042
+----
+
+* the `keyspace.name` property identifies the keyspace used for Decanter data
+* the `table.name` property defines the name of the table where to store the data
+* the `cassandra.host` property contains the hostname or IP address where the Cassandra instance is running (default is localhost)
+* the `cassandra.port` property contains the port number of the Cassandra instance (default is 9042)
