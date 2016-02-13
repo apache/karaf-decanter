@@ -189,6 +189,13 @@
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-1.x/${project.version}</bundle>
     </feature>
 
+    <feature name="elasticsearch" version="${elasticsearch2.version}" description="Embedded Elasticsearch 2.x node">
+        <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-2.x/${project.version}/yml</configfile>
+        <bundle dependency='true'>mvn:com.google.guava/guava/16.0.1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch2.bundle.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-2.x/${project.version}</bundle>
+    </feature>
+
     <feature name="elasticsearch-head" version="${elasticsearch1.version}" description="Elasticsearch Head web frontend">
         <feature>war</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-head/${project.version}</bundle>
