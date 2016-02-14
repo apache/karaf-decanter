@@ -43,8 +43,12 @@ public class TestEmbeddedNode {
         Node node = embeddedNode.getNode();
         embeddedNode.start();
 
+        // gives time to the cluster to startup
+        Thread.sleep(5000);
+
         ClusterHealthResponse healthResponse = node.client().admin().cluster().health(Requests.clusterHealthRequest()).actionGet();
         assertEquals(ClusterHealthStatus.GREEN, healthResponse.getStatus());
+        
         embeddedNode.stop();
         
     }

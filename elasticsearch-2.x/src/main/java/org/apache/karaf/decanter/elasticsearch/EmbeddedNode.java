@@ -39,9 +39,7 @@ public class EmbeddedNode {
 
     public static String CLUSTER_NAME = "cluster.name";
     public static String HTTP_ENABLED = "http.enabled";
-    public static String NODE_DATA = "node.data";
     public static String NODE_NAME = "node.name";
-    public static String NODE_MASTER = "node.master";
     public static String PATH_DATA = "path.data";
     public static String PATH_HOME = "path.home";
     public static String NETWORK_HOST = "network.host";
