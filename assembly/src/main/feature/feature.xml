@@ -205,12 +205,17 @@
 
     <feature name="elasticsearch-head" version="${elasticsearch1.version}" description="Elasticsearch Head web frontend">
         <feature>war</feature>
-        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-head/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-head-1.x/${project.version}</bundle>
+    </feature>
+
+    <feature name="elasticsearch-head" version="${elasticsearch2.version}" description="Elasticsearch Head web frontend">
+        <feature>war</feature>
+        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-head-2.x/${project.version}</bundle>
     </feature>
 
     <feature name="kibana" version="${kibana.version}" description="Embedded Kibana dashboard">
         <feature>war</feature>
-        <feature>elasticsearch</feature>
+        <feature version="${elasticsearch1.version}">elasticsearch</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana/${project.version}</bundle>
     </feature>
 

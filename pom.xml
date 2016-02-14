@@ -62,7 +62,8 @@
         <module>sla</module>
         <module>elasticsearch-1.x</module>
         <module>elasticsearch-2.x</module>
-        <module>elasticsearch-head</module>
+        <module>elasticsearch-head-1.x</module>
+        <module>elasticsearch-head-2.x</module>
         <module>kibana</module>
         <module>assembly</module>
     </modules>
