@@ -83,8 +83,6 @@ public class EmbeddedNode {
        	settingsBuilder.put(HTTP_ENABLED, getConfig(config, settings, HTTP_ENABLED, "true"));
        	settingsBuilder.put(PATH_DATA, getConfig(config, settings, PATH_DATA, "data"));
         settingsBuilder.put(PATH_HOME, getConfig(config, settings, PATH_HOME, "data"));
-       	settingsBuilder.put(NODE_MASTER, getConfig(config, settings, NODE_MASTER, "true"));
-       	settingsBuilder.put(NODE_DATA, getConfig(config, settings, NODE_DATA, "true"));
        	settingsBuilder.put(NODE_NAME, getConfig(config, settings, NODE_NAME, getNodeName()));
        	settingsBuilder.put(NETWORK_HOST, getConfig(config, settings, NETWORK_HOST, "127.0.0.1"));
        	settingsBuilder.put(CLUSTER_ROUTING_SCHEDULE, getConfig(config, settings, CLUSTER_ROUTING_SCHEDULE, "50ms"));
@@ -93,7 +91,7 @@ public class EmbeddedNode {
        	settingsBuilder.put(HTTP_CORS_ALLOW_ORIGIN, getConfig(config, settings, HTTP_CORS_ALLOW_ORIGIN, "/.*/"));
         
         LOGGER.debug("Creating the elasticsearch node");
-        node = NodeBuilder.nodeBuilder().settings(settingsBuilder).client(true).node();
+        node = NodeBuilder.nodeBuilder().settings(settingsBuilder).build();
 
         LOGGER.info("Elasticsearch node created");
     }

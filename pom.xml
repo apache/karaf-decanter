@@ -45,7 +45,7 @@
         <elasticsearch1.version>1.7.3</elasticsearch1.version>
         <elasticsearch1.bundle.version>1.7.3_1</elasticsearch1.bundle.version>
         <elasticsearch2.version>2.1.1</elasticsearch2.version>
-        <elasticsearch2.bundle.version>2.1.1_1</elasticsearch2.bundle.version>
+        <elasticsearch2.bundle.version>2.1.1_3-SNAPSHOT</elasticsearch2.bundle.version>
         <glassfish-json.version>1.0.4</glassfish-json.version>
         <json-api.version>1.0</json-api.version>
         <kibana.version>3.1.1</kibana.version>

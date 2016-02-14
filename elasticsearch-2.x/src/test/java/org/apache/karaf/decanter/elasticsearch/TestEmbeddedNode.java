@@ -26,13 +26,11 @@ import static org.junit.Assert.*;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestEmbeddedNode {
 
     @Test
-    @Ignore
     public void testNode() throws Exception {
 
         System.setProperty("karaf.home", "target/karaf");
@@ -44,6 +42,7 @@ public class TestEmbeddedNode {
         
         Node node = embeddedNode.getNode();
         embeddedNode.start();
+
         ClusterHealthResponse healthResponse = node.client().admin().cluster().health(Requests.clusterHealthRequest()).actionGet();
         assertEquals(ClusterHealthStatus.GREEN, healthResponse.getStatus());
         embeddedNode.stop();

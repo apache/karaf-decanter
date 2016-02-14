@@ -191,7 +191,12 @@
 
     <feature name="elasticsearch" version="${elasticsearch2.version}" description="Embedded Elasticsearch 2.x node">
         <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-2.x/${project.version}/yml</configfile>
-        <bundle dependency='true'>mvn:com.google.guava/guava/16.0.1</bundle>
+        <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.6.3</bundle>
+        <bundle dependency="true">mvn:io.netty/netty/3.10.5.Final</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch2.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-2.x/${project.version}</bundle>
     </feature>
