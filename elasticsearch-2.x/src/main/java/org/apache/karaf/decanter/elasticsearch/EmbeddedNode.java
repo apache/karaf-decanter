@@ -47,6 +47,7 @@ public class EmbeddedNode {
     public static String PATH_PLUGINS = "path.plugins";
     public static String HTTP_CORS_ENABLED = "http.cors.enabled";
     public static String HTTP_CORS_ALLOW_ORIGIN = "http.cors.allow-origin";
+    public static String INDEX_MAX_RESULT_WINDOW = "index.max_result_window";
 
     public EmbeddedNode(Dictionary<String, ?> config) throws Exception {
         LOGGER.info("Starting Elasticsearch node ...");
@@ -87,6 +88,7 @@ public class EmbeddedNode {
        	settingsBuilder.put(PATH_PLUGINS, getConfig(config, settings, PATH_PLUGINS, pluginsFile.getAbsolutePath()));
        	settingsBuilder.put(HTTP_CORS_ENABLED, getConfig(config, settings, HTTP_CORS_ENABLED, "true"));
        	settingsBuilder.put(HTTP_CORS_ALLOW_ORIGIN, getConfig(config, settings, HTTP_CORS_ALLOW_ORIGIN, "/.*/"));
+        settingsBuilder.put(INDEX_MAX_RESULT_WINDOW, getConfig(config, settings, INDEX_MAX_RESULT_WINDOW, "2147483647"));
         
         LOGGER.debug("Creating the elasticsearch node");
         node = NodeBuilder.nodeBuilder().settings(settingsBuilder).build();

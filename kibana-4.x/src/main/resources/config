@@ -1,0 +1,18 @@
+{
+  "kibana_index": ".kibana-4",
+  "default_app_id": "discover",
+  "shard_timeout": 0,
+  "plugins": [
+    "plugins/dashboard/index",
+    "plugins/discover/index",
+    "plugins/doc/index",
+    "plugins/kibana/index",
+    "plugins/markdown_vis/index",
+    "plugins/metric_vis/index",
+    "plugins/settings/index",
+    "plugins/table_vis/index",
+    "plugins/vis_types/index",
+    "plugins/visualize/index"
+  ],
+  "elasticsearch": "http://localhost:9200/"
+}

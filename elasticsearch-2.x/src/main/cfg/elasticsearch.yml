@@ -94,3 +94,6 @@ path.home: data
 # Require explicit names when deleting indices:
 #
 # action.destructive_requires_name: true
+
+# Required for Kibana 4.x support
+index.max_result_window: 2147483647
