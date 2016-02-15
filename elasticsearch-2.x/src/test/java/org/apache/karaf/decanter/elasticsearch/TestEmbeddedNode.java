@@ -17,8 +17,8 @@
 package org.apache.karaf.decanter.elasticsearch;
 
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.client.Requests;
+import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.node.Node;
 
 import static org.junit.Assert.*;
