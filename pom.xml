@@ -216,7 +216,6 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <_include>bnd.bnd</_include>
                     </instructions>
                 </configuration>
                 <executions>

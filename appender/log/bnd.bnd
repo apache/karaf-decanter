@@ -1,2 +1,0 @@
-Bundle-Activator: org.apache.karaf.decanter.appender.log.Activator
-Private-Package: org.apache.karaf.decanter.appender.log

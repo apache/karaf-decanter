@@ -33,4 +33,17 @@
     <packaging>bundle</packaging>
     <name>Apache Karaf :: Decanter :: Elasticsearch Head 1.x</name>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Web-ContextPath>/elasticsearch-head</Web-ContextPath>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build> 
 </project>

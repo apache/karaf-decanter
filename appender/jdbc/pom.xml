@@ -58,6 +58,16 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>org.apache.karaf.decanter.appender.jdbc.Activator</Bundle-Activator>
+                        <Private-Package>org.apache.karaf.decanter.appender.jdbc</Private-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>

@@ -1,3 +1,0 @@
-Bundle-Activator: org.apache.karaf.decanter.appender.elasticsearch.rest.Activator
-Import-Package: org.apache.log;resolution:=optional,*
-Private-Package: org.apache.karaf.decanter.appender.elasticsearch.rest,org.apache.http*,org.apache.commons*,io.searchbox*,com.google*

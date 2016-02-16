@@ -36,4 +36,21 @@
     <properties>
         <baseline.skip>false</baseline.skip>
     </properties>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.apache.karaf.decanter.api,
+                            org.apache.karaf.decanter.api.marshaller
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build> 
 </project>
