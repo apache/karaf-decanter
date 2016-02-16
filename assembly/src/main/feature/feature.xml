@@ -69,6 +69,13 @@
         <feature version="${project.version}">decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.camel-tracer/${project.version}</bundle>
     </feature>
+    
+    <feature name="decanter-collector-rest" version="${project.version}" description="Karaf Decanter REST Collector">
+        <feature version="${project.version}">decanter-common</feature>
+        <feature version="${project.version}">decanter-simple-scheduler</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.rest-1.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest/${project.version}/cfg</configfile>
+    </feature>
 
     <feature name="decanter-collector-system" version="${project.version}" description="Karaf Decanter OS Collector">
         <feature version="${project.version}">decanter-common</feature>

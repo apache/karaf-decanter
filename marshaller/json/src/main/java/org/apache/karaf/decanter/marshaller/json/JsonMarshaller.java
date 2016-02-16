@@ -16,7 +16,6 @@
  */
 package org.apache.karaf.decanter.marshaller.json;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -35,11 +34,10 @@ import javax.json.JsonObjectBuilder;
 import javax.json.JsonWriter;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
-import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 
-public class JsonMarshaller implements Marshaller, Unmarshaller {
+public class JsonMarshaller implements Marshaller {
     private final SimpleDateFormat tsFormat;
     
     public JsonMarshaller() {
@@ -58,16 +56,6 @@ public class JsonMarshaller implements Marshaller, Unmarshaller {
     @Override
     public String marshal(Object obj) {
         return marshal((Event)obj).toString();
-    }
-    
-    @Override
-    public Object unmarshal(String jsonSt) {
-        return null;
-    }
-
-    @Override
-    public Object unmarshal(InputStream in) {
-        return null;
     }
 
     private JsonObject marshal(Event event) {

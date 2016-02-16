@@ -17,8 +17,8 @@
 package org.apache.karaf.decanter.api.marshaller;
 
 import java.io.InputStream;
+import java.util.Map;
 
 public interface Unmarshaller {
-    Object unmarshal(InputStream in);
-    Object unmarshal(String jsonSt);
+    Map<String, Object> unmarshal(InputStream in);
 }
