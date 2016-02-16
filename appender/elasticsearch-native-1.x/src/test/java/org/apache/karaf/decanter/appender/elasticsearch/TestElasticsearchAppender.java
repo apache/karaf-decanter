@@ -28,10 +28,13 @@ import org.osgi.service.event.Event;
 
 import static org.elasticsearch.node.NodeBuilder.*;
 
+import java.util.Map;
+
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
 
 public class TestElasticsearchAppender {
+    private static final int MAX_TRIES = 10;
 
    @Test
    public void testAppender() throws Exception {
@@ -52,18 +55,25 @@ public class TestElasticsearchAppender {
        Marshaller marshaller = new JsonMarshaller();
        ElasticsearchAppender appender = new ElasticsearchAppender(marshaller, "127.0.0.1", 9300, "elasticsearch");
        appender.open();
-       appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
-       appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
-       appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
+       appender.handleEvent(new Event("testTopic", dummyMap()));
+       appender.handleEvent(new Event("testTopic", dummyMap()));
+       appender.handleEvent(new Event("testTopic", dummyMap()));
        appender.close();
-       
-       int maxTryCount = 10;
-       for(int i=0; node.client().count(Requests.countRequest()).actionGet().getCount() == 0 && i< maxTryCount; i++) {
+
+       long currentCount = 0;
+       int c = 0; 
+       while (c < MAX_TRIES && currentCount != 3) {
+           currentCount = node.client().count(Requests.countRequest()).actionGet().getCount();
            Thread.sleep(500);
+           c++;
        }
        
-       Assert.assertEquals(3L, node.client().count(Requests.countRequest()).actionGet().getCount());
+       Assert.assertEquals(3L, currentCount);
        node.close();
+   }
+
+   private Map<String, String> dummyMap() {
+       return MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map();
    }
 
 }
