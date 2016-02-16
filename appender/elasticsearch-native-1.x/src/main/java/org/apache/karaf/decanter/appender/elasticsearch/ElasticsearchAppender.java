@@ -92,12 +92,14 @@ public class ElasticsearchAppender implements EventHandler {
     public void close() {
         LOGGER.info("Stopping Elasticsearch appender");
 
-        if(bulkProcessor != null) {
+        if (bulkProcessor != null) {
             bulkProcessor.close();
         }
 
         // Need to wait till all requests are processed as close would do this asynchronously
-        listener.waitFinished();
+        if (listener != null) {
+            listener.waitFinished();
+        }
 
         if(client != null) {
             client.close();

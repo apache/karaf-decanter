@@ -90,14 +90,14 @@
         <feature version="${project.version}">decanter-common</feature>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch1.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-1.x/${project.version}</bundle>
-        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch/${project.version}/cfg</configfile>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-1.x/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="decanter-appender-elasticsearch-native-2.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender">
         <feature version="${project.version}">decanter-common</feature>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch2.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-2.x/${project.version}</bundle>
-        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch/${project.version}/cfg</configfile>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-2.x/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="decanter-appender-elasticsearch-rest" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Appender">
@@ -184,12 +184,14 @@
     </feature>
 
     <feature name="elasticsearch" version="${elasticsearch1.version}" description="Embedded Elasticsearch 1.x node">
+        <feature>war</feature>
         <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-1.x/${project.version}/yml</configfile>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch1.bundle.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch1.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-1.x/${project.version}</bundle>
     </feature>
 
     <feature name="elasticsearch" version="${elasticsearch2.version}" description="Embedded Elasticsearch 2.x node">
+        <feature>war</feature>
         <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-2.x/${project.version}/yml</configfile>
         <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
@@ -199,7 +201,7 @@
         <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-smile/2.6.3</bundle>
         <bundle dependency="true">mvn:com.ning/compress-lzf/1.0.2</bundle>
         <bundle dependency="true">mvn:io.netty/netty/3.10.5.Final</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch2.bundle.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch2.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-2.x/${project.version}</bundle>
     </feature>
 
