@@ -217,13 +217,13 @@
 
     <feature name="kibana" version="${kibana.version}" description="Embedded Kibana dashboard">
         <feature>war</feature>
-        <feature version="${elasticsearch1.version}">elasticsearch</feature>
+        <feature version="[${elasticsearch1.version},2.0)">elasticsearch</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana-3.x/${project.version}</bundle>
     </feature>
 
     <feature name="kibana" version="${kibana4.version}" description="Embedded Kibana 4.x dashboard">
         <feature>war</feature>
-        <feature version="${elasticsearch2.version}">elasticsearch</feature>
+        <feature version="[${elasticsearch2.version},3.0)">elasticsearch</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana-4.x/${project.version}</bundle>
     </feature>
 
