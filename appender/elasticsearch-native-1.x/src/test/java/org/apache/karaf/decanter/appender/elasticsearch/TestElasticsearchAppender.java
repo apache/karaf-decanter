@@ -36,7 +36,7 @@ import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
 public class TestElasticsearchAppender {
     private static final String HOST = "127.0.0.1";
     private static final String CLUSTER_NAME = "elasticsearch-test";
-    private static final int PORT = 9301;
+    private static final int PORT = 9300;
     private static final int MAX_TRIES = 10;
 
    @Test
