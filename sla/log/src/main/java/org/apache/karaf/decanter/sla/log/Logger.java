@@ -16,10 +16,17 @@
  */
 package org.apache.karaf.decanter.sla.log;
 
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.LoggerFactory;
 
+@Component(
+    name="org.apache.karaf.decanter.sla.log",
+    immediate=true,
+    property=EventConstants.EVENT_TOPIC + "=decanter/alert/*"
+)
 public class Logger implements EventHandler {
 
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Logger.class);

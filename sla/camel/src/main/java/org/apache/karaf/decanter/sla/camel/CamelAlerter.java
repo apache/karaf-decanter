@@ -19,19 +19,36 @@ package org.apache.karaf.decanter.sla.camel;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component(
+    configurationPid="org.apache.karaf.decanter.sla.camel",
+    property=EventConstants.EVENT_TOPIC + "=decanter/alert/*"
+)
 public class CamelAlerter implements EventHandler {
 
     private CamelContext camelContext;
     private String alertDestinationUri;
 
-    public CamelAlerter(String alertDestinationUri) {
-        this.alertDestinationUri = alertDestinationUri;
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) throws ConfigurationException {
+        Dictionary<String, String> config = context.getProperties();
+        this.alertDestinationUri = (String) config.get("alert.destination.uri");
+        if (alertDestinationUri == null) {
+            throw new ConfigurationException("alert.destination.uri", "alert.destination.uri property is not defined");
+        }
         this.camelContext = new DefaultCamelContext();
     }
 
@@ -49,4 +66,8 @@ public class CamelAlerter implements EventHandler {
         producerTemplate.sendBodyAndHeaders(alertDestinationUri, data, headers);
     }
 
+    @Deactivate
+    public void deactivate() throws Exception {
+        this.camelContext.stop();
+    }
 }

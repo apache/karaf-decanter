@@ -16,8 +16,13 @@
  */
 package org.apache.karaf.decanter.sla.checker;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,16 +36,22 @@ import java.util.regex.Pattern;
 /**
  * Receive all collect events to validate SLA and eventually throw alert events
  */
+@Component(
+    name="org.apache.karaf.decanter.sla.checker",
+    immediate=true,
+    property=EventConstants.EVENT_TOPIC + "=decanter/collect/*"
+)
 public class Checker implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Checker.class);
 
-    private Dictionary config;
+    private Dictionary<String, Object> config;
     private EventAdmin eventAdmin;
 
-    public Checker(Dictionary config, EventAdmin eventAdmin) {
-        this.config = config;
-        this.eventAdmin = eventAdmin;
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) {
+        this.config = context.getProperties();
     }
 
     @Override
@@ -381,4 +392,9 @@ public class Checker implements EventHandler {
         }
     }
 
+    @Reference
+    public void setEventAdmin(EventAdmin eventAdmin) {
+        this.eventAdmin = eventAdmin;
+    }
+    
 }

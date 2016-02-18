@@ -40,7 +40,6 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>org.apache.karaf.decanter.sla.log.Activator</Bundle-Activator>
                     </instructions>
                 </configuration>
             </plugin>

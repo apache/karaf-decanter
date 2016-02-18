@@ -16,7 +16,11 @@
  */
 package org.apache.karaf.decanter.sla.email;
 
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,46 +30,57 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import java.util.Dictionary;
 import java.util.Properties;
 
+@Component(
+    name = "org.apache.karaf.decanter.sla.email",
+    property = EventConstants.EVENT_TOPIC + "=decanter/alert/*"
+)
 public class EmailAlerter implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(EmailAlerter.class);
 
     private String from;
     private String to;
-    private String host;
-    private String port;
-    private String auth;
-    private String starttls;
-    private String ssl;
-    private String username;
-    private String password;
 
-    public EmailAlerter(String from, String to, String host, String port, String auth, String starttls, String ssl, String username, String password) {
-        this.from = from;
-        this.to = to;
-        this.host = host;
-        this.port = port;
-        this.auth = auth;
-        this.starttls = starttls;
-        this.ssl = ssl;
-        this.username = username;
-        this.password = password;
+    private Properties properties;
+
+    @SuppressWarnings("unchecked")
+    public void activate(ComponentContext context) throws ConfigurationException {
+        Dictionary<String, String> config = context.getProperties();
+        requireProperty(config, "from");
+        requireProperty(config, "to");
+        requireProperty(config, "host");
+
+        this.from = config.get("from");
+        this.to = config.get("to");
+
+        properties = new Properties();
+        properties.put("mail.smtp.host", config.get("host"));
+        properties.put("mail.smtp.port", config.get("port"));
+        properties.put("mail.smtp.auth", config.get("auth"));
+        properties.put("mail.smtp.starttls.enable", config.get("starttls"));
+        properties.put("mail.smtp.ssl.enable", config.get("ssl"));
+        String username = (String) config.get("username");
+        String password = (String) config.get("password");
+        if (username != null) {
+            properties.put("mail.user", username);
+        }
+        if (password != null) {
+            properties.put("mail.password", password);
+        }
+    }
+
+    private void requireProperty(Dictionary<String, ?> config, String key) throws ConfigurationException {
+        if (config.get(key) == null) {
+            throw new ConfigurationException(key, key + " property is not defined");
+        }
     }
 
     @Override
     public void handleEvent(Event event) {
-        Properties properties = new Properties();
-        properties.put("mail.smtp.host", host);
-        properties.put("mail.smtp.port", port);
-        properties.put("mail.smtp.auth", auth);
-        properties.put("mail.smtp.starttls.enable", starttls);
-        properties.put("mail.smtp.ssl.enable", ssl);
-        if (username != null)
-            properties.put("mail.user", username);
-        if (password != null)
-            properties.put("mail.password", password);
         Session session = Session.getDefaultInstance(properties);
         MimeMessage message = new MimeMessage(session);
         try {
