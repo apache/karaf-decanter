@@ -37,6 +37,7 @@ public class TestJsonMarshaller {
    @Test
    public void testMarshal() throws Exception {
        Marshaller marshaller = new JsonMarshaller();
+
        Map<String, Object> map = new HashMap<>();
        map.put(EventConstants.TIMESTAMP, EXPECTED_TIMESTAMP);
        map.put("c", "d");

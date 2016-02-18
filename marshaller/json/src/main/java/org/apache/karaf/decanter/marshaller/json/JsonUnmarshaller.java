@@ -27,8 +27,13 @@ import javax.json.JsonReader;
 import javax.json.JsonString;
 import javax.json.JsonValue;
 
+import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
+import org.osgi.service.component.annotations.Component;
 
+@Component(
+        property = { Marshaller.SERVICE_KEY_DATAFORMAT + "=json" }
+)
 public class JsonUnmarshaller implements Unmarshaller {
 
     @Override
@@ -53,4 +58,5 @@ public class JsonUnmarshaller implements Unmarshaller {
             return null;
         }
     }
+
 }
