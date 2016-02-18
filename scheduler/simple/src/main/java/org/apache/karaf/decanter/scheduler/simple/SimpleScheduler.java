@@ -16,41 +16,48 @@
  */
 package org.apache.karaf.decanter.scheduler.simple;
 
+import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.karaf.decanter.api.Scheduler;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Very simple Decanter scheduler using a single thread.
  */
+@Component(
+    name = "org.apache.karaf.decanter.scheduler.simple",
+    immediate = true
+)
 public class SimpleScheduler implements Runnable, Scheduler {
     private final static Logger LOGGER = LoggerFactory.getLogger(SimpleScheduler.class);
 
     private AtomicBoolean running = new AtomicBoolean(false);
-    private long period;
-    ServiceTracker<Runnable, Runnable> collectors;
+    private long period = 5000;
+    Set<Runnable> collectors;
     
-    SimpleScheduler() {
+    public SimpleScheduler() {
+        collectors = new HashSet<>();
     }
     
-    public SimpleScheduler(int period, BundleContext bundleContext) {
-        this.period = period;
-        this.collectors = new ServiceTracker<>(bundleContext, collectorFilter(bundleContext), null);
-        this.collectors.open();
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) {
+        configure(context.getProperties());
+        start();
     }
-
-    private Filter collectorFilter(BundleContext bundleContext) {
-        try {
-            return bundleContext.createFilter(String.format("(&(objectClass=%s)(decanter.collector.name=*))", Runnable.class.getName()));
-        } catch (InvalidSyntaxException e) {
-            throw new RuntimeException(e);
-        }
+    
+    public void configure(Dictionary<String, String> config) {
+        String periodSt = config.get("period");
+        period = periodSt != null ? Integer.parseInt(periodSt) : 5000;
     }
 
     @Override
@@ -59,7 +66,7 @@ public class SimpleScheduler implements Runnable, Scheduler {
 
         while (running.get()) {
             LOGGER.debug("Calling the collectors ...");
-            for (Runnable collector : collectors.getServices(new Runnable[] {})) {
+            for (Runnable collector : collectors) {
                 try {
                     collector.run();
                 } catch (Exception e) {
@@ -80,9 +87,6 @@ public class SimpleScheduler implements Runnable, Scheduler {
     @Override
     public void stop() {
         running.set(false);
-        if (collectors != null) {
-            this.collectors.close();
-        }
     }
 
     @Override
@@ -100,11 +104,16 @@ public class SimpleScheduler implements Runnable, Scheduler {
 
     @Override
     public String state() {
-        if (running.get()) {
-            return "Started";
-        } else {
-            return "Stopped";
-        }
+        return running.get() ? "Started" : "Stopped";
+    }
+
+    @Reference(target="(decanter.collector.name=*)", cardinality=ReferenceCardinality.MULTIPLE)
+    public void setCollector(Runnable collector) {
+        this.collectors.add(collector);
+    }
+    
+    public void unsetCollector(Runnable collector) {
+        this.collectors.remove(collector);
     }
 
 }

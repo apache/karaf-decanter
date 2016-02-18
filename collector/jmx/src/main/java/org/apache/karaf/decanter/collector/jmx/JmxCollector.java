@@ -26,6 +26,9 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
@@ -34,6 +37,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Decanter JMX Pooling Collector
  */
+@Component(
+    name = "org.apache.karaf.decanter.collector.jmx",
+    immediate = true,
+    property = "decanter.collector.name=jmx"
+)
 public class JmxCollector implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(JmxCollector.class);
 
@@ -43,16 +51,27 @@ public class JmxCollector implements Runnable {
     private String password;
     private String objectName;
     private EventAdmin eventAdmin;
-    private Dictionary<String, String> properties;
+    private Dictionary<String, Object> properties;
 
-    public JmxCollector(String type, String url, String username, String password, String objectName, EventAdmin eventAdmin, Dictionary<String, String> properties) {
+    @SuppressWarnings("unchecked")
+    public void activate(ComponentContext context) {
+        properties = context.getProperties();
+        String type = getProperty(properties, "type", "jmx-local");
+        String url = getProperty(properties, "url", "local");
+        String username = getProperty(properties, "username", null);
+        String password = getProperty(properties, "password", null);
+        String objectName = getProperty(properties, "object.name", null);
+        Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
+        serviceProperties.put("decanter.collector.name", type);
         this.type = type;
         this.url = url;
         this.username = username;
         this.password = password;
-        this.eventAdmin = eventAdmin;
         this.objectName = objectName;
-        this.properties = properties;
+    }
+    
+    private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
+        return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
     }
 
     @Override
@@ -135,4 +154,8 @@ public class JmxCollector implements Runnable {
         return name.getDomain().replace(".", "/").replace(" ", "_");
     }
 
+    @Reference
+    public void setEventAdmin(EventAdmin eventAdmin) {
+        this.eventAdmin = eventAdmin;
+    }
 }

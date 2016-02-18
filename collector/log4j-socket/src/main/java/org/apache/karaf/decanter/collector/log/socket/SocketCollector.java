@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.appender.log.socket;
+package org.apache.karaf.decanter.collector.log.socket;
 
 import java.io.BufferedInputStream;
 import java.io.Closeable;
@@ -24,6 +24,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -32,11 +33,19 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.spi.LocationInfo;
 import org.apache.log4j.spi.LoggingEvent;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component(
+    name = "org.apache.karaf.decanter.collector.log.socket",
+    immediate = true
+)
 public class SocketCollector implements Closeable, Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketCollector.class);
     private ServerSocket serverSocket;
@@ -44,12 +53,20 @@ public class SocketCollector implements Closeable, Runnable {
     private boolean open;
     private ExecutorService executor;
 
-    public SocketCollector(int port, EventAdmin eventAdmin) throws IOException {
-        this.eventAdmin = eventAdmin;
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) throws IOException {
+        Dictionary<String, Object> properties = context.getProperties();
+        int port = Integer.parseInt(getProperty(properties, "port", "4560"));
+        LOGGER.info("Starting Log4j Socket collector on port {}", port);
         this.serverSocket = new ServerSocket(port);
         this.executor = Executors.newFixedThreadPool(1);
         this.executor.execute(this);
         this.open = true;
+    }
+    
+    private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
+        return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
     }
 
     @Override
@@ -151,6 +168,11 @@ public class SocketCollector implements Closeable, Runnable {
             LOGGER.warn("Error shutting down Socket");
         }
         serverSocket.close();
+    }
+    
+    @Reference
+    public void setEventAdmin(EventAdmin eventAdmin) {
+        this.eventAdmin = eventAdmin;
     }
 
 }

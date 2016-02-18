@@ -19,13 +19,25 @@ package org.apache.karaf.decanter.appender.camel;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Dictionary;
 import java.util.HashMap;
 
+@Component(
+    name = "org.apache.karaf.decanter.appender.camel",
+    immediate = true,
+    property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
+)
 public class CamelAppender implements EventHandler {
 
     private CamelContext camelContext;
@@ -33,10 +45,19 @@ public class CamelAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CamelAppender.class);
 
-    public CamelAppender(String destinationUri) {
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) throws ConfigurationException {
+        open(context.getProperties());
+    }
+    
+    public void open(Dictionary<String, String> config) throws ConfigurationException {
         LOGGER.debug("Creating CamelContext, and use the {} URI", destinationUri);
         this.camelContext = new DefaultCamelContext();
-        this.destinationUri = destinationUri;
+        this.destinationUri = config.get("destination.uri");
+        if (this.destinationUri == null) {
+            throw new ConfigurationException("destination.uri", "destination.uri is not defined");
+        }
     }
 
     @Override
@@ -51,4 +72,8 @@ public class CamelAppender implements EventHandler {
         producerTemplate.sendBody(destinationUri, data);
     }
 
+    @Deactivate
+    public void deactivate() throws Exception {
+        this.camelContext.stop();
+    }
 }

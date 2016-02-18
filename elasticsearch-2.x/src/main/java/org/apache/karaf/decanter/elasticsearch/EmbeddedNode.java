@@ -19,6 +19,10 @@ package org.apache.karaf.decanter.elasticsearch;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +33,10 @@ import java.util.Dictionary;
 /**
  * Start an Elasticsearch node internally to Karaf.
  */
+@Component(
+    name = "org.apache.karaf.decanter.elasticsearch",
+    immediate = true
+)
 public class EmbeddedNode {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(EmbeddedNode.class);
@@ -49,7 +57,13 @@ public class EmbeddedNode {
     public static String HTTP_CORS_ALLOW_ORIGIN = "http.cors.allow-origin";
     public static String INDEX_MAX_RESULT_WINDOW = "index.max_result_window";
 
-    public EmbeddedNode(Dictionary<String, ?> config) throws Exception {
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void acticate(ComponentContext context) throws Exception {
+        start(context.getProperties());
+    }
+    
+    public void start(Dictionary<String, ?> config) throws Exception {
         LOGGER.info("Starting Elasticsearch node ...");
 
         LOGGER.debug("Creating elasticsearch settings");
@@ -94,18 +108,16 @@ public class EmbeddedNode {
         node = NodeBuilder.nodeBuilder().settings(settingsBuilder).build();
 
         LOGGER.info("Elasticsearch node created");
+        if (node != null) {
+            node.start();
+        }
     }
 
     private String getNodeName() {
         return System.getProperty("karaf.name") == null ? "decanter" : System.getProperty("karaf.name");
     }
 
-    public void start() throws Exception {
-        if (node != null) {
-            node.start();
-        }
-    }
-
+    @Deactivate
     public void stop() throws Exception {
         if (node != null) {
             node.close();

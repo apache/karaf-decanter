@@ -19,6 +19,10 @@ package org.apache.karaf.decanter.collector.system;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
@@ -30,16 +34,21 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 
+@Component(
+    name = "org.apache.karaf.decanter.collector.system",
+    immediate = true,
+    property = "decanter.collector.name=system"
+)
 public class SystemCollector implements Runnable {
-
     private final static Logger LOGGER = LoggerFactory.getLogger(SystemCollector.class);
 
     private EventAdmin eventAdmin;
-    private Dictionary config;
+    private Dictionary<String, Object> config;
 
-    public SystemCollector(Dictionary config, EventAdmin eventAdmin) {
-        this.config = config;
-        this.eventAdmin = eventAdmin;
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) {
+        this.config = context.getProperties();
     }
 
     @Override
@@ -54,7 +63,7 @@ public class SystemCollector implements Runnable {
             } catch (Exception e) {
                 // nothing to do
             }
-            Enumeration keys = config.keys();
+            Enumeration<String> keys = config.keys();
             while (keys.hasMoreElements()) {
                 String key = (String) keys.nextElement();
                 try {
@@ -106,4 +115,8 @@ public class SystemCollector implements Runnable {
         }
     }
 
+    @Reference
+    public void setEventAdmin(EventAdmin eventAdmin) {
+        this.eventAdmin = eventAdmin;
+    }
 }

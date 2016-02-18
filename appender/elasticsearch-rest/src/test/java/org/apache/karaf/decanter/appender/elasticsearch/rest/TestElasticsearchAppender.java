@@ -28,6 +28,9 @@ import org.osgi.service.event.Event;
 
 import static org.elasticsearch.node.NodeBuilder.*;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
 
@@ -57,7 +60,11 @@ public class TestElasticsearchAppender {
         Node node = nodeBuilder().settings(settings).node();
 
         Marshaller marshaller = new JsonMarshaller();
-        ElasticsearchAppender appender = new ElasticsearchAppender(marshaller, "http://" + HOST + ":" + HTTP_PORT, null, null);
+        ElasticsearchAppender appender = new ElasticsearchAppender();
+        appender.setMarshaller(marshaller);
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put("address", "http://" + HOST + ":" + HTTP_PORT);
+        appender.open(config );
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));

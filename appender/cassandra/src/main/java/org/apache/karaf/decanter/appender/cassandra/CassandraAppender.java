@@ -16,13 +16,16 @@
  */
 package org.apache.karaf.decanter.appender.cassandra;
 
-import java.text.SimpleDateFormat;
+import java.util.Dictionary;
 import java.util.List;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,11 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
 
+@Component(
+    name = "org.apache.karaf.decanter.appender.cassandra",
+    immediate = true,
+    property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
+)
 public class CassandraAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CassandraAppender.class);
@@ -50,10 +58,9 @@ public class CassandraAppender implements EventHandler {
 
     private final static String upsertQueryTemplate = "INSERT INTO TABLENAME(timeStamp, content) VALUES(?,?);";
 
-    public CassandraAppender(Marshaller marshaller, String keyspace, String tableName, String cassandraHost, Integer cassandraPort) {
-        this(marshaller, keyspace, tableName, cassandraHost, cassandraPort, null, null);
+    public CassandraAppender() {
     }
-
+    
     public CassandraAppender(Marshaller marshaller, String keyspace, String tableName, String cassandraHost,
             Integer cassandraPort, String cassandraUser, String cassandraPassword) {
         this.marshaller = marshaller;
@@ -64,27 +71,26 @@ public class CassandraAppender implements EventHandler {
         this.cassandraUser = cassandraUser;
         this.cassandraPassword = cassandraPassword;
     }
-
-    private int getRank(ServiceReference<?> reference) {
-        Object rankObj = reference.getProperty(Constants.SERVICE_RANKING);
-        // If no rank, then spec says it defaults to zero.
-        rankObj = (rankObj == null) ? new Integer(0) : rankObj;
-        // If rank is not Integer, then spec says it defaults to zero.
-        return (rankObj instanceof Integer) ? (Integer) rankObj : 0;
+    
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) {
+        Dictionary<String, Object> config = context.getProperties();
+        this.keyspace = getValue(config, "keyspace.name", "decanter");
+        this.tableName = getValue(config, "table.name", "decanter");
+        this.cassandraHost = getValue(config, "cassandra.host", "localhost");
+        this.cassandraPort = Integer.parseInt(getValue(config, "cassandra.port", "9042"));
+    }
+    
+    private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
+        String value = (String)config.get(key);
+        return (value != null) ? value :  defaultValue;
     }
 
     @Override
     public void handleEvent(Event event) {
         LOGGER.trace("Looking for the Cassandra datasource");
-        Session session = null;
-        try {
-            Builder clusterBuilder = Cluster.builder().addContactPoint(cassandraHost);
-            if (cassandraPort != null) {
-                clusterBuilder.withPort(cassandraPort);
-            }
-            Cluster cluster = clusterBuilder.build();
-            session = cluster.connect();
-
+        try (Session session = createSession()){
             ResultSet execute;
             try {
                 execute = session.execute("USE " + keyspace + ";");
@@ -122,13 +128,22 @@ public class CassandraAppender implements EventHandler {
             LOGGER.trace("Data inserted into {} table", tableName);
         } catch (Exception e) {
             LOGGER.error("Can't store in the database", e);
-        } finally {
-            try {
-                if (session != null)
-                    session.close();
-            } catch (Exception e) {
-                // nothing to do
-            }
         }
+    }
+
+    private Session createSession() {
+        Session session;
+        Builder clusterBuilder = Cluster.builder().addContactPoint(cassandraHost);
+        if (cassandraPort != null) {
+            clusterBuilder.withPort(cassandraPort);
+        }
+        Cluster cluster = clusterBuilder.build();
+        session = cluster.connect();
+        return session;
+    }
+    
+    @Reference
+    public void setMarshaller(Marshaller marshaller) {
+        this.marshaller = marshaller;
     }
 }

@@ -28,6 +28,8 @@ import org.osgi.service.event.Event;
 
 import static org.elasticsearch.node.NodeBuilder.*;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.Map;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
@@ -55,10 +57,13 @@ public class TestElasticsearchAppender {
                .build();
        
        Node node = nodeBuilder().settings(settings).node();
-       
        Marshaller marshaller = new JsonMarshaller();
-       ElasticsearchAppender appender = new ElasticsearchAppender(marshaller, HOST, PORT, CLUSTER_NAME);
-       appender.open();
+       ElasticsearchAppender appender = new ElasticsearchAppender();
+       appender.setMarshaller(marshaller);
+       Dictionary<String, Object> config = new Hashtable<>();
+       config.put("clusterName", CLUSTER_NAME);
+       config.put("port", "" + PORT);
+       appender.open(config);
        appender.handleEvent(new Event("testTopic", dummyMap()));
        appender.handleEvent(new Event("testTopic", dummyMap()));
        appender.handleEvent(new Event("testTopic", dummyMap()));

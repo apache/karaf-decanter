@@ -52,8 +52,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>org.apache.karaf.decanter.appender.kafka.Activator</Bundle-Activator>
-                        <Import-Package>org.apache.kafka*,*</Import-Package>
+                        <Private-Package>org.apache.karaf.decanter.appender.kafka</Private-Package>
                     </instructions>
                 </configuration>
             </plugin>

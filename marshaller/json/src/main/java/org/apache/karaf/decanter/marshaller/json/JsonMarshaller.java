@@ -34,13 +34,13 @@ import javax.json.JsonObjectBuilder;
 import javax.json.JsonWriter;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 
 @Component(
-        property = { Marshaller.SERVICE_KEY_DATAFORMAT + "=json" }
+    immediate = true,
+    property = Marshaller.SERVICE_KEY_DATAFORMAT + "=json"
 )
 public class JsonMarshaller implements Marshaller {
 

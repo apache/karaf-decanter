@@ -38,11 +38,10 @@ public class TestEmbeddedNode {
 
         Dictionary<String, String> configuration = new Hashtable<>();
         configuration.put(EmbeddedNode.PATH_DATA, "target/karaf/es");
-        EmbeddedNode embeddedNode = new EmbeddedNode(configuration);
-        
+        EmbeddedNode embeddedNode = new EmbeddedNode();
+        embeddedNode.start(configuration);
         Node node = embeddedNode.getNode();
-        embeddedNode.start();
-
+        
         // gives time to the cluster to startup
         Thread.sleep(5000);
 

@@ -16,22 +16,23 @@
  */
 package org.apache.karaf.decanter.appender.elasticsearch;
 
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Requests;
-import org.elasticsearch.common.collect.MapBuilder;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.node.Node;
-import org.junit.Assert;
-import org.junit.Test;
-import org.osgi.service.event.Event;
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
-import static org.elasticsearch.node.NodeBuilder.*;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.collect.MapBuilder;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.node.Node;
+import org.junit.Test;
+import org.osgi.service.event.Event;
 
 public class TestElasticsearchAppender {
+    private static final String CLUSTER_NAME = "elasticsearch-test";
+    private static final int PORT = 9300;
 
    @Test
    public void testAppender() throws Exception {
@@ -51,8 +52,12 @@ public class TestElasticsearchAppender {
        Node node = nodeBuilder().settings(settings).node();
        
        Marshaller marshaller = new JsonMarshaller();
-       ElasticsearchAppender appender = new ElasticsearchAppender(marshaller, "127.0.0.1", 9300, "elasticsearch");
-       appender.open();
+       ElasticsearchAppender appender = new ElasticsearchAppender();
+       appender.setMarshaller(marshaller);
+       Dictionary<String, Object> config = new Hashtable<>();
+       config.put("clusterName", CLUSTER_NAME);
+       config.put("port", "" + PORT);
+       appender.open(config);
        appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
        appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
        appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
