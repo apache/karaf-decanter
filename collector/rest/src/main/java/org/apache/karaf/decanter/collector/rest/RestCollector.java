@@ -24,6 +24,10 @@ import java.util.Enumeration;
 import java.util.Map;
 
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
@@ -32,29 +36,35 @@ import org.slf4j.LoggerFactory;
 /**
  * Decanter REST Collector
  */
+@Component(
+    configurationPid = "org.apache.karaf.decanter.collector.rest",
+    property = {"decanter.collector.name=rest"}
+)
 public class RestCollector implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(RestCollector.class);
 
     private String type;
     private URL url;
     private String[] paths;
-    private EventAdmin eventAdmin;
-    private Dictionary<String, String> properties;
-    private Unmarshaller marshaller;
+    private Dictionary<String, Object> properties;
 
-    public RestCollector(String url, 
-                         String username, 
-                         String password, 
-                         String[] paths,
-                         EventAdmin eventAdmin,
-                         Unmarshaller marshaller,
-                         Dictionary<String, String> properties)
-                         throws MalformedURLException {
-        this.marshaller = marshaller;
-        this.url = new URL(url);
-        this.eventAdmin = eventAdmin;
-        this.paths = paths;
-        this.properties = properties;
+    private EventAdmin eventAdmin;
+    private Unmarshaller unmarshaller;
+
+    @Activate
+    public void activate(ComponentContext context) throws MalformedURLException {
+        Dictionary<String, Object> props = context.getProperties();
+        this.url = new URL(getProperty(props, "url", null));
+        getProperty(props, "username", null);
+        getProperty(props, "password", null);
+        this.paths = getProperty(props, "paths", "").split(",");
+        //props.remove("password");
+        //props.remove("username");
+        this.properties = props;
+    }
+    
+    private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
+        return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
     }
 
     @Override
@@ -64,7 +74,7 @@ public class RestCollector implements Runnable {
             try {
                 URL complete = new URL(url, path);
                 URLConnection connection = complete.openConnection();
-                Map<String, Object> data = marshaller.unmarshal(connection.getInputStream());
+                Map<String, Object> data = unmarshaller.unmarshal(connection.getInputStream());
                 data.put("type", "rest");
                 data.put("hostName", url.getHost());
                 data.put("remote.url", complete);
@@ -90,5 +100,14 @@ public class RestCollector implements Runnable {
             }
         }
     }
+    
+    @Reference
+    public void setEventAdmin(EventAdmin eventAdmin) {
+        this.eventAdmin = eventAdmin;
+    }
 
+    @Reference
+    public void setUnmarshaller(Unmarshaller unmarshaller) {
+        this.unmarshaller = unmarshaller;
+    }
 }
