@@ -24,6 +24,8 @@ import org.apache.log4j.MDC;
 import org.ops4j.pax.logging.spi.PaxAppender;
 import org.ops4j.pax.logging.spi.PaxLocationInfo;
 import org.ops4j.pax.logging.spi.PaxLoggingEvent;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
@@ -32,16 +34,18 @@ import org.slf4j.LoggerFactory;
 /**
  * Decanter log collector, event driven implementing a PaxAppender
  */
+@Component(
+    name = "org.apache.karaf.decanter.collector.log",
+    property = {"org.ops4j.pax.logging.appender.name=DecanterLogCollectorAppender",
+              "name=log"},
+    immediate = true
+)
 public class LogAppender implements PaxAppender {
     private static final String MDC_IN_LOG_APPENDER = "inLogAppender";
     private final static String[] ignoredCategories = {"org.apache.karaf.decanter"};
     private final static Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
     private EventAdmin dispatcher;
     
-    public LogAppender(EventAdmin dispatcher) {
-        this.dispatcher = dispatcher;
-    }
-
     public void doAppend(PaxLoggingEvent event) {
         try {
             if (MDC.get(MDC_IN_LOG_APPENDER) != null) {
@@ -114,4 +118,8 @@ public class LogAppender implements PaxAppender {
         return false;
     }
 
+    @Reference
+    public void setDispatcher(EventAdmin dispatcher) {
+        this.dispatcher = dispatcher;
+    }
 }

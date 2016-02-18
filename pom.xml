@@ -260,12 +260,6 @@
                 <scope>provided</scope>
             </dependency>
 
-            <dependency>
-                <groupId>biz.aQute.bnd</groupId>
-                <artifactId>biz.aQute.bnd.annotation</artifactId>
-                <version>3.1.0</version>
-            </dependency>
-
             <!-- ActiveMQ -->
             <dependency>
                 <groupId>org.apache.activemq</groupId>
@@ -334,11 +328,6 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>biz.aQute.bnd</groupId>
-            <artifactId>biz.aQute.bnd.annotation</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

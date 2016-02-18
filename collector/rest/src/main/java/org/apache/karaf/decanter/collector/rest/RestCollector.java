@@ -37,8 +37,10 @@ import org.slf4j.LoggerFactory;
  * Decanter REST Collector
  */
 @Component(
-    configurationPid = "org.apache.karaf.decanter.collector.rest",
-    property = {"decanter.collector.name=rest"}
+    service = Runnable.class,
+    name = "org.apache.karaf.decanter.collector.rest",
+    immediate = true,
+    property = "decanter.collector.name=rest"
 )
 public class RestCollector implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(RestCollector.class);
@@ -51,6 +53,7 @@ public class RestCollector implements Runnable {
     private EventAdmin eventAdmin;
     private Unmarshaller unmarshaller;
 
+    @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext context) throws MalformedURLException {
         Dictionary<String, Object> props = context.getProperties();

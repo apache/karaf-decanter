@@ -16,22 +16,36 @@
  */
 package org.apache.karaf.decanter.appender.elasticsearch.rest;
 
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
-import io.searchbox.client.JestResult;
-import io.searchbox.client.config.HttpClientConfig;
-import io.searchbox.core.Index;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Dictionary;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.JestResult;
+import io.searchbox.client.config.HttpClientConfig;
+import io.searchbox.client.config.HttpClientConfig.Builder;
+import io.searchbox.core.Index;
 
+@Component(
+    name ="org.apache.karaf.decanter.appender.elasticsearch.rest",
+    immediate = true,
+    property=EventConstants.EVENT_TOPIC + "=decanter/collect/*"
+)
 public class ElasticsearchAppender implements EventHandler {
 
     private JestClient client;
@@ -42,31 +56,37 @@ public class ElasticsearchAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
 
-    public ElasticsearchAppender(Marshaller marshaller, String address, String username, String password) throws Exception {
-        JestClientFactory factory = new JestClientFactory();
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) {
+        open(context.getProperties());
+    }
+    
+    public void open(Dictionary<String, Object> config) {
+        String address = getValue(config, "address", "http://localhost:9200");
+        String username = getValue(config, "username", null);
+        String password = getValue(config, "password", null);
+        Builder builder = new HttpClientConfig.Builder(address)
+            .discoveryEnabled(true)
+            .discoveryFrequency(1l, TimeUnit.MINUTES)
+            .multiThreaded(true);
         if (username != null) {
-            factory.setHttpClientConfig(new HttpClientConfig
-                    .Builder(address)
-                    .defaultCredentials(username, password)
-                    .discoveryEnabled(true)
-                    .discoveryFrequency(1l, TimeUnit.MINUTES)
-                    .multiThreaded(true)
-                    .build());
-        } else {
-            factory.setHttpClientConfig(new HttpClientConfig
-                    .Builder(address)
-                    .discoveryEnabled(true)
-                    .discoveryFrequency(1l, TimeUnit.MINUTES)
-                    .multiThreaded(true)
-                    .build());
+            builder = builder.defaultCredentials(username, password);
         }
+        JestClientFactory factory = new JestClientFactory();
+        factory.setHttpClientConfig(builder.build());
         client = factory.getObject();
-        this.marshaller = marshaller;
         TimeZone tz = TimeZone.getTimeZone( "UTC" );
         tsFormat.setTimeZone(tz);
         indexDateFormat.setTimeZone(tz);
     }
+    
+    private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
+        String value = (String)config.get(key);
+        return (value != null) ? value :  defaultValue;
+    }
 
+    @Deactivate
     public void close() {
         client.shutdownClient();
     }
@@ -106,4 +126,8 @@ public class ElasticsearchAppender implements EventHandler {
         return prefix + "-" + indexDateFormat.format(date);
     }
 
+    @Reference
+    public void setMarshaller(Marshaller marshaller) {
+        this.marshaller = marshaller;
+    }
 }

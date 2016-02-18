@@ -67,12 +67,12 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>org.apache.karaf.decanter.appender.log.socket.Activator</Bundle-Activator>
                         <Import-Package>
                             !com.ibm.uvm.tools,
                             *
                         </Import-Package>
                         <Private-Package>
+                            org.apache.karaf.decanter.collector.log.socket,
                             org.apache.log4j.spi,
                             org.apache.log4j.helpers,
                             org.apache.log4j.or,

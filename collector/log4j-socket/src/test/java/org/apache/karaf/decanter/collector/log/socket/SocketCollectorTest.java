@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.appender.log.socket;
+package org.apache.karaf.decanter.collector.log.socket;
 
+import org.apache.karaf.decanter.collector.log.socket.SocketCollector;
 import org.junit.Assert;
 import org.junit.Test;
 

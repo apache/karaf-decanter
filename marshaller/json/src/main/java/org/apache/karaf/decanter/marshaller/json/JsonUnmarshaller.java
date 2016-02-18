@@ -32,7 +32,8 @@ import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
 import org.osgi.service.component.annotations.Component;
 
 @Component(
-        property = { Marshaller.SERVICE_KEY_DATAFORMAT + "=json" }
+    immediate = true,
+    property = Marshaller.SERVICE_KEY_DATAFORMAT + "=json"
 )
 public class JsonUnmarshaller implements Unmarshaller {
 

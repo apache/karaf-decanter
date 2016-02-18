@@ -16,18 +16,29 @@
  */
 package org.apache.karaf.decanter.collector.file;
 
-import org.apache.commons.io.input.TailerListenerAdapter;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.io.File;
 import java.net.InetAddress;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.input.Tailer;
+import org.apache.commons.io.input.TailerListenerAdapter;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Component(
+    name="org.apache.karaf.decanter.collector.file",
+    immediate = true
+)
 public class DecanterTailerListener extends TailerListenerAdapter {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DecanterTailerListener.class);
@@ -35,20 +46,37 @@ public class DecanterTailerListener extends TailerListenerAdapter {
     private String type;
     private String path;
     private EventAdmin eventAdmin;
-    private Dictionary<String, Object> properties;
-
+    
     /**
-     * 
-     * @param type
-     * @param path
-     * @param eventAdmin
-     * @param properties additional properties provided by the user
+     * additional properties provided by the user
      */
-    public DecanterTailerListener(String type, String path, EventAdmin eventAdmin, Dictionary<String, Object> properties) {
+    private Dictionary<String, Object> properties;
+    private Tailer tailer;
+
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) throws ConfigurationException {
+        properties = context.getProperties();
+        if (properties.get("type") == null) {
+            throw new ConfigurationException("type","type property is mandatory");
+        }
+        String type = (String) properties.get("type");
+        if (properties.get("path") == null) {
+            throw new ConfigurationException("path", "path property is mandatory");
+        }
+        String path = (String) properties.get("path");
+
+        LOGGER.debug("Starting tail on {}", path);
+        tailer = new Tailer(new File(path), this);
+        Thread thread = new Thread(tailer, "Log Tailer for " + path);
+        thread.start();
         this.type = type;
         this.path = path;
-        this.eventAdmin = eventAdmin;
-        this.properties = properties;
+    }
+    
+    @Deactivate
+    public void deactivate() {
+        tailer.stop();
     }
 
     @Override

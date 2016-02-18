@@ -36,12 +36,13 @@ public class TestEmbeddedNode {
         System.setProperty("karaf.home", "target/karaf");
         System.setProperty("karaf.name", "decanter-test");
 
-        Dictionary<String, String> configuration = new Hashtable<>();
+        Dictionary<String, Object> configuration = new Hashtable<>();
         configuration.put(EmbeddedNode.PATH_DATA, "target/karaf/es");
-        EmbeddedNode embeddedNode = new EmbeddedNode(configuration);
-        
+        configuration.put(EmbeddedNode.CLUSTER_NAME, "elasticsearch-test");
+        configuration.put(EmbeddedNode.PORT, 9301);
+        EmbeddedNode embeddedNode = new EmbeddedNode();
+        embeddedNode.start(configuration);
         Node node = embeddedNode.getNode();
-        embeddedNode.start();
         ClusterHealthResponse healthResponse = node.client().admin().cluster().health(Requests.clusterHealthRequest()).actionGet();
         assertEquals(ClusterHealthStatus.GREEN, healthResponse.getStatus());
         embeddedNode.stop();

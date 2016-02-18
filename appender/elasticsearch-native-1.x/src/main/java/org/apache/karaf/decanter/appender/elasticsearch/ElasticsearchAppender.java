@@ -20,18 +20,24 @@ import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilde
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.TimeZone;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +45,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Karaf Decanter appender which inserts into Elasticsearch
  */
+@Component(
+    name = "org.apache.karaf.decanter.appender.elasticsearch",
+    immediate = true,
+    property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
+)
 public class ElasticsearchAppender implements EventHandler {
 
     final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
@@ -48,34 +59,32 @@ public class ElasticsearchAppender implements EventHandler {
 
     private final int concurrentRequests = 1;
     private BulkProcessor bulkProcessor;
-    Client client;
+    TransportClient client;
 
     private Marshaller marshaller;
-    private String host;
-    private int port;
-    private String cluster;
-
     private WorkFinishedListener listener;
 
-    public ElasticsearchAppender(Marshaller marshaller, String host, int port, String cluster) {
-        this.marshaller = marshaller;
-        this.host = host;
-        this.port = port;
-        this.cluster = cluster;
-        TimeZone tz = TimeZone.getTimeZone( "UTC" );
-        tsFormat.setTimeZone(tz);
-        indexDateFormat.setTimeZone(tz);
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) {
+        open(context.getProperties());
     }
-
-    @SuppressWarnings("resource")
-    public void open() {
+    
+    public void open(Dictionary<String, Object> config) {
         try {
+            String host = getValue(config, "host", "localhost");
+            int port = Integer.parseInt(getValue(config, "port", "9300"));
+            String cluster = getValue(config, "clusterName", "elasticsearch");
+            TimeZone tz = TimeZone.getTimeZone( "UTC" );
+            tsFormat.setTimeZone(tz);
+            indexDateFormat.setTimeZone(tz);
             Settings settings = settingsBuilder()
                 .classLoader(Settings.class.getClassLoader())
                 .put("cluster.name", cluster)
                 .build();
             InetSocketTransportAddress address = new InetSocketTransportAddress(host, port);
-            client = new TransportClient(settings).addTransportAddress(address);
+            client = new TransportClient(settings);
+            client.addTransportAddress(address);
             listener = new WorkFinishedListener(concurrentRequests);
             bulkProcessor = BulkProcessor.builder(client, listener)
             .setBulkActions(1000)
@@ -89,6 +98,12 @@ public class ElasticsearchAppender implements EventHandler {
         }
     }
 
+    private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
+        String value = (String)config.get(key);
+        return (value != null) ? value :  defaultValue;
+    }
+
+    @Deactivate
     public void close() {
         LOGGER.info("Stopping Elasticsearch appender");
 
@@ -137,4 +152,8 @@ public class ElasticsearchAppender implements EventHandler {
         return prefix + "-" + indexDateFormat.format(date);
     }
 
+    @Reference
+    public void setMarshaller(Marshaller marshaller) {
+        this.marshaller = marshaller;
+    }
 }
