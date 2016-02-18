@@ -167,6 +167,12 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.cassandra.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.cassandra/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-appender-redis" version="${project.version}" description="Karaf Decanter Redis Appender">
+        <feature version="${project.version}">decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.redis/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.redis.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.redis/${project.version}/cfg</configfile>
+    </feature>
+
     <feature name="decanter-sla" version="${project.version}" description="Karaf Decanter SLA support">
         <feature version="${project.version}">decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.checker/${project.version}</bundle>
