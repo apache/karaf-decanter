@@ -20,16 +20,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Dictionary;
 
 import javax.sql.DataSource;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component(
+    name = "org.apache.karaf.decanter.appender.jdbc",
+    immediate = true,
+    property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
+)
 public class JdbcAppender implements EventHandler {
     private final static Logger LOGGER = LoggerFactory.getLogger(JdbcAppender.class);
 
@@ -43,16 +53,21 @@ public class JdbcAppender implements EventHandler {
     private final static String insertQueryTemplate =
             "INSERT INTO TABLENAME(timestamp, content) VALUES(?,?)";
 
-    private String tableName;
-    private String dialect;
     private Marshaller marshaller;
     private DataSource dataSource;
-
-    public JdbcAppender(String tableName, String dialect, Marshaller marshaller, DataSource dataSource) {
-        this.tableName = tableName;
-        this.dialect = (dialect == null) ? "generic" : dialect;
-        this.marshaller = marshaller;
-        this.dataSource = dataSource;
+    
+    String tableName;
+    String dialect;
+    
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) {
+        open(context.getProperties());
+    }
+    
+    public void open(Dictionary<String, Object> config) {
+        this.tableName = getValue(config, "table.name", "decanter");
+        this.dialect = getValue(config, "dialect", "generic");
         try (Connection connection = dataSource.getConnection()) {
             createTable(connection);
         } catch (Exception e) {
@@ -60,7 +75,10 @@ public class JdbcAppender implements EventHandler {
         } 
     }
     
-    
+    private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
+        String value = (String)config.get(key);
+        return (value != null) ? value :  defaultValue;
+    }
 
     @Override
     public void handleEvent(Event event) {
@@ -99,5 +117,14 @@ public class JdbcAppender implements EventHandler {
             LOGGER.trace("Can't create table {}", e);
         }
     }
+    
+    @Reference
+    public void setMarshaller(Marshaller marshaller) {
+        this.marshaller = marshaller;
+    }
 
+    @Reference(target="(osgi.jndi.service.name=jdbc/decanter)")
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 }

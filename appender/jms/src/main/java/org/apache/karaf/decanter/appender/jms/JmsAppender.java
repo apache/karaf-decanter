@@ -16,6 +16,8 @@
  */
 package org.apache.karaf.decanter.appender.jms;
 
+import java.util.Dictionary;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -24,11 +26,21 @@ import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component(
+    name = "org.apache.karaf.decanter.appender.jms",
+    immediate = true,
+    property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
+)
 public class JmsAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(JmsAppender.class);
@@ -39,12 +51,18 @@ public class JmsAppender implements EventHandler {
     private String destinationName;
     private String destinationType;
 
-    public JmsAppender(ConnectionFactory connectionFactory, String username, String password, String destinationName, String destinationType) {
-        this.connectionFactory = connectionFactory;
-        this.username = username;
-        this.password = password;
-        this.destinationName = destinationName;
-        this.destinationType = destinationType;
+    @SuppressWarnings("unchecked")
+    @Activate
+    public void activate(ComponentContext context) {
+        Dictionary<String, Object> config = context.getProperties();
+        username = getProperty(config, "username", null);
+        password = getProperty(config, "password", null);
+        destinationName = getProperty(config, "destination.name", "decanter");
+        destinationType = getProperty(config, "destination.type", "queue");
+    }
+
+    private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
+        return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
     }
 
     @Override
@@ -125,5 +143,10 @@ public class JmsAppender implements EventHandler {
                 // Ignore
             }
         }
+    }
+    
+    @Reference(target="(osgi.jndi.service.name=jms/decanter)")
+    public void setConnectionFactory(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
     }
 }

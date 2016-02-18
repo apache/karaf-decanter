@@ -21,7 +21,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import javax.json.Json;
@@ -51,7 +53,13 @@ public class TestJdbcAppender {
         
         deleteTable(dataSource);
         
-        JdbcAppender appender = new JdbcAppender(TABLE_NAME, "derby", marshaller, dataSource);
+        JdbcAppender appender = new JdbcAppender();
+        appender.setMarshaller(marshaller);
+        appender.setDataSource(dataSource);
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put("dialect", "derby");
+        appender.open(config);
+        
         Map<String, Object> properties = new HashMap<>();
         properties.put(EventConstants.TIMESTAMP, TIMESTAMP);
         Event event = new Event(TOPIC, properties);
