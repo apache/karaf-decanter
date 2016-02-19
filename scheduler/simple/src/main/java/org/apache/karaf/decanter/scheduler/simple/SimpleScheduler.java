@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,15 +74,19 @@ public class SimpleScheduler implements Runnable, Scheduler {
                     LOGGER.warn("Can't collect data", e);
                 }
             }
-            try {
-                Thread.sleep(period);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                running.set(false);
-            }
+            sleep();
         }
 
         LOGGER.debug("Decanter SimpleScheduler thread stopped ...");
+    }
+
+    private void sleep() {
+        try {
+            Thread.sleep(period);
+        } catch (InterruptedException e) {
+            running.set(false);
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override
@@ -107,7 +112,7 @@ public class SimpleScheduler implements Runnable, Scheduler {
         return running.get() ? "Started" : "Stopped";
     }
 
-    @Reference(target="(decanter.collector.name=*)", cardinality=ReferenceCardinality.MULTIPLE)
+    @Reference(target="(decanter.collector.name=*)", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC)
     public void setCollector(Runnable collector) {
         this.collectors.add(collector);
     }
