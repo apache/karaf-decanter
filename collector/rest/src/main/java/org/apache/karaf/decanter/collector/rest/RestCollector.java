@@ -45,13 +45,15 @@ import org.slf4j.LoggerFactory;
 public class RestCollector implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(RestCollector.class);
 
-    private String type;
     private URL url;
     private String[] paths;
+    private String baseTopic;
     private Dictionary<String, Object> properties;
 
     private EventAdmin eventAdmin;
     private Unmarshaller unmarshaller;
+
+    private boolean repeatedError;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -61,9 +63,11 @@ public class RestCollector implements Runnable {
         getProperty(props, "username", null);
         getProperty(props, "password", null);
         this.paths = getProperty(props, "paths", "").split(",");
+        this.baseTopic = getProperty(props, "topic", "decanter/collect");
         //props.remove("password");
         //props.remove("username");
         this.properties = props;
+        this.repeatedError = false;
     }
     
     private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
@@ -74,8 +78,14 @@ public class RestCollector implements Runnable {
     public void run() {
         LOGGER.debug("Karaf Decanter REST Collector starts harvesting from {} ...", url);
         for (String path : paths) {
+            URL complete;
             try {
-                URL complete = new URL(url, path);
+                complete = new URL(url, path);
+            } catch (MalformedURLException e) {
+                LOGGER.warn("Invalid URL. Stopping collector", e);
+                throw new IllegalArgumentException(e);
+            }
+            try {
                 URLConnection connection = complete.openConnection();
                 Map<String, Object> data = unmarshaller.unmarshal(connection.getInputStream());
                 data.put("type", "rest");
@@ -83,15 +93,22 @@ public class RestCollector implements Runnable {
                 data.put("remote.url", complete);
                 addUserProperties(data);
                 eventAdmin.postEvent(new Event(toTopic(complete), data));
+                repeatedError = false;
             } catch (Exception e) {
-                LOGGER.warn("Error fetching", e);
+                if (repeatedError) {
+                    LOGGER.warn("Error fetching " + complete, e);
+                    repeatedError = true;
+                } else {
+                    LOGGER.debug("Repeated Error fetching " + complete, e);
+                }
+                
             }
         }
-        LOGGER.debug("Karaf Decanter JMX Collector harvesting {} done", type);
+        LOGGER.debug("Karaf Decanter REST Collector harvesting done");
     }
 
     private String toTopic(URL url) {
-        return "decanter/collect/rest/" + url.getHost() + url.getPath();
+        return baseTopic + "/" + url.getHost() + url.getPath();
     }
 
     private void addUserProperties(Map<String, Object> data) {
