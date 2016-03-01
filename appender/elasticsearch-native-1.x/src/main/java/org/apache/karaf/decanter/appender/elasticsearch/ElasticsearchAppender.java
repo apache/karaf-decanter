@@ -37,7 +37,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
-import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,10 @@ import org.slf4j.LoggerFactory;
 @Component(
     name = "org.apache.karaf.decanter.appender.elasticsearch",
     immediate = true,
-    property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
+    property = {"event.topics=decanter/collect/*",
+                "event.topics=org/osgi/framework/*",
+                "event.topics=org/apache/karaf/*"
+                }
 )
 public class ElasticsearchAppender implements EventHandler {
 

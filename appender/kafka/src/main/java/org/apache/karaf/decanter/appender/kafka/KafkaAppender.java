@@ -35,7 +35,11 @@ import org.slf4j.LoggerFactory;
 @Component(
     name = "org.apache.karaf.decanter.appender.kafka",
     immediate = true,
-    property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
+    property = {
+                "event.topics=decanter/collect/*",
+                "event.topics=org/osgi/framework/*",
+                "event.topics=org/apache/karaf/*"
+               }
 )
 public class KafkaAppender implements EventHandler {
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaAppender.class);
