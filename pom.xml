@@ -211,6 +211,7 @@
                 <inherited>true</inherited>
                 <extensions>true</extensions>
                 <configuration>
+                    <obrRepository>NONE</obrRepository>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>!*</Export-Package>
