@@ -41,6 +41,7 @@
         <module>system</module>
         <module>log4j-socket</module>
         <module>rest</module>
+        <module>eventadmin</module>
     </modules>
 
 </project>

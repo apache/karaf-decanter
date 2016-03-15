@@ -47,10 +47,7 @@ import org.slf4j.LoggerFactory;
 @Component(
     name = "org.apache.karaf.decanter.appender.elasticsearch",
     immediate = true,
-        property = {"event.topics=decanter/collect/*",
-                    "event.topics=org/osgi/framework/*",
-                    "event.topics=org/apache/karaf/*"
-                    }
+    property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
 )
 public class ElasticsearchAppender implements EventHandler {
 
