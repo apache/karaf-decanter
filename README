@@ -84,6 +84,7 @@ Appenders
 * decanter-appender-mqtt
 * decanter-appender-kafka
 * decanter-appender-cassandra
+* decanter-appender-redis
 
 SLA/Alerters
 ------------
