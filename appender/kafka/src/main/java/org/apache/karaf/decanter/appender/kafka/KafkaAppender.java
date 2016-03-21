@@ -80,7 +80,54 @@ public class KafkaAppender implements EventHandler {
         String valueSerializer = getValue(config, "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("value.serializer", valueSerializer);
 
+        String securityProtocol = getValue(config, "security.protocol", null);
+        if (securityProtocol != null)
+            properties.put("security.protocol", securityProtocol);
+
+        String sslTruststoreLocation = getValue(config, "ssl.truststore.location", null);
+        if (sslTruststoreLocation != null)
+            properties.put("ssl.truststore.location", sslTruststoreLocation);
+
+        String sslTruststorePassword = getValue(config, "ssl.truststore.password", null);
+        if (sslTruststorePassword != null)
+            properties.put("ssl.truststore.password", sslTruststorePassword);
+
+        String sslKeystoreLocation = getValue(config, "ssl.keystore.location", null);
+        if (sslKeystoreLocation != null)
+            properties.put("ssl.keystore.location", sslKeystoreLocation);
+
+        String sslKeystorePassword = getValue(config, "ssl.keystore.password", null);
+        if (sslKeystorePassword != null)
+            properties.put("ssl.keystore.password", sslKeystorePassword);
+
+        String sslKeyPassword = getValue(config, "ssl.key.password", null);
+        if (sslKeyPassword != null)
+            properties.put("ssl.key.password", sslKeyPassword);
+
+        String sslProvider = getValue(config, "ssl.provider", null);
+        if (sslProvider != null)
+            properties.put("ssl.provider", sslProvider);
+
+        String sslCipherSuites = getValue(config, "ssl.cipher.suites", null);
+        if (sslCipherSuites != null)
+            properties.put("ssl.cipher.suites", sslCipherSuites);
+
+        String sslEnabledProtocols = getValue(config, "ssl.enabled.protocols", null);
+        if (sslEnabledProtocols != null)
+            properties.put("ssl.enabled.protocols", sslEnabledProtocols);
+
+        String sslTruststoreType = getValue(config, "ssl.truststore.type", null);
+        if (sslTruststoreType != null)
+            properties.put("ssl.truststore.type", sslTruststoreType);
+
+        String sslKeystoreType = getValue(config, "ssl.keystore.type", null);
+        if (sslKeystoreType != null)
+            properties.put("ssl.keystore.type", sslKeystoreType);
+
         this.topic = getValue(config, "topic", "decanter");
+
+        // workaround for KAFKA-3218
+        Thread.currentThread().setContextClassLoader(null);
         this.producer = new KafkaProducer<>(properties);
     }
     
