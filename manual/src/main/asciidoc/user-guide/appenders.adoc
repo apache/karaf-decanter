@@ -663,13 +663,13 @@ settings as soon as you change the cfg file.
 
 ===== Embedding Decanter Kibana 3.x (only working with Elasticsearch 1.x)
 
-In addition of the embedded elasticsearch instance, Decanter also provides an embedded Kibana instance, containing
+In addition of the embedded elasticsearch 1.x instance, Decanter also provides an embedded Kibana 3.x instance, containing
 ready to use Decanter dashboards.
 
 The `kibana` feature installs the embedded kibana instance:
 
 ----
-karaf@root()> feature:install kibana
+karaf@root()> feature:install kibana/3.1.1
 ----
 
 By default, the kibana instance is available on `http://host:8181/kibana`.
@@ -698,15 +698,36 @@ instance by providing the elasticsearch parameter on the URL like this for insta
 http://localhost:8181/kibana?elasticsearch=http://localhost:9400
 ----
 
+===== Embedding Decanter Kibana 4.x (only working with Elasticsearch 2.x)
+
+In addition of the embedded elasticsearch 2.x instance, Decanter also provides an embedded Kibana 4.x instance.
+
+The `kibana` feature installs the embedded kibana instance:
+
+----
+karaf@root()> feature:install kibana/4.1.2
+----
+
+By default, the kibana instance is available on `http://host:8181/kibana`.
+
 ===== Elasticsearch Head console
 
 In addition of the embedded elasticsearch instance, Decanter also provides a web console allowing you to monitor and
 manage your elasticsearch cluster. It's a ready to use elastisearch-head console, directly embedded in Karaf.
 
-The `elasticsearch-head` feature installs the embedded elasticsearch-head web console:
+The `elasticsearch-head` feature installs the embedded elasticsearch-head web console, corresponding to the
+elasticsearch version you are using.
+
+We can install `elasticsearch-head` 1.x feature, working with elasticsearch 1.x:
 
 ----
-karaf@root()> feature:install elasticsearch-head
+karaf@root()> feature:install elasticsearch-head/1.7.3
+----
+
+or 2.x feature, working with elasticsearch 2.x:
+
+----
+karaf@root()> feature:install elasticsearch-head/2.2.0
 ----
 
 By default, the elasticsearch-head web console is available on `http://host:8181/elasticsearch-head`.
@@ -912,6 +933,36 @@ This feature installs a default `etc/org.apache.karaf.decanter.appender.kafka.cf
 
 # Name of the topic
 # topic=decanter
+
+# Security (SSL)
+# security.protocol=SSL
+
+# SSL truststore location (Kafka broker) and password
+# ssl.truststore.location=${karaf.etc}/keystores/keystore.jks
+# ssl.truststore.password=karaf
+
+# SSL keystore (if client authentication is required)
+# ssl.keystore.location=${karaf.etc}/keystores/clientstore.jks
+# ssl.keystore.password=karaf
+# ssl.key.password=karaf
+
+# (Optional) SSL provider (default uses the JVM one)
+# ssl.provider=
+
+# (Optional) SSL Cipher suites
+# ssl.cipher.suites=
+
+# (Optional) SSL Protocols enabled (default is TLSv1.2,TLSv1.1,TLSv1)
+# ssl.enabled.protocols=TLSv1.2,TLSv1.1,TLSv1
+
+# (Optional) SSL Truststore type (default is JKS)
+# ssl.truststore.type=JKS
+
+# (Optional) SSL Keystore type (default is JKS)
+# ssl.keystore.type=JKS
+
+# Security (SASL)
+# For SASL, you have to configure Java System property as explained in http://kafka.apache.org/documentation.html#security_ssl
 ----
 
 This file allows you to define how the messages are sent to the Kafka broker:
@@ -929,6 +980,8 @@ This file allows you to define how the messages are sent to the Kafka broker:
 * the `key.serializer` defines the full qualified class name of the Serializer used to serializer the keys. The default is a String serializer (`org.apache.kafka.common.serialization.StringSerializer`).
 * the `value.serializer` defines the full qualified class name of the Serializer used to serializer the values. The default is a String serializer (`org.apache.kafka.common.serialization.StringSerializer`).
 * the `topic` defines the name of the topic where to send data on the Kafka broker.
+
+It's also possible to enable SSL security (with Kafka 0.9.x) using the SSL properties.
 
 ==== MQTT
 
