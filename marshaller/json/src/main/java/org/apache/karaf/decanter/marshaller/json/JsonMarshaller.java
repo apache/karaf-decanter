@@ -176,7 +176,9 @@ public class JsonMarshaller implements Marshaller {
         } else if (value instanceof Float) {
             json.add(key, (Float)value);
         } else if (value instanceof Double) {
-            if (Double.isNaN((Double)value)) {
+            if (Double.isInfinite((Double)value)) {
+                json.add(key, "Infinity");
+            } else if (Double.isNaN((Double)value)) {
                 json.add(key, "NaN");
             } else {
                 json.add(key, (Double)value);
