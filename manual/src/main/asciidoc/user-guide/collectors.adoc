@@ -35,6 +35,26 @@ karaf@root()> feature:install decanter-collector-log
 
 The log collector doesn't need any configuration, the installation of the decanter-collector-log feature is enough.
 
+[NOTE]
+=====================================================================
+The Decanter log collector is using `osgi:DecanterLogCollectorAppender` appender.
+In order to work, your Apache Karaf Pax Logging configuration should contain this appender.
+
+The default Apache Karaf `etc/org.ops4j.pax.logging.cfg` configuration file is already fine:
+
+----
+log4j.rootLogger = DEBUG, out, osgi:*
+----
+
+If you want, you can explicitly specify the `DecanterLogCollectorAppender` appender:
+
+----
+log4j.rootLogger = DEBUG, out, osgi:DecanterLogCollectorAppender, osgi:VmLogAppender
+----
+
+=====================================================================
+
+
 ==== Log Socket
 
 The Decanter Log Socket Collector is an event driven collector. It creates a socket, waiting for incoming event. The expected
