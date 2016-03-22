@@ -127,8 +127,13 @@ public class KafkaAppender implements EventHandler {
         this.topic = getValue(config, "topic", "decanter");
 
         // workaround for KAFKA-3218
-        Thread.currentThread().setContextClassLoader(null);
-        this.producer = new KafkaProducer<>(properties);
+        ClassLoader originClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(null);
+            this.producer = new KafkaProducer<>(properties);
+        } finally {
+            Thread.currentThread().setContextClassLoader(originClassLoader);
+        }
     }
     
     private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
