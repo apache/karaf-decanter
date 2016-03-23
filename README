@@ -64,13 +64,15 @@ See user guide for the details of Decanter features:
 Collectors
 -----------
 * decanter-collector-log
+* decanter-collector-log-socket
 * decanter-collector-file
+* decanter-collector-eventadmin
 * decanter-collector-jmx
+* decanter-collector-rest
 * decanter-collector-activemq
 * decanter-collector-camel
 * decanter-collector-camel-tracer
 * decanter-collector-system
-* decanter-collector-log-socket
 
 Appenders
 ---------
@@ -84,6 +86,7 @@ Appenders
 * decanter-appender-mqtt
 * decanter-appender-kafka
 * decanter-appender-cassandra
+* decanter-appender-redis
 
 SLA/Alerters
 ------------
