@@ -19,8 +19,11 @@ package org.apache.karaf.decanter.appender.kafka;
 import java.util.Dictionary;
 import java.util.Properties;
 
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.clients.producer.internals.FutureRecordMetadata;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -76,6 +79,9 @@ public class KafkaAppender implements EventHandler {
 
         String keySerializer = getValue(config, "key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("key.serializer", keySerializer);
+
+        String requestTimeoutMs = getValue(config, "request.timeout.ms", "5000");
+        properties.put("request.timeout.ms", requestTimeoutMs);
 
         String valueSerializer = getValue(config, "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("value.serializer", valueSerializer);
@@ -146,7 +152,15 @@ public class KafkaAppender implements EventHandler {
         try {
             String type = (String)event.getProperty("type");
             String data = marshaller.marshal(event);
-            producer.send(new ProducerRecord<>(topic, type, data));
+            producer.send(new ProducerRecord<>(topic, type, data), new Callback() {
+                @Override
+                public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                    if (e != null) {
+                        LOGGER.warn("Can't send event to Kafka broker", e);
+                    }
+                }
+            });
+            producer.flush();
         } catch (RuntimeException e) {
             LOGGER.warn("Error sending event to kafka", e);
         }

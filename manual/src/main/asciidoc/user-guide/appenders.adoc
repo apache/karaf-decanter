@@ -931,6 +931,9 @@ This feature installs a default `etc/org.apache.karaf.decanter.appender.kafka.cf
 # Serializer class for value that implements the Serializer interface.
 # value.serializer=org.apache.kafka.common.serialization.StringSerializer
 
+# Producer request timeout
+# request.timeout.ms=5000
+
 # Name of the topic
 # topic=decanter
 
