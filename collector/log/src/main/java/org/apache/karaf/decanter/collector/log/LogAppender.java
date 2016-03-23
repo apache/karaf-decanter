@@ -89,7 +89,11 @@ public class LogAppender implements PaxAppender {
         }
 
         if (!isIgnored(event.getLoggerName())) {
-            String topic = "decanter/collect/log/" + event.getLoggerName().replace(".", "/").replace(" ", "_").replace("{", "_").replace("}", "_");
+            String loggerName = event.getLoggerName();
+            if (loggerName == null || loggerName.isEmpty()) {
+                loggerName = "default";
+            }
+            String topic = "decanter/collect/log/" + loggerName.replace(".", "/").replace(" ", "_").replace("{", "_").replace("}", "_");
             this.dispatcher.postEvent(new Event(topic, data));
         }
     }
