@@ -20,6 +20,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
 import java.util.HashMap;
@@ -38,7 +39,15 @@ public class EventCollector implements EventHandler {
         String topic = event.getTopic();
         Map<String, Object> data = new HashMap<>();
         for (String property : event.getPropertyNames()) {
-            data.put(property, event.getProperty(property));
+            if (property.equals("type")) {
+                if (event.getProperty(property) != null) {
+                    data.put(property, event.getProperty(property).toString());
+                } else {
+                    data.put(property, "eventadmin");
+                }
+            } else {
+                data.put(property, event.getProperty(property));
+            }
         }
         Event bridge = new Event("decanter/collect/eventadmin/" + topic, data);
         eventAdmin.sendEvent(bridge);
