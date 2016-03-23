@@ -54,7 +54,6 @@ log4j.rootLogger = DEBUG, out, osgi:DecanterLogCollectorAppender, osgi:VmLogAppe
 
 =====================================================================
 
-
 ==== Log Socket
 
 The Decanter Log Socket Collector is an event driven collector. It creates a socket, waiting for incoming event. The expected
@@ -128,6 +127,34 @@ my=stuff
 ----
 
 The file collector will tail on karaf.log file, and send any new line in this log file as collected data.
+
+==== EventAdmin
+
+The Decanter EventAdmin Collector is an event-driven collector, listening for all internal events happening in
+the Apache Karaf Container.
+
+[NOTE]
+================================================
+It's the perfect way to audit all actions performed on resources (features, bundles, configurations, ...) by users
+(via local shell console, SSH, or JMX).
+
+We recommend to use this collector to implement users and actions auditing.
+================================================
+
+The `decanter-collector-eventadmin` feature installs the eventadmin collector:
+
+----
+karaf@root()> feature:install decanter-collector-eventadmin
+----
+
+By default, the eventadmin collector is listening for all OSGi framework and Karaf internal events.
+
+You can specify additional events to trap by providing a `etc/org.apache.karaf.decanter.collector.eventadmin-my.cfg' configuration
+file, containing the EventAdmin topics you want to listen:
+
+----
+event.topics=my/*
+----
 
 ==== JMX
 
