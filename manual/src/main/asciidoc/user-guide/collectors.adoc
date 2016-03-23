@@ -156,6 +156,17 @@ file, containing the EventAdmin topics you want to listen:
 event.topics=my/*
 ----
 
+[NOTE]
+================================================
+By default, the events contain timestamp and subject.
+You can disable this by modifying `etc/org.apache.felix.eventadmin.impl.EventAdmin` configuration file:
+
+----
+org.apache.felix.eventadmin.AddTimestamp=true
+org.apache.felix.eventadmin.AddSubject=true
+----
+================================================
+
 ==== JMX
 
 The Decanter JMX Collector is a polled collector, executed periodically by the Decanter Scheduler.
