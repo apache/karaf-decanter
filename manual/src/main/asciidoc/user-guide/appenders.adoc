@@ -934,6 +934,9 @@ This feature installs a default `etc/org.apache.karaf.decanter.appender.kafka.cf
 # Producer request timeout
 # request.timeout.ms=5000
 
+# Max size of the request
+# max.request.size=2097152
+
 # Name of the topic
 # topic=decanter
 
@@ -982,6 +985,8 @@ This file allows you to define how the messages are sent to the Kafka broker:
 * the `buffer.memory` defines the size of the buffer the appender uses to send to the Kafka broker. The default value is 33554432.
 * the `key.serializer` defines the full qualified class name of the Serializer used to serializer the keys. The default is a String serializer (`org.apache.kafka.common.serialization.StringSerializer`).
 * the `value.serializer` defines the full qualified class name of the Serializer used to serializer the values. The default is a String serializer (`org.apache.kafka.common.serialization.StringSerializer`).
+* the `request.timeout.ms` is the time the producer wait before considering the message production on the broker fails (default is 5s).
+* the `max.request.size` is the max size of the request sent to the broker (default is 2097152 bytes).
 * the `topic` defines the name of the topic where to send data on the Kafka broker.
 
 It's also possible to enable SSL security (with Kafka 0.9.x) using the SSL properties.

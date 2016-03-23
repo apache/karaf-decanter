@@ -83,6 +83,9 @@ public class KafkaAppender implements EventHandler {
         String requestTimeoutMs = getValue(config, "request.timeout.ms", "5000");
         properties.put("request.timeout.ms", requestTimeoutMs);
 
+        String maxRequestSize = getValue(config, "max.request.size", "2097152");
+        properties.put("max.request.size", maxRequestSize);
+
         String valueSerializer = getValue(config, "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("value.serializer", valueSerializer);
 
