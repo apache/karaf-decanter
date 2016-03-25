@@ -28,7 +28,7 @@ karaf@root()> feature:install decanter-appender-log
 
 The log appender doesn't require any configuration.
 
-==== Elasticsearch
+==== Elasticsearch & Kibana
 
 Decanter provides three appenders for Elasticsearch:
 
@@ -709,6 +709,21 @@ karaf@root()> feature:install kibana/4.1.2
 ----
 
 By default, the kibana instance is available on `http://host:8181/kibana`.
+
+[NOTE]
+===========================================
+As Kibana 4 stores all resources (queries, visualization charts, dashboards) in Elasticsearch, we can't provide
+default dashboards "out of the box".
+
+First, create a default index (in Settings->Indices) just containing * as pattern.
+
+However, we provide a `decanter.json` file that you can import in Kibana (in the Settings->Objects menu).
+
+When you install the `kibana` 4.x feature, it automatically provides the `decanter.json` file in the
+Apache Karaf etc folder. In Kibana, you can directly import using `etc/decanter.json` file.
+
+Once `decanter.json` has been imported, you will see default dashboards provided by Decanter.
+===========================================
 
 ===== Elasticsearch Head console
 
