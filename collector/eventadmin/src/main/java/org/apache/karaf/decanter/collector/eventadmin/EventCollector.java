@@ -23,6 +23,7 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,12 +39,23 @@ public class EventCollector implements EventHandler {
     public void handleEvent(Event event) {
         String topic = event.getTopic();
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "eventadmin");
+        String karafName = System.getProperty("karaf.name");
+        if (karafName != null) {
+            data.put("karafName", karafName);
+        }
+        try {
+            data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
+            data.put("hostName", InetAddress.getLocalHost().getHostName());
+        } catch (Exception e) {
+            // nothing to do
+        }
         for (String property : event.getPropertyNames()) {
             if (property.equals("type")) {
                 if (event.getProperty(property) != null) {
-                    data.put(property, event.getProperty(property).toString());
+                    data.put("eventType", event.getProperty(property).toString());
                 } else {
-                    data.put(property, "eventadmin");
+                    data.put("eventType", "eventadmin");
                 }
             } else {
                 data.put(property, event.getProperty(property));
