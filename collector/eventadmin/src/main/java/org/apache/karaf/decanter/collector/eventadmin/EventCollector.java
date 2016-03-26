@@ -20,12 +20,12 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
-import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
+import javax.security.auth.Subject;
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Map;
+import java.security.Principal;
+import java.util.*;
 
 @Component(
         name = "org.apache.karaf.decanter.collector.eventadmin",
@@ -57,12 +57,29 @@ public class EventCollector implements EventHandler {
                 } else {
                     data.put("eventType", "eventadmin");
                 }
+            } else if (property.equalsIgnoreCase("subject")) {
+                if (event.getProperty(property) != null && (event.getProperty(property) instanceof Subject)) {
+                    data.put(property, convertSubject((Subject) event.getProperty(property)));
+                }
             } else {
                 data.put(property, event.getProperty(property));
             }
         }
         Event bridge = new Event("decanter/collect/eventadmin/" + topic, data);
         eventAdmin.sendEvent(bridge);
+    }
+
+    public Map<String, String> convertSubject(Subject subject) {
+        Map<String, String> map = new HashMap<String, String>();
+        Set<Principal> principals = subject.getPrincipals();
+        for (Principal principal : principals) {
+            if (map.get(principal.getClass().getSimpleName()) != null) {
+                map.put(principal.getClass().getSimpleName(), map.get(principal.getClass().getSimpleName()) + "," + principal.getName());
+            } else {
+                map.put(principal.getClass().getSimpleName(), principal.getName());
+            }
+        }
+        return map;
     }
 
     @Reference
