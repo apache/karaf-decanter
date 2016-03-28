@@ -1,12 +1,27 @@
 [
   {
+    "_id": "ActiveMQ",
+    "_type": "dashboard",
+    "_source": {
+      "title": "ActiveMQ",
+      "hits": 0,
+      "description": "",
+      "panelsJSON": "[{\"id\":\"ActiveMQ-Connections\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":5,\"col\":1,\"row\":1},{\"id\":\"ActiveMQ-Messages\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":5,\"col\":7,\"row\":1},{\"id\":\"ActiveMQ-Log\",\"type\":\"search\",\"size_x\":12,\"size_y\":4,\"col\":1,\"row\":6,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
+      "version": 1,
+      "timeRestore": false,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+      }
+    }
+  },
+  {
     "_id": "Karaf",
     "_type": "dashboard",
     "_source": {
       "title": "Karaf",
       "hits": 0,
       "description": "",
-      "panelsJSON": "[{\"col\":10,\"id\":\"Log-Levels\",\"row\":5,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Garbage-Collector\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Threads\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":5,\"id\":\"JVM-Memory\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Class-Loading\",\"row\":5,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Operating-System\",\"row\":5,\"size_x\":5,\"size_y\":4,\"type\":\"visualization\"}]",
+      "panelsJSON": "[{\"col\":10,\"id\":\"Log-Levels\",\"row\":5,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Garbage-Collector\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Threads\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":5,\"id\":\"JVM-Memory\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Class-Loading\",\"row\":5,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Operating-System\",\"row\":5,\"size_x\":5,\"size_y\":4,\"type\":\"visualization\"},{\"id\":\"Log\",\"type\":\"search\",\"size_x\":12,\"size_y\":2,\"col\":1,\"row\":9,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
       "version": 1,
       "timeRestore": false,
       "kibanaSavedObjectMeta": {
@@ -15,22 +30,17 @@
     }
   },
   {
-    "_id": "ActiveMQ-JMX",
-    "_type": "search",
+    "_id": "Camel",
+    "_type": "dashboard",
     "_source": {
-      "title": "ActiveMQ JMX",
-      "description": "",
+      "title": "Camel",
       "hits": 0,
-      "columns": [
-        "_source"
-      ],
-      "sort": [
-        "@timestamp",
-        "desc"
-      ],
+      "description": "",
+      "panelsJSON": "[{\"id\":\"Camel-Exchanges\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":5,\"col\":1,\"row\":1},{\"id\":\"Camel-Exchanges-Time\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":5,\"col\":7,\"row\":1},{\"id\":\"Camel-Log\",\"type\":\"search\",\"size_x\":6,\"size_y\":4,\"col\":1,\"row\":6,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]},{\"id\":\"Camel-Tracer\",\"type\":\"search\",\"size_x\":6,\"size_y\":4,\"col\":7,\"row\":6,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
       "version": 1,
+      "timeRestore": false,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[],\"query\":{\"query_string\":{\"query\":\"ObjectName:org.apache.activemq*\",\"analyze_wildcard\":true}}}"
+        "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
       }
     }
   },
@@ -55,11 +65,104 @@
     }
   },
   {
+    "_id": "ActiveMQ-JMX",
+    "_type": "search",
+    "_source": {
+      "title": "ActiveMQ JMX",
+      "description": "",
+      "hits": 0,
+      "columns": [
+        "_source"
+      ],
+      "sort": [
+        "@timestamp",
+        "desc"
+      ],
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[],\"query\":{\"query_string\":{\"query\":\"ObjectName:org.apache.activemq*\",\"analyze_wildcard\":true}}}"
+      }
+    }
+  },
+  {
+    "_id": "Log",
+    "_type": "search",
+    "_source": {
+      "title": "Log",
+      "description": "",
+      "hits": 0,
+      "columns": [
+        "_source"
+      ],
+      "sort": [
+        "@timestamp",
+        "desc"
+      ],
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[],\"query\":{\"query_string\":{\"query\":\"type:log\",\"analyze_wildcard\":true}}}"
+      }
+    }
+  },
+  {
+    "_id": "Camel-Log",
+    "_type": "search",
+    "_source": {
+      "title": "Camel Log",
+      "description": "",
+      "hits": 0,
+      "columns": [
+        "_source"
+      ],
+      "sort": [
+        "@timestamp",
+        "desc"
+      ],
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[],\"query\":{\"query_string\":{\"query\":\"loggerName:org.apache.camel*\",\"analyze_wildcard\":true}}}"
+      }
+    }
+  },
+  {
+    "_id": "Camel-Tracer",
+    "_type": "search",
+    "_source": {
+      "title": "Camel Tracer",
+      "description": "",
+      "hits": 0,
+      "columns": [
+        "_source"
+      ],
+      "sort": [
+        "@timestamp",
+        "desc"
+      ],
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[],\"query\":{\"query_string\":{\"query\":\"type:camelTracer\",\"analyze_wildcard\":true}}}"
+      }
+    }
+  },
+  {
     "_id": "Operating-System",
     "_type": "visualization",
     "_source": {
       "title": "Operating System",
       "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"2\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"FreePhysicalMemorySize\"}},{\"id\":\"3\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"4\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"FreeSwapSpaceSize\"}},{\"id\":\"5\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"OpenFileDescriptorCount\"}},{\"id\":\"6\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"ProcessCpuLoad\"}},{\"id\":\"7\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"SystemCpuLoad\"}}],\"listeners\":{}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Threads",
+    "_type": "visualization",
+    "_source": {
+      "title": "Threads",
+      "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"ThreadCount\"}},{\"id\":\"4\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"DaemonThreadCount\"}},{\"id\":\"5\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"PeakThreadCount\"}}],\"listeners\":{}}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
@@ -94,6 +197,33 @@
     }
   },
   {
+    "_id": "Log-Levels",
+    "_type": "visualization",
+    "_source": {
+      "title": "Log Levels",
+      "visState": "{\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":false,\"shareYAxis\":true},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"Level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"type=log\"}},\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "ActiveMQ-Messages",
+    "_type": "visualization",
+    "_source": {
+      "title": "ActiveMQ Messages",
+      "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"3\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"4\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"EnqueueCount\"}},{\"id\":\"5\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"DequeueCount\"}},{\"id\":\"6\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"ExpiredCount\"}},{\"id\":\"7\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"DispatchCount\"}},{\"id\":\"8\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"ForwardCount\"}},{\"id\":\"9\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"InFlightCount\"}}],\"listeners\":{}}",
+      "description": "",
+      "savedSearchId": "ActiveMQ-JMX",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[]}"
+      }
+    }
+  },
+  {
     "_id": "Class-Loading",
     "_type": "visualization",
     "_source": {
@@ -107,11 +237,25 @@
     }
   },
   {
-    "_id": "Threads",
+    "_id": "ActiveMQ-Connections",
     "_type": "visualization",
     "_source": {
-      "title": "Threads",
-      "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"ThreadCount\"}},{\"id\":\"4\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"DaemonThreadCount\"}},{\"id\":\"5\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"PeakThreadCount\"}}],\"listeners\":{}}",
+      "title": "ActiveMQ Connections",
+      "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"ConsumerCount\"}},{\"id\":\"4\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"ProducerCount\"}}],\"listeners\":{}}",
+      "description": "",
+      "savedSearchId": "ActiveMQ-JMX",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[]}"
+      }
+    }
+  },
+  {
+    "_id": "Camel-Exchanges",
+    "_type": "visualization",
+    "_source": {
+      "title": "Camel Exchanges",
+      "visState": "{\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"ExchangesCompleted\"}},{\"id\":\"4\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"ExchangesFailed\"}},{\"id\":\"5\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"ExchangesInflight\"}},{\"id\":\"6\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"RouteId\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"3\"}}],\"listeners\":{}}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
@@ -120,15 +264,15 @@
     }
   },
   {
-    "_id": "Log-Levels",
+    "_id": "Camel-Exchanges-Time",
     "_type": "visualization",
     "_source": {
-      "title": "Log Levels",
-      "visState": "{\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":false,\"shareYAxis\":true},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"Level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "title": "Camel Exchanges Time",
+      "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"LastProcessingTime\"}},{\"id\":\"4\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"RouteId\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"3\"}},{\"id\":\"5\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"MaxProcessingTime\"}}],\"listeners\":{}}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"type=log\"}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       }
     }
   }
