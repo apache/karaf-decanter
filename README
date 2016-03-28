@@ -94,6 +94,15 @@ SLA/Alerters
 * decanter-sla-email
 * decanter-sla-camel
 
+Additional features
+-------------------
+* elasticsearch 1.7.3
+* elasticsearch 2.2.0
+* elasticsearch-head 1.7.3
+* elasticsearch-head 2.2.0
+* kibana 3.1.1
+* kibana 4.1.2
+
 Thanks for using Apache Karaf Decanter !
 
 --

@@ -15,6 +15,65 @@
  * limitations under the License.
  */
 
+                    Apache Karaf Decanter 1.1.0
+                    ===========================
+
+  Overview
+  --------
+Apache Karaf Decanter 1.1.0 is the first release on the Decanter 1.1.x serie. It's a complete new version of Decanter
+including a lot of new features and bug fixes.
+
+Decanter is a completed monitoring and alerting solution for Apache Karaf container, and related applications
+running on it.
+
+You can use Decanter in any Karaf version.
+
+For details, see the ChangeLog:
+
+  ChangeLog
+  ---------
+** Bug
+    * [KARAF-4059] - Exception thrown during elasticsearch restart
+    * [KARAF-4121] - Escape characters in the log collection
+    * [KARAF-4125] - Elasticsearch clusterName and nodeName can't be changed
+    * [KARAF-4305] - Logs and JMX stats do not show in kibana with default settings
+    * [KARAF-4312] - Have to provide a decanter src distribution
+    * [KARAF-4341] - Add REST collector to pull metrics from jolokia
+    * [KARAF-4375] - IllegalArgumentException: invalid topic exception
+    * [KARAF-4432] - Marshaller is not able to deal with some event properties
+    * [KARAF-4440] - Decanter eventadmin collector should cast type property as String
+    * [KARAF-4448] - Type property is not correctly populated by the eventadmin collector
+    * [KARAF-4453] - Marshaller doesn't include subject property
+
+** Dependency upgrade
+    * [KARAF-3624] - Provide Kibana 4.1 feature
+    * [KARAF-4331] - Upgrade to elasticsearch 2.2.0
+    * [KARAF-4431] - Upgrade to kafka 0.9.0.0
+
+** Improvement
+    * [KARAF-4113] - Be able to use a remote elasticsearch instance in Decanter Kibana
+    * [KARAF-4170] - Authentication to access Kibana dashboard on karaf-decanter
+    * [KARAF-4171] - Authentication to access elasticsearch-head on karaf-decanter
+    * [KARAF-4295] - Use of Elasticsearch REST API in addition of the TransportClient (by configuration)
+    * [KARAF-4300] - Centralize maven bundle plugin config
+    * [KARAF-4304] - Cleanup elasticsearch code and build
+    * [KARAF-4344] - Migrate decanter to DS
+    * [KARAF-4369] - Collect bundle and other OSGi events in decanter
+    * [KARAF-4430] - Kafka appender should deal with the ConnectException when the Kafka broker is not available
+    * [KARAF-4438] - Define the max.request.size on the kafka appender configuration, and increase the default value
+
+** New Feature
+    * [KARAF-3698] - Add decanter cassandra appender
+    * [KARAF-3773] - Add decanter redis appender
+    * [KARAF-4120] - Provide elasticsearch 2.x feature
+    * [KARAF-4291] - Add kafka appender
+    * [KARAF-4296] - Add mqtt appender
+    * [KARAF-4303] - Create decanter marshalling services
+    * [KARAF-4321] - Add log4j socket collector
+    * [KARAF-4368] - Support SSL for kafka appender
+    * [KARAF-4404] - Create eventadmin collector
+    * [KARAF-4443] - Create default dahboards in Decanter Kibana 4.x
+
                     Apache Karaf Decanter 1.0.1
                     ===========================
 
