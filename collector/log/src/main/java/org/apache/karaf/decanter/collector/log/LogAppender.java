@@ -74,7 +74,7 @@ public class LogAppender implements PaxAppender {
         data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
         data.put("hostName", InetAddress.getLocalHost().getHostName());
 
-        data.put("timeStamp", event.getTimeStamp());
+        data.put("timestamp", event.getTimeStamp());
         data.put("loggerClass", event.getFQNOfLoggerClass());
         data.put("loggerName", event.getLoggerName());
         data.put("threadName", event.getThreadName());
