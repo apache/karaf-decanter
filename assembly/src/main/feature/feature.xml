@@ -97,8 +97,8 @@
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}</bundle>
     </feature>
 
-    <feature name="decanter-appender-elasticsearch" version="${project.version}" description="Karaf Decanter Elasticsearch Native 1.x Appender">
-        <feature version="${project.version}">decanter-appender-elasticsearch-native-1.x</feature>
+    <feature name="decanter-appender-elasticsearch" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender">
+        <feature version="${project.version}">decanter-appender-elasticsearch-native-2.x</feature>
     </feature>
 
     <feature name="decanter-appender-elasticsearch-native-1.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 1.x Appender">
