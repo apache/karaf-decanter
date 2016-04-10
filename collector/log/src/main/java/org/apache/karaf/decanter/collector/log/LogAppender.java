@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
     immediate = true
 )
 public class LogAppender implements PaxAppender {
+    
     private static final String MDC_IN_LOG_APPENDER = "inLogAppender";
     private final static String[] ignoredCategories = {"org.apache.karaf.decanter"};
     private final static Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
@@ -62,7 +63,12 @@ public class LogAppender implements PaxAppender {
     }
 
     private void appendInternal(PaxLoggingEvent event) throws Exception {
-        LOGGER.debug("Karaf Decanter Log Collector hooked ...");
+        if (isIgnored(event.getLoggerName())) {
+            LOGGER.debug("{} logger is ignored by the log collector", event.getLoggerName());
+            return;
+        }
+
+        LOGGER.debug("Publishing log event to the appenders ...");
 
         Map<String, Object> data = new HashMap<>();
         data.put("type", "log");
@@ -83,19 +89,17 @@ public class LogAppender implements PaxAppender {
         data.put("renderedMessage", event.getRenderedMessage());
         data.put("MDC", event.getProperties());
         putLocation(data, event.getLocationInformation());
-        String[] throwableAr = event.getThrowableStrRep(); 
+        String[] throwableAr = event.getThrowableStrRep();
         if (throwableAr != null) {
             data.put("throwable", join(throwableAr));
         }
 
-        if (!isIgnored(event.getLoggerName())) {
-            String loggerName = event.getLoggerName();
-            if (loggerName == null || loggerName.isEmpty()) {
-                loggerName = "default";
-            }
-            String topic = "decanter/collect/log/" + loggerName.replace(".", "/").replace(" ", "_").replace("{", "_").replace("}", "_").replace("$", "_");
-            this.dispatcher.postEvent(new Event(topic, data));
+        String loggerName = event.getLoggerName();
+        if (loggerName == null || loggerName.isEmpty()) {
+            loggerName = "default";
         }
+        String topic = "decanter/collect/log/" + loggerName.replace(".", "/").replace(" ", "_").replace("{", "_").replace("}", "_").replace("$", "_");
+        this.dispatcher.postEvent(new Event(topic, data));
     }
 
     private void putLocation(Map<String, Object> data, PaxLocationInfo loc) {
@@ -114,6 +118,9 @@ public class LogAppender implements PaxAppender {
     }
 
     private boolean isIgnored(String loggerName) {
+        if (loggerName == null) {
+            return true;
+        }
         for (String cat : ignoredCategories) {
             if (loggerName.startsWith(cat)) {
                 return true;
