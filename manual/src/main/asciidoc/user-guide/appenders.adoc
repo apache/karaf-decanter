@@ -140,6 +140,17 @@ This file contains the elasticsearch instance connection properties:
 
 ===== Embedding Decanter Elasticsearch (1.x and 2.x)
 
+[NOTE]
+=========================================
+For a larger and shared production platform, we recommend to dedicate a Elasticsearch instance on its own JVM.
+It allows you some specific tuning for elasticsearch.
+Another acceptable configuration is to set up the Decanter embedded Elasticsearch instance as part (client) of a larger
+cluster.
+
+The following Decanter Elasticsearch embedded instance setup works perfectly fine for Karaf Decanter monitoring purpose,
+especially for the current Karaf instance.
+=========================================
+
 For convenience, Decanter provides `elasticsearch` feature starting an embedded Elasticsearch instance:
 
 ----
