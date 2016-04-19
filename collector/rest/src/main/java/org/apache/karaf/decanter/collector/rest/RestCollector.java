@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
     property = "decanter.collector.name=rest"
 )
 public class RestCollector implements Runnable {
+
     private final static Logger LOGGER = LoggerFactory.getLogger(RestCollector.class);
 
     private URL url;
@@ -91,6 +92,14 @@ public class RestCollector implements Runnable {
                 data.put("type", "rest");
                 data.put("hostName", url.getHost());
                 data.put("remote.url", complete);
+
+                // custom fields
+                Enumeration<String> keys = properties.keys();
+                while (keys.hasMoreElements()) {
+                    String key = keys.nextElement();
+                    data.put(key, properties.get(key));
+                }
+
                 addUserProperties(data);
                 eventAdmin.postEvent(new Event(toTopic(complete), data));
                 repeatedError = false;

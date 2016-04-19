@@ -16,6 +16,8 @@
  */
 package org.apache.karaf.decanter.collector.eventadmin;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
@@ -35,6 +37,13 @@ public class EventCollector implements EventHandler {
 
     private EventAdmin eventAdmin;
 
+    private Dictionary<String, Object> properties;
+
+    @Activate
+    public void activate(ComponentContext context) {
+        properties = context.getProperties();
+    }
+
     @Override
     public void handleEvent(Event event) {
         String topic = event.getTopic();
@@ -50,6 +59,14 @@ public class EventCollector implements EventHandler {
         } catch (Exception e) {
             // nothing to do
         }
+
+        // custom fields
+        Enumeration<String> keys = properties.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            data.put(key, properties.get(key));
+        }
+
         for (String property : event.getPropertyNames()) {
             if (property.equals("type")) {
                 if (event.getProperty(property) != null) {

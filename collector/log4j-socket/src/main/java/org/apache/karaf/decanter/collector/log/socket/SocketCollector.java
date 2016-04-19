@@ -25,6 +25,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -47,17 +48,19 @@ import org.slf4j.LoggerFactory;
     immediate = true
 )
 public class SocketCollector implements Closeable, Runnable {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketCollector.class);
     private ServerSocket serverSocket;
     private EventAdmin eventAdmin;
     private boolean open;
     private ExecutorService executor;
+    private Dictionary<String, Object> properties;
 
     @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext context) throws IOException {
-        Dictionary<String, Object> properties = context.getProperties();
-        int port = Integer.parseInt(getProperty(properties, "port", "4560"));
+        this.properties = context.getProperties();
+        int port = Integer.parseInt(getProperty(this.properties, "port", "4560"));
         LOGGER.info("Starting Log4j Socket collector on port {}", port);
         this.serverSocket = new ServerSocket(port);
         this.executor = Executors.newFixedThreadPool(1);
@@ -95,7 +98,15 @@ public class SocketCollector implements Closeable, Runnable {
         Map<String, Object> data = new HashMap<>();
         data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
         data.put("hostName", InetAddress.getLocalHost().getHostName());
-        data.put("timeStamp", event.getTimeStamp());
+
+        // custom fields
+        Enumeration<String> keys = properties.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            data.put(key, properties.get(key));
+        }
+
+        data.put("timestamp", event.getTimeStamp());
         data.put("loggerClass", event.getFQNOfLoggerClass());
         data.put("loggerName", event.getLoggerName());
         data.put("threadName", event.getThreadName());

@@ -45,7 +45,17 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
         data.put("routeId", exchange.getFromRouteId());
         data.put("shortExchangeId", extractShortExchangeId(exchange));
         data.put("exchangePattern", exchange.getPattern().toString());
+        for (String property : exchange.getProperties().keySet()) {
+            if (property.startsWith("decanter.")) {
+                data.put(property.substring("decanter.".length()), exchange.getProperties().get(property));
+            }
+        }
         data.put("properties", exchange.getProperties().isEmpty() ? null : exchange.getProperties().toString());
+        for (String header : exchange.getIn().getHeaders().keySet()) {
+            if (header.startsWith("decanter.")) {
+                data.put(header.substring("decanter.".length()), exchange.getIn().getHeader(header));
+            }
+        }
         data.put("inHeaders", exchange.getIn().getHeaders().isEmpty() ? null : exchange.getIn().getHeaders().toString());
         data.put("inBody", MessageHelper.extractBodyAsString(exchange.getIn()));
         data.put("inBodyType", MessageHelper.getBodyTypeName(exchange.getIn()));

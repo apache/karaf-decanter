@@ -43,17 +43,17 @@ public class SystemCollector implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(SystemCollector.class);
 
     private EventAdmin eventAdmin;
-    private Dictionary<String, Object> config;
+    private Dictionary<String, Object> properties;
 
     @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext context) {
-        this.config = context.getProperties();
+        this.properties = context.getProperties();
     }
 
     @Override
     public void run() {
-        if (config != null) {
+        if (properties != null) {
             String karafName = System.getProperty("karaf.name");
             String hostAddress = null;
             String hostName = null;
@@ -63,13 +63,13 @@ public class SystemCollector implements Runnable {
             } catch (Exception e) {
                 // nothing to do
             }
-            Enumeration<String> keys = config.keys();
+            Enumeration<String> keys = properties.keys();
             while (keys.hasMoreElements()) {
                 String key = (String) keys.nextElement();
                 try {
                     if (!key.equals("felix.fileinstall.filename") && !key.equals("service.pid")) {
                         HashMap<String, Object> data = new HashMap<>();
-                        String command = (String) config.get(key);
+                        String command = (String) properties.get(key);
                         LOGGER.debug("Executing {} ({})", command, key);
                         CommandLine cmdLine = CommandLine.parse(command);
                         DefaultExecutor executor = new DefaultExecutor();

@@ -17,6 +17,8 @@
 package org.apache.karaf.decanter.collector.log;
 
 import java.net.InetAddress;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +26,8 @@ import org.apache.log4j.MDC;
 import org.ops4j.pax.logging.spi.PaxAppender;
 import org.ops4j.pax.logging.spi.PaxLocationInfo;
 import org.ops4j.pax.logging.spi.PaxLoggingEvent;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
@@ -45,7 +49,15 @@ public class LogAppender implements PaxAppender {
     private static final String MDC_IN_LOG_APPENDER = "inLogAppender";
     private final static String[] ignoredCategories = {"org.apache.karaf.decanter"};
     private final static Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
+
+    private Dictionary<String, Object> properties;
+
     private EventAdmin dispatcher;
+
+    @Activate
+    public void activate(ComponentContext context) {
+        this.properties = context.getProperties();
+    }
     
     public void doAppend(PaxLoggingEvent event) {
         try {
@@ -79,6 +91,13 @@ public class LogAppender implements PaxAppender {
 
         data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
         data.put("hostName", InetAddress.getLocalHost().getHostName());
+
+        // custom fields
+        Enumeration<String> keys = properties.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            data.put(key, properties.get(key));
+        }
 
         data.put("timestamp", event.getTimeStamp());
         data.put("loggerClass", event.getFQNOfLoggerClass());
