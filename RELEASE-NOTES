@@ -44,6 +44,7 @@ For details, see the ChangeLog:
     * [KARAF-4440] - Decanter eventadmin collector should cast type property as String
     * [KARAF-4448] - Type property is not correctly populated by the eventadmin collector
     * [KARAF-4453] - Marshaller doesn't include subject property
+    * [KARAF-4480] - LogAppender should use timestamp instead of timeStamp
 
 ** Dependency upgrade
     * [KARAF-3624] - Provide Kibana 4.1 feature
@@ -61,6 +62,11 @@ For details, see the ChangeLog:
     * [KARAF-4369] - Collect bundle and other OSGi events in decanter
     * [KARAF-4430] - Kafka appender should deal with the ConnectException when the Kafka broker is not available
     * [KARAF-4438] - Define the max.request.size on the kafka appender configuration, and increase the default value
+    * [KARAF-4463] - Secure Kibana 4
+    * [KARAF-4466] - Add a note about elasticsearch & kibana best practice for large installation
+    * [KARAF-4467] - decanter-appender-elasticsearch feature should be an alias to decanter-appender-elasticsearch-native-2.x
+    * [KARAF-4481] - LogAppender should check if the event is ignored earlier to avoid useless processing
+    * [KARAF-4495] - Add custom fields support in all collectors
 
 ** New Feature
     * [KARAF-3698] - Add decanter cassandra appender
