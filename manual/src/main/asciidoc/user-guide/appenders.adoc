@@ -723,17 +723,12 @@ By default, the kibana instance is available on `http://host:8181/kibana`.
 
 [NOTE]
 ===========================================
-As Kibana 4 stores all resources (queries, visualization charts, dashboards) in Elasticsearch, we can't provide
-default dashboards "out of the box".
+Decanter Kibana 4 automatically detects collector features. Then, it automatically creates corresponding dashboards.
 
-First, create a default index (in Settings->Indices) just containing * as pattern.
+However, you still have a complete control of the visualizations and dashboards. You can update the index to
+automatically include new fields and create your own visualizations and dashboards.
 
-However, we provide a `decanter.json` file that you can import in Kibana (in the Settings->Objects menu).
-
-When you install the `kibana` 4.x feature, it automatically provides the `decanter.json` file in the
-Apache Karaf etc folder. In Kibana, you can directly import using `etc/decanter.json` file.
-
-Once `decanter.json` has been imported, you will see default dashboards provided by Decanter.
+The default dashboard displayed is the "System" dashboard, requiring the jmx collector.
 ===========================================
 
 ===== Elasticsearch Head console
