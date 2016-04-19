@@ -23,7 +23,7 @@
 
     <groupId>org.apache.karaf</groupId>
     <artifactId>decanter</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Karaf :: Decanter</name>
 
@@ -68,7 +68,7 @@
         <connection>scm:git:https://git-wip-us.apache.org/repos/asf/karaf-decanter.git</connection>
         <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/karaf-decanter.git</developerConnection>
         <url>https://git-wip-us.apache.org/repos/asf?p=karaf-decanter.git;a=summary</url>
-        <tag>decanter-1.1.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
