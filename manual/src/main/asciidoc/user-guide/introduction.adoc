@@ -33,7 +33,13 @@ Apache Karaf Decanter provides Karaf features for each collector, appender, SLA 
 The first thing to do is to add the Decanter features repository in Karaf:
 
 ----
-karaf@root()> feature:repo-add mvn:org.apache.karaf.decanter/apache-karaf-decanter/1.0.0/xml/features
+karaf@root()> feature:repo-add mvn:org.apache.karaf.decanter/apache-karaf-decanter/1.1.0/xml/features
+----
+
+Or
+
+----
+karaf@root()> feature:repo-add decanter 1.1.0
 ----
 
 Now, you have to install the collectors, appenders, and eventually SLA alerters feature to match your need.
