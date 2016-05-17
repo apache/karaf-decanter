@@ -42,6 +42,7 @@
         <module>log4j-socket</module>
         <module>rest</module>
         <module>eventadmin</module>
+        <module>kafka</module>
     </modules>
 
 </project>
