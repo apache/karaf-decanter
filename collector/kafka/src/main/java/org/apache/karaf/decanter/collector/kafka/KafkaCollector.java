@@ -16,9 +16,21 @@
  */
 package org.apache.karaf.decanter.collector.kafka;
 
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.Executors;
+
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -28,9 +40,6 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.InetAddress;
-import java.util.*;
 
 @Component(
         name = "org.apache.karaf.decanter.collector.kafka",
@@ -46,7 +55,9 @@ public class KafkaCollector implements Runnable {
     private boolean consuming = false;
 
     private EventAdmin dispatcher;
+    private Unmarshaller unmarshaller;
 
+    @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext componentContext) {
         properties = componentContext.getProperties();
@@ -129,6 +140,7 @@ public class KafkaCollector implements Runnable {
             Thread.currentThread().setContextClassLoader(originClassLoader);
         }
         consuming = true;
+        Executors.newSingleThreadExecutor().execute(this);
     }
 
     @Deactivate
@@ -140,40 +152,57 @@ public class KafkaCollector implements Runnable {
     @Override
     public void run() {
         while (consuming) {
-
-            Map<String, Object> data = new HashMap<>();
             try {
-                data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-                data.put("hostName", InetAddress.getLocalHost().getHostName());
+                consume();
             } catch (Exception e) {
-                LOGGER.warn("Can't populate local host name and address", e);
+                LOGGER.warn(e.getMessage(), e);
             }
-
-            // custom fields
-            Enumeration<String> keys = properties.keys();
-            while (keys.hasMoreElements()) {
-                String key = keys.nextElement();
-                data.put(key, properties.get(key));
-            }
-
-            ConsumerRecords<String, String> records = consumer.poll(100);
-            for (ConsumerRecord<String, String> record : records) {
-                data.put(record.key(), record.value());
-            }
-
-            data.put("type", "kafka");
-            String karafName = System.getProperty("karaf.name");
-            if (karafName != null) {
-                data.put("karafName", karafName);
-            }
-            Event event = new Event("decanter/collect/kafka/" + topic, data);
-            dispatcher.postEvent(event);
         }
+    }
+
+    private void consume() throws UnsupportedEncodingException {
+        ConsumerRecords<String, String> records = consumer.poll(100);
+        if (records.isEmpty()) {
+            return;
+        }
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
+            data.put("hostName", InetAddress.getLocalHost().getHostName());
+        } catch (Exception e) {
+            LOGGER.warn("Can't populate local host name and address", e);
+        }
+
+        // custom fields
+        Enumeration<String> keys = properties.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            data.put(key, properties.get(key));
+        }
+        
+        for (ConsumerRecord<String, String> record : records) {
+            String value = record.value();
+            ByteArrayInputStream is = new ByteArrayInputStream(value.getBytes("utf-8"));
+            data.putAll(unmarshaller.unmarshal(is));
+        }
+
+        data.put("type", "kafka");
+        String karafName = System.getProperty("karaf.name");
+        if (karafName != null) {
+            data.put("karafName", karafName);
+        }
+        Event event = new Event("decanter/collect/kafka/" + topic, data);
+        dispatcher.postEvent(event);
     }
 
     @Reference
     public void setDispatcher(EventAdmin dispatcher) {
         this.dispatcher = dispatcher;
+    }
+    
+    @Reference
+    public void setUnmarshaller(Unmarshaller unmarshaller) {
+        this.unmarshaller = unmarshaller;
     }
 
     private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {

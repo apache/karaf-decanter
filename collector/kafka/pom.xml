@@ -34,6 +34,10 @@
     <name>Apache Karaf :: Decanter :: Collector :: Kafka</name>
 
     <dependencies>
+        <dependency>    
+            <groupId>org.apache.karaf.decanter</groupId>
+            <artifactId>org.apache.karaf.decanter.api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
