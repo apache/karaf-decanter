@@ -30,9 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.*;
 
 @Component(
     name = "org.apache.karaf.decanter.collector.system",
@@ -67,7 +65,8 @@ public class SystemCollector implements Runnable {
             while (keys.hasMoreElements()) {
                 String key = (String) keys.nextElement();
                 try {
-                    if (!key.equals("felix.fileinstall.filename") && !key.equals("service.pid")) {
+                    List<String> defaultProps = Arrays.asList("felix.fileinstall.filename","service.pid","component.name","decanter.collector.name","component.id");
+                    if (!defaultProps.contains(key)) {
                         HashMap<String, Object> data = new HashMap<>();
                         String command = (String) properties.get(key);
                         LOGGER.debug("Executing {} ({})", command, key);
