@@ -161,7 +161,7 @@ public class KafkaCollector implements Runnable {
     }
 
     private void consume() throws UnsupportedEncodingException {
-        ConsumerRecords<String, String> records = consumer.poll(100);
+        ConsumerRecords<String, String> records = consumer.poll(10000);
         if (records.isEmpty()) {
             return;
         }

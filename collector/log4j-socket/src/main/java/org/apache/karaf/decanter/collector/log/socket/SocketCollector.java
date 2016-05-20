@@ -18,6 +18,7 @@ package org.apache.karaf.decanter.collector.log.socket;
 
 import java.io.BufferedInputStream;
 import java.io.Closeable;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
@@ -37,16 +38,14 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(
-    name = "org.apache.karaf.decanter.collector.log.socket",
-    immediate = true
-)
+@Component(name = "org.apache.karaf.decanter.collector.log.socket", immediate = true)
 public class SocketCollector implements Closeable, Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketCollector.class);
@@ -67,17 +66,19 @@ public class SocketCollector implements Closeable, Runnable {
         this.executor.execute(this);
         this.open = true;
     }
-    
+
     private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
-        return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
+        return (properties.get(key) != null) ? (String)properties.get(key) : defaultValue;
     }
 
     @Override
     public void run() {
         while (open) {
-            try (Socket socket = serverSocket.accept();
+            try ( //
+                Socket socket = serverSocket.accept();
                 ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(socket
-                    .getInputStream()));) {
+                    .getInputStream())); //
+            ) {
                 while (open) {
                     try {
                         Object event = ois.readObject();
@@ -88,6 +89,8 @@ public class SocketCollector implements Closeable, Runnable {
                         LOGGER.warn("Unable to deserialize event from " + socket.getInetAddress(), e);
                     }
                 }
+            } catch (EOFException e) {
+                LOGGER.debug("Log client closed the connection.", e);
             } catch (IOException e) {
                 LOGGER.warn("Exception receiving log.", e);
             }
@@ -95,6 +98,7 @@ public class SocketCollector implements Closeable, Runnable {
     }
 
     private void handleLog4j(LoggingEvent event) throws UnknownHostException {
+        LOGGER.debug("Received log event {}", event.getLoggerName());
         Map<String, Object> data = new HashMap<>();
         data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
         data.put("hostName", InetAddress.getLocalHost().getHostName());
@@ -135,7 +139,7 @@ public class SocketCollector implements Closeable, Runnable {
 
     static String loggerName2Topic(String loggerName) {
         StringBuilder out = new StringBuilder();
-        for (int c=0; c<loggerName.length(); c++) {
+        for (int c = 0; c < loggerName.length(); c++) {
             Character ch = loggerName.charAt(c);
             if (Character.isDigit(ch) || Character.isLowerCase(ch) || Character.isUpperCase(ch)) {
                 out.append(ch);
@@ -149,7 +153,7 @@ public class SocketCollector implements Closeable, Runnable {
         }
         return "decanter/collect/log/" + outSt.replace(".", "/");
     }
-    
+
     private void putLocation(Map<String, Object> data, LocationInfo loc) {
         data.put("loc.class", loc.getClassName());
         data.put("loc.file", loc.getFileName());
@@ -165,8 +169,10 @@ public class SocketCollector implements Closeable, Runnable {
         return builder.toString();
     }
 
+    @Deactivate
     @Override
     public void close() throws IOException {
+        this.open = false;
         try {
             this.executor.shutdown();
             try {
@@ -180,7 +186,7 @@ public class SocketCollector implements Closeable, Runnable {
         }
         serverSocket.close();
     }
-    
+
     @Reference
     public void setEventAdmin(EventAdmin eventAdmin) {
         this.eventAdmin = eventAdmin;

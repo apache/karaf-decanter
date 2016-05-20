@@ -41,9 +41,13 @@ public class LogAppender implements EventHandler {
     public void handleEvent(Event event) {
         StringBuilder builder = new StringBuilder();
         for (String innerKey : event.getPropertyNames()) {
-            builder.append(innerKey).append(":").append(event.getProperty(innerKey).toString()).append(" | ");
+            builder.append(innerKey).append(":").append(toString(event.getProperty(innerKey))).append(" | ");
         }
         LOGGER.info(builder.toString());
+    }
+
+    private Object toString(Object value) {
+        return value == null ? null : value.toString();
     }
 
 }
