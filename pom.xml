@@ -61,6 +61,7 @@
         <module>elasticsearch-head-2.x</module>
         <module>kibana-3.x</module>
         <module>kibana-4.x</module>
+        <module>spring-boot-starter-decanter</module>
         <module>assembly</module>
     </modules>
 
