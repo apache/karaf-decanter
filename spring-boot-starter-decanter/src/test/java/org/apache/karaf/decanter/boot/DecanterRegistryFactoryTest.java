@@ -18,11 +18,16 @@
  */
 package org.apache.karaf.decanter.boot;
 
+import java.io.IOException;
 import java.util.Arrays;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 public class DecanterRegistryFactoryTest {
 
@@ -36,6 +41,16 @@ public class DecanterRegistryFactoryTest {
     public void testCreate() throws Exception {
         DecanterRegistryFactory factory = new DecanterRegistryFactory();
         BundleContext context = factory.create();
+        checkConfigPresent(context);
         context.getBundle().stop();
+    }
+
+    private void checkConfigPresent(BundleContext context)
+        throws IOException {
+        ServiceReference<ConfigurationAdmin> sref = context.getServiceReference(ConfigurationAdmin.class);
+        ConfigurationAdmin configAdmin = context.getService(sref);
+        Configuration config = configAdmin.getConfiguration("test");
+        Assert.assertEquals("myvalue", config.getProperties().get("mykey"));
+        context.ungetService(sref);
     }
 }

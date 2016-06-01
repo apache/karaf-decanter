@@ -2,6 +2,7 @@ org.apache.felix.connect
 org.apache.felix.scr
 org.apache.felix.eventadmin
 org.apache.felix.configadmin
+org.apache.felix.fileinstall
 org.apache.karaf.decanter.api
 org.apache.karaf.decanter.marshaller.json
 org.apache.karaf.decanter.appender.log

@@ -18,16 +18,10 @@
  */
 package org.apache.karaf.decanter.boot;
 
-import java.io.IOException;
-import java.util.Dictionary;
-import java.util.Hashtable;
-
 import javax.annotation.PreDestroy;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -37,31 +31,17 @@ public class DecanterConnect {
 
     public DecanterConnect() throws Exception {
         registryContext = new DecanterRegistryFactory().create();
-        Dictionary<String, String> kafka = new Hashtable<>();
-        kafka.put("bootstrap.servers", "kafka:9092");
-        configure(registryContext, "org.apache.karaf.decanter.appender.kafka", kafka);
-        injectEventAdmin(registryContext);
+        LogbackDecanterAppender.setDispatcher(getService(registryContext, EventAdmin.class));
     }
 
-    private static void configure(BundleContext context, String pid, Dictionary<String, String> properties)
-        throws IOException {
-        ServiceTracker<ConfigurationAdmin, ConfigurationAdmin> tracker = new ServiceTracker<>(context,
-                                                                                              ConfigurationAdmin.class,
-                                                                                              null);
-        tracker.open();
-        ConfigurationAdmin configAdmin = tracker.getService();
-        Configuration config = configAdmin.getConfiguration(pid);
-        config.update(properties);
-        tracker.close();
-    }
-
-    private static void injectEventAdmin(BundleContext context) {
-        ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<>(context, EventAdmin.class,
-                                                                              null);
-        tracker.open();
-        EventAdmin eventAdmin = tracker.getService();
-        LogbackDecanterAppender.setDispatcher(eventAdmin);
-        tracker.close();
+    private <S>S getService(BundleContext context, Class<S> serviceClazz) {
+        ServiceTracker<S, S> tracker = new ServiceTracker<S, S>(context, serviceClazz, null);
+        try {
+            tracker.open();
+            return tracker.getService();
+        } finally {
+            tracker.close();
+        }
     }
 
     @PreDestroy
