@@ -56,7 +56,11 @@
                     <instructions>
                         <Bundle-Activator>org.apache.karaf.decanter.kibana4.Activator</Bundle-Activator>
                         <Web-ContextPath>/kibana</Web-ContextPath>
-                        <Import-Package>org.apache.log;resolution:=optional,*</Import-Package>
+                        <Import-Package>
+                            org.apache.log;resolution:=optional,
+                            org.apache.karaf.features;version="[2,6)",
+                            *
+                        </Import-Package>
                         <Private-Package>
                             org.apache.karaf.decanter.kibana4,
                             org.apache.http*,
