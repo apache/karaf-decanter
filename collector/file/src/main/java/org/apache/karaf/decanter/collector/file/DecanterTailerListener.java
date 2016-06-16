@@ -30,6 +30,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class DecanterTailerListener extends TailerListenerAdapter {
     public void activate(ComponentContext context) throws ConfigurationException {
         properties = context.getProperties();
         if (properties.get("type") == null) {
-            throw new ConfigurationException("type","type property is mandatory");
+            throw new ConfigurationException("type", "type property is mandatory");
         }
         String type = (String) properties.get("type");
         if (properties.get("path") == null) {
@@ -132,4 +133,8 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         LOGGER.debug("File {} rotated", path);
     }
 
+    @Reference
+    public void setEventAdmin(EventAdmin eventAdmin) {
+        this.eventAdmin = eventAdmin;
+    }
 }
