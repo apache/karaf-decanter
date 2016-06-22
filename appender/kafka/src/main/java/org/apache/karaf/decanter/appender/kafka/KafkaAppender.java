@@ -27,6 +27,7 @@ import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 @Component(
     name = "org.apache.karaf.decanter.appender.kafka",
     immediate = true,
+    configurationPolicy = ConfigurationPolicy.REQUIRE,
     property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
 )
 public class KafkaAppender implements EventHandler {
