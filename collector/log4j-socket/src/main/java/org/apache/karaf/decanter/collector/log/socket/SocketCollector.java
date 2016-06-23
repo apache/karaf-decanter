@@ -48,6 +48,8 @@ import org.slf4j.LoggerFactory;
 @Component(name = "org.apache.karaf.decanter.collector.log.socket", immediate = true)
 public class SocketCollector implements Closeable, Runnable {
 
+    public static final String PORT_NAME = "port";
+    public static final String WORKERS_NAME = "workers";
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketCollector.class);
     private ServerSocket serverSocket;
     private EventAdmin eventAdmin;
@@ -59,10 +61,12 @@ public class SocketCollector implements Closeable, Runnable {
     @Activate
     public void activate(ComponentContext context) throws IOException {
         this.properties = context.getProperties();
-        int port = Integer.parseInt(getProperty(this.properties, "port", "4560"));
+        int port = Integer.parseInt(getProperty(this.properties, PORT_NAME, "4560"));
+        int workers = Integer.parseInt(getProperty(this.properties, WORKERS_NAME, "10"));
         LOGGER.info("Starting Log4j Socket collector on port {}", port);
         this.serverSocket = new ServerSocket(port);
-        this.executor = Executors.newFixedThreadPool(1);
+        // adding 1 for serverSocket handling
+        this.executor = Executors.newFixedThreadPool(workers + 1);
         this.executor.execute(this);
         this.open = true;
     }
@@ -74,27 +78,28 @@ public class SocketCollector implements Closeable, Runnable {
     @Override
     public void run() {
         while (open) {
-            try ( //
+            try {
                 Socket socket = serverSocket.accept();
-                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(socket
-                    .getInputStream())); //
-            ) {
-                while (open) {
-                    try {
-                        Object event = ois.readObject();
-                        if (event instanceof LoggingEvent) {
-                            handleLog4j((LoggingEvent)event);
-                        }
-                    } catch (ClassNotFoundException e) {
-                        LOGGER.warn("Unable to deserialize event from " + socket.getInetAddress(), e);
-                    }
-                }
-            } catch (EOFException e) {
-                LOGGER.debug("Log client closed the connection.", e);
+                LOGGER.debug("Connected to client at {}", socket.getInetAddress());
+                this.executor.execute(new SocketRunnable(socket));
             } catch (IOException e) {
                 LOGGER.warn("Exception receiving log.", e);
             }
         }
+    }
+
+    /**
+     * Returns true if this class is active (waiting for client logging events)
+     */
+    boolean isOpen() {
+        return open;
+    }
+
+    /**
+     * returns executor service used for serverSocket and client socket handling
+     */
+    ExecutorService getExecutorService() {
+        return executor;
     }
 
     private void handleLog4j(LoggingEvent event) throws UnknownHostException {
@@ -192,4 +197,36 @@ public class SocketCollector implements Closeable, Runnable {
         this.eventAdmin = eventAdmin;
     }
 
+    private class SocketRunnable implements Runnable {
+        private Socket clientSocket;
+
+        public SocketRunnable(Socket clientSocket) {
+            this.clientSocket = clientSocket;
+        }
+
+        public void run() {
+            try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(clientSocket
+                .getInputStream()))) {
+                while (open) {
+                    try {
+                        Object event = ois.readObject();
+                        if (event instanceof LoggingEvent) {
+                            handleLog4j((LoggingEvent)event);
+                        }
+                    } catch (ClassNotFoundException e) {
+                        LOGGER.warn("Unable to deserialize event from " + clientSocket.getInetAddress(), e);
+                    }
+                }
+            } catch (EOFException e) {
+                LOGGER.debug("Log client closed the connection.", e);
+            } catch (IOException e) {
+                LOGGER.warn("Exception receiving log.", e);
+            }
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                LOGGER.info("Error closing socket", e);
+            }
+        }
+    }
 }
