@@ -79,10 +79,12 @@ containing:
 #
 
 #port=4560
+#workers=10
 
 ----
 
 * the `port` property defines the port number where the collector is bound and listen for incoming logging event. Default is 4560.
+* the `workers` properties defines the number of threads (workers) which can deal with multiple clients in the same time.
 
 ==== File
 
