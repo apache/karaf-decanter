@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -40,6 +41,17 @@ public class TestJsonUnmarshaller {
         BigDecimal load = (BigDecimal)map.get("systemload.average");
         Assert.assertEquals(new BigDecimal(0.61d, new MathContext(2)), load);
         Assert.assertEquals(256000, ((Long)map.get("heap.init")).longValue());
+        @SuppressWarnings("unchecked")
+        Map<String, Object> mdc = (Map<String, Object>)map.get("MDC");
+        Assert.assertNotNull("MDC shouldn't be null", mdc);
+        Assert.assertEquals("some test", mdc.get("testMDC"));
+        Assert.assertEquals(1, mdc.size());
+        @SuppressWarnings("unchecked")
+        List<Object> list = (List<Object>)map.get("sampleList");
+        Assert.assertNotNull("List shouldn't be null", list);
+        Assert.assertEquals(2, list.size());
+        Assert.assertEquals(3L, list.get(0));
+        Assert.assertEquals("Hello", list.get(1));
         System.out.println(map);
     }
 }

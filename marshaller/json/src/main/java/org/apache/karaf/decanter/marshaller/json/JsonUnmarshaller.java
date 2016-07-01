@@ -17,10 +17,14 @@
 package org.apache.karaf.decanter.marshaller.json;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
@@ -31,10 +35,7 @@ import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
 import org.osgi.service.component.annotations.Component;
 
-@Component(
-    immediate = true,
-    property = Marshaller.SERVICE_KEY_DATAFORMAT + "=json"
-)
+@Component(immediate = true, property = Marshaller.SERVICE_KEY_DATAFORMAT + "=json")
 public class JsonUnmarshaller implements Unmarshaller {
 
     @Override
@@ -43,21 +44,44 @@ public class JsonUnmarshaller implements Unmarshaller {
         JsonObject jsonO = reader.readObject();
         HashMap<String, Object> map = new HashMap<>();
         for (String key : jsonO.keySet()) {
-           map.put(key, unmarshalAttribute(jsonO.get(key))); 
+            map.put(key, unmarshalAttribute(jsonO.get(key)));
         }
         reader.close();
         return map;
     }
-    
+
     private Object unmarshalAttribute(JsonValue value) {
         if (value instanceof JsonNumber) {
             JsonNumber num = (JsonNumber)value;
             return num.isIntegral() ? num.longValue() : num.bigDecimalValue();
         } else if (value instanceof JsonString) {
             return ((JsonString)value).getString();
+        } else if (value instanceof JsonObject) {
+            return build((JsonObject)value);
+        } else if (value instanceof JsonArray) {
+            return build((JsonArray)value);
         } else {
             return null;
         }
     }
 
+    private Map<String, Object> build(JsonObject value) {
+        Map<String, Object> map = new HashMap<>();
+        Iterator<Map.Entry<String, JsonValue>> entrySet = value.entrySet().iterator();
+        while (entrySet.hasNext()) {
+            Map.Entry<String, JsonValue> entry = entrySet.next();
+            map.put(entry.getKey(), unmarshalAttribute(entry.getValue()));
+        }
+        return map;
+    }
+
+    private List<Object> build(JsonArray value) {
+        List<Object> list = new ArrayList<>();
+        Iterator<JsonValue> jsonValues = value.iterator();
+        while (jsonValues.hasNext()) {
+            JsonValue jsonValue = jsonValues.next();
+            list.add(unmarshalAttribute(jsonValue));
+        }
+        return list;
+    }
 }
