@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,7 @@ public class KafkaCollector implements Runnable {
     private Dictionary<String, Object> properties;
     private KafkaConsumer<String, String> consumer;
     private String topic;
+    private String eventAdminTopic;
     private boolean consuming = false;
 
     private EventAdmin dispatcher;
@@ -63,6 +65,7 @@ public class KafkaCollector implements Runnable {
         properties = componentContext.getProperties();
 
         topic = getValue(properties, "topic", "decanter");
+        eventAdminTopic = getValue(properties, EventConstants.EVENT_TOPIC, "decanter/collect/kafka/decanter");
 
         Properties config = new Properties();
 
@@ -191,7 +194,7 @@ public class KafkaCollector implements Runnable {
         if (karafName != null) {
             data.put("karafName", karafName);
         }
-        Event event = new Event("decanter/collect/kafka/" + topic, data);
+        Event event = new Event(eventAdminTopic, data);
         dispatcher.postEvent(event);
     }
 
