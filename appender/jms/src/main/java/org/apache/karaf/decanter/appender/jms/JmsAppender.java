@@ -106,23 +106,15 @@ public class JmsAppender implements EventHandler {
     }
 
     private Destination createDestination(Session session) throws JMSException {
-        Destination destination;
-        if (destinationType.equalsIgnoreCase("topic")) {
-            destination = session.createTopic(destinationName);
-        } else {
-            destination = session.createQueue(destinationName);
-        }
-        return destination;
+        return (destinationType.equalsIgnoreCase("topic"))
+            ? session.createTopic(destinationName)
+            : session.createQueue(destinationName);
     }
 
     private Connection createConnection() throws JMSException {
-        Connection connection;
-        if (username != null) {
-            connection = connectionFactory.createConnection(username, password);
-        } else {
-            connection = connectionFactory.createConnection();
-        }
-        return connection;
+        return (username != null) 
+            ? connectionFactory.createConnection(username, password)
+            : connectionFactory.createConnection();
     }
 
     public void safeClose(Session sess) {
