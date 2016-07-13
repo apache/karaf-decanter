@@ -38,6 +38,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
@@ -45,7 +46,12 @@ import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(name = "org.apache.karaf.decanter.collector.log.socket", immediate = true)
+@Component //
+( //
+  name = "org.apache.karaf.decanter.collector.log.socket", //
+  configurationPolicy = ConfigurationPolicy.REQUIRE, //
+  immediate = true //
+)
 public class SocketCollector implements Closeable, Runnable {
 
     public static final String PORT_NAME = "port";
