@@ -57,6 +57,8 @@ public class EmbeddedNode {
     public static String HTTP_CORS_ALLOW_ORIGIN = "http.cors.allow-origin";
     public static String INDEX_MAX_RESULT_WINDOW = "index.max_result_window";
 
+    private static final boolean IS_WINDOWS = System.getProperty("os.name").contains("indow");
+
     @SuppressWarnings("unchecked")
     @Activate
     public void acticate(ComponentContext context) throws Exception {
@@ -99,7 +101,11 @@ public class EmbeddedNode {
        	settingsBuilder.put(NODE_NAME, getConfig(config, settings, NODE_NAME, getNodeName()));
        	settingsBuilder.put(NETWORK_HOST, getConfig(config, settings, NETWORK_HOST, "127.0.0.1"));
        	settingsBuilder.put(CLUSTER_ROUTING_SCHEDULE, getConfig(config, settings, CLUSTER_ROUTING_SCHEDULE, "50ms"));
-       	settingsBuilder.put(PATH_PLUGINS, getConfig(config, settings, PATH_PLUGINS, pluginsFile.getAbsolutePath()));
+        String pluginsPath = pluginsFile.getAbsolutePath();
+        if (IS_WINDOWS) {
+            pluginsPath = pluginsPath.substring(1);
+        }
+       	settingsBuilder.put(PATH_PLUGINS, getConfig(config, settings, PATH_PLUGINS, pluginsPath));
        	settingsBuilder.put(HTTP_CORS_ENABLED, getConfig(config, settings, HTTP_CORS_ENABLED, "true"));
        	settingsBuilder.put(HTTP_CORS_ALLOW_ORIGIN, getConfig(config, settings, HTTP_CORS_ALLOW_ORIGIN, "/.*/"));
         settingsBuilder.put(INDEX_MAX_RESULT_WINDOW, getConfig(config, settings, INDEX_MAX_RESULT_WINDOW, "2147483647"));
