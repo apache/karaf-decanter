@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 public class LogAppender implements PaxAppender {
     
     private static final String MDC_IN_LOG_APPENDER = "inLogAppender";
-    private final static String[] ignoredCategories = {"org.apache.karaf.decanter"};
+    private final static String[] ignoredCategories = {"org.apache.karaf.decanter.collector.log"};
     private final static Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
 
     private Dictionary<String, Object> properties;
@@ -141,7 +141,7 @@ public class LogAppender implements PaxAppender {
             return true;
         }
         for (String cat : ignoredCategories) {
-            if (loggerName.startsWith(cat)) {
+            if (loggerName.equals(cat)) {
                 return true;
             }
         }
