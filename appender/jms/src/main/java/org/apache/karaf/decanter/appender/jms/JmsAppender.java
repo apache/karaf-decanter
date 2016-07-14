@@ -18,13 +18,7 @@ package org.apache.karaf.decanter.appender.jms;
 
 import java.util.Dictionary;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import javax.jms.*;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -74,7 +68,7 @@ public class JmsAppender implements EventHandler {
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = createDestination(session);
             MessageProducer producer = session.createProducer(destination);
-            Message message = session.createMapMessage();
+            MapMessage message = session.createMapMessage();
 
             for (String name : event.getPropertyNames()) {
                 Object value = event.getProperty(name);
@@ -92,16 +86,16 @@ public class JmsAppender implements EventHandler {
         }
     }
 
-    private void setProperty(Message message, String name, Object value) throws JMSException {
+    private void setProperty(MapMessage message, String name, Object value) throws JMSException {
         if (value instanceof String)
-            message.setStringProperty(name, (String) value);
+            message.setString(name, (String) value);
         else if (value instanceof Boolean)
-            message.setBooleanProperty(name, (Boolean) value);
+            message.setBoolean(name, (Boolean) value);
         else if (value instanceof Double)
-            message.setDoubleProperty(name, (Double) value);
+            message.setDouble(name, (Double) value);
         else if (value instanceof Integer)
-            message.setIntProperty(name, (Integer) value);
-        else message.setStringProperty(name, value.toString());
+            message.setInt(name, (Integer) value);
+        else message.setString(name, value.toString());
         // we can setObject with List, Map, but they have to contain only primitives
     }
 
