@@ -99,6 +99,13 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.kafka.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.kafka/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-collector-jms" version="${project.version}" description="Karaf Decanter JMS Collector">
+        <feature>decanter-common</feature>
+        <feature>jms</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jms/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.jms.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jms/${project.version}/cfg</configfile>
+    </feature>
+
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}</bundle>

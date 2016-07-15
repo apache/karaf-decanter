@@ -43,6 +43,7 @@
         <module>rest</module>
         <module>eventadmin</module>
         <module>kafka</module>
+        <module>jms</module>
     </modules>
 
 </project>
