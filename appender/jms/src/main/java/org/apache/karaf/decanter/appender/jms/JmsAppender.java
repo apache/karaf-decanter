@@ -48,11 +48,15 @@ public class JmsAppender implements EventHandler {
     @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext context) {
-        Dictionary<String, Object> config = context.getProperties();
+        activate(context.getProperties());
+    }
+    
+    void activate(Dictionary<String, Object> config) {
         username = getProperty(config, "username", null);
         password = getProperty(config, "password", null);
         destinationName = getProperty(config, "destination.name", "decanter");
         destinationType = getProperty(config, "destination.type", "queue");
+        LOGGER.info("Decanter JMS Appender started sending to {} {}",destinationType, destinationName);
     }
 
     private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
@@ -86,7 +90,7 @@ public class JmsAppender implements EventHandler {
         }
     }
 
-    private void setProperty(MapMessage message, String name, Object value) throws JMSException {
+    void setProperty(MapMessage message, String name, Object value) throws JMSException {
         if (value instanceof String)
             message.setString(name, (String) value);
         else if (value instanceof Boolean)
@@ -95,6 +99,8 @@ public class JmsAppender implements EventHandler {
             message.setDouble(name, (Double) value);
         else if (value instanceof Integer)
             message.setInt(name, (Integer) value);
+        else if (value instanceof Long)
+            message.setLong(name, (Long) value);
         else message.setString(name, value.toString());
         // we can setObject with List, Map, but they have to contain only primitives
     }
