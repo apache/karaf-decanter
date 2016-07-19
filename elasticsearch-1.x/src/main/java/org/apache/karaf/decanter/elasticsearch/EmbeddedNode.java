@@ -60,6 +60,8 @@ public class EmbeddedNode {
     public static String HTTP_CORS_ENABLED = "http.cors.enabled";
     public static String HTTP_CORS_ALLOW_ORIGIN = "http.cors.allow-origin";
 
+    private static final boolean IS_WINDOWS = System.getProperty("os.name").contains("indow");
+
     @SuppressWarnings("unchecked")
     @Activate
     public void acticate(ComponentContext context) throws Exception {
@@ -106,7 +108,9 @@ public class EmbeddedNode {
        	settingsBuilder.put(NETWORK_HOST, getConfig(config, settings, NETWORK_HOST, "127.0.0.1"));
        	settingsBuilder.put(PORT, getConfig(config, settings, PORT, 9300));
        	settingsBuilder.put(CLUSTER_ROUTING_SCHEDULE, getConfig(config, settings, CLUSTER_ROUTING_SCHEDULE, "50ms"));
-       	settingsBuilder.put(PATH_PLUGINS, getConfig(config, settings, PATH_PLUGINS, pluginsFile.getAbsolutePath()));
+        if (!IS_WINDOWS) {
+       	    settingsBuilder.put(PATH_PLUGINS, getConfig(config, settings, PATH_PLUGINS, pluginsFile.getAbsolutePath()));
+        }
        	settingsBuilder.put(HTTP_CORS_ENABLED, getConfig(config, settings, HTTP_CORS_ENABLED, "true"));
        	settingsBuilder.put(HTTP_CORS_ALLOW_ORIGIN, getConfig(config, settings, HTTP_CORS_ALLOW_ORIGIN, "/.*/"));
         
