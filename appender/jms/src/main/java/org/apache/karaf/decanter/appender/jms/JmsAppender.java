@@ -90,7 +90,10 @@ public class JmsAppender implements EventHandler {
         }
     }
 
-    void setProperty(MapMessage message, String name, Object value) throws JMSException {
+    private void setProperty(MapMessage message, String name, Object value) throws JMSException {
+        if (value == null) {
+            return;
+        }
         if (value instanceof String)
             message.setString(name, (String) value);
         else if (value instanceof Boolean)

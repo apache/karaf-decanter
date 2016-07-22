@@ -55,9 +55,10 @@ public class JmsAppenderTest {
         props.put("string", "test");
         props.put("boolean", true);
         props.put("integer", 1);
+        props.put("testnull", null);
         appender.handleEvent(new Event("decanter/collect", props));
         
-        MapMessage message = (MapMessage)consumer.receive();
+        MapMessage message = (MapMessage)consumer.receive(1000);
         consumer.close();
         sess.close();
         con.close();
