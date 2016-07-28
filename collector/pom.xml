@@ -41,6 +41,7 @@
         <module>system</module>
         <module>log4j-socket</module>
         <module>rest</module>
+        <module>rest-servlet</module>
         <module>eventadmin</module>
         <module>kafka</module>
         <module>jms</module>
