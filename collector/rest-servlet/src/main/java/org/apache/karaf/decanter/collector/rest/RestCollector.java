@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
     immediate = true, //
     property = //
     { //
-      "decanter.collector.name=rest-servlet", "alias=/decanter"
+      "decanter.collector.name=rest-servlet", "alias=/decanter/collect"
     } //
 )
 public class RestCollector extends HttpServlet {
