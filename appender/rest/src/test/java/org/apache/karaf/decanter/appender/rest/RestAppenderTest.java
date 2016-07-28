@@ -66,7 +66,7 @@ public class RestAppenderTest {
         Marshaller marshaller = new JsonMarshaller();
         appender.setMarshaller(marshaller);
         Dictionary<String, Object> config = new Hashtable<>();
-        config.put("uri", "http://localhost:8181/decanter");
+        config.put("uri", "http://localhost:8181/decanter/collect");
         appender.activate(config);
         return appender;
     }
