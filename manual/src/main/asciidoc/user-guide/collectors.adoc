@@ -378,17 +378,21 @@ This feature installs a default `etc/org.apache.karaf.decanter.collector.system.
 # This collector executes system commands, retrieve the exec output/err
 # sent to the appenders
 #
-# The format is key=command
+# The format is command.key=command_to_execute
+# where command is a reserved keyword used to identify a command property
 # for instance:
-# df=df -h
-# free=free
+#
+# command.df=df -h
+# command.free=free
+#
 # You can also create a script containing command like:
 #
 #   df -k / | awk -F " |%" '/dev/{print $8}'
 #
 # This script will get the available space on the / filesystem for instance.
 # and call the script:
-# df=/bin/script
+#
+# command.df=/bin/script
 #
 # Another example of script to get the temperature:
 #
@@ -399,7 +403,7 @@ This feature installs a default `etc/org.apache.karaf.decanter.collector.system.
 You can add the commands that you want to execute using the format:
 
 ----
-name=command
+command.name=system_command
 ----
 
 The collector will execute each command described in this file, and send the execution output to the appenders.
@@ -407,5 +411,5 @@ The collector will execute each command described in this file, and send the exe
 For instance, if you want to periodically send the free space available on the / filesystem, you can add:
 
 ----
-df=df -k / | awk -F " |%" '/dev/{print $8}'
+command.df=df -k / | awk -F " |%" '/dev/{print $8}'
 ----

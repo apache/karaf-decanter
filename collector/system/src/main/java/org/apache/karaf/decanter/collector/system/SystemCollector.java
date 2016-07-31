@@ -67,7 +67,7 @@ public class SystemCollector implements Runnable {
             while (keys.hasMoreElements()) {
                 String key = (String) keys.nextElement();
                 try {
-                    if (!key.equals("felix.fileinstall.filename") && !key.equals("service.pid")) {
+                    if (key.startsWith("command.")) {
                         HashMap<String, Object> data = new HashMap<>();
                         String command = (String) properties.get(key);
                         LOGGER.debug("Executing {} ({})", command, key);
@@ -100,7 +100,7 @@ public class SystemCollector implements Runnable {
                             data.put(key, outputStream.toString());
                         }
                         streamHandler.stop();
-                        Event event = new Event("decanter/collect/system/" + key, data);
+                        Event event = new Event("decanter/collect/system/" + key.replace(".", "_"), data);
                         eventAdmin.postEvent(event);
                         try {
                             outputStream.close();
