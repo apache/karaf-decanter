@@ -19,6 +19,7 @@ package org.apache.karaf.decanter.scheduler.simple;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.karaf.decanter.api.Scheduler;
@@ -42,7 +43,14 @@ public class SimpleScheduler implements Runnable, Scheduler {
     private final static Logger LOGGER = LoggerFactory.getLogger(SimpleScheduler.class);
 
     private AtomicBoolean running = new AtomicBoolean(false);
+
     private long period = 5000;
+    private long threadIdleTimeout = 60000;
+    private int threadInitCount = 5;
+    private int threadMaxCount = 200;
+
+    private ExecutorService executorService;
+
     Set<Runnable> collectors;
     
     public SimpleScheduler() {
@@ -59,6 +67,12 @@ public class SimpleScheduler implements Runnable, Scheduler {
     public void configure(Dictionary<String, String> config) {
         String periodSt = config.get("period");
         period = periodSt != null ? Integer.parseInt(periodSt) : 5000;
+        String threadIdleTimeoutSt = config.get("threadIdleTimeout");
+        threadIdleTimeout = threadIdleTimeoutSt != null ? Integer.parseInt(threadIdleTimeoutSt) : 60000;
+        String threadInitCountSt = config.get("threadInitCount");
+        threadInitCount = threadInitCountSt != null ? Integer.parseInt(threadInitCountSt) : 5;
+        String threadMaxCountSt = config.get("threadMaxCount");
+        threadMaxCount = threadMaxCountSt != null ? Integer.parseInt(threadMaxCountSt) : 200;
     }
 
     @Override
@@ -69,7 +83,7 @@ public class SimpleScheduler implements Runnable, Scheduler {
             LOGGER.debug("Calling the collectors ...");
             for (Runnable collector : collectors) {
                 try {
-                    collector.run();
+                    executorService.execute(collector);
                 } catch (Exception e) {
                     LOGGER.warn("Can't collect data", e);
                 }
@@ -91,12 +105,22 @@ public class SimpleScheduler implements Runnable, Scheduler {
 
     @Override
     public void stop() {
+        try {
+            executorService.awaitTermination(60L, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            LOGGER.warn("Collectors still active", e);
+        }
+        executorService.shutdownNow();
         running.set(false);
     }
 
     @Override
     public void start() {
         if (running.compareAndSet(false, true)) {
+            executorService = new ThreadPoolExecutor(threadInitCount,
+                    threadMaxCount, threadIdleTimeout, TimeUnit.SECONDS,
+                    new SynchronousQueue<Runnable>(), Executors.defaultThreadFactory(),
+                    new ThreadPoolExecutor.CallerRunsPolicy());
             Thread thread = new Thread(this, "decanter-scheduler-simple");
             thread.start();
         }
