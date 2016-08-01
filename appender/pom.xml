@@ -45,6 +45,7 @@
         <module>mqtt</module>
         <module>cassandra</module>
         <module>redis</module>
+        <module>rest</module>
     </modules>
 
 </project>
