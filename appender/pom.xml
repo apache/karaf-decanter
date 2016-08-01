@@ -46,6 +46,7 @@
         <module>cassandra</module>
         <module>redis</module>
         <module>rest</module>
+        <module>mongodb</module>
     </modules>
 
 </project>
