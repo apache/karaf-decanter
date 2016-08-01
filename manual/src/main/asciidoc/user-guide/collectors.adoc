@@ -413,3 +413,28 @@ For instance, if you want to periodically send the free space available on the /
 ----
 command.df=df -k / | awk -F " |%" '/dev/{print $8}'
 ----
+
+==== Network socket
+
+The Decanter network socket collector listens for incoming messages coming from a remote network socket collector.
+
+The `decanter-collector-socket` feature installs the network socket collector:
+
+----
+karaf@root()> feature:install decanter-collector-socket
+----
+
+This feature installs a default `etc/org.apache.karaf.decanter.collector.socket.cfg` configuration file containing:
+
+----
+# Decanter Socket Collector
+
+# Port number on which to listen
+#port=34343
+
+# Number of worker threads to deal with
+#workers=10
+----
+
+* the `port` property contains the port number where the network socket collector is listening
+* the `workers` property contains the number of worker thread the socket collector is using for connection

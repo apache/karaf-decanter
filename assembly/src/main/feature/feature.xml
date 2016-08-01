@@ -113,6 +113,12 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.rest.servlet.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest.servlet/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-collector-socket" version="${project.version}" description="Karaf Decanter Network Socket Collector">
+        <feature>decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.socket/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.socket.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.socket/${project.version}/cfg</configfile>
+    </feature>
+
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}</bundle>
@@ -211,6 +217,12 @@
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.mongodb/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.mongodb.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.mongodb/${project.version}/cfg</configfile>
+    </feature>
+
+    <feature name="decanter-appender-socket" version="${project.version}" description="Karaf Decanter Network Socket Appender">
+        <feature>decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.socket/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.socket.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.socket/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="decanter-sla" version="${project.version}" description="Karaf Decanter SLA support">

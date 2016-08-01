@@ -45,6 +45,7 @@
         <module>eventadmin</module>
         <module>kafka</module>
         <module>jms</module>
+        <module>socket</module>
     </modules>
 
 </project>

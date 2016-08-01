@@ -1071,3 +1071,32 @@ cassandra.port=9042
 * the `table.name` property defines the name of the table where to store the data
 * the `cassandra.host` property contains the hostname or IP address where the Cassandra instance is running (default is localhost)
 * the `cassandra.port` property contains the port number of the Cassandra instance (default is 9042)
+
+==== Network socket
+
+The Decanter network socket appender send the collected data to a remote Decanter network socket collector.
+
+The use case could be to dedicate a Karaf instance as a central monitoring platform, receiving collected data from
+the other nodes.
+
+The `decanter-appender-socket` feature installs this appender:
+
+----
+karaf@root()> feature:install decanter-appender-socket
+----
+
+This feature installs the appender and a default `etc/org.apache.karaf.decanter.appender.socket.cfg` configuration file
+containing:
+
+----
+# Decanter Socket Appender
+
+# Hostname (or IP address) where to send the collected data
+#host=localhost
+
+# Port number where to send the collected data
+#port=34343
+----
+
+* the `host` property contains the hostname or IP address of the remote network socket collector
+* the `port` property contains the port number of the remote network socket collector
