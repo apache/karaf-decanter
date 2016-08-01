@@ -281,7 +281,6 @@
         <feature>war</feature>
         <feature version="[${elasticsearch2.version},3.0)">elasticsearch</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana-4.x/${project.version}</bundle>
-        <configfile finalname="/etc/decanter.json">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana-4.x/${project.version}/json</configfile>
     </feature>
 
 </features>
