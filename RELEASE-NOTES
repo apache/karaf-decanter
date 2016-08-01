@@ -15,6 +15,51 @@
  * limitations under the License.
  */
 
+                    Apache Karaf Decanter 1.2.0
+                    ===========================
+
+  Overview
+  --------
+Apache Karaf Decanter 1.2.0 is a major new Decanter release, providing lot of new features (new collectors, new
+appenders) and bug fixes.
+
+Decanter is a completed monitoring and alerting solution for Apache Karaf container, and related applications
+running on it.
+
+You can use Decanter in any Karaf version.
+
+For details, see the ChangeLog:
+
+  ChangeLog
+  ---------
+** Bug
+    * [KARAF-4516] - Extend Karaf feature import version range in Decanter Kibana bundle
+    * [KARAF-4525] - Decanter log collector should not ignore the log alerter category
+    * [KARAF-4532] - SystemCollector throws IOException
+    * [KARAF-4574] - EventAdmin not injected in file collector
+    * [KARAF-4580] - Installing elasticsearch feature fails on Windows
+    * [KARAF-4594] - Log4J socket collector error handling mutiple clients
+    * [KARAF-4604] - JsonUnMarshaller doesn't handle Map and Lists
+    * [KARAF-4605] - Kafka Collector uses the same topic for eventadmin and kafka
+    * [KARAF-4625] - JMS appender should use MapMessage property instead of JMS properties
+    * [KARAF-4629] - Can't append into Elasticsearch
+
+** Dependency upgrade
+    * [KARAF-4558] - Upgrade to Elasticsearch 1.7.4
+    * [KARAF-4560] - Upgrade to ActiveMQ 5.13.3
+    * [KARAF-4561] - Upgrade to Johnzon 0.9.3-incubating
+
+** Improvement
+    * [KARAF-4565] - Set ConfigurationPolicy.REQUIRE for decanter appenders and collectors
+    * [KARAF-4610] - Improve Decanter scheduler to reduce latency
+
+** New Feature
+    * [KARAF-4298] - Add MongoDB appender
+    * [KARAF-4320] - Create socket collector and appender
+    * [KARAF-4530] - Create Kafka collector
+    * [KARAF-4531] - Create JMS collector
+    * [KARAF-4546] - Support embedding decanter into spring boot apps
+
                     Apache Karaf Decanter 1.1.0
                     ===========================
 
