@@ -17,6 +17,7 @@
 package org.apache.karaf.decanter.appender.jms;
 
 import java.util.Dictionary;
+import java.util.Map;
 
 import javax.jms.*;
 
@@ -94,18 +95,22 @@ public class JmsAppender implements EventHandler {
         if (value == null) {
             return;
         }
-        if (value instanceof String)
+        if (value instanceof String) {
             message.setString(name, (String) value);
-        else if (value instanceof Boolean)
+        } else if (value instanceof Boolean) {
             message.setBoolean(name, (Boolean) value);
-        else if (value instanceof Double)
+        } else if (value instanceof Double) {
             message.setDouble(name, (Double) value);
-        else if (value instanceof Integer)
+        } else if (value instanceof Integer) {
             message.setInt(name, (Integer) value);
-        else if (value instanceof Long)
+        } else if (value instanceof Long) {
             message.setLong(name, (Long) value);
-        else message.setString(name, value.toString());
-        // we can setObject with List, Map, but they have to contain only primitives
+        } else if (value instanceof Map) {
+            // Must only contain primitives
+            message.setObject(name, value);
+        } else {
+            message.setString(name, value.toString());
+        }
     }
 
     private Destination createDestination(Session session) throws JMSException {

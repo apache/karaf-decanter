@@ -56,6 +56,7 @@ public class JmsAppenderTest {
         props.put("boolean", true);
         props.put("integer", 1);
         props.put("testnull", null);
+        props.put("map", new HashMap<String, String>());
         appender.handleEvent(new Event("decanter/collect", props));
         
         MapMessage message = (MapMessage)consumer.receive(1000);
@@ -67,5 +68,7 @@ public class JmsAppenderTest {
         Assert.assertEquals("test", message.getObject("string"));
         Assert.assertEquals(true, message.getObject("boolean"));
         Assert.assertEquals(1, message.getObject("integer"));
+        Object map = message.getObject("map");
+        Assert.assertTrue(map instanceof Map);
     }
 }
