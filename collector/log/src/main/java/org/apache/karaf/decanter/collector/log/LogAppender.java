@@ -54,6 +54,7 @@ public class LogAppender implements PaxAppender {
 
     private EventAdmin dispatcher;
 
+    @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext context) {
         this.properties = context.getProperties();
