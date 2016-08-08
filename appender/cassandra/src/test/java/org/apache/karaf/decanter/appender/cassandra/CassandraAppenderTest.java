@@ -5,7 +5,9 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +32,7 @@ import com.datastax.driver.core.Session;
 public class CassandraAppenderTest {
 
     private static final String KEYSPACE = "decanter";
-    private static final int CASSANDRA_PORT = 9142;
+    private static final String CASSANDRA_PORT = "9142";
     private static final String CASSANDRA_HOST = "localhost";
     private static final String TABLE_NAME = "decanter";
     private static final String TOPIC = "decanter/collect/jmx";
@@ -68,8 +70,14 @@ public class CassandraAppenderTest {
     @Test
     public void testHandleEvent() throws Exception {
         Marshaller marshaller = new JsonMarshaller();
-        CassandraAppender appender = new CassandraAppender(marshaller, KEYSPACE, TABLE_NAME, CASSANDRA_HOST, 
-                                                           CASSANDRA_PORT, null, null);
+        CassandraAppender appender = new CassandraAppender();
+        Dictionary<String, Object> config = new Hashtable<String, Object>();
+        config.put("cassandra.host", CASSANDRA_HOST);
+        config.put("cassandra.port", CASSANDRA_PORT);
+        config.put("keyspace.name", KEYSPACE);
+        config.put("table.name", TABLE_NAME);
+        appender.setMarshaller(marshaller);
+        appender.activate(config);
         
         Map<String, Object> properties = new HashMap<>();
         properties.put(EventConstants.TIMESTAMP, TIMESTAMP);
@@ -90,7 +98,7 @@ public class CassandraAppenderTest {
 
     private Session getSesion() {
         Builder clusterBuilder = Cluster.builder().addContactPoint(CASSANDRA_HOST);
-        clusterBuilder.withPort(CASSANDRA_PORT);
+        clusterBuilder.withPort(Integer.valueOf(CASSANDRA_PORT));
 
         Cluster cluster = clusterBuilder.build();
         return cluster.connect();
