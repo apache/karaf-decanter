@@ -31,7 +31,7 @@
     <groupId>org.apache.karaf.decanter.appender</groupId>
     <artifactId>org.apache.karaf.decanter.appender.rest</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Appender :: Kafka</name>
+    <name>Apache Karaf :: Decanter :: Appender :: REST</name>
 
     <dependencies>
         <dependency>
