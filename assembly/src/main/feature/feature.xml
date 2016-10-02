@@ -118,6 +118,14 @@
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.socket/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.socket.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.socket/${project.version}/cfg</configfile>
     </feature>
+    
+    <feature name="decanter-collector-process" version="${project.version}" description="Karaf Decanter JMX Process Collector">
+        <feature>decanter-common</feature>
+        <feature version="${project.version}">decanter-simple-scheduler</feature>
+        <bundle>mvn:org.apache.karaf.decanter/tools-jar-wraper/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.process/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.process-jmx.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.process/${project.version}/cfg/process</configfile>
+    </feature>
 
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature>decanter-common</feature>

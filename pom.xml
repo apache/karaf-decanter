@@ -63,6 +63,7 @@
         <module>kibana-4.x</module>
         <module>spring-boot-starter-decanter</module>
         <module>assembly</module>
+        <module>tools-jar-wraper</module>
     </modules>
 
     <scm>
