@@ -151,7 +151,6 @@
     </feature>
 
     <feature name="decanter-appender-elasticsearch-rest" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Appender">
-        <feature>http</feature>
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.rest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}/cfg</configfile>

@@ -70,7 +70,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Import-Package>org.apache.log;resolution:=optional,*</Import-Package>
+                        <Import-Package>!javax.servlet*, org.apache.log;resolution:=optional,*</Import-Package>
                         <Private-Package>
                             org.apache.karaf.decanter.appender.elasticsearch.rest,
                             org.apache.http*,
