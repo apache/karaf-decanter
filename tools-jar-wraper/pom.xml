@@ -227,7 +227,7 @@
 							sun.tools.serialver;version="0.0.0",
 							sun.tools.serialver.resources;version="0.0.0",
 							sun.tools.tree;version="0.0.0",
-							sun.tools.util
+							sun.tools.util;version="0.0.0"
 						</Export-Package>
 						<Bundle-ClassPath>external:$java.home$/../lib/tools.jar</Bundle-ClassPath>
 					</instructions>
