@@ -37,9 +37,13 @@
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log/${project.version}</bundle>
     </feature>
     
-    <feature name="decanter-collector-log-socket" version="${project.version}" description="Karaf Decanter Log4j socket Collector">
+    <feature name="decanter-collector-log-socket-core" version="${project.version}" description="Karaf Decanter Log4j socket Collector core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log.socket/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-collector-log-socket" version="${project.version}" description="Karaf Decanter Log4j socket Collector">
+        <feature>decanter-collector-log-socket-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.log.socket.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log.socket/${project.version}/cfg</configfile>
     </feature>
 
@@ -49,20 +53,24 @@
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.file/${project.version}</bundle>
     </feature>
 
-    <feature name="decanter-collector-jmx" version="${project.version}" description="Karaf Decanter JMX Collector">
+    <feature name="decanter-collector-jmx-core" version="${project.version}" description="Karaf Decanter JMX Collector core">
         <feature>decanter-common</feature>
         <feature version="${project.version}">decanter-simple-scheduler</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-collector-jmx" version="${project.version}" description="Karaf Decanter JMX Collector">
+        <feature>decanter-collector-jmx-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.jmx-local.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}/cfg/local</configfile>
     </feature>
 
     <feature name="decanter-collector-camel" version="${project.version}" description="Karaf Decanter Camel Collector">
-        <feature version="${project.version}">decanter-collector-jmx</feature>
+        <feature version="${project.version}">decanter-collector-jmx-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.jmx-camel.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}/cfg/camel</configfile>
     </feature>
 
     <feature name="decanter-collector-activemq" version="${project.version}" description="Karaf Decanter ActiveMQ Collector">
-        <feature version="${project.version}">decanter-collector-jmx</feature>
+        <feature version="${project.version}">decanter-collector-jmx-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.jmx-activemq.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}/cfg/activemq</configfile>
     </feature>
 
@@ -71,10 +79,14 @@
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.camel-tracer/${project.version}</bundle>
     </feature>
     
-    <feature name="decanter-collector-rest" version="${project.version}" description="Karaf Decanter REST Collector">
+    <feature name="decanter-collector-rest-core" version="${project.version}" description="Karaf Decanter REST Collector core">
         <feature>decanter-common</feature>
         <feature version="${project.version}">decanter-simple-scheduler</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-collector-rest" version="${project.version}" description="Karaf Decanter REST Collector">
+        <feature>decanter-collector-rest-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.rest-1.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest/${project.version}/cfg</configfile>
     </feature>
 
@@ -92,17 +104,25 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.eventadmin-karaf.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.eventadmin/${project.version}/cfg/karaf</configfile>
     </feature>
 
-    <feature name="decanter-collector-kafka" version="${project.version}" description="Karaf Decanter Kafka Collector">
+	<feature name="decanter-collector-kafka-core" version="${project.version}" description="Karaf Decanter Kafka Collector core">
         <feature>decanter-common</feature>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.kafka-clients/0.9.0.0_1</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.kafka/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-collector-kafka" version="${project.version}" description="Karaf Decanter Kafka Collector">
+        <feature>decanter-collector-kafka-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.kafka.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.kafka/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-collector-jms" version="${project.version}" description="Karaf Decanter JMS Collector">
+    <feature name="decanter-collector-jms-core" version="${project.version}" description="Karaf Decanter JMS Collector core">
         <feature>decanter-common</feature>
         <feature>jms</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jms/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-collector-jms" version="${project.version}" description="Karaf Decanter JMS Collector">
+        <feature>decanter-collector-jms-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.jms.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jms/${project.version}/cfg</configfile>
     </feature>
     
@@ -119,11 +139,15 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.socket.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.socket/${project.version}/cfg</configfile>
     </feature>
     
-    <feature name="decanter-collector-process" version="${project.version}" description="Karaf Decanter JMX Process Collector">
+    <feature name="decanter-collector-process-core" version="${project.version}" description="Karaf Decanter JMX Process Collector core">
         <feature>decanter-common</feature>
         <feature version="${project.version}">decanter-simple-scheduler</feature>
         <bundle>mvn:org.apache.karaf.decanter/tools-jar-wraper/${project.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.process/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-collector-process" version="${project.version}" description="Karaf Decanter JMX Process Collector">
+        <feature>decanter-collector-process-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.process-jmx.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.process/${project.version}/cfg/process</configfile>
     </feature>
 
@@ -136,60 +160,92 @@
         <feature>decanter-appender-elasticsearch-native-2.x</feature>
     </feature>
 
-    <feature name="decanter-appender-elasticsearch-native-1.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 1.x Appender">
+    <feature name="decanter-appender-elasticsearch-native-core-1.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 1.x Appender core">
         <feature>decanter-common</feature>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch1.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-1.x/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-appender-elasticsearch-native-1.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 1.x Appender">
+        <feature>decanter-appender-elasticsearch-native-core-1.x</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-1.x/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-appender-elasticsearch-native-2.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender">
+    <feature name="decanter-appender-elasticsearch-native-core-2.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender core">
         <feature>decanter-common</feature>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch2.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-2.x/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-appender-elasticsearch-native-2.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender">
+        <feature>decanter-appender-elasticsearch-native-core-2.x<feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-2.x/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-appender-elasticsearch-rest" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Appender">
+    <feature name="decanter-appender-elasticsearch-rest-core" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Appender core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-appender-elasticsearch-rest" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Appender">
+        <feature>decanter-appender-elasticsearch-rest-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.rest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-appender-jdbc" version="${project.version}" description="Karaf Decanter JDBC Appender">
+    <feature name="decanter-appender-jdbc-core" version="${project.version}" description="Karaf Decanter JDBC Appender core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jdbc/${project.version}</bundle>
-        <configfile finalname="/etc/org.apache.karaf.decanter.appender.jdbc.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jdbc/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-appender-jms" version="${project.version}" description="Karaf Decanter JMS Appender">
+	<feature name="decanter-appender-jdbc" version="${project.version}" description="Karaf Decanter JDBC Appender">
+        <feature>decanter-appender-jdbc-core</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.jdbc.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jdbc/${project.version}/cfg</configfile>
+    </feature>
+    
+    <feature name="decanter-appender-jms-core" version="${project.version}" description="Karaf Decanter JMS Appender core">
         <feature>decanter-common</feature>
         <feature>jms</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jms/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-appender-jms" version="${project.version}" description="Karaf Decanter JMS Appender">
+        <feature>decanter-appender-jms-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.jms.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jms/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-appender-camel" version="${project.version}" description="Karaf Decanter Camel Appender">
+    <feature name="decanter-appender-camel-core" version="${project.version}" description="Karaf Decanter Camel Appender core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.camel/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-appender-camel" version="${project.version}" description="Karaf Decanter Camel Appender">
+        <feature>decanter-appender-camel-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.camel.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.camel/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-appender-kafka" version="${project.version}" description="Karaf Decanter Kafka Appender">
+    <feature name="decanter-appender-kafka-core" version="${project.version}" description="Karaf Decanter Kafka Appender core">
         <feature>decanter-common</feature>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.kafka-clients/0.9.0.0_1</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.kafka/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-appender-kafka" version="${project.version}" description="Karaf Decanter Kafka Appender">
+        <feature>decanter-appender-kafka-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.kafka.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.kafka/${project.version}/cfg</configfile>
     </feature>
     
-    <feature name="decanter-appender-mqtt" version="${project.version}" description="Karaf Decanter MQTT Appender">
+    <feature name="decanter-appender-mqtt-core" version="${project.version}" description="Karaf Decanter MQTT Appender core">
         <feature>decanter-common</feature>
         <bundle dependency="true">mvn:org.eclipse.paho/org.eclipse.paho.client.mqttv3/${paho.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.mqtt/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-appender-mqtt" version="${project.version}" description="Karaf Decanter MQTT Appender">
+        <feature>decanter-appender-mqtt-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.mqtt.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.mqtt/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-appender-cassandra" version="${project.version}" description="Karaf Decanter Cassandra Appender">
+    <feature name="decanter-appender-cassandra-core" version="${project.version}" description="Karaf Decanter Cassandra Appender core">
         <feature>decanter-common</feature>
         <bundle dependency="true">mvn:com.google.guava/guava/16.0.1</bundle>
         <bundle dependency="true">mvn:io.netty/netty-handler/4.0.33.Final</bundle>
@@ -205,36 +261,60 @@
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
         <bundle dependency="true">mvn:com.datastax.cassandra/cassandra-driver-core/${cassandra.driver.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.cassandra/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-appender-cassandra" version="${project.version}" description="Karaf Decanter Cassandra Appender">
+        <feature>decanter-appender-cassandra-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.cassandra.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.cassandra/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-appender-redis" version="${project.version}" description="Karaf Decanter Redis Appender">
+    <feature name="decanter-appender-redis-core" version="${project.version}" description="Karaf Decanter Redis Appender core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.redis/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-appender-redis" version="${project.version}" description="Karaf Decanter Redis Appender">
+        <feature>decanter-appender-redis-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.redis.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.redis/${project.version}/cfg</configfile>
     </feature>
     
-    <feature name="decanter-appender-rest" version="${project.version}" description="Karaf Decanter REST Appender">
+    <feature name="decanter-appender-rest-core" version="${project.version}" description="Karaf Decanter REST Appender core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.rest/${project.version}</bundle>
+    </feature>
+
+	<feature name="decanter-appender-rest" version="${project.version}" description="Karaf Decanter REST Appender">
+        <feature>decanter-appender-rest-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.rest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.rest/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-appender-mongodb" version="${project.version}" description="Karaf Decanter MongoDB Appender">
+    <feature name="decanter-appender-mongodb-core" version="${project.version}" description="Karaf Decanter MongoDB Appender core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.mongodb/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-appender-mongodb" version="${project.version}" description="Karaf Decanter MongoDB Appender">
+        <feature>decanter-appender-mongodb-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.mongodb.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.mongodb/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-appender-socket" version="${project.version}" description="Karaf Decanter Network Socket Appender">
+    <feature name="decanter-appender-socket-core" version="${project.version}" description="Karaf Decanter Network Socket Appender core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.socket/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-appender-socket" version="${project.version}" description="Karaf Decanter Network Socket Appender">
+        <feature>decanter-appender-socket-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.socket.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.socket/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-sla" version="${project.version}" description="Karaf Decanter SLA support">
+    <feature name="decanter-sla-core" version="${project.version}" description="Karaf Decanter SLA support core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.checker/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-sla" version="${project.version}" description="Karaf Decanter SLA support">
+        <feature>decanter-sla-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.sla.checker.cfg">mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.checker/${project.version}/cfg</configfile>
     </feature>
 
@@ -243,16 +323,24 @@
         <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.log/${project.version}</bundle>
     </feature>
 
-    <feature name="decanter-sla-email" version="${project.version}" description="Karaf Decanter SLA email alerter">
+    <feature name="decanter-sla-email-core" version="${project.version}" description="Karaf Decanter SLA email alerter core">
         <feature version="${project.version}">decanter-sla</feature>
         <bundle>mvn:javax.mail/mail/1.4.7</bundle>
         <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.email/${project.version}</bundle>
+    </feature>
+    
+    <feature name="decanter-sla-email" version="${project.version}" description="Karaf Decanter SLA email alerter">
+        <feature version="${project.version}">decanter-sla-email-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.sla.email.cfg">mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.email/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-sla-camel" version="${project.version}" description="Karaf Decanter SLA Camel alerter">
+    <feature name="decanter-sla-camel-core" version="${project.version}" description="Karaf Decanter SLA Camel alerter core">
         <feature version="${project.version}">decanter-sla</feature>
         <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.camel/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-sla-camel" version="${project.version}" description="Karaf Decanter SLA Camel alerter">
+        <feature version="${project.version}">decanter-sla-camel-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.sla.camel.cfg">mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.camel/${project.version}/cfg</configfile>
     </feature>
 
