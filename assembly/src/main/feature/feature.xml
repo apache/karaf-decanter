@@ -178,7 +178,7 @@
     </feature>
     
     <feature name="decanter-appender-elasticsearch-native-2.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender">
-        <feature>decanter-appender-elasticsearch-native-core-2.x<feature>
+        <feature>decanter-appender-elasticsearch-native-core-2.x</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-2.x/${project.version}/cfg</configfile>
     </feature>
 
