@@ -17,8 +17,11 @@
 package org.apache.karaf.decanter.appender.elasticsearch.rest;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -65,13 +68,19 @@ public class ElasticsearchAppender implements EventHandler {
     }
     
     public void open(Dictionary<String, Object> config) {
-        String address = getValue(config, "address", "http://localhost:9200");
+        String addressesString = getValue(config, "address", "http://localhost:9200");
+        Set<String> addresses = new HashSet<String>(Arrays.asList(addressesString.split(";")));
         String username = getValue(config, "username", null);
         String password = getValue(config, "password", null);
-        Builder builder = new HttpClientConfig.Builder(address)
-            .discoveryEnabled(true)
-            .discoveryFrequency(1l, TimeUnit.MINUTES)
+        Builder builder = new HttpClientConfig.Builder(addresses)
             .multiThreaded(true);
+        
+        if (addresses.size() > 1) {
+            builder = builder
+                    .discoveryEnabled(true)
+                    .discoveryFrequency(1l, TimeUnit.MINUTES);
+        }
+
         if (username != null) {
             builder = builder.defaultCredentials(username, password);
         }
