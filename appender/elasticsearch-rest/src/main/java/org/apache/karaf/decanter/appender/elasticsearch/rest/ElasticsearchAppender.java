@@ -79,6 +79,8 @@ public class ElasticsearchAppender implements EventHandler {
             builder = builder
                     .discoveryEnabled(true)
                     .discoveryFrequency(1l, TimeUnit.MINUTES);
+        } else {
+            builder.discoveryEnabled(false);
         }
 
         if (username != null) {
