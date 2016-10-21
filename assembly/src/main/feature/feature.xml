@@ -151,6 +151,13 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.process-jmx.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.process/${project.version}/cfg/process</configfile>
     </feature>
 
+    <feature name="decanter-collector-mqtt" version="${project.version}" description="Karaf Decanter MQTT Collector">
+        <feature>decanter-common</feature>
+        <bundle dependency="true">mvn:org.eclipse.paho/org.eclipse.paho.client.mqttv3/${paho.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.mqtt/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.mqtt.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.mqtt/${project.version}/cfg</configfile>
+    </feature>
+
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}</bundle>

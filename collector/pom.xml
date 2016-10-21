@@ -47,6 +47,7 @@
         <module>jms</module>
         <module>process</module>
         <module>socket</module>
+        <module>mqtt</module>
     </modules>
 
 </project>
