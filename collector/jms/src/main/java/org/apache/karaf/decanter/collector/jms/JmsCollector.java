@@ -16,6 +16,7 @@
  */
 package org.apache.karaf.decanter.collector.jms;
 
+import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -28,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
+import java.io.ByteArrayInputStream;
 import java.net.InetAddress;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -51,6 +53,7 @@ public class JmsCollector {
     private String destinationType;
 
     private EventAdmin dispatcher;
+    private Unmarshaller unmarshaller;
     private Connection connection;
     private Session session;
 
@@ -67,7 +70,7 @@ public class JmsCollector {
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Destination destination = createDestination(session);
         MessageConsumer consumer = session.createConsumer(destination);
-        consumer.setMessageListener(new DecanterMessageListener(dispatcher));
+        consumer.setMessageListener(new DecanterMessageListener(dispatcher, unmarshaller));
         connection.start();
     }
 
@@ -123,56 +126,100 @@ public class JmsCollector {
         this.dispatcher = dispatcher;
     }
 
+    @Reference
+    public void setUnmarshaller(Unmarshaller unmarshaller) {
+        this.unmarshaller = unmarshaller;
+    }
+
     public class DecanterMessageListener implements MessageListener {
 
         private EventAdmin dispatcher;
+        private Unmarshaller unmarshaller;
 
-        public DecanterMessageListener(EventAdmin dispatcher) {
+        public DecanterMessageListener(EventAdmin dispatcher, Unmarshaller unmarshaller) {
             this.dispatcher = dispatcher;
+            this.unmarshaller = unmarshaller;
         }
 
         @Override
         public void onMessage(Message message) {
-            if (!(message instanceof MapMessage)) {
-                LOGGER.warn("JMS is not a MapMessage.");
+            if (!(message instanceof MapMessage) && !(message instanceof TextMessage)) {
+                LOGGER.warn("JMS is not a MapMessage or a TextMessage.");
                 return;
             }
 
-            MapMessage mapMessage = (MapMessage) message;
-
-            try {
-                Map<String, Object> data = new HashMap<>();
+            if (message instanceof MapMessage) {
+                MapMessage mapMessage = (MapMessage) message;
 
                 try {
-                    data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-                    data.put("hostName", InetAddress.getLocalHost().getHostName());
+                    Map<String, Object> data = new HashMap<>();
+
+                    try {
+                        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
+                        data.put("hostName", InetAddress.getLocalHost().getHostName());
+                    } catch (Exception e) {
+                        LOGGER.warn("Can't populate local host name and address", e);
+                    }
+
+                    // custom fields
+                    Enumeration<String> keys = properties.keys();
+                    while (keys.hasMoreElements()) {
+                        String key = keys.nextElement();
+                        data.put(key, properties.get(key));
+                    }
+
+                    Enumeration names = mapMessage.getMapNames();
+                    while (names.hasMoreElements()) {
+                        String name = (String) names.nextElement();
+                        data.put(name, mapMessage.getObject(name));
+                    }
+
+                    data.put("type", "jms");
+                    String karafName = System.getProperty("karaf.name");
+                    if (karafName != null) {
+                        data.put("karafName", karafName);
+                    }
+
+                    Event event = new Event(dispatcherTopic, data);
+                    dispatcher.postEvent(event);
                 } catch (Exception e) {
-                    LOGGER.warn("Can't populate local host name and address", e);
+                    LOGGER.warn("Can't process JMS message", e);
                 }
+            }
+            if (message instanceof TextMessage) {
+                TextMessage textMessage = (TextMessage) message;
 
-                // custom fields
-                Enumeration<String> keys = properties.keys();
-                while (keys.hasMoreElements()) {
-                    String key = keys.nextElement();
-                    data.put(key, properties.get(key));
+                try {
+                    Map<String, Object> data = new HashMap<>();
+
+                    try {
+                        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
+                        data.put("hostName", InetAddress.getLocalHost().getHostName());
+                    } catch (Exception e) {
+                        LOGGER.warn("Can't populate local host name and address", e);
+                    }
+
+                    // custom fields
+                    Enumeration<String> keys = properties.keys();
+                    while (keys.hasMoreElements()) {
+                        String key = keys.nextElement();
+                        data.put(key, properties.get(key));
+                    }
+
+                    ByteArrayInputStream is = new ByteArrayInputStream(textMessage.getText().getBytes());
+                    data.putAll(unmarshaller.unmarshal(is));
+
+                    data.put("type", "jms");
+                    String karafName = System.getProperty("karaf.name");
+                    if (karafName != null) {
+                        data.put("karafName", karafName);
+                    }
+
+                    Event event = new Event(dispatcherTopic, data);
+                    dispatcher.postEvent(event);
+                } catch (Exception e) {
+                    LOGGER.warn("Can't process JMS message", e);
                 }
-
-                Enumeration names = mapMessage.getMapNames();
-                while (names.hasMoreElements()) {
-                    String name = (String) names.nextElement();
-                    data.put(name, mapMessage.getObject(name));
-                }
-
-                data.put("type", "jms");
-                String karafName = System.getProperty("karaf.name");
-                if (karafName != null) {
-                    data.put("karafName", karafName);
-                }
-
-                Event event = new Event(dispatcherTopic, data);
-                dispatcher.postEvent(event);
-            } catch (Exception e) {
-                LOGGER.warn("Can't process JMS message", e);
             }
         }
 
