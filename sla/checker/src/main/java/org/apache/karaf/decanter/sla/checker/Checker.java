@@ -27,6 +27,7 @@ import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
@@ -135,6 +136,13 @@ public class Checker implements EventHandler {
             }
             if (patterns[0].contains(".")) {
                 Float m = Float.parseFloat(patterns[0]);
+                if (value instanceof BigDecimal) {
+                    BigDecimal v = new BigDecimal(value.toString());
+                    BigDecimal mBD = new BigDecimal(m);
+                    int compare = v.compareTo(mBD);
+                    if (minIncluded && compare == -1) return false;
+                    else if (compare <= 0) return false;
+                }
                 if (value instanceof Double) {
                     double v = value.doubleValue();
                     if (minIncluded && m > v) return false;
@@ -162,6 +170,13 @@ public class Checker implements EventHandler {
                 }
             } else {
                 int m = Integer.parseInt(patterns[0]);
+                if (value instanceof BigDecimal) {
+                    BigDecimal v = new BigDecimal(value.toString());
+                    BigDecimal mBD = new BigDecimal(m);
+                    int compare = v.compareTo(mBD);
+                    if (minIncluded && compare == -1) return false;
+                    else if (compare <= 0) return false;
+                }
                 if (value instanceof Double) {
                     double v = value.doubleValue();
                     if (minIncluded && m > v) return false;
@@ -190,6 +205,13 @@ public class Checker implements EventHandler {
             }
             if (patterns[1].contains(".")) {
                 Float m = Float.parseFloat(patterns[1]);
+                if (value instanceof BigDecimal) {
+                    BigDecimal v = new BigDecimal(value.toString());
+                    BigDecimal mBD = new BigDecimal(m);
+                    int compare = v.compareTo(mBD);
+                    if (maxIncluded && compare <= 0) return false;
+                    else if (compare < 0) return false;
+                }
                 if (value instanceof Double) {
                     double v = value.doubleValue();
                     if (maxIncluded && m <= v) return false;
@@ -217,6 +239,13 @@ public class Checker implements EventHandler {
                 }
             } else {
                 int m = Integer.parseInt(patterns[1]);
+                if (value instanceof BigDecimal) {
+                    BigDecimal v = new BigDecimal(value.toString());
+                    BigDecimal mBD = new BigDecimal(m);
+                    int compare = v.compareTo(mBD);
+                    if (maxIncluded && compare <= 0) return false;
+                    else if (compare == -1) return false;
+                }
                 if (value instanceof Double) {
                     double v = value.doubleValue();
                     if (maxIncluded && m <= v) return false;
@@ -250,6 +279,12 @@ public class Checker implements EventHandler {
             for (String p : patterns) {
                 if (p.contains(".")) {
                     float f = Float.parseFloat(p);
+                    if (value instanceof BigDecimal) {
+                        BigDecimal v = new BigDecimal(value.toString());
+                        BigDecimal mBD = new BigDecimal(f);
+                        int compare = v.compareTo(mBD);
+                        if (compare != 0) return false;
+                    }
                     if (value instanceof Double) {
                         double v = value.doubleValue();
                         if (v != f) return false;
@@ -272,6 +307,12 @@ public class Checker implements EventHandler {
                     }
                 } else {
                     int f = Integer.parseInt(p);
+                    if (value instanceof BigDecimal) {
+                        BigDecimal v = new BigDecimal(value.toString());
+                        BigDecimal mBD = new BigDecimal(f);
+                        int compare = v.compareTo(mBD);
+                        if (compare != 0) return false;
+                    }
                     if (value instanceof Double) {
                         double v = value.doubleValue();
                         if (v != f) return false;
@@ -301,6 +342,12 @@ public class Checker implements EventHandler {
             for (String p : patterns) {
                 if (p.contains(".")) {
                     float f = Float.parseFloat(p);
+                    if (value instanceof BigDecimal) {
+                        BigDecimal v = new BigDecimal(value.toString());
+                        BigDecimal mBD = new BigDecimal(f);
+                        int compare = v.compareTo(mBD);
+                        if (compare == 0) return false;
+                    }
                     if (value instanceof Double) {
                         double v = value.doubleValue();
                         if (v == f) return false;
@@ -323,6 +370,12 @@ public class Checker implements EventHandler {
                     }
                 } else {
                     int f = Integer.parseInt(p);
+                    if (value instanceof BigDecimal) {
+                        BigDecimal v = new BigDecimal(value.toString());
+                        BigDecimal mBD = new BigDecimal(f);
+                        int compare = v.compareTo(mBD);
+                        if (compare == 0) return false;
+                    }
                     if (value instanceof Double) {
                         double v = value.doubleValue();
                         if (v == f) return false;
@@ -383,7 +436,8 @@ public class Checker implements EventHandler {
                 value instanceof Float ||
                 value instanceof Integer ||
                 value instanceof Long ||
-                value instanceof Short) {
+                value instanceof Short ||
+                value instanceof BigDecimal) {
             // we use a number checker
             return validateNumber(pattern, (Number) value);
         } else {
