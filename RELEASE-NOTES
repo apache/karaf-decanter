@@ -15,6 +15,38 @@
  * limitations under the License.
  */
 
+                    Apache Karaf Decanter 1.3.0
+                    ===========================
+
+  Overview
+  --------
+Apache Karaf Decanter 1.3.0 is a major new Decanter release, providing new features (new collectors, new
+appenders) and bug fixes.
+
+Decanter is a completed monitoring and alerting solution for Apache Karaf container, and related applications
+running on it.
+
+You can use Decanter in any Karaf version.
+
+For details, see the ChangeLog:
+
+  ChangeLog
+  ---------
+** Bug
+    * [KARAF-4647] - Can't append into Elasticsearch with JMS
+    * [KARAF-4757] - Decanter: elasticsearch-appender-rest shouldn't be dependent on http
+    * [KARAF-4767] - Decanter: collectors and appenders can't be re-used without default configuration
+
+** Improvement
+    * [KARAF-4749] - Support range, equal, and notequal for BigDecimal in org/apache/karaf/decanter/sla/checker/Checker.java
+    * [KARAF-4791] - Decanter: elasticsearch-rest appender should support multipe addresses
+    * [KARAF-4794] - Decanter: make sure the discovery is disabled if only one address is configured
+    * [KARAF-4799] - JMS collector should support TextMessage
+
+** New Feature
+    * [KARAF-4706] - Create MQTT collector
+    * [KARAF-4742] - Decanter: Add Java Process JMX Collector
+
                     Apache Karaf Decanter 1.2.0
                     ===========================
 
