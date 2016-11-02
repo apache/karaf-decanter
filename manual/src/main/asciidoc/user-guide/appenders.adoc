@@ -1012,6 +1012,72 @@ This file allows you to define how the messages are sent to the Kafka broker:
 
 It's also possible to enable SSL security (with Kafka 0.9.x) using the SSL properties.
 
+==== Redis
+
+The Decanter Redis appender sends the data (collected by the collectors) to a Redis broker.
+
+The `decanter-appender-redis` feature installs the Redis appender:
+
+----
+karaf@root()> feature:install decanter-appender-redis
+----
+
+This feature also installs a default `etc/org.apache.karaf.decanter.appender.redis.cfg` configuration file containing:
+
+----
+#######################################
+# Decanter Redis Appender Configuration
+#######################################
+
+#
+# Location of the Redis broker
+# It's possible to use a list of brokers, for instance:
+# host= locahost:6389,localhost:6332,localhost:6419
+#
+# Default is localhost:6379
+#
+address=localhost:6379
+
+#
+# Define the connection mode.
+# Possible modes: Single (default), Master_Slave, Sentinel, Cluster
+#
+mode=Single
+
+#
+# Name of the Redis map
+# Default is Decanter
+#
+map=Decanter
+
+#
+# For Master_Slave mode, we define the location of the master
+# Default is localhost:6379
+#
+#masterAddress=localhost:6379
+
+#
+# For Sentinel model, define the name of the master
+# Default is myMaster
+#
+#masterName=myMaster
+
+#
+# For Cluster mode, define the scan interval of the nodes in the cluster
+# Default value is 2000 (2 seconds).
+#
+#scanInterval=2000
+----
+
+This file allows you to configure the Redis broker to use:
+
+* the `address` property contains the location of the Redis broker
+* the `mode` property defines the Redis topology to use (Single, Master_Slave, Sentinel, Cluster)
+* the `map` property contains the name of the Redis map to use
+* the `masterAddress` is the location of the master when using the Master_Slave topology
+* the `masterName` is the name of the master when using the Sentinel topology
+* the `scanInternal` is the scan interval of the nodes when using the Cluster topology
+
 ==== MQTT
 
 The Decanter MQTT appender sends the data (collected by the collectors) to a MQTT broker.
@@ -1030,7 +1096,7 @@ This feature installs a default `etc/org.apache.karaf.decanter.appender.mqtt.cfg
 #topic=decanter
 ----
 
-This file allows you to configuration the location and where to send in the MQTT broker:
+This file allows you to configure the location and where to send in the MQTT broker:
 
 * the `server` contains the location of the MQTT broker
 * the `clientId` identifies the appender on the MQTT broker
@@ -1038,7 +1104,7 @@ This file allows you to configuration the location and where to send in the MQTT
 
 ==== Cassandra
 
-The Decanter Cassandra appender allows your to store the data (coming from the collectors) into an Apache Cassandra database.
+The Decanter Cassandra appender allows you to store the data (coming from the collectors) into an Apache Cassandra database.
 
 The `decanter-appender-cassandra` feature installs this appender:
 
@@ -1071,6 +1137,38 @@ cassandra.port=9042
 * the `table.name` property defines the name of the table where to store the data
 * the `cassandra.host` property contains the hostname or IP address where the Cassandra instance is running (default is localhost)
 * the `cassandra.port` property contains the port number of the Cassandra instance (default is 9042)
+
+==== MongoDB
+
+The Decanter MongoDB appender allows you to store the data (coming from the collectors) into a MongoDB database.
+
+The `decanter-appender-mongodb` feature installs this appender:
+
+----
+karaf@root()> feature:install decanter-appender-mongodb
+----
+
+This feature installs the appender and a default `etc/org.apache.karaf.decanter.appender.mongodb.cfg` configuration file
+containing:
+
+----
+################################
+# Decanter MongoDB Configuration
+################################
+
+# MongoDB connection URI
+#uri=mongodb://localhost
+
+# MongoDB database name
+#database=decanter
+
+# MongoDB collection name
+#collection=decanter
+----
+
+* the `uri` property contains the location of the MongoDB instance
+* the `database` property contains the name of the MongoDB database
+* the `collection` property contains the name of the MongoDB collection
 
 ==== Network socket
 
