@@ -17,7 +17,13 @@
 package org.apache.karaf.decanter.collector.jmx;
 
 import java.lang.management.ManagementFactory;
-import java.util.*;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
 
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
@@ -49,50 +55,59 @@ public class JmxCollector implements Runnable {
     private String url;
     private String username;
     private String password;
-    private String objectName;
+    private Set<String> objectNames;
     private EventAdmin eventAdmin;
     private Dictionary<String, Object> properties;
 
     @SuppressWarnings("unchecked")
     public void activate(ComponentContext context) {
-        properties = context.getProperties();
-        String type = getProperty(properties, "type", "jmx-local");
-        String url = getProperty(properties, "url", "local");
-        String username = getProperty(properties, "username", null);
-        String password = getProperty(properties, "password", null);
-        String objectName = getProperty(properties, "object.name", null);
-        Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
+        this.properties = context.getProperties();
+        String type = getProperty(this.properties, "type", "jmx-local");
+        String url = getProperty(this.properties, "url", "local");
+        String username = getProperty(this.properties, "username", null);
+        String password = getProperty(this.properties, "password", null);
+        Dictionary<String, String> serviceProperties = new Hashtable<> ();
         serviceProperties.put("decanter.collector.name", type);
+
         this.type = type;
         this.url = url;
         this.username = username;
         this.password = password;
-        this.objectName = objectName;
+
+        this.objectNames = new HashSet<> ();
+        for (Enumeration<String> e = this.properties.keys(); e.hasMoreElements(); ) {
+        	String key = e.nextElement();
+        	if( "object.name".equals( key ) || key.startsWith( "object.name." )) {
+        		Object value = this.properties.get( key );
+        		if (value != null)
+        			this.objectNames.add( value.toString());
+        	}
+        }
     }
-    
+
     private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
         return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
     }
 
     @Override
     public void run() {
-        LOGGER.debug("Karaf Decanter JMX Collector starts harvesting {}...", type);
+        LOGGER.debug("Karaf Decanter JMX Collector starts harvesting {}...", this.type);
 
         JMXConnector connector = null;
         MBeanServerConnection connection = null;
 
         String host = null;
-        if (url == null || url.equalsIgnoreCase("local")) {
-            LOGGER.debug("Harvesting local MBeanServer ({})...", type);
+        if (this.url == null || this.url.equalsIgnoreCase("local")) {
+            LOGGER.debug("Harvesting local MBeanServer ({})...", this.type);
             connection = ManagementFactory.getPlatformMBeanServer();
         } else {
             try {
-                JMXServiceURL jmxServiceURL = new JMXServiceURL(url);
+                JMXServiceURL jmxServiceURL = new JMXServiceURL(this.url);
                 connector = JMXConnectorFactory.connect(jmxServiceURL, getEnv());
                 connection = connector.getMBeanServerConnection();
                 host = jmxServiceURL.toString();
             } catch (Exception e) {
-                LOGGER.error("Can't connect to MBeanServer {} ({})", url, type, e);
+                LOGGER.error("Can't connect to MBeanServer {} ({})", this.url, this.type, e);
             }
         }
 
@@ -101,22 +116,28 @@ public class JmxCollector implements Runnable {
             return;
         }
 
+        String currentObjectName = null;
         try {
             String karafName = System.getProperty("karaf.name");
-            BeanHarvester harvester = new BeanHarvester(connection, type, host, karafName);
-            Set<ObjectName> names = connection.queryNames(getObjectName(objectName), null);
+            BeanHarvester harvester = new BeanHarvester(connection, this.type, host, karafName);
+            Set<ObjectName> names = new HashSet<> ();
+            for (String objectName : this.objectNames) {
+            	currentObjectName = objectName;
+            	names.addAll( connection.queryNames(getObjectName(objectName), null));
+            }
+
             for (ObjectName name : names) {
                 try {
                     Map<String, Object> data = harvester.harvestBean(name);
                     addUserProperties(data);
-                    Event event = new Event("decanter/collect/jmx/" + type + "/" + getTopic(name), data);
-                    eventAdmin.postEvent(event);
+                    Event event = new Event("decanter/collect/jmx/" + this.type + "/" + getTopic(name), data);
+                    this.eventAdmin.postEvent(event);
                 } catch (Exception e) {
-                    LOGGER.warn("Can't read MBean {} ({})", name, type, e);
+                    LOGGER.warn("Can't read MBean {} ({})", name, this.type, e);
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("Can't query object name from {} ({}) {}", url, type, objectName);
+            LOGGER.warn("Can't query object name from {} ({}) {}", this.url, this.type, currentObjectName);
         }
 
         try {
@@ -125,23 +146,23 @@ public class JmxCollector implements Runnable {
             LOGGER.trace("Can't close JMX connector", e);
         }
 
-        LOGGER.debug("Karaf Decanter JMX Collector harvesting {} done", type);
+        LOGGER.debug("Karaf Decanter JMX Collector harvesting {} done", this.type);
     }
 
     private Map<String, Object> getEnv() {
-        Map<String, Object> env = new HashMap<>();
-        if (username != null && password != null) {
-            env.put(JMXConnector.CREDENTIALS, new String[] { username, password });
-        }            
+        Map<String,Object> env = new HashMap<> ();
+        if (this.username != null && this.password != null) {
+            env.put(JMXConnector.CREDENTIALS, new String[] { this.username, this.password });
+        }
         return env;
     }
 
     private void addUserProperties(Map<String, Object> data) {
-        if (properties != null) {
-            Enumeration<String> keys = properties.keys();
+        if (this.properties != null) {
+            Enumeration<String> keys = this.properties.keys();
             while (keys.hasMoreElements()) {
                 String property = keys.nextElement();
-                data.put(property, properties.get(property));
+                data.put(property, this.properties.get(property));
             }
         }
     }
@@ -158,4 +179,8 @@ public class JmxCollector implements Runnable {
     public void setEventAdmin(EventAdmin eventAdmin) {
         this.eventAdmin = eventAdmin;
     }
+
+	Set<String> getObjectNames() {
+		return this.objectNames;
+	}
 }

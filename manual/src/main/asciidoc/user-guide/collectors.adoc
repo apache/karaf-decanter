@@ -206,6 +206,12 @@ url=local
 # Object name filter to use. Instead of harvesting all MBeans, you can select only
 # some MBeans matching the object name filter
 #object.name=org.apache.camel:context=*,type=routes,name=*
+
+# Several object names can also be specified.
+# What matters is that the property names begin with "object.name".
+#object.name.system=java.lang:*
+#object.name.karaf=org.apache.karaf:type=http,name=*
+#object.name.3=org.apache.activemq:*
 ----
 
 This file harvests the data of the local MBeanServer:
@@ -221,7 +227,7 @@ is secured.
 is secured.
 * the `object.name` property is optional. If this property is not specified, the collector will retrieve the attributes
 of all MBeans. You can filter to consider only some MBeans. This property contains the ObjectName filter to retrieve
-the attributes only to some MBeans.
+the attributes only to some MBeans. Several object names can be listed, provided the property prefix is `object.name.`.
 * any other values will be part of the collected data. It means that you can add your own property if you want to add
 additional data, and create queries based on this data.
 
