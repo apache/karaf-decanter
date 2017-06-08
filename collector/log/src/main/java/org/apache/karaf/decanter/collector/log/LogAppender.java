@@ -21,6 +21,8 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.MDC;
 import org.ops4j.pax.logging.spi.PaxAppender;
@@ -49,6 +51,7 @@ public class LogAppender implements PaxAppender {
     private static final String MDC_IN_LOG_APPENDER = "inLogAppender";
     private final static String[] ignoredCategories = {"org.apache.karaf.decanter.collector.log"};
     private final static Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
+    private final static Pattern PATTERN = Pattern.compile("[^A-Za-z0-9]");
 
     private Dictionary<String, Object> properties;
 
@@ -118,8 +121,21 @@ public class LogAppender implements PaxAppender {
         if (loggerName == null || loggerName.isEmpty()) {
             loggerName = "default";
         }
-        String topic = "decanter/collect/log/" + loggerName.replace(".", "/").replace(" ", "_").replace("{", "_").replace("}", "_").replace("$", "_");
+        String topic = "decanter/collect/log/" + cleanLoggerName(loggerName);
         this.dispatcher.postEvent(new Event(topic, data));
+    }
+    
+    /*
+     * only protected for testing. 
+     */
+    protected final String cleanLoggerName(String loggerName) {
+        Matcher matcher = PATTERN.matcher(loggerName);
+        
+        if (matcher.find()) {
+            return matcher.replaceAll("_");
+        } else {
+            return loggerName;
+        }
     }
 
     private void putLocation(Map<String, Object> data, PaxLocationInfo loc) {
