@@ -49,11 +49,11 @@ import org.slf4j.LoggerFactory;
 public class LogAppender implements PaxAppender {
     
     private static final String MDC_IN_LOG_APPENDER = "inLogAppender";
-    private final static String[] ignoredCategories = {"org.apache.karaf.decanter.collector.log"};
     private final static Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
     private final static Pattern PATTERN = Pattern.compile("[^A-Za-z0-9]");
 
     private Dictionary<String, Object> properties;
+    protected String[] ignoredCategories;
 
     private EventAdmin dispatcher;
 
@@ -61,6 +61,9 @@ public class LogAppender implements PaxAppender {
     @Activate
     public void activate(ComponentContext context) {
         this.properties = context.getProperties();
+        if (this.properties.get("ignored.categories") != null) {
+            ignoredCategories = ((String)this.properties.get("ignored.categories")).split(",");
+        }
     }
     
     public void doAppend(PaxLoggingEvent event) {
@@ -153,13 +156,15 @@ public class LogAppender implements PaxAppender {
         return builder.toString();
     }
 
-    private boolean isIgnored(String loggerName) {
+    protected boolean isIgnored(String loggerName) {
         if (loggerName == null) {
             return true;
         }
-        for (String cat : ignoredCategories) {
-            if (loggerName.equals(cat)) {
-                return true;
+        if (ignoredCategories != null) {
+            for (String cat : ignoredCategories) {
+                if (loggerName.matches(cat)) {
+                    return true;
+                }
             }
         }
         return false;
