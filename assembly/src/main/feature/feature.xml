@@ -181,6 +181,13 @@
 
     <feature name="decanter-appender-elasticsearch-native-core-2.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender core">
         <feature>decanter-common</feature>
+        <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.6.3</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-smile/2.6.3</bundle>
+        <bundle dependency="true">mvn:com.ning/compress-lzf/1.0.2</bundle>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch2.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-2.x/${project.version}</bundle>
     </feature>
