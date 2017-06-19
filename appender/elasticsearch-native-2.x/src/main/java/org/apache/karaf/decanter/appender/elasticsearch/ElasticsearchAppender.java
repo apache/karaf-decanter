@@ -62,6 +62,9 @@ public class ElasticsearchAppender implements EventHandler {
     private Marshaller marshaller;
     private WorkFinishedListener listener;
 
+    private String indexPrefix;
+    private boolean indexTimestamped;
+
     @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext context) {
@@ -73,6 +76,8 @@ public class ElasticsearchAppender implements EventHandler {
             String host = getValue(config, "host", "localhost");
             int port = Integer.parseInt(getValue(config, "port", "9300"));
             String cluster = getValue(config, "clusterName", "elasticsearch");
+            indexPrefix = getValue(config, "index.prefix", "karaf");
+            indexTimestamped = Boolean.parseBoolean(getValue(config, "index.event.timestamped", "true"));
             TimeZone tz = TimeZone.getTimeZone( "UTC" );
             tsFormat.setTimeZone(tz);
             indexDateFormat.setTimeZone(tz);
@@ -124,7 +129,7 @@ public class ElasticsearchAppender implements EventHandler {
     }
 
     private void send(Event event) {
-        String indexName = getIndexName("karaf", getDate(event));
+        String indexName = getIndexName(indexPrefix, getDate(event));
         String jsonSt = marshaller.marshal(event);
         LOGGER.debug("Sending event to elastic search with content: {}", jsonSt);
         bulkProcessor.add(new IndexRequest(indexName, getType(event)).source(jsonSt));
@@ -142,7 +147,11 @@ public class ElasticsearchAppender implements EventHandler {
     }
 
     private String getIndexName(String prefix, Date date) {
-        return prefix + "-" + indexDateFormat.format(date);
+        if (indexTimestamped) {
+            return prefix + "-" + indexDateFormat.format(date);
+        } else {
+            return prefix;
+        }
     }
 
     @Reference

@@ -55,6 +55,8 @@ public class ElasticsearchAppender implements EventHandler {
 
     private JestClient client;
     private Marshaller marshaller;
+    private String indexPrefix;
+    private boolean indexTimestamped;
 
     private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSS'Z'");
     private final SimpleDateFormat indexDateFormat = new SimpleDateFormat("yyyy.MM.dd");
@@ -92,6 +94,9 @@ public class ElasticsearchAppender implements EventHandler {
         TimeZone tz = TimeZone.getTimeZone( "UTC" );
         tsFormat.setTimeZone(tz);
         indexDateFormat.setTimeZone(tz);
+
+        indexPrefix = getValue(config, "index.prefix", "karaf");
+        indexTimestamped = Boolean.parseBoolean(getValue(config, "index.event.timestamped", "true"));
     }
     
     private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
@@ -114,7 +119,7 @@ public class ElasticsearchAppender implements EventHandler {
     }
 
     private void send(Event event) throws Exception {
-        String indexName = getIndexName("karaf", getDate(event));
+        String indexName = getIndexName(indexPrefix, getDate(event));
         String jsonSt = marshaller.marshal(event);
 
         JestResult result = client.execute(new Index.Builder(jsonSt).index(indexName).type(getType(event)).build());
@@ -136,7 +141,11 @@ public class ElasticsearchAppender implements EventHandler {
     }
 
     private String getIndexName(String prefix, Date date) {
-        return prefix + "-" + indexDateFormat.format(date);
+        if (indexTimestamped) {
+            return prefix + "-" + indexDateFormat.format(date);
+        } else {
+            return prefix;
+        }
     }
 
     @Reference
