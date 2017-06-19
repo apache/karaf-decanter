@@ -66,10 +66,10 @@ public class EmailAlerter implements EventHandler {
         String username = (String) config.get("username");
         String password = (String) config.get("password");
         if (username != null) {
-            properties.put("mail.user", username);
+            properties.put("mail.smtp.user", username);
         }
         if (password != null) {
-            properties.put("mail.password", password);
+            properties.put("mail.smtp.password", password);
         }
     }
 
@@ -98,7 +98,11 @@ public class EmailAlerter implements EventHandler {
                 builder.append("\t").append(name).append(": ").append(event.getProperty(name)).append("\n");
             }
             message.setText(builder.toString());
-            Transport.send(message);
+            if (properties.get("mail.smtp.user") != null) {
+                Transport.send(message, (String) properties.get("mail.smtp.user"), (String) properties.get("mail.smtp.password"));
+            } else {
+                Transport.send(message);
+            }
         } catch (Exception e) {
             LOGGER.error("Can't send the alert e-mail", e);
         }
