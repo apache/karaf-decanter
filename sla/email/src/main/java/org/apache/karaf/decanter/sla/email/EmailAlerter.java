@@ -85,7 +85,7 @@ public class EmailAlerter implements EventHandler {
         MimeMessage message = new MimeMessage(session);
         try {
             message.setFrom(new InternetAddress(from));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+            message.addRecipients(Message.RecipientType.TO, to);
             String alertLevel = (String) event.getProperty("alertLevel");
             String alertAttribute = (String) event.getProperty("alertAttribute");
             String alertPattern = (String) event.getProperty("alertPattern");
