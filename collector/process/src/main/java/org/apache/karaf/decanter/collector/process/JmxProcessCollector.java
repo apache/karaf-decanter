@@ -44,7 +44,14 @@ import com.sun.tools.attach.VirtualMachineDescriptor;
 /**
  * Decanter JMX Local Process Pooling Collector
  */
-@Component(name = "org.apache.karaf.decanter.collector.process", immediate = true, property = "decanter.collector.name=process")
+@Component(
+        name = "org.apache.karaf.decanter.collector.process",
+        immediate = true,
+        property = {"decanter.collector.name=process",
+                "scheduler.period:Long=10",
+                "scheduler.concurrent:Boolean=false",
+                "scheduler.name=decanter-collector-process"}
+)
 public class JmxProcessCollector implements Runnable {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(JmxProcessCollector.class);

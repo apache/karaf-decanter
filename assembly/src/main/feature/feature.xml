@@ -26,12 +26,6 @@
         <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.json/${project.version}</bundle>
     </feature>
 
-    <feature name="decanter-simple-scheduler" version="${project.version}" description="Karaf Decanter Simple Scheduler">
-        <feature>decanter-common</feature>
-        <bundle>mvn:org.apache.karaf.decanter.scheduler/org.apache.karaf.decanter.scheduler.simple/${project.version}</bundle>
-        <configfile finalname="/etc/org.apache.karaf.decanter.scheduler.simple.cfg">mvn:org.apache.karaf.decanter.scheduler/org.apache.karaf.decanter.scheduler.simple/${project.version}/cfg</configfile>
-    </feature>
-
     <feature name="decanter-collector-log" version="${project.version}" description="Karaf Decanter Log Messages Collector">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log/${project.version}</bundle>
@@ -56,7 +50,7 @@
 
     <feature name="decanter-collector-jmx-core" version="${project.version}" description="Karaf Decanter JMX Collector core">
         <feature>decanter-common</feature>
-        <feature version="${project.version}">decanter-simple-scheduler</feature>
+        <feature>scheduler</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}</bundle>
     </feature>
     
@@ -82,7 +76,7 @@
     
     <feature name="decanter-collector-rest-core" version="${project.version}" description="Karaf Decanter REST Collector core">
         <feature>decanter-common</feature>
-        <feature version="${project.version}">decanter-simple-scheduler</feature>
+        <feature>scheduler</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest/${project.version}</bundle>
     </feature>
     
@@ -93,7 +87,7 @@
 
     <feature name="decanter-collector-system" version="${project.version}" description="Karaf Decanter OS Collector">
         <feature>decanter-common</feature>
-        <feature version="${project.version}">decanter-simple-scheduler</feature>
+        <feature>scheduler</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.system/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.system.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.system/${project.version}/cfg</configfile>
     </feature>
@@ -142,7 +136,7 @@
     
     <feature name="decanter-collector-process-core" version="${project.version}" description="Karaf Decanter JMX Process Collector core">
         <feature>decanter-common</feature>
-        <feature version="${project.version}">decanter-simple-scheduler</feature>
+        <feature>scheduler</feature>
         <bundle>mvn:org.apache.karaf.decanter/tools-jar-wraper/${project.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.process/${project.version}</bundle>
     </feature>

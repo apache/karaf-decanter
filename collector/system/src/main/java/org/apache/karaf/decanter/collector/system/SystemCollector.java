@@ -37,7 +37,10 @@ import java.util.HashMap;
 @Component(
     name = "org.apache.karaf.decanter.collector.system",
     immediate = true,
-    property = "decanter.collector.name=system"
+    property = { "decanter.collector.name=system",
+            "scheduler.period:Long=10",
+            "scheduler.concurrent:Boolean=false",
+            "scheduler.name=decanter-collector-system" }
 )
 public class SystemCollector implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(SystemCollector.class);

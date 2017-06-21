@@ -46,7 +46,10 @@ import org.slf4j.LoggerFactory;
 @Component(
     name = "org.apache.karaf.decanter.collector.jmx",
     immediate = true,
-    property = "decanter.collector.name=jmx"
+    property = { "decanter.collector.name=jmx",
+            "scheduler.period:Long=10",
+            "scheduler.concurrent:Boolean=false",
+            "scheduler.name=decanter-collector-jmx"}
 )
 public class JmxCollector implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(JmxCollector.class);

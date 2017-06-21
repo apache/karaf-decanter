@@ -40,7 +40,10 @@ import org.slf4j.LoggerFactory;
     service = Runnable.class,
     name = "org.apache.karaf.decanter.collector.rest",
     immediate = true,
-    property = "decanter.collector.name=rest"
+    property = { "decanter.collector.name=rest",
+            "scheduler.period:Long=10",
+            "scheduler.concurrent:Boolean=false",
+            "scheduler.name=decanter-collector-rest" }
 )
 public class RestCollector implements Runnable {
 

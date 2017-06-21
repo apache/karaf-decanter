@@ -50,7 +50,6 @@
 
     <modules>
         <module>api</module>
-        <module>scheduler</module>
         <module>collector</module>
         <module>appender</module>
         <module>marshaller</module>
