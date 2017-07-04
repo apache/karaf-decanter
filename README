@@ -79,6 +79,7 @@ Collectors
 * decanter-collector-rest-servlet
 * decanter-collector-socket
 * decanter-collector-system
+* decanter-collector-process
 
 Appenders
 ---------
