@@ -38,7 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class BeanHarvester {
+
     private final static Logger LOGGER = LoggerFactory.getLogger(BeanHarvester.class);
+
     private MBeanServerConnection connection;
     private String type;
     private String hostName;
@@ -61,6 +63,7 @@ class BeanHarvester {
     }
 
     Map<String, Object> harvestBean(ObjectName name) throws Exception {
+        LOGGER.debug("Harvesting {}", name);
         MBeanAttributeInfo[] attributes = connection.getMBeanInfo(name).getAttributes();
         Map<String, Object> data = new HashMap<>();
         data.put("type", type);

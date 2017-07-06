@@ -122,18 +122,28 @@ public class JmxCollector implements Runnable {
         String currentObjectName = null;
         try {
             String karafName = System.getProperty("karaf.name");
+            LOGGER.debug("Creating harvester");
             BeanHarvester harvester = new BeanHarvester(connection, this.type, host, karafName);
+
+            LOGGER.debug("Populating names ({})", this.objectNames);
             Set<ObjectName> names = new HashSet<> ();
-            for (String objectName : this.objectNames) {
-            	currentObjectName = objectName;
-            	names.addAll( connection.queryNames(getObjectName(objectName), null));
+            if (objectNames.size() > 0) {
+                for (String objectName : this.objectNames) {
+                    LOGGER.debug("Query {}", objectName);
+                    currentObjectName = objectName;
+                    names.addAll(connection.queryNames(getObjectName(objectName), null));
+                }
+            } else {
+                names.addAll(connection.queryNames(getObjectName(null), null));
             }
 
             for (ObjectName name : names) {
+                LOGGER.debug("Harvesting {}", name);
                 try {
                     Map<String, Object> data = harvester.harvestBean(name);
                     addUserProperties(data);
                     Event event = new Event("decanter/collect/jmx/" + this.type + "/" + getTopic(name), data);
+                    LOGGER.debug("Posting for {}", name);
                     this.eventAdmin.postEvent(event);
                 } catch (Exception e) {
                     LOGGER.warn("Can't read MBean {} ({})", name, this.type, e);
