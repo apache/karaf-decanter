@@ -165,6 +165,7 @@ public class Activator implements BundleActivator {
                 return false;
             }
         } catch (Exception e) {
+            LOGGER.warn("Can't check data", e);
             return false;
         }
     }
@@ -286,12 +287,15 @@ public class Activator implements BundleActivator {
                 if (event.getFeature().getName().equalsIgnoreCase("decanter-collector-log")) {
                     LOGGER.info("Decanter Kibana detected installation of the decanter-collector-log feature");
                     // check if data has been appended
-                    while (!checkCollectedDataType("log*")) {
+                    int i = 0;
+                    while (!checkCollectedDataType("log*") && i < 10) {
                         try {
-                            Thread.sleep(10000);
+                            LOGGER.info("Checking log collected data");
+                            Thread.sleep(500);
                         } catch (Exception e) {
                             // nothing to do
                         }
+                        i++;
                     }
                     updateIndex();
                     createLogDashboard();
@@ -299,12 +303,15 @@ public class Activator implements BundleActivator {
                 if (event.getFeature().getName().equalsIgnoreCase("decanter-collector-jmx")) {
                     LOGGER.info("Decanter Kibana detected installation of the decanter-collector-log feature");
                     // check if data has been appended
-                    while (!checkCollectedDataType("jmx*")) {
+                    int i = 0;
+                    while (!checkCollectedDataType("jmx*") && i < 10) {
                         try {
-                            Thread.sleep(10000);
+                            LOGGER.info("Checking jmx collected data");
+                            Thread.sleep(500);
                         } catch (Exception e) {
                             // nothing to do
                         }
+                        i++;
                     }
                     updateIndex();
                     createSystemDashboard();
