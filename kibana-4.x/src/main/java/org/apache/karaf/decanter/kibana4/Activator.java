@@ -67,8 +67,9 @@ public class Activator implements BundleActivator {
                     else if (element.getValue().getAsString().equalsIgnoreCase("object")) {
                         // bypass object
                     } else map.put(parent, element.getValue().getAsString());
-                } else if (element.getValue().isJsonObject())
+                } else if (element.getValue().isJsonObject()) {
                     traverseJson(element.getKey(), element.getValue().getAsJsonObject(), map);
+                }
             }
         }
     }
@@ -170,6 +171,15 @@ public class Activator implements BundleActivator {
         }
     }
 
+    private void createDashboard(String type) {
+        if (type.equals("log*")) {
+            createLogDashboard();
+        }
+        if (type.equals("jmx*")) {
+            createSystemDashboard();
+        }
+    }
+
     private void createLogDashboard() {
         JestClient client = createClient();
 
@@ -214,7 +224,7 @@ public class Activator implements BundleActivator {
         try {
             String memory = "{\n" +
                     "      \"title\": \"Memory\",\n" +
-                    "      \"visState\": \"{\\\"type\\\":\\\"line\\\",\\\"params\\\":{\\\"shareYAxis\\\":true,\\\"addTooltip\\\":true,\\\"addLegend\\\":true,\\\"showCircles\\\":true,\\\"smoothLines\\\":false,\\\"interpolate\\\":\\\"linear\\\",\\\"scale\\\":\\\"linear\\\",\\\"drawLinesBetweenPoints\\\":true,\\\"radiusRatio\\\":9,\\\"times\\\":[],\\\"addTimeMarker\\\":false,\\\"defaultYExtents\\\":false,\\\"setYExtents\\\":false,\\\"yAxis\\\":{}},\\\"aggs\\\":[{\\\"id\\\":\\\"1\\\",\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"used\\\"}},{\\\"id\\\":\\\"2\\\",\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"interval\\\":\\\"auto\\\",\\\"customInterval\\\":\\\"2h\\\",\\\"min_doc_count\\\":1,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"3\\\",\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"max\\\"}},{\\\"id\\\":\\\"4\\\",\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"committed\\\"}}],\\\"listeners\\\":{}}\",\n" +
+                    "      \"visState\": \"{\\\"type\\\":\\\"line\\\",\\\"params\\\":{\\\"shareYAxis\\\":true,\\\"addTooltip\\\":true,\\\"addLegend\\\":true,\\\"showCircles\\\":true,\\\"smoothLines\\\":false,\\\"interpolate\\\":\\\"linear\\\",\\\"scale\\\":\\\"linear\\\",\\\"drawLinesBetweenPoints\\\":true,\\\"radiusRatio\\\":9,\\\"times\\\":[],\\\"addTimeMarker\\\":false,\\\"defaultYExtents\\\":false,\\\"setYExtents\\\":false,\\\"yAxis\\\":{}},\\\"aggs\\\":[{\\\"id\\\":\\\"1\\\",\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"Usage.used\\\"}},{\\\"id\\\":\\\"2\\\",\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"interval\\\":\\\"auto\\\",\\\"customInterval\\\":\\\"2h\\\",\\\"min_doc_count\\\":1,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"3\\\",\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"Usage.max\\\"}},{\\\"id\\\":\\\"4\\\",\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"Usage.committed\\\"}}],\\\"listeners\\\":{}}\",\n" +
                     "      \"description\": \"\",\n" +
                     "      \"kibanaSavedObjectMeta\": {\n" +
                     "        \"searchSourceJSON\": \"{\\\"index\\\":\\\"*\\\",\\\"query\\\":{\\\"query_string\\\":{\\\"query\\\":\\\"*\\\",\\\"analyze_wildcard\\\":true}},\\\"filter\\\":[]}\"\n" +
@@ -223,7 +233,7 @@ public class Activator implements BundleActivator {
 
             String gc = "{\n" +
                     "      \"title\": \"Garbage Collector\",\n" +
-                    "      \"visState\": \"{\\\"type\\\":\\\"line\\\",\\\"params\\\":{\\\"shareYAxis\\\":true,\\\"addTooltip\\\":true,\\\"addLegend\\\":true,\\\"showCircles\\\":true,\\\"smoothLines\\\":false,\\\"interpolate\\\":\\\"linear\\\",\\\"scale\\\":\\\"linear\\\",\\\"drawLinesBetweenPoints\\\":true,\\\"radiusRatio\\\":9,\\\"times\\\":[],\\\"addTimeMarker\\\":false,\\\"defaultYExtents\\\":false,\\\"setYExtents\\\":false,\\\"yAxis\\\":{}},\\\"aggs\\\":[{\\\"id\\\":\\\"1\\\",\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"CollectionCount\\\"}},{\\\"id\\\":\\\"2\\\",\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"interval\\\":\\\"auto\\\",\\\"customInterval\\\":\\\"2h\\\",\\\"min_doc_count\\\":1,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"3\\\",\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"CollectionTime\\\"}},{\\\"id\\\":\\\"4\\\",\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"duration\\\"}}],\\\"listeners\\\":{}}\",\n" +
+                    "      \"visState\": \"{\\\"type\\\":\\\"line\\\",\\\"params\\\":{\\\"shareYAxis\\\":true,\\\"addTooltip\\\":true,\\\"addLegend\\\":true,\\\"showCircles\\\":true,\\\"smoothLines\\\":false,\\\"interpolate\\\":\\\"linear\\\",\\\"scale\\\":\\\"linear\\\",\\\"drawLinesBetweenPoints\\\":true,\\\"radiusRatio\\\":9,\\\"times\\\":[],\\\"addTimeMarker\\\":false,\\\"defaultYExtents\\\":false,\\\"setYExtents\\\":false,\\\"yAxis\\\":{}},\\\"aggs\\\":[{\\\"id\\\":\\\"1\\\",\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"LastGcInfo.GcThreadCount\\\"}},{\\\"id\\\":\\\"2\\\",\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"interval\\\":\\\"auto\\\",\\\"customInterval\\\":\\\"2h\\\",\\\"min_doc_count\\\":1,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"4\\\",\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"LastGcInfo.duration\\\"}}],\\\"listeners\\\":{}}\",\n" +
                     "      \"description\": \"\",\n" +
                     "      \"kibanaSavedObjectMeta\": {\n" +
                     "        \"searchSourceJSON\": \"{\\\"index\\\":\\\"*\\\",\\\"query\\\":{\\\"query_string\\\":{\\\"query\\\":\\\"*\\\",\\\"analyze_wildcard\\\":true}},\\\"filter\\\":[]}\"\n" +
@@ -285,36 +295,12 @@ public class Activator implements BundleActivator {
             // add a timeout to let some data to be populated
             if (event.getType().equals(FeatureEvent.EventType.FeatureInstalled)) {
                 if (event.getFeature().getName().equalsIgnoreCase("decanter-collector-log")) {
-                    LOGGER.info("Decanter Kibana detected installation of the decanter-collector-log feature");
-                    // check if data has been appended
-                    int i = 0;
-                    while (!checkCollectedDataType("log*") && i < 10) {
-                        try {
-                            LOGGER.info("Checking log collected data");
-                            Thread.sleep(500);
-                        } catch (Exception e) {
-                            // nothing to do
-                        }
-                        i++;
-                    }
-                    updateIndex();
-                    createLogDashboard();
+                    LOGGER.debug("Decanter Kibana detected installation of the decanter-collector-log feature");
+                    new Thread(new UpdateThread("log*")).start();
                 }
                 if (event.getFeature().getName().equalsIgnoreCase("decanter-collector-jmx")) {
-                    LOGGER.info("Decanter Kibana detected installation of the decanter-collector-log feature");
-                    // check if data has been appended
-                    int i = 0;
-                    while (!checkCollectedDataType("jmx*") && i < 10) {
-                        try {
-                            LOGGER.info("Checking jmx collected data");
-                            Thread.sleep(500);
-                        } catch (Exception e) {
-                            // nothing to do
-                        }
-                        i++;
-                    }
-                    updateIndex();
-                    createSystemDashboard();
+                    LOGGER.debug("Decanter Kibana detected installation of the decanter-collector-log feature");
+                    new Thread(new UpdateThread("jmx*")).start();
                 }
             }
         }
@@ -322,6 +308,29 @@ public class Activator implements BundleActivator {
         @Override
         public void repositoryEvent(RepositoryEvent event) {
             // nothing to do
+        }
+
+    }
+
+    private class UpdateThread implements Runnable {
+
+        private String type;
+
+        public UpdateThread(String type) {
+            this.type = type;
+        }
+
+        @Override
+        public void run() {
+            while (!checkCollectedDataType(type)) {
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    // nothing to do
+                }
+            }
+            updateIndex();
+            createDashboard(type);
         }
 
     }
