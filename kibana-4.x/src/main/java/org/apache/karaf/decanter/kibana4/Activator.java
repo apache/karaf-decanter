@@ -25,8 +25,6 @@ import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.core.Index;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
-import io.searchbox.indices.Analyze;
-import io.searchbox.indices.mapping.GetMapping;
 import org.apache.karaf.features.FeatureEvent;
 import org.apache.karaf.features.FeaturesListener;
 import org.apache.karaf.features.RepositoryEvent;
@@ -35,8 +33,6 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class Activator implements BundleActivator {
@@ -58,22 +54,6 @@ public class Activator implements BundleActivator {
         LOGGER.debug("Stopping Kibana 4 console ...");
     }
 
-    private void traverseJson(String parent, JsonObject jsonObject, Map<String, String> map) {
-        if (jsonObject.entrySet().size() > 0) {
-            for (Map.Entry<String, JsonElement> element : jsonObject.entrySet()) {
-                if (element.getKey().equalsIgnoreCase("type") && element.getValue().isJsonPrimitive()) {
-                    if (element.getValue().getAsString().equalsIgnoreCase("long") || element.getValue().getAsString().equalsIgnoreCase("double"))
-                        map.put(parent, "number");
-                    else if (element.getValue().getAsString().equalsIgnoreCase("object")) {
-                        // bypass object
-                    } else map.put(parent, element.getValue().getAsString());
-                } else if (element.getValue().isJsonObject()) {
-                    traverseJson(element.getKey(), element.getValue().getAsJsonObject(), map);
-                }
-            }
-        }
-    }
-
     private JestClient createClient() {
         // TODO load the config from resources to get the Kibana index name
         // and location of the elasticsearch instance
@@ -89,64 +69,83 @@ public class Activator implements BundleActivator {
         return factory.getObject();
     }
 
+    private void addField(StringBuilder stringBuilder, String fieldName, String fieldType) {
+        stringBuilder.append("{");
+        stringBuilder.append("\\\"name\\\": \\\"").append(fieldName).append("\\\",");
+        stringBuilder.append("\\\"type\\\": \\\"").append(fieldType).append("\\\",");
+        stringBuilder.append("\\\"indexed\\\": true,");
+        if (fieldType.equals("number")) {
+            stringBuilder.append("\\\"analyzed\\\": true");
+        } else {
+            stringBuilder.append("\\\"analyzed\\\": false");
+        }
+        stringBuilder.append("}");
+    }
+
     private void updateIndex() {
         LOGGER.debug("Updating kibana index");
 
         JestClient client = createClient();
 
         try {
-            GetMapping getMapping = new GetMapping.Builder().build();
-            JestResult result = client.execute(getMapping);
-            if (!result.isSucceeded()) {
-                throw new IllegalStateException("Can't retrieve mappings");
-            }
-            JsonObject resultJson = result.getJsonObject();
-            JsonObject karafIndex = resultJson.getAsJsonObject();
 
-            Map<String, String> fields = new HashMap<>();
-
-            for (Map.Entry<String, JsonElement> index : karafIndex.entrySet()) {
-                if (index.getKey().startsWith("karaf")) {
-                    traverseJson(index.getKey(), index.getValue().getAsJsonObject(), fields);
-                }
-            }
-
-            LOGGER.debug("Updating .kibana index");
+            LOGGER.debug("Updating .kibana index mapping");
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("{ \"title\": \"*\",");
             stringBuilder.append("\"timeFieldName\": \"@timestamp\",");
             stringBuilder.append("\"fields\": \"[");
 
-            for (String field : fields.keySet()) {
-                stringBuilder.append("{");
-                stringBuilder.append("\\\"name\\\":\\\"").append(field).append("\\\",");
-                stringBuilder.append("\\\"type\\\":\\\"").append(fields.get(field)).append("\\\",");
-                stringBuilder.append("\\\"count\\\":0,");
-                stringBuilder.append("\\\"scripted\\\":false,");
-                if (field.startsWith("_"))
-                    stringBuilder.append("\\\"indexed\\\":false,");
-                else stringBuilder.append("\\\"indexed\\\":true,");
-                if (fields.get(field).equalsIgnoreCase("string"))
-                    stringBuilder.append("\\\"analyzed\\\":false,");
-                else stringBuilder.append("\\\"analyzed\\\":true,");
-                stringBuilder.append("\\\"doc_values\\\":false");
-                stringBuilder.append("},");
-            }
-            if (stringBuilder.charAt(stringBuilder.length() - 1) == ',')
-                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+            addField(stringBuilder, "level", "string");
+            stringBuilder.append(",");
+            addField(stringBuilder, "loggerName", "string");
+            stringBuilder.append(",");
+            addField(stringBuilder, "Usage.used", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "Usage.max", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "Usage.committed", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "LastGcInfo.GcThreadCount", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "LastGcInfo.duration", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "LoadedClassCount", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "TotalLoadedClassCount", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "UnloadedClassCount", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "FreePhysicalMemorySize", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "FreeSwapSpaceSize", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "OpenFileDescriptorCount", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "ProcessCpuLoad", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "SystemCpuLoad", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "ThreadCount", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "DaemonThreadCount", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "PeakThreadCount", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "timestamp", "number");
+            stringBuilder.append(",");
+            addField(stringBuilder, "@timestamp", "date");
 
             stringBuilder.append("]\" }");
 
-            result = client.execute(new Index.Builder(stringBuilder.toString()).index(KIBANA_INDEX).type("index-pattern").id("*").build());
+            JestResult result = client.execute(new Index.Builder(stringBuilder.toString()).index(KIBANA_INDEX).type("index-pattern").id("*").build());
             if (!result.isSucceeded()) {
                 throw new IllegalStateException(result.getErrorMessage());
             }
+
             result = client.execute(new Index.Builder("{ \"buildNum\" : 7562, \"defaultIndex\": \"*\" }").index(KIBANA_INDEX).type("config").id("4.1.2-es-2.0").build());
             if (!result.isSucceeded()) {
                 throw new IllegalStateException(result.getErrorMessage());
             }
-            Analyze analyze = new Analyze.Builder().analyzer("standard").build();
-            client.execute(analyze);
         } catch (Exception e) {
             LOGGER.warn("Can't update .kibana index", e);
         }
@@ -160,7 +159,7 @@ public class Activator implements BundleActivator {
         Search search = new Search.Builder(query).build();
         try {
             SearchResult result = client.execute(search);
-            if (result.getTotal() > 1) {
+            if (result != null && result.getTotal() > 1) {
                 return true;
             } else {
                 return false;
