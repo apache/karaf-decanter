@@ -54,6 +54,14 @@ log4j.rootLogger = DEBUG, out, osgi:DecanterLogCollectorAppender, osgi:VmLogAppe
 
 =====================================================================
 
+==== CXF Logging feature integration
+
+The link:http://cxf.apache.org/docs/message-logging.html[CXF message logging] nicely integrates with Decanter. Simply add the link:https://github.com/apache/cxf/blob/master/rt/features/logging/src/main/java/org/apache/cxf/ext/logging/LoggingFeature.java[org.apache.cxf.ext.logging.LoggingFeature] to your service.
+
+This will automatically log the messages from all clients and endpoints to slf4j. All meta data can be found in the MDC attributes. The message logging can be switched on/off per service using the org.ops4j.pax.logging.cfg.
+
+When using with Decanter make sure you enable the log collector to actually process the message logs.
+
 ==== Log Socket
 
 The Decanter Log Socket Collector is an event driven collector. It creates a socket, waiting for incoming event. The expected
