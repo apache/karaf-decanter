@@ -28,9 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +46,8 @@ public class Checker implements EventHandler {
 
     private Dictionary<String, Object> config;
     private EventAdmin eventAdmin;
+
+    private AlertStore alertStore;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -70,8 +70,20 @@ public class Checker implements EventHandler {
             if (errorPattern != null) {
                 Object value = collectEvent.getProperty(name);
                 if (!validate(errorPattern, value)) {
-                    Event alertEvent = populateAlertEvent("error", collectEvent, name, errorPattern);
-                    eventAdmin.postEvent(alertEvent);
+                    if (!alertStore.known(name, "error")) {
+                        alertStore.add(name, "error");
+                        Event alertEvent = populateAlertEvent("error", collectEvent, name, errorPattern, false);
+                        eventAdmin.postEvent(alertEvent);
+                    }
+                } else {
+                    if (alertStore.known(name, "error")) {
+                        eventAdmin.postEvent(populateAlertEvent("error", collectEvent, name, errorPattern, true));
+                        alertStore.remove(name, "error");
+                    }
+                }
+            } else {
+                if (alertStore.known(name, "error")) {
+                    eventAdmin.postEvent(populateAlertEvent("error", collectEvent, name, "REMOVED", true));
                 }
             }
 
@@ -85,18 +97,32 @@ public class Checker implements EventHandler {
             if (warnPattern != null) {
                 Object value = collectEvent.getProperty(name);
                 if (!validate(warnPattern, value)) {
-                    Event alertEvent = populateAlertEvent("warn", collectEvent, name, warnPattern);
-                    eventAdmin.postEvent(alertEvent);
+                    if (!alertStore.known(name, "warn")) {
+                        alertStore.add(name, "warn");
+                        Event alertEvent = populateAlertEvent("warn", collectEvent, name, warnPattern, false);
+                        eventAdmin.postEvent(alertEvent);
+                    }
+                } else {
+                    if (alertStore.known(name, "warn")) {
+                        eventAdmin.postEvent(populateAlertEvent("warn", collectEvent, name, warnPattern, true));
+                        alertStore.remove(name, "warn");
+                    }
+                }
+            } else {
+                if (alertStore.known(name, "warn")) {
+                    eventAdmin.postEvent(populateAlertEvent("warn", collectEvent, name, "REMOVED", true));
+                    alertStore.remove(name, "warn");
                 }
             }
         }
     }
 
-    private Event populateAlertEvent(String level, Event collectEvent, String attribute, String pattern) {
+    private Event populateAlertEvent(String level, Event collectEvent, String attribute, String pattern, boolean recovery) {
         Map<String, Object> data = new HashMap<>();
         data.put("alertLevel", level);
         data.put("alertAttribute", attribute);
         data.put("alertPattern", pattern);
+        data.put("alertBackToNormal", recovery);
         for (String name : collectEvent.getPropertyNames()) {
             data.put(name, collectEvent.getProperty(name));
         }
@@ -449,6 +475,11 @@ public class Checker implements EventHandler {
     @Reference
     public void setEventAdmin(EventAdmin eventAdmin) {
         this.eventAdmin = eventAdmin;
+    }
+
+    @Reference
+    public void setAlertStore(AlertStore alertStore) {
+        this.alertStore = alertStore;
     }
     
 }

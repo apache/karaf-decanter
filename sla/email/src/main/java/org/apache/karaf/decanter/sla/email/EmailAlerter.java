@@ -89,9 +89,18 @@ public class EmailAlerter implements EventHandler {
             String alertLevel = (String) event.getProperty("alertLevel");
             String alertAttribute = (String) event.getProperty("alertAttribute");
             String alertPattern = (String) event.getProperty("alertPattern");
-            message.setSubject("[" + alertLevel + "] Alert on " + alertAttribute);
+            boolean recovery = (boolean) event.getProperty("alertBackToNormal");
+            if (!recovery) {
+                message.setSubject("[" + alertLevel + "] Alert on " + alertAttribute);
+            } else {
+                message.setSubject("Alert on " + alertAttribute + " back to normal");
+            }
             StringBuilder builder = new StringBuilder();
-            builder.append(alertLevel + " alert: " + alertAttribute + " is out of the pattern " + alertPattern + "\n");
+            if (!recovery) {
+                builder.append(alertLevel + " alert: " + alertAttribute + " is out of the pattern " + alertPattern + "\n");
+            } else {
+                builder.append(alertLevel + " alert: " + alertAttribute + " was out of the pattern " + alertPattern + ", but back to normal now\n");
+            }
             builder.append("\n");
             builder.append("Details:\n");
             for (String name : event.getPropertyNames()) {
