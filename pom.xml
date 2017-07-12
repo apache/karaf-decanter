@@ -41,6 +41,7 @@
         <elasticsearch2.bundle.version>2.2.0_1</elasticsearch2.bundle.version>
         <glassfish-json.version>1.0.4</glassfish-json.version>
         <json-api.version>1.0</json-api.version>
+        <kafka.version>0.11.0.0</kafka.version>
         <kibana.version>3.1.1</kibana.version>
         <kibana4.version>4.1.2</kibana4.version>
         <paho.version>1.0.2</paho.version>
