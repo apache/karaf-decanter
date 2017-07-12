@@ -16,7 +16,6 @@
  */
 package org.apache.karaf.decanter.appender.kafka;
 
-import java.util.Dictionary;
 import java.util.Properties;
 
 import org.apache.kafka.clients.producer.Callback;
@@ -54,87 +53,9 @@ public class KafkaAppender implements EventHandler {
     @Activate
     @SuppressWarnings("unchecked")
     public void activate(ComponentContext context) {
-        Dictionary<String, Object> config = context.getProperties();
-        this.properties = new Properties();
-
-        String bootstrapServers = getValue(config, "bootstrap.servers", "localhost:9092");
-        properties.put("bootstrap.servers", bootstrapServers);
-
-        String clientId = getValue(config, "client.id", "");
-        properties.put("client.id", clientId);
-
-        String compressionType = getValue(config, "compression.type", "none");
-        properties.put("compression.type", compressionType);
-
-        String acks = getValue(config, "acks", "all");
-        properties.put("acks", acks);
-
-        String retries = getValue(config, "retries", "0");
-        properties.put("retries", Integer.parseInt(retries));
-
-        String batchSize = getValue(config, "batch.size", "16384");
-        properties.put("batch.size", Integer.parseInt(batchSize));
-
-        String bufferMemory = getValue(config, "buffer.memory", "33554432");
-        properties.put("buffer.memory", Long.parseLong(bufferMemory));
-
-        String keySerializer = getValue(config, "key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        properties.put("key.serializer", keySerializer);
-
-        String requestTimeoutMs = getValue(config, "request.timeout.ms", "5000");
-        properties.put("request.timeout.ms", requestTimeoutMs);
-
-        String maxRequestSize = getValue(config, "max.request.size", "2097152");
-        properties.put("max.request.size", maxRequestSize);
-
-        String valueSerializer = getValue(config, "value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        properties.put("value.serializer", valueSerializer);
-
-        String securityProtocol = getValue(config, "security.protocol", null);
-        if (securityProtocol != null)
-            properties.put("security.protocol", securityProtocol);
-
-        String sslTruststoreLocation = getValue(config, "ssl.truststore.location", null);
-        if (sslTruststoreLocation != null)
-            properties.put("ssl.truststore.location", sslTruststoreLocation);
-
-        String sslTruststorePassword = getValue(config, "ssl.truststore.password", null);
-        if (sslTruststorePassword != null)
-            properties.put("ssl.truststore.password", sslTruststorePassword);
-
-        String sslKeystoreLocation = getValue(config, "ssl.keystore.location", null);
-        if (sslKeystoreLocation != null)
-            properties.put("ssl.keystore.location", sslKeystoreLocation);
-
-        String sslKeystorePassword = getValue(config, "ssl.keystore.password", null);
-        if (sslKeystorePassword != null)
-            properties.put("ssl.keystore.password", sslKeystorePassword);
-
-        String sslKeyPassword = getValue(config, "ssl.key.password", null);
-        if (sslKeyPassword != null)
-            properties.put("ssl.key.password", sslKeyPassword);
-
-        String sslProvider = getValue(config, "ssl.provider", null);
-        if (sslProvider != null)
-            properties.put("ssl.provider", sslProvider);
-
-        String sslCipherSuites = getValue(config, "ssl.cipher.suites", null);
-        if (sslCipherSuites != null)
-            properties.put("ssl.cipher.suites", sslCipherSuites);
-
-        String sslEnabledProtocols = getValue(config, "ssl.enabled.protocols", null);
-        if (sslEnabledProtocols != null)
-            properties.put("ssl.enabled.protocols", sslEnabledProtocols);
-
-        String sslTruststoreType = getValue(config, "ssl.truststore.type", null);
-        if (sslTruststoreType != null)
-            properties.put("ssl.truststore.type", sslTruststoreType);
-
-        String sslKeystoreType = getValue(config, "ssl.keystore.type", null);
-        if (sslKeystoreType != null)
-            properties.put("ssl.keystore.type", sslKeystoreType);
-
-        this.topic = getValue(config, "topic", "decanter");
+        this.properties = ConfigMapper.map(context.getProperties());
+        this.topic = properties.getProperty("topic");
+        properties.remove("topic");
 
         // workaround for KAFKA-3218
         ClassLoader originClassLoader = Thread.currentThread().getContextClassLoader();
@@ -144,11 +65,6 @@ public class KafkaAppender implements EventHandler {
         } finally {
             Thread.currentThread().setContextClassLoader(originClassLoader);
         }
-    }
-    
-    private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
-        String value = (String)config.get(key);
-        return (value != null) ? value :  defaultValue;
     }
 
     @Override
