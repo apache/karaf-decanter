@@ -76,7 +76,6 @@ public class DecanterTraceEventHandlerTest {
             JsonObject headersObject = rootObject.getJsonObject("inHeaders");
             Assert.assertEquals("test", headersObject.getString("header"));
             Assert.assertEquals("direct://start", rootObject.getString("fromEndpointUri"));
-            Assert.assertEquals("127.0.0.1", rootObject.getString("hostAddress"));
             Assert.assertEquals("to1", rootObject.getString("nodeId"));
             Assert.assertEquals("TEST", rootObject.getString("inBody"));
             JsonObject propertiesObject = rootObject.getJsonObject("properties");
