@@ -31,6 +31,7 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 
 public class TestJsonMarshaller {
+
     private static final long EXPECTED_TIMESTAMP = 1454428780634L;
     private static final String EXPECTED_TOPIC = "testTopic";
 
@@ -49,7 +50,33 @@ public class TestJsonMarshaller {
        long ts = jsonO.getJsonNumber(EventConstants.TIMESTAMP).longValue();
        Assert.assertEquals("timestamp long", EXPECTED_TIMESTAMP, ts);
        Assert.assertEquals("Topic", EXPECTED_TOPIC, jsonO.getString(EventConstants.EVENT_TOPIC.replace('.', '_')));
+   }
 
+   @Test
+   public void testInnerMap() throws Exception {
+       Marshaller marshaller = new JsonMarshaller();
+
+       Map<String, Object> map = new HashMap<>();
+       map.put(EventConstants.TIMESTAMP, EXPECTED_TIMESTAMP);
+       map.put("test", "test");
+       Map<String, Object> inner = new HashMap<>();
+       inner.put("other", "other");
+       map.put("inner", inner);
+
+       String jsonString = marshaller.marshal(new Event(EXPECTED_TOPIC, map));
+
+       System.out.println(jsonString);
+
+       JsonReader reader = Json.createReader(new StringReader(jsonString));
+       JsonObject jsonObject = reader.readObject();
+       Assert.assertEquals("Timestamp string", "2016-02-02T15:59:40,634Z", jsonObject.getString("@timestamp"));
+       long ts = jsonObject.getJsonNumber(EventConstants.TIMESTAMP).longValue();
+       Assert.assertEquals("timestamp long", EXPECTED_TIMESTAMP, ts);
+
+       Assert.assertEquals("test", jsonObject.getString("test"));
+
+       JsonObject innerObject = jsonObject.getJsonObject("inner");
+       Assert.assertEquals("other", innerObject.getString("other"));
    }
 
 }
