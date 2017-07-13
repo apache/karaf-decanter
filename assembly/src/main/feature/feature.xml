@@ -18,6 +18,14 @@
 -->
 <features name="karaf-decanter-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
 
+    <feature name="decanter" version="${project.version}" description="Meta feature installing elasticsearch, kibana, jmx collector, log collector Decanter features">
+        <feature version="${elasticsearch22.version}">elasticsearch</feature>
+        <feature version="${kibana4.version}">kibana</feature>
+        <feature version="${project.version}">decanter-appender-elasticsearch</feature>
+        <feature version="${project.version}">decanter-collector-log</feature>
+        <feature version="${project.version}">decanter-collector-jmx</feature>
+    </feature>
+
     <feature name="decanter-common" version="${project.version}" description="Karaf Decanter API">
         <feature>eventadmin</feature>
         <feature>scr</feature>
@@ -361,7 +369,7 @@
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-1.x/${project.version}</bundle>
     </feature>
 
-    <feature name="elasticsearch" version="${elasticsearch2.version}" description="Embedded Elasticsearch 2.x node">
+    <feature name="elasticsearch" version="${elasticsearch22.version}" description="Embedded Elasticsearch 2.2.x node">
         <feature>scr</feature>
         <feature>war</feature>
         <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-2.x/${project.version}/yml</configfile>
@@ -382,7 +390,7 @@
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-head-1.x/${project.version}</bundle>
     </feature>
 
-    <feature name="elasticsearch-head" version="${elasticsearch2.version}" description="Elasticsearch Head web frontend">
+    <feature name="elasticsearch-head" version="${elasticsearch22.version}" description="Elasticsearch Head web frontend">
         <feature>war</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-head-2.x/${project.version}</bundle>
     </feature>
@@ -395,7 +403,7 @@
 
     <feature name="kibana" version="${kibana4.version}" description="Embedded Kibana 4.x dashboard">
         <feature>war</feature>
-        <feature version="[${elasticsearch2.version},3.0)">elasticsearch</feature>
+        <feature version="[${elasticsearch22.version},3.0)">elasticsearch</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana-4.x/${project.version}</bundle>
     </feature>
 

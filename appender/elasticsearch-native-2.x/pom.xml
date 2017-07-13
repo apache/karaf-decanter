@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
-            <version>${elasticsearch2.version}</version>
+            <version>${elasticsearch22.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter</groupId>

@@ -43,3 +43,10 @@ karaf@root()> feature:repo-add decanter 1.1.0
 ----
 
 Now, you have to install the collectors, appenders, and eventually SLA alerters feature to match your need.
+
+For convenience the `decanter` feature installs a quick "ready to go" set of components:
+
+- elasticsearch
+- kibana
+- the elasticsearch appender
+- the JMX and log collectors
