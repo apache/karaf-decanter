@@ -16,7 +16,7 @@
  */
 package org.apache.karaf.decanter.collector.camel;
 
-import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
@@ -34,6 +34,7 @@ import javax.json.JsonReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DecanterTraceEventHandlerTest {
 
@@ -46,10 +47,11 @@ public class DecanterTraceEventHandlerTest {
         RouteBuilder builder = new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("direct:start").id("testRoute").to("log:foo");
+                from("direct:start").routeId("test-route").to("log:foo");
             }
         };
-        CamelContext camelContext = new DefaultCamelContext();
+        DefaultCamelContext camelContext = new DefaultCamelContext();
+        camelContext.setName("test-context");
         camelContext.addRoutes(builder);
         Tracer tracer = new Tracer();
         tracer.setEnabled(true);
@@ -72,11 +74,11 @@ public class DecanterTraceEventHandlerTest {
             Assert.assertEquals("InOnly", rootObject.getString("exchangePattern"));
             Assert.assertEquals("camelTracer", rootObject.getString("type"));
             Assert.assertEquals("log://foo", rootObject.getString("toNode"));
-            Assert.assertEquals("testRoute", rootObject.getString("routeId"));
+            Assert.assertEquals("test-route", rootObject.getString("routeId"));
+            Assert.assertEquals("test-context", rootObject.getString("camelContextName"));
             JsonObject headersObject = rootObject.getJsonObject("inHeaders");
             Assert.assertEquals("test", headersObject.getString("header"));
             Assert.assertEquals("direct://start", rootObject.getString("fromEndpointUri"));
-            Assert.assertEquals("to1", rootObject.getString("nodeId"));
             Assert.assertEquals("TEST", rootObject.getString("inBody"));
             JsonObject propertiesObject = rootObject.getJsonObject("properties");
             Assert.assertEquals("log://foo", propertiesObject.getString("CamelToEndpoint"));
@@ -84,6 +86,42 @@ public class DecanterTraceEventHandlerTest {
             Assert.assertEquals("decanter/collect/camel/tracer", rootObject.getString("event_topics"));
             System.out.println(marshaller.marshal(event));
         }
+    }
+
+    @Test
+    public void testTracerWithExtender() throws Exception {
+        DispatcherMock eventAdmin = new DispatcherMock();
+
+        TestExtender extender = new TestExtender();
+
+        RouteBuilder builder = new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("direct:start").routeId("test-route").to("log:foo");
+            }
+        };
+        DefaultCamelContext camelContext = new DefaultCamelContext();
+        camelContext.setName("test-context");
+        camelContext.addRoutes(builder);
+        Tracer tracer = new Tracer();
+        tracer.setEnabled(true);
+        tracer.setTraceOutExchanges(true);
+        tracer.setLogLevel(LoggingLevel.OFF);
+        DecanterTraceEventHandler handler = new DecanterTraceEventHandler();
+        handler.setExtender(extender);
+        handler.setEventAdmin(eventAdmin);
+        tracer.addTraceHandler(handler);
+        camelContext.setTracing(true);
+        camelContext.setDefaultTracer(tracer);
+        camelContext.start();
+
+        ProducerTemplate template = camelContext.createProducerTemplate();
+        template.sendBodyAndHeader("direct:start", "TEST", "header", "test");
+
+        Assert.assertEquals(2, eventAdmin.getPostEvents().size());
+
+        Assert.assertEquals("test", eventAdmin.getPostEvents().get(0).getProperty("extender-test"));
+        Assert.assertEquals("test", eventAdmin.getPostEvents().get(1).getProperty("extender-test"));
     }
 
     private class DispatcherMock implements EventAdmin {
@@ -109,6 +147,15 @@ public class DecanterTraceEventHandlerTest {
         public List<Event> getSendEvents() {
             return sendEvents;
         }
+    }
+
+    private class TestExtender implements DecanterCamelEventExtender {
+
+        @Override
+        public void extend(Map<String, Object> decanterData, Exchange camelExchange) {
+            decanterData.put("extender-test", "test");
+        }
+
     }
 
 }

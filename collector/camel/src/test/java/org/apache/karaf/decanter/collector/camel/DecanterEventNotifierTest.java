@@ -1,0 +1,240 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.karaf.decanter.collector.camel;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.management.event.*;
+import org.junit.Assert;
+import org.junit.Test;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class DecanterEventNotifierTest {
+
+    @Test
+    public void testEventNotifier() throws Exception {
+        DispatcherMock eventAdmin = new DispatcherMock();
+        DecanterEventNotifier notifier = new DecanterEventNotifier();
+        notifier.setEventAdmin(eventAdmin);
+
+        RouteBuilder builder = new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("direct:start").routeId("test-route").to("log:foo");
+            }
+        };
+
+        DefaultCamelContext camelContext = new DefaultCamelContext();
+        camelContext.setName("test-context");
+        camelContext.addRoutes(builder);
+        camelContext.getManagementStrategy().addEventNotifier(notifier);
+        camelContext.start();
+
+        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
+        producerTemplate.sendBodyAndHeader("direct:start", "TEST", "foo", "bar");
+
+        Assert.assertEquals(10, eventAdmin.getPostEvents().size());
+
+        Event camelContextStartingEvent = eventAdmin.getPostEvents().get(0);
+        Assert.assertEquals("test-context", camelContextStartingEvent.getProperty("camelContextName"));
+        Assert.assertEquals(CamelContextStartingEvent.class.getName(), camelContextStartingEvent.getProperty("eventType"));
+        Assert.assertEquals("camelEvent", camelContextStartingEvent.getProperty("type"));
+
+        Event routeAddedEvent = eventAdmin.getPostEvents().get(1);
+        Assert.assertEquals("test-context", routeAddedEvent.getProperty("camelContextName"));
+        Assert.assertEquals("test-route", routeAddedEvent.getProperty("routeId"));
+        Assert.assertEquals(RouteAddedEvent.class.getName(), routeAddedEvent.getProperty("eventType"));
+        Assert.assertEquals("camelEvent", routeAddedEvent.getProperty("type"));
+
+        Event routeStartedEvent = eventAdmin.getPostEvents().get(2);
+        Assert.assertEquals("test-context", routeStartedEvent.getProperty("camelContextName"));
+        Assert.assertEquals("test-route", routeStartedEvent.getProperty("routeId"));
+        Assert.assertEquals(RouteStartedEvent.class.getName(), routeStartedEvent.getProperty("eventType"));
+        Assert.assertEquals("camelEvent", routeStartedEvent.getProperty("type"));
+
+        Event camelContextStartedEvent = eventAdmin.getPostEvents().get(3);
+        Assert.assertEquals("test-context", camelContextStartedEvent.getProperty("camelContextName"));
+        Assert.assertEquals(CamelContextStartedEvent.class.getName(), camelContextStartedEvent.getProperty("eventType"));
+        Assert.assertEquals("camelEvent", camelContextStartedEvent.getProperty("type"));
+
+        Event exchangeSendingEvent = eventAdmin.getPostEvents().get(4);
+        Assert.assertEquals("test-context", exchangeSendingEvent.getProperty("camelContextName"));
+        Assert.assertEquals(ExchangeSendingEvent.class.getName(), exchangeSendingEvent.getProperty("eventType"));
+        Assert.assertEquals("camelEvent", exchangeSendingEvent.getProperty("type"));
+        Assert.assertEquals("InOnly", exchangeSendingEvent.getProperty("exchangePattern"));
+        Assert.assertEquals("direct://start", exchangeSendingEvent.getProperty("sendingToEndpointUri"));
+        Assert.assertEquals("TEST", exchangeSendingEvent.getProperty("inBody"));
+
+        Event exchangeCreatedEvent = eventAdmin.getPostEvents().get(5);
+        Assert.assertEquals("test-context", exchangeCreatedEvent.getProperty("camelContextName"));
+        Assert.assertEquals(ExchangeCreatedEvent.class.getName(), exchangeCreatedEvent.getProperty("eventType"));
+        Assert.assertEquals("camelEvent", exchangeCreatedEvent.getProperty("type"));
+        Assert.assertEquals("InOnly", exchangeCreatedEvent.getProperty("exchangePattern"));
+        Assert.assertEquals("TEST", exchangeCreatedEvent.getProperty("inBody"));
+    }
+
+    @Test
+    public void testCamelContextFilter() throws Exception {
+        DispatcherMock eventAdmin = new DispatcherMock();
+        DecanterEventNotifier notifier = new DecanterEventNotifier();
+        notifier.setEventAdmin(eventAdmin);
+        notifier.setCamelContextMatcher("foo");
+
+        RouteBuilder builder = new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("direct:start").routeId("test-route").to("log:foo");
+            }
+        };
+
+        DefaultCamelContext camelContext = new DefaultCamelContext();
+        camelContext.setName("test-context");
+        camelContext.addRoutes(builder);
+        camelContext.getManagementStrategy().addEventNotifier(notifier);
+        camelContext.start();
+
+        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
+        producerTemplate.sendBodyAndHeader("direct:start", "TEST", "foo", "bar");
+
+        Assert.assertEquals(0, eventAdmin.getPostEvents().size());
+    }
+
+    @Test
+    public void testRouteIdFilter() throws Exception {
+        DispatcherMock eventAdmin = new DispatcherMock();
+        DecanterEventNotifier notifier = new DecanterEventNotifier();
+        notifier.setEventAdmin(eventAdmin);
+        notifier.setCamelContextMatcher(".*");
+        notifier.setRouteMatcher("foo");
+
+        RouteBuilder builder = new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("direct:start").routeId("test-route").to("log:foo");
+            }
+        };
+
+        DefaultCamelContext camelContext = new DefaultCamelContext();
+        camelContext.setName("test-context");
+        camelContext.addRoutes(builder);
+        camelContext.getManagementStrategy().addEventNotifier(notifier);
+        camelContext.start();
+
+        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
+        producerTemplate.sendBodyAndHeader("direct:start", "TEST", "foo", "bar");
+
+        Assert.assertEquals(4, eventAdmin.getPostEvents().size());
+    }
+
+    @Test
+    public void testIgnoredEvents() throws Exception {
+        DispatcherMock eventAdmin = new DispatcherMock();
+        DecanterEventNotifier notifier = new DecanterEventNotifier();
+        notifier.setEventAdmin(eventAdmin);
+        notifier.setIgnoreCamelContextEvents(true);
+
+        RouteBuilder builder = new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("direct:start").routeId("test-route").to("log:foo");
+            }
+        };
+
+        DefaultCamelContext camelContext = new DefaultCamelContext();
+        camelContext.setName("test-context");
+        camelContext.addRoutes(builder);
+        camelContext.getManagementStrategy().addEventNotifier(notifier);
+        camelContext.start();
+
+        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
+        producerTemplate.sendBodyAndHeader("direct:start", "TEST", "foo", "bar");
+
+        Assert.assertEquals(8, eventAdmin.getPostEvents().size());
+    }
+
+    @Test
+    public void testExtender() throws Exception {
+        DispatcherMock eventAdmin = new DispatcherMock();
+        DecanterEventNotifier notifier = new DecanterEventNotifier();
+        notifier.setIgnoreCamelContextEvents(true);
+        notifier.setIgnoreRouteEvents(true);
+        notifier.setEventAdmin(eventAdmin);
+        notifier.setExtender(new TestExtender());
+
+        RouteBuilder builder = new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("direct:start").routeId("test-route").to("log:foo");
+            }
+        };
+
+        DefaultCamelContext camelContext = new DefaultCamelContext();
+        camelContext.setName("test-context");
+        camelContext.addRoutes(builder);
+        camelContext.getManagementStrategy().addEventNotifier(notifier);
+        camelContext.start();
+
+        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
+        producerTemplate.sendBodyAndHeader("direct:start", "TEST", "foo", "bar");
+
+        Assert.assertEquals(6, eventAdmin.getPostEvents().size());
+
+        Assert.assertEquals("test", eventAdmin.getPostEvents().get(0).getProperty("extender-test"));
+    }
+
+    private class DispatcherMock implements EventAdmin {
+
+        private List<Event> postEvents = new ArrayList<>();
+        private List<Event> sendEvents = new ArrayList<>();
+
+        @Override
+        public void postEvent(Event event) {
+            postEvents.add(event);
+        }
+
+        @Override
+        public void sendEvent(Event event) {
+            System.out.println("SEND EVENT");
+            sendEvents.add(event);
+        }
+
+        public List<Event> getPostEvents() {
+            return postEvents;
+        }
+
+        public List<Event> getSendEvents() {
+            return sendEvents;
+        }
+    }
+
+    private class TestExtender implements DecanterCamelEventExtender {
+
+        @Override
+        public void extend(Map<String, Object> decanterData, Exchange camelExchange) {
+            decanterData.put("extender-test", "test");
+        }
+
+    }
+
+}

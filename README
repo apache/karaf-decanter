@@ -71,9 +71,9 @@ Collectors
 * decanter-collector-jmx
 * decanter-collector-kafka
 * decanter-collector-rest
-* decanter-collector-activemq
+* decanter-collector-jmx-activemq
+* decanter-collector-jmx-camel
 * decanter-collector-camel
-* decanter-collector-camel-tracer
 * decanter-collector-mqtt
 * decanter-collector-rest
 * decanter-collector-rest-servlet

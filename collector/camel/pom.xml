@@ -29,9 +29,9 @@
     </parent>
 
     <groupId>org.apache.karaf.decanter.collector</groupId>
-    <artifactId>org.apache.karaf.decanter.collector.camel-tracer</artifactId>
+    <artifactId>org.apache.karaf.decanter.collector.camel</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Collector :: Camel Tracer</name>
+    <name>Apache Karaf :: Decanter :: Collector :: Camel</name>
 
     <dependencies>
         <dependency>

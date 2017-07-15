@@ -37,7 +37,7 @@
         <module>jmx</module>
         <module>log</module>
         <module>file</module>
-        <module>camel-tracer</module>
+        <module>camel</module>
         <module>system</module>
         <module>log4j-socket</module>
         <module>rest</module>

@@ -33,12 +33,17 @@ import java.util.HashMap;
 public class DecanterTraceEventHandler implements TraceEventHandler {
 
     private EventAdmin eventAdmin;
+    private DecanterCamelEventExtender extender = null;
 
     public DecanterTraceEventHandler() {
     }
 
     public EventAdmin getEventAdmin() {
         return eventAdmin;
+    }
+
+    public void setExtender(DecanterCamelEventExtender extender) {
+        this.extender = extender;
     }
 
     public void setEventAdmin(EventAdmin eventAdmin) {
@@ -59,6 +64,7 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
         data.put("toNode", extractToNode(exchange));
         data.put("exchangeId", exchange.getExchangeId());
         data.put("routeId", exchange.getFromRouteId());
+        data.put("camelContextName", exchange.getContext().getName());
         data.put("shortExchangeId", extractShortExchangeId(exchange));
         data.put("exchangePattern", exchange.getPattern().toString());
         for (String property : exchange.getProperties().keySet()) {
@@ -81,6 +87,9 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
             data.put("outBodyType", MessageHelper.getBodyTypeName(exchange.getOut()));
         }
         data.put("causedByException", extractCausedByException(exchange));
+        if (extender != null) {
+            extender.extend(data, exchange);
+        }
         Event event = new Event("decanter/collect/camel/tracer", data);
         eventAdmin.postEvent(event);
     }

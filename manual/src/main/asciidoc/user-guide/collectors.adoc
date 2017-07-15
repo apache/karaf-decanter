@@ -249,7 +249,7 @@ The ActiveMQ JMX collector is just a special configuration of the JMX collector.
 The `decanter-collector-activemq` feature installs the default JMX collector, with the specific ActiveMQ JMX configuration:
 
 ----
-karaf@root()> feature:install decanter-collector-activemq
+karaf@root()> feature:install decanter-collector-jmx-activemq
 ----
 
 This feature installs the same collector as the `decanter-collector-jmx`, but also add the
@@ -287,10 +287,10 @@ This configuration actually contains a filter to retrieve only the ActiveMQ JMX 
 
 The Camel JMX collector is just a special configuration of the JMX collector.
 
-The `decanter-collector-camel` feature installs the default JMX collector, with the specific Camel JMX configuration:
+The `decanter-collector-jmx-camel` feature installs the default JMX collector, with the specific Camel JMX configuration:
 
 ----
-karaf@root()> feature:install decanter-collector-camel
+karaf@root()> feature:install decanter-collector-jmx-camel
 ----
 
 This feature installs the same collector as the `decanter-collector-jmx`, but also add the
@@ -324,17 +324,19 @@ object.name=org.apache.camel:context=*,type=routes,name=*
 
 This configuration actually contains a filter to retrieve only the Camel Routes JMX MBeans.
 
-==== Camel Tracer
+==== Camel Tracer & Notifier
 
-The Camel Tracer provides a Camel Tracer Handler that you can set on a Camel Tracer.
+Decanter provides a Camel Tracer Handler that you can set on a Camel Tracer. It also provides a Camel Event Notifier.
+
+===== Camel Tracer
 
 If you enable the tracer on a Camel route, all tracer events (exchanges on each step of the route) are send to the
 appenders.
 
-The `decanter-collector-camel-tracer` feature provides the Camel Tracer Handler:
+The `decanter-collector-camel` feature provides the Camel Tracer Handler:
 
 ----
-karaf@root()> feature:install decanter-collector-camel-tracer
+karaf@root()> feature:install decanter-collector-camel
 ----
 
 Now, you can use the Decanter Camel Tracer Handler in a tracer that you can use in routes.
@@ -369,6 +371,25 @@ in the Camel Tracer:
 
 </blueprint>
 ----
+
+You can extend the Decanter event with any property using a custom `DecanterCamelEventExtender`:
+
+----
+public interface DecanterCamelEventExtender {
+
+    void extend(Map<String, Object> decanterData, Exchange camelExchange);
+
+}
+----
+
+You can inject your extender using `setExtender(myExtender)` on the `DecanterTraceEventHandler`. Decanter will automatically
+call your extender to populate extra properties.
+
+===== Camel Event Notifier
+
+Decanter also provides `DecanterEventNotifier` implementing a Camel event notifier: http://camel.apache.org/eventnotifier-to-log-details-about-all-sent-exchanges.html
+
+It's very similar to the Decanter Camel Tracer. You can control the camel contexts and routes to which you want to trap event.
 
 ==== System
 
