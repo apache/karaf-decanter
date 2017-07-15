@@ -33,14 +33,28 @@ For details, see the ChangeLog:
   ---------
 ** Bug
     * [KARAF-4906] - Decanter e-mail alerter can't use javamail authentication
+    * [KARAF-5141] - Decanter log collector seems to consume lot of resources on Karaf 4.1.x
     * [KARAF-5186] - [DECANTER] - Fails work in case the event topic contains arbitrary characters like %
     * [KARAF-5212] - Decanter Elasticsearch Appender feature should install com.fasterxml.jackson.core bundle
+    * [KARAF-5238] - Embedded Kibana can block installation of decanter collectors
+    * [KARAF-5239] - JMX collector doesn't full harvest metrics
+    * [KARAF-5240] - Default Kibana dashboard doesn't render correctly
+
+** Dependency upgrade
+    * [KARAF-4541] - Upgrade to Kafka 0.11.0.0
+
 ** Improvement
     * [KARAF-3696] - Decanter: Switch to Karaf provided Scheduler (Cron-based)
+    * [KARAF-4645] - Alerters should be throttable
     * [KARAF-4850] - Be able to specify several object names for the JMX collector
     * [KARAF-4929] - Email alerter should support list of destination (to) addresses
     * [KARAF-5060] - Be able to configure the index name in elasticsearch appenders
     * [KARAF-5192] - Decanter collector should be able to filter some loggers
+    * [KARAF-5244] - Refactor kafka config handling
+
+** New Feature
+    * [KARAF-3890] - Provide Decanter CXF interceptor collector
+    * [KARAF-5033] - Provide a Camel EventNotifier collector
 
                     Apache Karaf Decanter 1.3.0
                     ===========================
