@@ -105,7 +105,7 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
             if (includeBody) {
                 data.put("outBody", MessageHelper.extractBodyAsString(exchange.getOut()));
             }
-            data.put("outBodyType", MessageHelper.getBodyTypeName(exchange.getOut()));œ
+            data.put("outBodyType", MessageHelper.getBodyTypeName(exchange.getOut()));
         }
         data.put("causedByException", extractCausedByException(exchange));
         if (extender != null) {
