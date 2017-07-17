@@ -96,16 +96,16 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
         }
         if (includeBody) {
             data.put("inBody", MessageHelper.extractBodyAsString(exchange.getIn()));
-            data.put("inBodyType", MessageHelper.getBodyTypeName(exchange.getIn()));
         }
+        data.put("inBodyType", MessageHelper.getBodyTypeName(exchange.getIn()));
         if (exchange.hasOut()) {
             if (includeHeaders) {
                 data.put("outHeaders", exchange.getOut().getHeaders().isEmpty() ? null : exchange.getOut().getHeaders());
             }
             if (includeBody) {
                 data.put("outBody", MessageHelper.extractBodyAsString(exchange.getOut()));
-                data.put("outBodyType", MessageHelper.getBodyTypeName(exchange.getOut()));
             }
+            data.put("outBodyType", MessageHelper.getBodyTypeName(exchange.getOut()));œ
         }
         data.put("causedByException", extractCausedByException(exchange));
         if (extender != null) {
