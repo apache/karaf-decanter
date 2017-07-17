@@ -34,6 +34,9 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
 
     private EventAdmin eventAdmin;
     private DecanterCamelEventExtender extender = null;
+    private boolean includeHeaders = true;
+    private boolean includeProperties = true;
+    private boolean includeBody = true;
 
     public DecanterTraceEventHandler() {
     }
@@ -48,6 +51,14 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
 
     public void setEventAdmin(EventAdmin eventAdmin) {
         this.eventAdmin = eventAdmin;
+    }
+
+    public void setIncludeHeaders(boolean includeHeaders) {
+        this.includeHeaders = includeHeaders;
+    }
+
+    public void setIncludeProperties(boolean includeProperties) {
+        this.includeProperties = includeProperties;
     }
 
     @Override
@@ -72,19 +83,29 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
                 data.put(property.substring("decanter.".length()), exchange.getProperties().get(property));
             }
         }
-        data.put("properties", exchange.getProperties().isEmpty() ? null : exchange.getProperties());
+        if (includeProperties) {
+            data.put("properties", exchange.getProperties().isEmpty() ? null : exchange.getProperties());
+        }
         for (String header : exchange.getIn().getHeaders().keySet()) {
             if (header.startsWith("decanter.")) {
                 data.put(header.substring("decanter.".length()), exchange.getIn().getHeader(header));
             }
         }
-        data.put("inHeaders", exchange.getIn().getHeaders().isEmpty() ? null : exchange.getIn().getHeaders());
-        data.put("inBody", MessageHelper.extractBodyAsString(exchange.getIn()));
-        data.put("inBodyType", MessageHelper.getBodyTypeName(exchange.getIn()));
+        if (includeHeaders) {
+            data.put("inHeaders", exchange.getIn().getHeaders().isEmpty() ? null : exchange.getIn().getHeaders());
+        }
+        if (includeBody) {
+            data.put("inBody", MessageHelper.extractBodyAsString(exchange.getIn()));
+            data.put("inBodyType", MessageHelper.getBodyTypeName(exchange.getIn()));
+        }
         if (exchange.hasOut()) {
-            data.put("outHeaders", exchange.getOut().getHeaders().isEmpty() ? null : exchange.getOut().getHeaders());
-            data.put("outBody", MessageHelper.extractBodyAsString(exchange.getOut()));
-            data.put("outBodyType", MessageHelper.getBodyTypeName(exchange.getOut()));
+            if (includeHeaders) {
+                data.put("outHeaders", exchange.getOut().getHeaders().isEmpty() ? null : exchange.getOut().getHeaders());
+            }
+            if (includeBody) {
+                data.put("outBody", MessageHelper.extractBodyAsString(exchange.getOut()));
+                data.put("outBodyType", MessageHelper.getBodyTypeName(exchange.getOut()));
+            }
         }
         data.put("causedByException", extractCausedByException(exchange));
         if (extender != null) {
