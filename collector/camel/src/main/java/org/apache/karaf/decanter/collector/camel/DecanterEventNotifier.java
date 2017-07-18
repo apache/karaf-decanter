@@ -15,26 +15,14 @@ import org.apache.camel.support.EventNotifierSupport;
 import org.apache.camel.util.MessageHelper;
 import org.apache.camel.management.event.AbstractExchangeEvent;
 import org.apache.camel.management.event.CamelContextResumeFailureEvent;
-import org.apache.camel.management.event.CamelContextResumedEvent;
-import org.apache.camel.management.event.CamelContextResumingEvent;
-import org.apache.camel.management.event.CamelContextStartedEvent;
-import org.apache.camel.management.event.CamelContextStartingEvent;
 import org.apache.camel.management.event.CamelContextStartupFailureEvent;
 import org.apache.camel.management.event.CamelContextStopFailureEvent;
-import org.apache.camel.management.event.CamelContextStoppedEvent;
-import org.apache.camel.management.event.CamelContextStoppingEvent;
-import org.apache.camel.management.event.CamelContextSuspendedEvent;
-import org.apache.camel.management.event.CamelContextSuspendingEvent;
 import org.apache.camel.management.event.ExchangeCompletedEvent;
 import org.apache.camel.management.event.ExchangeCreatedEvent;
 import org.apache.camel.management.event.ExchangeFailureHandledEvent;
 import org.apache.camel.management.event.ExchangeRedeliveryEvent;
 import org.apache.camel.management.event.ExchangeSendingEvent;
 import org.apache.camel.management.event.ExchangeSentEvent;
-import org.apache.camel.management.event.RouteAddedEvent;
-import org.apache.camel.management.event.RouteRemovedEvent;
-import org.apache.camel.management.event.RouteStartedEvent;
-import org.apache.camel.management.event.RouteStoppedEvent;
 import org.apache.camel.management.event.ServiceStartupFailureEvent;
 import org.apache.camel.management.event.ServiceStopFailureEvent;
 
@@ -116,6 +104,7 @@ public class DecanterEventNotifier extends EventNotifierSupport {
                     event instanceof AbstractExchangeEvent ? ((AbstractExchangeEvent) event)
                             .getExchange() : null);
             boolean post = false;
+            Object source = event.getSource();
             if (event instanceof ExchangeSentEvent && !isIgnoreExchangeEvents() && !isIgnoreExchangeSentEvents()) {
                 ExchangeSentEvent sent = (ExchangeSentEvent) event;
                 eventMap.put("sentToEndpointUri", sent.getEndpoint()
@@ -141,30 +130,18 @@ public class DecanterEventNotifier extends EventNotifierSupport {
                 eventMap.put("redeliveryAttempt", redelivery.getAttempt());
                 post = true;
             }
-            if (event instanceof RouteStartedEvent && !isIgnoreRouteEvents()) {
-                RouteStartedEvent route = (RouteStartedEvent) event;
-                eventMap.put("routeId", route.getRoute().getId());
-                eventMap.put("camelContextName", route.getRoute().getRouteContext().getCamelContext().getName());
+            if (source instanceof Route && !isIgnoreRouteEvents()) {
+                Route route = (Route)source;
+                eventMap.put("routeId", route.getId());
+                eventMap.put("camelContextName", route.getRouteContext().getCamelContext().getName());
                 post = true;
             }
-            if (event instanceof RouteAddedEvent && !isIgnoreRouteEvents()) {
-                RouteAddedEvent route = (RouteAddedEvent) event;
-                eventMap.put("routeId", route.getRoute().getId());
-                eventMap.put("camelContextName", route.getRoute().getRouteContext().getCamelContext().getName());
+            if (source instanceof CamelContext && !isIgnoreCamelContextEvents()) {
+                CamelContext context = (CamelContext)source;
+                eventMap.put("camelContextName", context.getName());
                 post = true;
             }
-            if (event instanceof RouteRemovedEvent && !isIgnoreRouteEvents()) {
-                RouteRemovedEvent route = (RouteRemovedEvent) event;
-                eventMap.put("routeId", route.getRoute().getId());
-                eventMap.put("camelContextName", route.getRoute().getRouteContext().getCamelContext().getName());
-                post = true;
-            }
-            if (event instanceof RouteStoppedEvent && !isIgnoreRouteEvents()) {
-                RouteStoppedEvent route = (RouteStoppedEvent) event;
-                eventMap.put("routeId", route.getRoute().getId());
-                eventMap.put("camelContextName", route.getRoute().getRouteContext().getCamelContext().getName());
-                post = true;
-            }
+                
             if (event instanceof ServiceStartupFailureEvent && !isIgnoreServiceEvents()) {
                 ServiceStartupFailureEvent service = (ServiceStartupFailureEvent) event;
                 eventMap.put("serviceName", service.getService().getClass().getName());
@@ -179,63 +156,17 @@ public class DecanterEventNotifier extends EventNotifierSupport {
                 eventMap.put("cause", service.getCause().toString());
                 post = true;
             }
-            if (event instanceof CamelContextResumedEvent && !isIgnoreCamelContextEvents()) {
-                CamelContextResumedEvent context = (CamelContextResumedEvent) event;
-                eventMap.put("camelContextName", context.getContext().getName());
-                post = true;
-            }
             if (event instanceof CamelContextResumeFailureEvent && !isIgnoreCamelContextEvents()) {
                 CamelContextResumeFailureEvent context = (CamelContextResumeFailureEvent) event;
-                eventMap.put("camelContextName", context.getContext().getName());
                 eventMap.put("cause", context.getCause().toString());
-                post = true;
-            }
-            if (event instanceof CamelContextResumingEvent && !isIgnoreCamelContextEvents()) {
-                CamelContextResumingEvent context = (CamelContextResumingEvent) event;
-                eventMap.put("camelContextName", context.getContext().getName());
-                post = true;
-            }
-            if (event instanceof CamelContextStartedEvent && !isIgnoreCamelContextEvents()) {
-                CamelContextStartedEvent context = (CamelContextStartedEvent) event;
-                eventMap.put("camelContextName", context.getContext().getName());
-                post = true;
-            }
-            if (event instanceof CamelContextStartingEvent && !isIgnoreCamelContextEvents()) {
-                CamelContextStartingEvent context = (CamelContextStartingEvent) event;
-                eventMap.put("camelContextName", context.getContext().getName());
-                post = true;
             }
             if (event instanceof CamelContextStartupFailureEvent && !isIgnoreCamelContextEvents()) {
                 CamelContextStartupFailureEvent context = (CamelContextStartupFailureEvent) event;
-                eventMap.put("camelContextName", context.getContext().getName());
                 eventMap.put("cause", context.getCause().toString());
-                post = true;
             }
             if (event instanceof CamelContextStopFailureEvent && !isIgnoreCamelContextEvents()) {
-                CamelContextStopFailureEvent context = (CamelContextStopFailureEvent) event;
-                eventMap.put("camelContextName", context.getContext().getName());
+                CamelContextStartupFailureEvent context = (CamelContextStartupFailureEvent) event;
                 eventMap.put("cause", context.getCause().toString());
-                post = true;
-            }
-            if (event instanceof CamelContextStoppedEvent && !isIgnoreCamelContextEvents()) {
-                CamelContextStoppedEvent context = (CamelContextStoppedEvent) event;
-                eventMap.put("camelContextName", context.getContext().getName());
-                post = true;
-            }
-            if (event instanceof CamelContextStoppingEvent && !isIgnoreCamelContextEvents()) {
-                CamelContextStoppingEvent context = (CamelContextStoppingEvent) event;
-                eventMap.put("camelContextName", context.getContext().getName());
-                post = true;
-            }
-            if (event instanceof CamelContextSuspendedEvent && !isIgnoreCamelContextEvents()) {
-                CamelContextSuspendedEvent context = (CamelContextSuspendedEvent) event;
-                eventMap.put("camelContextName", context.getContext().getName());
-                post = true;
-            }
-            if (event instanceof CamelContextSuspendingEvent && !isIgnoreCamelContextEvents()) {
-                CamelContextSuspendingEvent context = (CamelContextSuspendingEvent) event;
-                eventMap.put("camelContextName", context.getContext().getName());
-                post = true;
             }
             if (event instanceof ExchangeCompletedEvent && !isIgnoreExchangeEvents() && !isIgnoreExchangeCompletedEvent()) {
                 post = true;
