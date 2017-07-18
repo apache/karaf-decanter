@@ -6,7 +6,9 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.Route;
 import org.apache.camel.RouteNode;
 import org.apache.camel.spi.TracedRouteNodes;
 import org.apache.camel.support.EventNotifierSupport;
@@ -41,7 +43,6 @@ import org.osgi.service.event.EventAdmin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class DecanterEventNotifier extends EventNotifierSupport {
 
@@ -85,60 +86,28 @@ public class DecanterEventNotifier extends EventNotifierSupport {
 
     @Override
     public boolean isEnabled(EventObject eventObject) {
-        if (eventObject != null) {
-            if (eventObject instanceof AbstractExchangeEvent) {
-                AbstractExchangeEvent event = (AbstractExchangeEvent) eventObject;
-                if (event.getExchange().getFromRouteId() != null) {
-                    return (event.getExchange().getFromRouteId().matches(routeMatcher) && event.getExchange().getContext().getName().matches(camelContextMatcher));
-                } else {
-                    return (event.getExchange().getContext().getName().matches(camelContextMatcher));
-                }
-            }
-            if (eventObject instanceof CamelContextResumedEvent) {
-                return ((CamelContextResumedEvent) eventObject).getContext().getName().matches(camelContextMatcher);
-            }
-            if (eventObject instanceof CamelContextResumeFailureEvent) {
-                return ((CamelContextResumeFailureEvent) eventObject).getContext().getName().matches(camelContextMatcher);
-            }
-            if (eventObject instanceof CamelContextResumingEvent) {
-                return ((CamelContextResumingEvent) eventObject).getContext().getName().matches(camelContextMatcher);
-            }
-            if (eventObject instanceof CamelContextStartedEvent) {
-                return ((CamelContextStartedEvent) eventObject).getContext().getName().matches(camelContextMatcher);
-            }
-            if (eventObject instanceof CamelContextStartingEvent) {
-                return ((CamelContextStartingEvent) eventObject).getContext().getName().matches(camelContextMatcher);
-            }
-            if (eventObject instanceof CamelContextStartupFailureEvent) {
-                return ((CamelContextStartupFailureEvent) eventObject).getContext().getName().matches(camelContextMatcher);
-            }
-            if (eventObject instanceof CamelContextStopFailureEvent) {
-                return ((CamelContextStopFailureEvent) eventObject).getContext().getName().matches(camelContextMatcher);
-            }
-            if (eventObject instanceof CamelContextStoppedEvent) {
-                return ((CamelContextStoppedEvent) eventObject).getContext().getName().matches(camelContextMatcher);
-            }
-            if (eventObject instanceof CamelContextStoppingEvent) {
-                return ((CamelContextStoppingEvent) eventObject).getContext().getName().matches(camelContextMatcher);
-            }
-            if (eventObject instanceof RouteAddedEvent) {
-                return ((RouteAddedEvent) eventObject).getRoute().getRouteContext().getCamelContext().getName().matches(camelContextMatcher)
-                        && ((RouteAddedEvent) eventObject).getRoute().getId().matches(routeMatcher);
-            }
-            if (eventObject instanceof RouteRemovedEvent) {
-                return ((RouteRemovedEvent) eventObject).getRoute().getRouteContext().getCamelContext().getName().matches(camelContextMatcher)
-                        && ((RouteRemovedEvent) eventObject).getRoute().getId().matches(routeMatcher);
-            }
-            if (eventObject instanceof RouteStartedEvent) {
-                return ((RouteStartedEvent) eventObject).getRoute().getRouteContext().getCamelContext().getName().matches(camelContextMatcher)
-                        && ((RouteStartedEvent) eventObject).getRoute().getId().matches(routeMatcher);
-            }
-            if (eventObject instanceof RouteStoppedEvent) {
-                return ((RouteStoppedEvent) eventObject).getRoute().getRouteContext().getCamelContext().getName().matches(camelContextMatcher)
-                        && ((RouteStoppedEvent) eventObject).getRoute().getId().matches(routeMatcher);
-            }
+        if (eventObject == null) {
+            return false;
         }
-        return  false;
+        Object source = eventObject.getSource();
+        if (source instanceof Exchange) {
+            Exchange exchange = (Exchange)source;
+            boolean contextMatches = exchange.getContext().getName().matches(camelContextMatcher);
+            if (exchange.getFromRouteId() != null) {
+                return exchange.getFromRouteId().matches(routeMatcher) && contextMatches;
+            } else {
+                return contextMatches;
+            }
+        } else if (source instanceof CamelContext) {
+            CamelContext context = (CamelContext)eventObject.getSource();
+            return context.getName().matches(camelContextMatcher);
+        } else if (source instanceof Route) {
+            Route route = (Route)source;
+            boolean contextMatches = route.getRouteContext().getCamelContext().getName().matches(camelContextMatcher);
+            return contextMatches && route.getId().matches(routeMatcher);
+        } else {
+            return false;
+        }
     }
 
     public void notify(EventObject event) throws Exception {
