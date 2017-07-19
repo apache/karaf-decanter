@@ -16,50 +16,22 @@
  */
 package org.apache.karaf.decanter.collector.camel;
 
+import java.net.InetAddress;
+import java.util.HashMap;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.RouteNode;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.processor.interceptor.TraceEventHandler;
 import org.apache.camel.processor.interceptor.TraceInterceptor;
-import org.apache.camel.spi.TracedRouteNodes;
-import org.apache.camel.util.MessageHelper;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
-
-import java.net.InetAddress;
-import java.util.HashMap;
 
 public class DecanterTraceEventHandler implements TraceEventHandler {
 
     private EventAdmin eventAdmin;
-    private DecanterCamelEventExtender extender = null;
-    private boolean includeHeaders = true;
-    private boolean includeProperties = true;
-    private boolean includeBody = true;
-
-    public DecanterTraceEventHandler() {
-    }
-
-    public EventAdmin getEventAdmin() {
-        return eventAdmin;
-    }
-
-    public void setExtender(DecanterCamelEventExtender extender) {
-        this.extender = extender;
-    }
-
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
-    }
-
-    public void setIncludeHeaders(boolean includeHeaders) {
-        this.includeHeaders = includeHeaders;
-    }
-
-    public void setIncludeProperties(boolean includeProperties) {
-        this.includeProperties = includeProperties;
-    }
+    private DefaultExchangeExtender dextender = new DefaultExchangeExtender();
+    private DecanterCamelEventExtender extender;
 
     @Override
     public void traceExchange(ProcessorDefinition<?> node, Processor target, TraceInterceptor traceInterceptor, Exchange exchange) throws Exception {
@@ -70,46 +42,20 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
         data.put("hostName", InetAddress.getLocalHost().getHostName());
         data.put("nodeId", node.getId());
         data.put("timestamp", System.currentTimeMillis());
-        data.put("fromEndpointUri", exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : null);
-        data.put("previousNode", extractFromNode(exchange));
-        data.put("toNode", extractToNode(exchange));
-        data.put("exchangeId", exchange.getExchangeId());
-        data.put("routeId", exchange.getFromRouteId());
-        data.put("camelContextName", exchange.getContext().getName());
-        data.put("shortExchangeId", extractShortExchangeId(exchange));
-        data.put("exchangePattern", exchange.getPattern().toString());
+        new DefaultExchangeExtender().extend(data, exchange);
         for (String property : exchange.getProperties().keySet()) {
             if (property.startsWith("decanter.")) {
                 data.put(property.substring("decanter.".length()), exchange.getProperties().get(property));
             }
         }
-        if (includeProperties) {
-            data.put("properties", exchange.getProperties().isEmpty() ? null : exchange.getProperties());
+        dextender.extend(data, exchange);
+        if (extender != null)  {
+            extender.extend(data, exchange);
         }
         for (String header : exchange.getIn().getHeaders().keySet()) {
             if (header.startsWith("decanter.")) {
                 data.put(header.substring("decanter.".length()), exchange.getIn().getHeader(header));
             }
-        }
-        if (includeHeaders) {
-            data.put("inHeaders", exchange.getIn().getHeaders().isEmpty() ? null : exchange.getIn().getHeaders());
-        }
-        if (includeBody) {
-            data.put("inBody", MessageHelper.extractBodyAsString(exchange.getIn()));
-        }
-        data.put("inBodyType", MessageHelper.getBodyTypeName(exchange.getIn()));
-        if (exchange.hasOut()) {
-            if (includeHeaders) {
-                data.put("outHeaders", exchange.getOut().getHeaders().isEmpty() ? null : exchange.getOut().getHeaders());
-            }
-            if (includeBody) {
-                data.put("outBody", MessageHelper.extractBodyAsString(exchange.getOut()));
-            }
-            data.put("outBodyType", MessageHelper.getBodyTypeName(exchange.getOut()));
-        }
-        data.put("causedByException", extractCausedByException(exchange));
-        if (extender != null) {
-            extender.extend(data, exchange);
         }
         Event event = new Event("decanter/collect/camel/tracer", data);
         eventAdmin.postEvent(event);
@@ -125,35 +71,29 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
     public void traceExchangeOut(ProcessorDefinition<?> node, Processor target, TraceInterceptor traceInterceptor, Exchange exchange, Object traceState) throws Exception {
         traceExchange(node, target, traceInterceptor, exchange);
     }
-
-    private static String extractShortExchangeId(Exchange exchange) {
-        return exchange.getExchangeId().substring(exchange.getExchangeId().indexOf("/") + 1);
+    
+    public EventAdmin getEventAdmin() {
+        return eventAdmin;
     }
 
-    private static String extractFromNode(Exchange exchange) {
-        if (exchange.getUnitOfWork() == null) {
-            return null;
-        }
-        TracedRouteNodes traced = exchange.getUnitOfWork().getTracedRouteNodes();
-        RouteNode last = traced.getSecondLastNode();
-        return last != null ? last.getLabel(exchange) : null;
+    public void setExtender(DecanterCamelEventExtender extender) {
+        this.extender = extender;
     }
 
-    private static String extractToNode(Exchange exchange) {
-        if (exchange.getUnitOfWork() == null) {
-            return null;
-        }
-        TracedRouteNodes traced = exchange.getUnitOfWork().getTracedRouteNodes();
-        RouteNode last = traced.getLastNode();
-        return last != null ? last.getLabel(exchange) : null;
+    public void setEventAdmin(EventAdmin eventAdmin) {
+        this.eventAdmin = eventAdmin;
+    }
+    
+    public void setIncludeBody(boolean includeBody) {
+        dextender.setIncludeBody(includeBody);
     }
 
-    private static String extractCausedByException(Exchange exchange) {
-        Throwable cause = exchange.getException();
-        if (cause == null) {
-            cause = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
-        }
-        return (cause != null) ? cause.toString() : null;
+    public void setIncludeHeaders(boolean includeHeaders) {
+        dextender.setIncludeHeaders(includeHeaders);
+    }
+
+    public void setIncludeProperties(boolean includeProperties) {
+        dextender.setIncludeProperties(includeProperties);
     }
 
 }
