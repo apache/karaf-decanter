@@ -17,6 +17,8 @@
 package org.apache.karaf.decanter.collector.socket;
 
 import java.io.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -49,6 +51,8 @@ public class SocketCollector implements Closeable, Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketCollector.class);
 
     private ServerSocket serverSocket;
+    private DatagramSocket datagramSocket;
+    private Protocol protocol;
     private EventAdmin eventAdmin;
     private boolean open;
     private ExecutorService executor;
@@ -56,6 +60,11 @@ public class SocketCollector implements Closeable, Runnable {
     private String eventAdminTopic;
     private EventAdmin dispatcher;
     private Unmarshaller unmarshaller;
+    
+    private enum Protocol {
+        TCP,
+        UDP;
+    }
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -63,8 +72,24 @@ public class SocketCollector implements Closeable, Runnable {
         this.properties = context.getProperties();
         int port = Integer.parseInt(getProperty(this.properties, "port", "34343"));
         int workers = Integer.parseInt(getProperty(this.properties, "workers", "10"));
+        
+        this.protocol = Protocol.valueOf(getProperty(this.properties, "protocol", "tcp").toUpperCase());
+        // force TCP protocol if value not in Enum
+        if (this.protocol == null) {
+            this.protocol = Protocol.TCP;
+        }
+        
         eventAdminTopic = getProperty(this.properties, EventConstants.EVENT_TOPIC, "decanter/collect/socket");
-        this.serverSocket = new ServerSocket(port);
+        
+        switch (protocol) {
+            case TCP:
+                this.serverSocket = new ServerSocket(port);
+                break;
+            case UDP:
+                this.datagramSocket = new DatagramSocket(port);
+                break;
+        }
+        
         // adding 1 for serverSocket handling
         this.executor = Executors.newFixedThreadPool(workers + 1);
         this.executor.execute(this);
@@ -79,9 +104,21 @@ public class SocketCollector implements Closeable, Runnable {
     public void run() {
         while (open) {
             try {
-                Socket socket = serverSocket.accept();
-                LOGGER.debug("Connected to client at {}", socket.getInetAddress());
-                this.executor.execute(new SocketRunnable(socket));
+                switch (protocol) {
+                    case TCP:
+                        Socket socket = serverSocket.accept();
+                        LOGGER.debug("Connected to TCP client at {}", socket.getInetAddress());
+                        this.executor.execute(new SocketRunnable(socket));
+                        break;
+                        
+                    case UDP:
+                        byte[] buffer = new byte[1024];
+                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                        LOGGER.debug("Connected to UDP client at {}", datagramSocket.getLocalSocketAddress());
+                        datagramSocket.receive(packet);
+                        this.executor.execute(new DatagramRunnable(packet));
+                        break;
+                }
             } catch (IOException e) {
                 LOGGER.warn("Exception receiving log.", e);
             }
@@ -103,7 +140,15 @@ public class SocketCollector implements Closeable, Runnable {
         } catch (Exception e) {
             // nothing to do
         }
-        serverSocket.close();
+        switch (protocol) {
+            case TCP:
+                serverSocket.close();
+                break;
+                
+            case UDP:
+                datagramSocket.close();
+                break;
+        }
     }
 
     @Reference
@@ -145,6 +190,41 @@ public class SocketCollector implements Closeable, Runnable {
                 clientSocket.close();
             } catch (IOException e) {
                 LOGGER.info("Error closing socket", e);
+            }
+        }
+    }
+    
+    private class DatagramRunnable implements Runnable {
+
+        private DatagramPacket packet;
+
+        public DatagramRunnable(DatagramPacket packet) {
+            this.packet = packet;
+        }
+
+        public void run() {
+            
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(packet.getData())) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
+                data.put("hostName", InetAddress.getLocalHost().getHostName());
+                data.put("type", "socket");
+                String karafName = System.getProperty("karaf.name");
+                if (karafName != null) {
+                    data.put("karafName", karafName);
+                }
+                try {
+                    data.putAll(unmarshaller.unmarshal(bais));
+                } catch (Exception e) {
+                    // nothing to do
+                }
+                Event event = new Event(eventAdminTopic, data);
+                dispatcher.postEvent(event);
+                datagramSocket.send(packet);
+            } catch (EOFException e) {
+                LOGGER.warn("Client closed the connection", e);
+            } catch (IOException e) {
+                LOGGER.warn("Exception receiving data", e);
             }
         }
     }
