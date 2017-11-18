@@ -38,7 +38,7 @@ import java.util.HashMap;
     name = "org.apache.karaf.decanter.collector.system",
     immediate = true,
     property = { "decanter.collector.name=system",
-            "scheduler.period:Long=10",
+            "scheduler.period:Long=60",
             "scheduler.concurrent:Boolean=false",
             "scheduler.name=decanter-collector-system" }
 )

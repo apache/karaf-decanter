@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
     name = "org.apache.karaf.decanter.collector.jmx",
     immediate = true,
     property = { "decanter.collector.name=jmx",
-            "scheduler.period:Long=10",
+            "scheduler.period:Long=60",
             "scheduler.concurrent:Boolean=false",
             "scheduler.name=decanter-collector-jmx"}
 )

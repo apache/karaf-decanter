@@ -48,7 +48,7 @@ import com.sun.tools.attach.VirtualMachineDescriptor;
         name = "org.apache.karaf.decanter.collector.process",
         immediate = true,
         property = {"decanter.collector.name=process",
-                "scheduler.period:Long=10",
+                "scheduler.period:Long=60",
                 "scheduler.concurrent:Boolean=false",
                 "scheduler.name=decanter-collector-process"}
 )
