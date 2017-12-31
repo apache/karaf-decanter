@@ -34,20 +34,20 @@
     <name>Apache Karaf :: Decanter :: Collector</name>
 
     <modules>
-        <module>jmx</module>
-        <module>log</module>
-        <module>file</module>
         <module>camel</module>
-        <module>system</module>
+        <module>eventadmin</module>
+        <module>file</module>
+        <module>jms</module>
+        <module>jmx</module>
+        <module>kafka</module>
+        <module>log</module>
         <module>log4j-socket</module>
+        <module>mqtt</module>
+        <module>process</module>
         <module>rest</module>
         <module>rest-servlet</module>
-        <module>eventadmin</module>
-        <module>kafka</module>
-        <module>jms</module>
-        <module>process</module>
+        <module>system</module>
         <module>socket</module>
-        <module>mqtt</module>
     </modules>
 
 </project>

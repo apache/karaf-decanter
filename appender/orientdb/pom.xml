@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <!--
@@ -28,54 +29,36 @@
     </parent>
 
     <groupId>org.apache.karaf.decanter.appender</groupId>
-    <artifactId>org.apache.karaf.decanter.appender.mqtt</artifactId>
+    <artifactId>org.apache.karaf.decanter.appender.orientdb</artifactId>
+    <name>Apache Karaf :: Decanter :: Appender :: OrientDB</name>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Appender :: MQTT</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.paho</groupId>
-            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-            <version>1.0.2</version>
+            <groupId>org.apache.karaf.decanter</groupId>
+            <artifactId>org.apache.karaf.decanter.api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-client</artifactId>
+            <version>${orientdb.version}</version>
+        </dependency>
+
+        <!-- test -->
         <dependency>
             <groupId>org.apache.karaf.decanter.marshaller</groupId>
             <artifactId>org.apache.karaf.decanter.marshaller.json</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.json</groupId>
-            <artifactId>javax.json-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-mqtt</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-kahadb-store</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-Activator>org.apache.karaf.decanter.appender.mqtt.Activator</Bundle-Activator>
-                    </instructions>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -88,7 +71,7 @@
                         <configuration>
                             <artifacts>
                                 <artifact>
-                                    <file>src/main/cfg/org.apache.karaf.decanter.appender.mqtt.cfg</file>
+                                    <file>src/main/cfg/org.apache.karaf.decanter.appender.orientdb.cfg</file>
                                     <type>cfg</type>
                                 </artifact>
                             </artifacts>
@@ -98,5 +81,5 @@
             </plugin>
         </plugins>
     </build>
-    
+
 </project>

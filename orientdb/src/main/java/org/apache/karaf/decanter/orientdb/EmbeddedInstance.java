@@ -50,7 +50,7 @@ public class EmbeddedInstance {
         server = OServerMain.create();
         server.startup(new File(new File(System.getProperty("karaf.etc")), ORIENTDB_SERVER_CONFIG));
         server.activate();
-        OServerAdmin admin = new OServerAdmin("remote:0.0.0.0").connect("root", "decanter");
+        OServerAdmin admin = new OServerAdmin("remote:localhost").connect("root", "decanter");
         if (!admin.existsDatabase("decanter", "plocal")) {
             admin.createDatabase("decanter", "document", "plocal");
         }

@@ -34,19 +34,20 @@
     <name>Apache Karaf :: Decanter :: Appender</name>
 
     <modules>
-        <module>log</module>
+        <module>camel</module>
+        <module>cassandra</module>
         <module>elasticsearch-native-1.x</module>
         <module>elasticsearch-native-2.x</module>
         <module>elasticsearch-rest</module>
         <module>jdbc</module>
         <module>jms</module>
-        <module>camel</module>
         <module>kafka</module>
+        <module>log</module>
+        <module>orientdb</module>
+        <module>mongodb</module>
         <module>mqtt</module>
-        <module>cassandra</module>
         <module>redis</module>
         <module>rest</module>
-        <module>mongodb</module>
         <module>socket</module>
     </modules>
 
