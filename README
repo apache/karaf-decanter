@@ -51,7 +51,7 @@ Apache Karaf Decanter is available as a Karaf features. The commands below start
 the jmx collector, log collector and an appender to a local elasticsearch instance
 on the default port. Prerquisite is a running elasticsearch instance.
 
-feature:repo-add decanter 1.3.0
+feature:repo-add decanter
 
 Depending of what you want to monitor and collect, you have to install the corresponding features
 using feature:install command.
@@ -97,6 +97,7 @@ Appenders
 * decanter-appender-socket
 * decanter-appender-redis
 * decanter-appender-rest
+* decanter-appender-orientdb
 
 SLA/Alerters
 ------------
