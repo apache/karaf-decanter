@@ -46,6 +46,7 @@ public class EmbeddedInstance {
     public void activate() throws Exception {
         LOGGER.info("Starting embedded OrientDB server");
         System.setProperty("ORIENTDB_ROOT_PASSWORD", "decanter");
+        System.setProperty("ORIENTDB_HOME", System.getProperty("karaf.data") + File.separator + "orientdb");
         Orient.instance().startup();
         server = OServerMain.create();
         server.startup(new File(new File(System.getProperty("karaf.etc")), ORIENTDB_SERVER_CONFIG));
