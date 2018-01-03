@@ -166,8 +166,8 @@
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}</bundle>
     </feature>
 
-    <feature name="decanter-appender-elasticsearch" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender">
-        <feature>decanter-appender-elasticsearch-native-2.x</feature>
+    <feature name="decanter-appender-elasticsearch" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender">
+        <feature>decanter-appender-elasticsearch-rest</feature>
     </feature>
 
     <feature name="decanter-appender-elasticsearch-native-core-1.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 1.x Appender core">
@@ -199,12 +199,23 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-2.x/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-appender-elasticsearch-rest-core" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Appender core">
+    <feature name="decanter-appender-elasticsearch-jest-core" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Jest Appender core">
         <feature>decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.jest/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-appender-elasticsearch-jest" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Jest Appender">
+        <feature>decanter-appender-elasticsearch-jest-core</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.jest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.jest/${project.version}/cfg</configfile>
+    </feature>
+
+    <feature name="decanter-appender-elasticsearch-rest-core" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender core">
+        <feature>decanter-common</feature>
+        <feature>http</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}</bundle>
     </feature>
 
-    <feature name="decanter-appender-elasticsearch-rest" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Appender">
+    <feature name="decanter-appender-elasticsearch-rest" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender">
         <feature>decanter-appender-elasticsearch-rest-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.rest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}/cfg</configfile>
     </feature>

@@ -29,9 +29,9 @@
     </parent>
 
     <groupId>org.apache.karaf.decanter.appender</groupId>
-    <artifactId>org.apache.karaf.decanter.appender.elasticsearch.rest</artifactId>
+    <artifactId>org.apache.karaf.decanter.appender.elasticsearch.jest</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Appender :: Elasticsearch Rest</name>
+    <name>Apache Karaf :: Decanter :: Appender :: Elasticsearch Jest</name>
 
     <dependencies>
         <dependency>
@@ -39,39 +39,26 @@
             <artifactId>org.apache.karaf.decanter.api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-client</artifactId>
-            <version>${elasticsearch6.version}</version>
+            <groupId>io.searchbox</groupId>
+            <artifactId>jest</artifactId>
+            <version>2.0.2</version>
         </dependency>
 
         <!-- test -->
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
-            <version>${elasticsearch6.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch.plugin</groupId>
-            <artifactId>transport-netty4-client</artifactId>
-            <version>${elasticsearch6.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.9.1</version>
+            <version>${elasticsearch1.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter.marshaller</groupId>
             <artifactId>org.apache.karaf.decanter.marshaller.json</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -83,15 +70,13 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Import-Package>
-                            org.apache.log;resolution:=optional,
-                            *
-                        </Import-Package>
+                        <Import-Package>!javax.servlet*, org.apache.log;resolution:=optional,*</Import-Package>
                         <Private-Package>
-                            org.apache.karaf.decanter.appender.elasticsearch.rest,
+                            org.apache.karaf.decanter.appender.elasticsearch.jest,
                             org.apache.http*,
                             org.apache.commons*,
-                            org.elasticsearch*
+                            io.searchbox*,
+                            com.google*
                         </Private-Package>
                     </instructions>
                 </configuration>
@@ -108,7 +93,7 @@
                         <configuration>
                             <artifacts>
                                 <artifact>
-                                    <file>src/main/cfg/org.apache.karaf.decanter.appender.elasticsearch.rest.cfg</file>
+                                    <file>src/main/cfg/org.apache.karaf.decanter.appender.elasticsearch.jest.cfg</file>
                                     <type>cfg</type>
                                 </artifact>
                             </artifacts>
