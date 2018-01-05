@@ -142,7 +142,7 @@ public class ElasticsearchAppender implements EventHandler {
         String endpoint = String.format("/%s/%s", indexName, indexType);
         HttpEntity request = new NStringEntity(jsonSt, ContentType.APPLICATION_JSON);
 
-        client.performRequest("POST", endpoint, Collections.EMPTY_MAP, request);
+        client.performRequest("POST", endpoint, Collections.singletonMap("refresh", "true"), request);
     }
 
     private Date getDate(Event event) {

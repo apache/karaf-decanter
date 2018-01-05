@@ -43,6 +43,7 @@ import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.transport.Netty4Plugin;
+import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.service.event.Event;
 
@@ -89,24 +90,11 @@ public class TestElasticsearchAppender {
         RestClient client = RestClient.builder(new HttpHost[]{ host }).build();
         Response response = client.performRequest("GET", "/_count", Collections.EMPTY_MAP);
 
-        System.out.println(EntityUtils.toString(response.getEntity()));
+        String responseString = EntityUtils.toString(response.getEntity());
 
-        String requestBody =
-            "{ \"query\" : { \"match\" : { \"a\" : \"b\" }}}";
-        NStringEntity request = new NStringEntity(requestBody, ContentType.APPLICATION_JSON);
-        response = client.performRequest("GET", "/_search", Collections.EMPTY_MAP, request);
-        System.out.println(EntityUtils.toString(response.getEntity()));
+        System.out.println(responseString);
 
-        /*
-        int maxTryCount = 10;
-
-        for(int i=0; node.client().count(Requests.countRequest()).actionGet().getCount() == 0 && i< maxTryCount; i++) {
-            Thread.sleep(500);
-        }
-
-        Assert.assertEquals(3L, node.client().count(Requests.countRequest()).actionGet().getCount());
-        node.close();
-        */
+        Assert.assertTrue(responseString.contains("\"count\":3"));
     }
 
     private static class PluginConfigurableNode extends Node {
