@@ -100,6 +100,7 @@ public class DecanterTailerListener extends TailerListenerAdapter {
             LOGGER.debug("Can't get host address and name", e);
         }
 
+        // custom fields
         addPropertiesTo(data);
 
         // TODO: try some line parsing

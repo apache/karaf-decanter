@@ -43,6 +43,7 @@ import java.util.HashMap;
             "scheduler.name=decanter-collector-system" }
 )
 public class SystemCollector implements Runnable {
+
     private final static Logger LOGGER = LoggerFactory.getLogger(SystemCollector.class);
 
     private EventAdmin eventAdmin;

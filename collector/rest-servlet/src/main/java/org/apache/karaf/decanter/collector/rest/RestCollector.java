@@ -19,6 +19,7 @@ package org.apache.karaf.decanter.collector.rest;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Map;
 
 import javax.servlet.Servlet;
@@ -40,22 +41,18 @@ import org.slf4j.LoggerFactory;
 /**
  * Decanter REST Servlet Collector
  */
-@Component //
-(//
-    service = Servlet.class, //
-    name = "org.apache.karaf.decanter.collector.rest.servlet", //
-    immediate = true, //
-    property = //
-    { //
-      "decanter.collector.name=rest-servlet", "alias=/decanter/collect"
-    } //
+@Component(
+    service = Servlet.class,
+    name = "org.apache.karaf.decanter.collector.rest.servlet",
+    immediate = true,
+    property = { "decanter.collector.name=rest-servlet", "alias=/decanter/collect" }
 )
 public class RestCollector extends HttpServlet {
-    private static final long serialVersionUID = -2042284119223927588L;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(RestCollector.class);
 
     private String baseTopic;
+    private Dictionary<String, Object> properties;
 
     private EventAdmin eventAdmin;
     private Unmarshaller unmarshaller;
@@ -65,6 +62,7 @@ public class RestCollector extends HttpServlet {
     public void activate(ComponentContext context) throws MalformedURLException {
         Dictionary<String, Object> props = context.getProperties();
         this.baseTopic = getProperty(props, "topic", "decanter/collect/rest");
+        this.properties = props;
     }
 
     private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
@@ -75,8 +73,16 @@ public class RestCollector extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
         try {
-            Map<String, Object> properties = unmarshaller.unmarshal(req.getInputStream());
-            Event event = new Event(baseTopic, properties);
+            Map<String, Object> data = unmarshaller.unmarshal(req.getInputStream());
+
+            // custom fields
+            Enumeration<String> keys = properties.keys();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                data.put(key, properties.get(key));
+            }
+
+            Event event = new Event(baseTopic, data);
             eventAdmin.postEvent(event);
             resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (Exception e) {

@@ -23,6 +23,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -179,6 +180,14 @@ public class SocketCollector implements Closeable, Runnable {
                 } catch (Exception e) {
                     // nothing to do
                 }
+
+                // custom fields
+                Enumeration<String> keys = properties.keys();
+                while (keys.hasMoreElements()) {
+                    String key = keys.nextElement();
+                    data.put(key, properties.get(key));
+                }
+
                 Event event = new Event(eventAdminTopic, data);
                 dispatcher.postEvent(event);
             } catch (EOFException e) {
@@ -218,6 +227,14 @@ public class SocketCollector implements Closeable, Runnable {
                 } catch (Exception e) {
                     // nothing to do
                 }
+
+                // custom fields
+                Enumeration<String> keys = properties.keys();
+                while (keys.hasMoreElements()) {
+                    String key = keys.nextElement();
+                    data.put(key, properties.get(key));
+                }
+
                 Event event = new Event(eventAdminTopic, data);
                 dispatcher.postEvent(event);
                 datagramSocket.send(packet);
