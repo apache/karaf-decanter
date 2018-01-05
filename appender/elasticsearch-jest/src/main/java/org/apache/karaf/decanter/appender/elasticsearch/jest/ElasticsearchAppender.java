@@ -14,33 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.appender.elasticsearch.rest;
+package org.apache.karaf.decanter.appender.elasticsearch.jest;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.nio.entity.NStringEntity;
-import org.apache.http.util.EntityUtils;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.JestResult;
+import io.searchbox.client.config.HttpClientConfig;
+import io.searchbox.client.config.HttpClientConfig.Builder;
+import io.searchbox.core.Index;
 
 @Component(
     name ="org.apache.karaf.decanter.appender.elasticsearch.rest",
@@ -50,11 +53,10 @@ import java.util.*;
 )
 public class ElasticsearchAppender implements EventHandler {
 
-    private RestClient client;
+    private JestClient client;
     private Marshaller marshaller;
     private String indexPrefix;
     private boolean indexTimestamped;
-    private String indexType;
 
     private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSS'Z'");
     private final SimpleDateFormat indexDateFormat = new SimpleDateFormat("yyyy.MM.dd");
@@ -68,47 +70,33 @@ public class ElasticsearchAppender implements EventHandler {
     }
     
     public void open(Dictionary<String, Object> config) {
-        String addressesString = getValue(config, "addresses", "http://localhost:9200");
+        String addressesString = getValue(config, "address", "http://localhost:9200");
+        Set<String> addresses = new HashSet<String>(Arrays.asList(addressesString.split(";")));
         String username = getValue(config, "username", null);
         String password = getValue(config, "password", null);
-
-        Set<String> addresses = new HashSet<String>(Arrays.asList(addressesString.split(",")));
-
-        HttpHost[] hosts = new HttpHost[addresses.size()];
-        int i = 0;
-        for (String address : addresses) {
-            try {
-                URL url = new URL(address);
-                hosts[i] = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
-                i++;
-            } catch (Exception e) {
-                LOGGER.warn("Bad elasticsearch address {}", address, e);
-            }
+        Builder builder = new HttpClientConfig.Builder(addresses)
+            .multiThreaded(true);
+        
+        if (addresses.size() > 1) {
+            builder = builder
+                    .discoveryEnabled(true)
+                    .discoveryFrequency(1l, TimeUnit.MINUTES);
+        } else {
+            builder.discoveryEnabled(false);
         }
-        RestClientBuilder restClientBuilder = RestClient.builder(hosts);
 
         if (username != null) {
-            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
-            restClientBuilder.setHttpClientConfigCallback(
-                    new RestClientBuilder.HttpClientConfigCallback() {
-                        @Override
-                        public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpAsyncClientBuilder) {
-                            return httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-                        }
-                    }
-            );
+            builder = builder.defaultCredentials(username, password);
         }
-
-        client = restClientBuilder.build();
-
+        JestClientFactory factory = new JestClientFactory();
+        factory.setHttpClientConfig(builder.build());
+        client = factory.getObject();
         TimeZone tz = TimeZone.getTimeZone( "UTC" );
         tsFormat.setTimeZone(tz);
         indexDateFormat.setTimeZone(tz);
 
         indexPrefix = getValue(config, "index.prefix", "karaf");
         indexTimestamped = Boolean.parseBoolean(getValue(config, "index.event.timestamped", "true"));
-        indexType = getValue(config, "index.type", "decanter");
     }
     
     private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
@@ -118,11 +106,7 @@ public class ElasticsearchAppender implements EventHandler {
 
     @Deactivate
     public void close() {
-        try {
-            client.close();
-        } catch (Exception e) {
-            LOGGER.warn("Warning when closing elasticsearch client", e);
-        }
+        client.shutdownClient();
     }
 
     @Override
@@ -138,17 +122,22 @@ public class ElasticsearchAppender implements EventHandler {
         String indexName = getIndexName(indexPrefix, getDate(event));
         String jsonSt = marshaller.marshal(event);
 
-        // elasticsearch 6.x only allows one type per index mapping, the _type is part of the document
-        String endpoint = String.format("/%s/%s", indexName, indexType);
-        HttpEntity request = new NStringEntity(jsonSt, ContentType.APPLICATION_JSON);
+        JestResult result = client.execute(new Index.Builder(jsonSt).index(indexName).type(getType(event)).build());
 
-        client.performRequest("POST", endpoint, Collections.singletonMap("refresh", "true"), request);
+        if (!result.isSucceeded()) {
+            throw new IllegalStateException(result.getErrorMessage());
+        }
     }
 
     private Date getDate(Event event) {
         Long ts = (Long)event.getProperty("timestamp");
         Date date = ts != null ? new Date(ts) : new Date();
         return date;
+    }
+
+    private String getType(Event event) {
+        String type = (String)event.getProperty("type");
+        return type != null ? type : "karaf_event";
     }
 
     private String getIndexName(String prefix, Date date) {

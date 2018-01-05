@@ -16,67 +16,91 @@
  */
 package org.apache.karaf.decanter.appender.elasticsearch.rest;
 
-import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
-
-import org.elasticsearch.client.Requests;
+import org.apache.http.HttpHost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.nio.entity.NStringEntity;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.common.collect.MapBuilder;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.node.InternalSettingsPreparer;
 import org.elasticsearch.node.Node;
+import org.elasticsearch.plugins.Plugin;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.transport.Netty4Plugin;
 import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.service.event.Event;
 
-import static org.elasticsearch.node.NodeBuilder.*;
+import java.util.*;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-
-import org.apache.karaf.decanter.api.marshaller.Marshaller;
-import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
 
 public class TestElasticsearchAppender {
 
     private static final String CLUSTER_NAME = "elasticsearch-test";
     private static final String HOST = "127.0.0.1";
-    private static final int PORT = 9301;
     private static final int HTTP_PORT = 9201;
 
     @Test
     public void testAppender() throws Exception {
 
-        Settings settings = settingsBuilder()
+        Settings settings = Settings.builder()
                 .put("cluster.name", CLUSTER_NAME)
+                .put("node.name", "test")
                 .put("http.enabled", "true")
-                .put("node.data", true)
+                .put("http.type", "netty4")
+                .put("path.home", "target/data")
                 .put("path.data", "target/data")
                 .put("network.host", HOST)
-                .put("port", PORT)
                 .put("http.port", HTTP_PORT)
-                .put("index.store.type", "memory")
-                .put("index.store.fs.memory.enabled", "true")
-                .put("path.plugins", "target/plugins")
                 .build();
 
-        Node node = nodeBuilder().settings(settings).node();
+        Collection plugins = Arrays.asList(Netty4Plugin.class);
+        Node node = new PluginConfigurableNode(settings, plugins);
+
+        node.start();
 
         Marshaller marshaller = new JsonMarshaller();
         ElasticsearchAppender appender = new ElasticsearchAppender();
         appender.setMarshaller(marshaller);
         Dictionary<String, Object> config = new Hashtable<>();
-        config.put("address", "http://" + HOST + ":" + HTTP_PORT);
+        config.put("addresses", "http://" + HOST + ":" + HTTP_PORT);
         appender.open(config );
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
         appender.close();
 
-        int maxTryCount = 10;
-        for(int i=0; node.client().count(Requests.countRequest()).actionGet().getCount() == 0 && i< maxTryCount; i++) {
-            Thread.sleep(500);
-        }
+        HttpHost host = new HttpHost(HOST, HTTP_PORT, "http");
+        RestClient client = RestClient.builder(new HttpHost[]{ host }).build();
+        Response response = client.performRequest("GET", "/_count", Collections.EMPTY_MAP);
 
-        Assert.assertEquals(3L, node.client().count(Requests.countRequest()).actionGet().getCount());
-        node.close();
+        String responseString = EntityUtils.toString(response.getEntity());
+
+        System.out.println(responseString);
+
+        Assert.assertTrue(responseString.contains("\"count\":3"));
+    }
+
+    private static class PluginConfigurableNode extends Node {
+        public PluginConfigurableNode(Settings settings, Collection<Class<? extends Plugin>> classpathPlugins) {
+            super(InternalSettingsPreparer.prepareEnvironment(settings, null), classpathPlugins);
+        }
     }
 
 }

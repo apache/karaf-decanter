@@ -84,6 +84,7 @@ Collectors
 Appenders
 ---------
 * decanter-appender-log
+* decanter-appender-elasticsearch-jest
 * decanter-appender-elasticsearch-rest
 * decanter-appender-elasticsearch-native-1.x
 * decanter-appender-elasticsearch-native-2.x

@@ -39,9 +39,9 @@ Decanter provides three appenders for Elasticsearch:
 These appenders store the data (coming from the collectors) into an Elasticsearch node.
 They transformm the data as a json document, stored into Elasticsearch.
 
-===== Elasticsearch HTTP REST appender
+===== Elasticsearch 5.x/6.x Rest Appender
 
-The Decanter Elasticsearch HTTP REST API appender uses the Elasticsearch REST API. It works with any Elasticsearch version (1.x and 2.x).
+The Decanter Elasticsearch Rest appender uses the Elasticsearch Rest client provided since Elasticsearch 5.x. It can be use with Elasticsearch 5.x or 6.x versions.
 
 The `decanter-appender-elasticsearch-rest` feature installs this appender:
 
@@ -49,12 +49,22 @@ The `decanter-appender-elasticsearch-rest` feature installs this appender:
 karaf@root()> feature:install decanter-appender-elasticsearch-rest
 ----
 
-This feature installs the appender and the `etc/org.apache.karaf.decanter.appender.elasticsearch.rest.cfg` configuration file
+===== Elasticsearch HTTP REST Jest appender
+
+The Decanter Elasticsearch HTTP REST API appender uses the Elasticsearch REST API. It works with any Elasticsearch version (1.x and 2.x).
+
+The `decanter-appender-elasticsearch-jest` feature installs this appender:
+
+----
+karaf@root()> feature:install decanter-appender-elasticsearch-jest
+----
+
+This feature installs the appender and the `etc/org.apache.karaf.decanter.appender.elasticsearch.jest.cfg` configuration file
 containing:
 
 ----
 #########################################################
-# Decanter Elasticsearch HTTP REST Appender Configuration
+# Decanter Elasticsearch HTTP Jest Appender Configuration
 #########################################################
 
 # HTTP address of the elasticsearch node
