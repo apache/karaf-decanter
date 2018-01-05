@@ -38,11 +38,27 @@
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>${elasticsearch5.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>jna</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch.plugin</groupId>
             <artifactId>transport-netty4-client</artifactId>
             <version>${elasticsearch5.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-backward-codecs</artifactId>
+            <version>6.6.1</version>
         </dependency>
 
         <dependency>
@@ -70,11 +86,17 @@
                             com.vividsolutions.jts.geom,
                             org.HdrHistogram,
                             org.locationtech.spatial4j*,
-                            org.tartarus.snowball*
+                            org.tartarus.snowball*,
+                            org.joda.time*,
+                            org.joda.convert*,
+                            !META-INF.services.org.apache.lucene.codecs.Codec,
+                            META-INF.services.*
                         </Private-Package>
                         <Import-Package>
                             !com.vividsolutions.jts.geom,
                             !org.locationtech.spatial4j*,
+                            !org.joda.time*,
+                            !org.joda.convert*,
                             com.sun.jna*;resolution:=optional,
                             org.apache.logging.log4j*;version="[2.8,3)",
                             *
