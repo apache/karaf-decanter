@@ -763,6 +763,19 @@ karaf@root()> feature:install elasticsearch-head/2.2.0
 
 By default, the elasticsearch-head web console is available on `http://host:8181/elasticsearch-head`.
 
+==== File
+
+The Decanter File appender stores the collected data in a CSV file.
+
+The `decanter-appender-file` feature installs the file appender:
+
+----
+karaf@root()> feature:install decanter-appender-file
+----
+
+By default, the file appender stores the collected data in `${karaf.data}/decanter` file. You can change the file where to store the data
+using the `filename` property in `etc/org.apache.karaf.decanter.appender.file.cfg` configuration file.
+
 ==== JDBC
 
 The Decanter JDBC appender allows your to store the data (coming from the collectors) into a database.

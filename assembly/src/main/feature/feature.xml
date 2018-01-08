@@ -32,6 +32,7 @@
         <bundle>mvn:org.glassfish/javax.json/${glassfish-json.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.api/${project.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.json/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.csv/${project.version}</bundle>
     </feature>
 
     <feature name="decanter-collector-log" version="${project.version}" description="Karaf Decanter Log Messages Collector">
@@ -218,6 +219,16 @@
     <feature name="decanter-appender-elasticsearch-rest" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender">
         <feature>decanter-appender-elasticsearch-rest-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.rest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}/cfg</configfile>
+    </feature>
+
+    <feature name="decanter-appender-file-core" version="${project.version}" description="Karaf Decanter File Appender core">
+        <feature>decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.file/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-appender-file" version="${project.version}" description="Karaf Decanter File Appender">
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.file.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.file/${project.version}/cfg</configfile>
+        <feature>decanter-appender-file-core</feature>
     </feature>
 
     <feature name="decanter-appender-jdbc-core" version="${project.version}" description="Karaf Decanter JDBC Appender core">
