@@ -88,6 +88,7 @@ Appenders
 * decanter-appender-elasticsearch-rest
 * decanter-appender-elasticsearch-native-1.x
 * decanter-appender-elasticsearch-native-2.x
+* decanter-appender-file
 * decanter-appender-jdbc
 * decanter-appender-jms
 * decanter-appender-camel
