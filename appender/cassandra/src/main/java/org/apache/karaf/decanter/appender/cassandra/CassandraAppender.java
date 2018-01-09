@@ -135,7 +135,7 @@ public class CassandraAppender implements EventHandler {
         }
     }
 
-    @Reference
+    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=json)")
     public void setMarshaller(Marshaller marshaller) {
         this.marshaller = marshaller;
     }

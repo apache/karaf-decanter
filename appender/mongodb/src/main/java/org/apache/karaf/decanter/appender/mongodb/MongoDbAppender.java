@@ -81,7 +81,7 @@ public class MongoDbAppender implements EventHandler {
         mongoClient.close();
     }
 
-    @Reference
+    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=json)")
     public void setMarshaller(Marshaller marshaller) {
         this.marshaller = marshaller;
     }
