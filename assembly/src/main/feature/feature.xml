@@ -411,7 +411,7 @@
 
     <feature name="elasticsearch" version="${elasticsearch1.version}" description="Embedded Elasticsearch 1.x node">
         <feature>scr</feature>
-        <feature>war</feature>
+        <feature prerequisite="true">war</feature>
         <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-1.x/${project.version}/yml</configfile>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch1.bundle.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-1.x/${project.version}</bundle>
@@ -419,7 +419,7 @@
 
     <feature name="elasticsearch" version="${elasticsearch22.version}" description="Embedded Elasticsearch 2.2.x node">
         <feature>scr</feature>
-        <feature>war</feature>
+        <feature prerequisite="true">war</feature>
         <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-2.x/${project.version}/yml</configfile>
         <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
@@ -435,7 +435,7 @@
 
     <feature name="elasticsearch" version="${elasticsearch5.version}" description="Embedded Elasticsearch 5.x node">
         <feature>scr</feature>
-        <feature>war</feature>
+        <feature prerequisite="true">war</feature>
         <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-5.x/${project.version}/yml</configfile>
         <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
         <bundle dependency="true">mvn:org.yaml/snakeyaml/1.18</bundle>
@@ -460,7 +460,7 @@
 
     <feature name="elasticsearch" version="${elasticsearch6.version}" description="Embedded Elasticsearch 6.x node">
         <feature>scr</feature>
-        <feature>war</feature>
+        <feature prerequisite="true">war</feature>
         <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-6.x/${project.version}/yml</configfile>
         <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
         <bundle dependency="true">mvn:org.yaml/snakeyaml/1.18</bundle>
@@ -484,25 +484,31 @@
     </feature>
 
     <feature name="elasticsearch-head" version="${elasticsearch1.version}" description="Elasticsearch Head web frontend">
-        <feature>war</feature>
+        <feature prerequisite="true">war</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-head-1.x/${project.version}</bundle>
     </feature>
 
     <feature name="elasticsearch-head" version="${elasticsearch22.version}" description="Elasticsearch Head web frontend">
-        <feature>war</feature>
+        <feature prerequisite="true">war</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-head-2.x/${project.version}</bundle>
     </feature>
 
     <feature name="kibana" version="${kibana.version}" description="Embedded Kibana dashboard">
-        <feature>war</feature>
-        <feature version="[${elasticsearch1.version},2.0)">elasticsearch</feature>
+        <feature prerequisite="true">war</feature>
+        <feature version="[${elasticsearch1.version},2.0)" prerequisite="true">elasticsearch</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana-3.x/${project.version}</bundle>
     </feature>
 
     <feature name="kibana" version="${kibana4.version}" description="Embedded Kibana 4.x dashboard">
-        <feature>war</feature>
-        <feature version="[${elasticsearch22.version},3.0)">elasticsearch</feature>
+        <feature prerequisite="true">war</feature>
+        <feature version="[${elasticsearch22.version},3.0)" prerequisite="true">elasticsearch</feature>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana-4.x/${project.version}</bundle>
+    </feature>
+
+    <feature name="kibana" version="${kibana6.version}" description="Kibana 6.x bootstrapper">
+        <feature prerequisite="true">http</feature>
+        <feature version="[${elasticsearch6.version},7)" prerequisite="true">elasticsearch</feature>
+        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana-6.x/${project.version}</bundle>
     </feature>
 
     <feature name="orientdb" version="${orientdb.version}" description="Embedded OrientDB instance">

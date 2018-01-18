@@ -30,6 +30,12 @@ The log appender doesn't require any configuration.
 
 ==== Elasticsearch & Kibana
 
+[WARNING]
+===============================================
+For production, we recommend to use a dedicated instance of Elasticsearch and Kibana. The following features are not recommended
+for production.
+===============================================
+
 Decanter provides three appenders for Elasticsearch:
 
 * decanter-appender-elasticsearch-rest (recommanded) is an appender which directly uses the Elasticsearch HTTP REST API. It's compliant with any Elasticsearch version (1.x and 2.x).
@@ -741,6 +747,27 @@ automatically include new fields and create your own visualizations and dashboar
 The default dashboard displayed is the "System" dashboard, requiring the jmx collector.
 ===========================================
 
+===== Kibana 6.x
+
+The `kibana` 6.x feature doesn't really embeds Kibana like Kibana 3 or 4 features.
+
+However, it's a convenient feature that download and starts a Kibana instance for you.
+
+----
+karaf@root()> feature:install kibana/6.1.1
+----
+
+The Kibana instance is started in a dedicated JVM and bound to port 5601 by default. However, the Decanter Kibana feature creates a proxy servlet.
+
+So, as for other Kibana features, you can access Kibana using `http://host:8181/kibana` in your browser.
+
+[NOTE]
+===========================================
+Decanter Kibana 6.x automatically detects collector features and installs the corresponding dashboards.
+
+However, in order to work, the only setup you have to do is to create an index pattern `*` with `default` as name (in the advanced settings).
+===========================================
+
 ===== Elasticsearch Head console
 
 In addition of the embedded elasticsearch instance, Decanter also provides a web console allowing you to monitor and
@@ -1257,6 +1284,11 @@ where:
 * `password` is the password to connect to the remote OrientDB Document database.
 
 ===== OrientDB embedded instance
+
+[WARNING]
+============================================
+For production, we recommend to use a dedicated OrientDB instance. The following feature is not recommended for production.
+============================================
 
 The `orientdb` feature starts an OrientDB embedded datase. It also installs the `etc/orientdb-server-config.xml` configuration file allowing you to configure the OrientBD instance:
 

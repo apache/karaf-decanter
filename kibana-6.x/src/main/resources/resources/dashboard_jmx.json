@@ -1,0 +1,14 @@
+{
+  "attributes": {
+    "title": "JMX",
+    "hits": 0,
+    "description": "Dashboard using metrics harvested by JMX Collector",
+    "panelsJSON": "[{\"panelIndex\":\"1\",\"gridData\":{\"x\":10,\"y\":6,\"w\":2,\"h\":3,\"i\":\"1\"},\"version\":\"6.1.1\",\"type\":\"visualization\",\"id\":\"available-processors\"},{\"panelIndex\":\"2\",\"gridData\":{\"x\":8,\"y\":3,\"w\":4,\"h\":3,\"i\":\"2\"},\"version\":\"6.1.1\",\"type\":\"visualization\",\"id\":\"classloading\"},{\"panelIndex\":\"3\",\"gridData\":{\"x\":0,\"y\":9,\"w\":8,\"h\":3,\"i\":\"3\"},\"version\":\"6.1.1\",\"type\":\"visualization\",\"id\":\"compilation\"},{\"panelIndex\":\"4\",\"gridData\":{\"x\":0,\"y\":6,\"w\":6,\"h\":3,\"i\":\"4\"},\"version\":\"6.1.1\",\"type\":\"visualization\",\"id\":\"garbagecollector\"},{\"panelIndex\":\"5\",\"gridData\":{\"x\":0,\"y\":12,\"w\":12,\"h\":4,\"i\":\"5\"},\"version\":\"6.1.1\",\"type\":\"visualization\",\"id\":\"load\"},{\"panelIndex\":\"6\",\"gridData\":{\"x\":0,\"y\":0,\"w\":8,\"h\":3,\"i\":\"6\"},\"version\":\"6.1.1\",\"type\":\"visualization\",\"id\":\"memory\"},{\"panelIndex\":\"7\",\"gridData\":{\"x\":8,\"y\":9,\"w\":4,\"h\":3,\"i\":\"7\"},\"version\":\"6.1.1\",\"type\":\"visualization\",\"id\":\"open-files\"},{\"panelIndex\":\"8\",\"gridData\":{\"x\":8,\"y\":0,\"w\":4,\"h\":3,\"i\":\"8\"},\"version\":\"6.1.1\",\"type\":\"visualization\",\"id\":\"system-memory\"},{\"panelIndex\":\"9\",\"gridData\":{\"x\":0,\"y\":3,\"w\":8,\"h\":3,\"i\":\"9\"},\"version\":\"6.1.1\",\"type\":\"visualization\",\"id\":\"threading\"},{\"panelIndex\":\"10\",\"gridData\":{\"x\":6,\"y\":6,\"w\":4,\"h\":3,\"i\":\"10\"},\"version\":\"6.1.1\",\"type\":\"visualization\",\"id\":\"uptime\"}]",
+    "optionsJSON": "{\"darkTheme\":false,\"useMargins\":true,\"hidePanelTitles\":false}",
+    "uiStateJSON": "{\"P-7\":{\"vis\":{\"defaultColors\":{\"0 - 1024\":\"rgb(0,104,55)\",\"1024 - 2048\":\"rgb(255,255,190)\",\"2048 - 3000\":\"rgb(165,0,38)\"}}}}",
+    "timeRestore": false,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+    }
+  }
+}

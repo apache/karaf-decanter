@@ -1,0 +1,11 @@
+{
+  "attributes": {
+    "title": "Logs per Bundle",
+    "visState": "{\"title\":\"Logs per Bundle\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false,\"labels\":{\"show\":true,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Log Messages Per Bundle\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"significant_terms\",\"schema\":\"segment\",\"params\":{\"field\":\"MDC.bundle_id.keyword\",\"size\":1000,\"customLabel\":\"Bundle ID\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"significant_terms\",\"schema\":\"segment\",\"params\":{\"field\":\"MDC.bundle_name.keyword\",\"size\":1000,\"customLabel\":\"Bundle Name\"}}]}",
+    "uiStateJSON": "{}",
+    "description": "",
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"default\",\"filter\":[],\"query\":{\"query\":\"type:log\",\"language\":\"lucene\"}}"
+    }
+  }
+}
