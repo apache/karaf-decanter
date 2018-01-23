@@ -49,13 +49,13 @@ public class EmailAlerter implements EventHandler {
 
     @SuppressWarnings("unchecked")
     public void activate(ComponentContext context) throws ConfigurationException {
-        Dictionary<String, String> config = context.getProperties();
+        Dictionary<String, Object> config = context.getProperties();
         requireProperty(config, "from");
         requireProperty(config, "to");
         requireProperty(config, "host");
 
-        this.from = config.get("from");
-        this.to = config.get("to");
+        this.from = (String) config.get("from");
+        this.to = (String) config.get("to");
 
         properties = new Properties();
         properties.put("mail.smtp.host", config.get("host"));

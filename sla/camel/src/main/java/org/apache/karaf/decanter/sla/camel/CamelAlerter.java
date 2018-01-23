@@ -44,7 +44,7 @@ public class CamelAlerter implements EventHandler {
     @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext context) throws ConfigurationException {
-        Dictionary<String, String> config = context.getProperties();
+        Dictionary<String, Object> config = context.getProperties();
         this.alertDestinationUri = (String) config.get("alert.destination.uri");
         if (alertDestinationUri == null) {
             throw new ConfigurationException("alert.destination.uri", "alert.destination.uri property is not defined");

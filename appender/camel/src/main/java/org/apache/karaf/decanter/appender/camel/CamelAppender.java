@@ -51,10 +51,10 @@ public class CamelAppender implements EventHandler {
         open(context.getProperties());
     }
     
-    public void open(Dictionary<String, String> config) throws ConfigurationException {
+    public void open(Dictionary<String, Object> config) throws ConfigurationException {
         LOGGER.debug("Creating CamelContext, and use the {} URI", destinationUri);
         this.camelContext = new DefaultCamelContext();
-        this.destinationUri = config.get("destination.uri");
+        this.destinationUri = (String) config.get("destination.uri");
         if (this.destinationUri == null) {
             throw new ConfigurationException("destination.uri", "destination.uri is not defined");
         }
