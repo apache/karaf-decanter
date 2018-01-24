@@ -52,16 +52,12 @@
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter.appender</groupId>
-            <artifactId>
-                org.apache.karaf.decanter.appender.log
-            </artifactId>
+            <artifactId>org.apache.karaf.decanter.appender.log</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter.marshaller</groupId>
-            <artifactId>
-                org.apache.karaf.decanter.marshaller.json
-            </artifactId>
+            <artifactId>org.apache.karaf.decanter.marshaller.json</artifactId>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
