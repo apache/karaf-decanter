@@ -38,7 +38,9 @@ import java.util.Dictionary;
 )
 public class FileAppender implements EventHandler {
 
-    private Marshaller marshaller;
+    @Reference
+    public Marshaller marshaller;
+
     private BufferedWriter writer;
 
     @Activate
@@ -71,11 +73,6 @@ public class FileAppender implements EventHandler {
     public void deactivate() throws Exception {
         this.writer.flush();
         this.writer.close();
-    }
-
-    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=csv)")
-    public void setMarshaller(Marshaller marshaller) {
-        this.marshaller = marshaller;
     }
 
 }

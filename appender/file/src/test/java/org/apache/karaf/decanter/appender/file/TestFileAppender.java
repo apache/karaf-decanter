@@ -32,7 +32,7 @@ public class TestFileAppender {
     @Test
     public void testAppender() throws Exception {
         FileAppender fileAppender = new FileAppender();
-        fileAppender.setMarshaller(new CsvMarshaller());
+        fileAppender.marshaller = new CsvMarshaller();
         fileAppender.open("target/test-classes/decanter");
         Map<String, String> map = new HashMap<>();
         map.put("a", "b");
