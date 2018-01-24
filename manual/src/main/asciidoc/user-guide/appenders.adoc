@@ -776,6 +776,9 @@ karaf@root()> feature:install decanter-appender-file
 By default, the file appender stores the collected data in `${karaf.data}/decanter` file. You can change the file where to store the data
 using the `filename` property in `etc/org.apache.karaf.decanter.appender.file.cfg` configuration file.
 
+You can also change the marshaller to use. By default, the marshaller used is the CSV one. But you can switch to the JSON one
+using the `marshaller.target` property in `etc/org.apache.karaf.decanter.appender.file.cfg` configuration file.
+
 ==== JDBC
 
 The Decanter JDBC appender allows your to store the data (coming from the collectors) into a database.
