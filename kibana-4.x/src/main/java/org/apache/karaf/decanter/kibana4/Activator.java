@@ -297,8 +297,8 @@ public class Activator implements BundleActivator {
                     LOGGER.debug("Decanter Kibana detected installation of the decanter-collector-log feature");
                     new Thread(new UpdateThread("log*")).start();
                 }
-                if (event.getFeature().getName().equalsIgnoreCase("decanter-collector-jmx")) {
-                    LOGGER.debug("Decanter Kibana detected installation of the decanter-collector-log feature");
+                if (event.getFeature().getName().equalsIgnoreCase("decanter-collector-jmx-core")) {
+                    LOGGER.debug("Decanter Kibana detected installation of the decanter-collector-jmx-core feature");
                     new Thread(new UpdateThread("jmx*")).start();
                 }
             }

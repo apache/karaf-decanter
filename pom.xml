@@ -48,6 +48,7 @@
         <kafka.version>0.11.0.0</kafka.version>
         <kibana.version>3.1.1</kibana.version>
         <kibana4.version>4.1.2</kibana4.version>
+        <kibana6.version>6.1.1</kibana6.version>
         <orientdb.version>2.2.31</orientdb.version>
         <paho.version>1.0.2</paho.version>
         <redisson.version>2.2.8</redisson.version>
@@ -68,6 +69,7 @@
         <module>elasticsearch-head-2.x</module>
         <module>kibana-3.x</module>
         <module>kibana-4.x</module>
+        <module>kibana-6.x</module>
         <module>orientdb</module>
         <module>spring-boot-starter-decanter</module>
         <module>assembly</module>

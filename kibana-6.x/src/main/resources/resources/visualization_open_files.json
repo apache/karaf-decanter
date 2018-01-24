@@ -1,0 +1,11 @@
+{
+  "attributes": {
+    "title": "Open Files",
+    "visState": "{\"title\":\"Open Files\",\"type\":\"gauge\",\"params\":{\"type\":\"gauge\",\"addTooltip\":true,\"addLegend\":true,\"isDisplayWarning\":false,\"gauge\":{\"verticalSplit\":false,\"extendRange\":true,\"percentageMode\":false,\"gaugeType\":\"Arc\",\"gaugeStyle\":\"Full\",\"backStyle\":\"Full\",\"orientation\":\"vertical\",\"colorSchema\":\"Green to Red\",\"gaugeColorMode\":\"Labels\",\"colorsRange\":[{\"from\":0,\"to\":1024},{\"from\":1024,\"to\":2048},{\"from\":2048,\"to\":3000}],\"invertColors\":false,\"labels\":{\"show\":true,\"color\":\"black\"},\"scale\":{\"show\":true,\"labels\":false,\"color\":\"#333\"},\"type\":\"meter\",\"style\":{\"bgWidth\":0.9,\"width\":0.9,\"mask\":false,\"bgMask\":false,\"maskBars\":50,\"bgFill\":\"#eee\",\"bgColor\":false,\"subText\":\"\",\"fontSize\":60,\"labelColor\":true}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"OpenFileDescriptorCount\",\"customLabel\":\"Open File\"}}]}",
+    "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 1024\":\"rgb(0,104,55)\",\"1024 - 2048\":\"rgb(255,255,190)\",\"2048 - 3000\":\"rgb(165,0,38)\"}}}",
+    "description": "",
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"default\",\"filter\":[],\"query\":{\"query\":\"type:jmx*\",\"language\":\"lucene\"}}"
+    }
+  }
+}

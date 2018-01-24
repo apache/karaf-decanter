@@ -1,0 +1,11 @@
+{
+  "attributes": {
+    "title": "Log Levels",
+    "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"Log Levels\"},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"Level\",\"field\":\"level.keyword\",\"size\":10},\"schema\":\"segment\",\"type\":\"significant_terms\"}],\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":false,\"labels\":{\"last_level\":true,\"show\":true,\"truncate\":100,\"values\":true},\"legendPosition\":\"right\",\"type\":\"pie\"},\"title\":\"Log Levels\",\"type\":\"pie\"}",
+    "uiStateJSON": "{}",
+    "description": "",
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"default\",\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"type:log\"}}"
+    }
+  }
+}

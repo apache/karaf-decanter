@@ -109,12 +109,19 @@ SLA/Alerters
 
 Additional features
 -------------------
+WARNING: Since Apache Karaf Decanter 2.0.0, it's not recommended to use the embedded instances of these backends.
+We encourage users to install, setup and start backends.
+
 * elasticsearch 1.7.4
 * elasticsearch 2.2.0
+* elasticsearch 5.6.3
+* elasticsearch 6.1.1
 * elasticsearch-head 1.7.4
 * elasticsearch-head 2.2.0
 * kibana 3.1.1
 * kibana 4.1.2
+* kibana 6.1.1
+* orientdb 2.2.31
 
 Thanks for using Apache Karaf Decanter !
 
