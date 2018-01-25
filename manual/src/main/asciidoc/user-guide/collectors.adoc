@@ -472,11 +472,17 @@ This feature installs a default `etc/org.apache.karaf.decanter.collector.socket.
 
 # Protocol tcp(default) or udp
 #protocol=tcp
+
+# Unmarshaller to use
+# Unmarshaller is identified by data format. The default is json, but you can use another unmarshaller
+unmarshaller.target=(dataFormat=json)
 ----
 
 * the `port` property contains the port number where the network socket collector is listening
 * the `workers` property contains the number of worker thread the socket collector is using for connection
 * the `protocol` property contains the protocol used by the collector for transferring data with the client
+* the `unmarshaller.target` property contains the unmarshaller used by the collector to transform the data
+sended by the client.
 
 ==== JMS
 

@@ -60,20 +60,21 @@ public class SocketCollector implements Closeable, Runnable {
     private Dictionary<String, Object> properties;
     private String eventAdminTopic;
     private EventAdmin dispatcher;
-    private Unmarshaller unmarshaller;
+    
+    @Reference
+    public Unmarshaller unmarshaller;
     
     private enum Protocol {
         TCP,
         UDP;
     }
 
-    @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext context) throws IOException {
         this.properties = context.getProperties();
         int port = Integer.parseInt(getProperty(this.properties, "port", "34343"));
         int workers = Integer.parseInt(getProperty(this.properties, "workers", "10"));
-        
+
         this.protocol = Protocol.valueOf(getProperty(this.properties, "protocol", "tcp").toUpperCase());
         // force TCP protocol if value not in Enum
         if (this.protocol == null) {
@@ -250,10 +251,4 @@ public class SocketCollector implements Closeable, Runnable {
     public void setDispatcher(EventAdmin dispatcher) {
         this.dispatcher = dispatcher;
     }
-
-    @Reference
-    public void setUnmarshaller(Unmarshaller unmarshaller) {
-        this.unmarshaller = unmarshaller;
-    }
-
 }
