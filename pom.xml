@@ -61,16 +61,7 @@
         <module>appender</module>
         <module>marshaller</module>
         <module>sla</module>
-        <module>elasticsearch-1.x</module>
-        <module>elasticsearch-2.x</module>
-        <module>elasticsearch-5.x</module>
-        <module>elasticsearch-6.x</module>
-        <module>elasticsearch-head-1.x</module>
-        <module>elasticsearch-head-2.x</module>
-        <module>kibana-3.x</module>
-        <module>kibana-4.x</module>
-        <module>kibana-6.x</module>
-        <module>orientdb</module>
+        <module>backend</module>
         <module>spring-boot-starter-decanter</module>
         <module>assembly</module>
         <module>tools-jar-wrapper</module>
