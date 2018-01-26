@@ -146,7 +146,7 @@
     <feature name="decanter-collector-process-core" version="${project.version}" description="Karaf Decanter JMX Process Collector core">
         <feature>decanter-common</feature>
         <feature>scheduler</feature>
-        <bundle>mvn:org.apache.karaf.decanter/tools-jar-wraper/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter/tools-jar-wrapper/${project.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.process/${project.version}</bundle>
     </feature>
     

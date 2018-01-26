@@ -73,7 +73,7 @@
         <module>orientdb</module>
         <module>spring-boot-starter-decanter</module>
         <module>assembly</module>
-        <module>tools-jar-wraper</module>
+        <module>tools-jar-wrapper</module>
     </modules>
 
     <scm>
