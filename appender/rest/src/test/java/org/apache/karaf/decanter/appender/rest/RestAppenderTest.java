@@ -64,7 +64,7 @@ public class RestAppenderTest {
     private RestAppender createAppender() throws URISyntaxException {
         RestAppender appender = new RestAppender();
         Marshaller marshaller = new JsonMarshaller();
-        appender.setMarshaller(marshaller);
+        appender.marshaller = marshaller;
         Dictionary<String, Object> config = new Hashtable<>();
         config.put("uri", "http://localhost:8181/decanter/collect");
         appender.activate(config);

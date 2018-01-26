@@ -32,14 +32,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.service.event.Event;
 
-
 public class JmsAppenderTest {
 
     @Test
     public void testHandleEvent() throws JMSException {
         ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
         JmsAppender appender = new JmsAppender();
-        appender.setConnectionFactory(cf);
+        appender.connectionFactory = cf;
         Dictionary<String, Object> config = new Hashtable<>();
         appender.activate(config);
         

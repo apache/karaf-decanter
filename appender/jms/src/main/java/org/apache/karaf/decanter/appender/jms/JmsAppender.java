@@ -38,9 +38,11 @@ import org.slf4j.LoggerFactory;
 )
 public class JmsAppender implements EventHandler {
 
+    @Reference
+    public ConnectionFactory connectionFactory;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(JmsAppender.class);
 
-    private ConnectionFactory connectionFactory;
     private String username;
     private String password;
     private String destinationName;
@@ -144,9 +146,5 @@ public class JmsAppender implements EventHandler {
             }
         }
     }
-    
-    @Reference(target="(osgi.jndi.service.name=jms/decanter)")
-    public void setConnectionFactory(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
-    }
+
 }

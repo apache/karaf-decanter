@@ -22,6 +22,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class ManualReceive {
+
     private static final String TOPIC_FILTER = "decanter";
     private static final String SERVER = "tcp://localhost:1883";
 

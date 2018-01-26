@@ -44,9 +44,11 @@ import java.util.HashMap;
 )
 public class SystemCollector implements Runnable {
 
+    @Reference
+    public EventAdmin dispatcher;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(SystemCollector.class);
 
-    private EventAdmin eventAdmin;
     private Dictionary<String, Object> properties;
 
     @SuppressWarnings("unchecked")
@@ -105,7 +107,7 @@ public class SystemCollector implements Runnable {
                         }
                         streamHandler.stop();
                         Event event = new Event("decanter/collect/system/" + key.replace(".", "_"), data);
-                        eventAdmin.postEvent(event);
+                        dispatcher.postEvent(event);
                         try {
                             outputStream.close();
                         } catch (Exception e) {
@@ -119,8 +121,4 @@ public class SystemCollector implements Runnable {
         }
     }
 
-    @Reference
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
-    }
 }

@@ -40,13 +40,14 @@ import java.util.Dictionary;
 )
 public class MongoDbAppender implements EventHandler {
 
+    @Reference
+    public Marshaller marshaller;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(MongoDbAppender.class);
 
     private MongoClient mongoClient;
     private MongoDatabase mongoDatabase;
     private MongoCollection mongoCollection;
-
-    private Marshaller marshaller;
 
     @Activate
     public void activate(ComponentContext componentContext) {
@@ -79,11 +80,6 @@ public class MongoDbAppender implements EventHandler {
     @Deactivate
     public void deactivate(ComponentContext componentContext) {
         mongoClient.close();
-    }
-
-    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=json)")
-    public void setMarshaller(Marshaller marshaller) {
-        this.marshaller = marshaller;
     }
 
 }

@@ -37,12 +37,14 @@ import java.util.Dictionary;
 )
 public class SocketAppender implements EventHandler {
 
+    @Reference
+    public Marshaller marshaller;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(SocketAppender.class);
 
     private String host;
     private int port;
 
-    private Marshaller marshaller;
 
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
@@ -81,11 +83,6 @@ public class SocketAppender implements EventHandler {
     private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
         String value = (String)config.get(key);
         return (value != null) ? value :  defaultValue;
-    }
-
-    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=json)")
-    public void setMarshaller(Marshaller marshaller) {
-        this.marshaller = marshaller;
     }
 
 }

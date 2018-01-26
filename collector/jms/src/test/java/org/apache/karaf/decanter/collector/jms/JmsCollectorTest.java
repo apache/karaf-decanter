@@ -65,9 +65,9 @@ public class JmsCollectorTest {
         dispatcher = new DispatcherMock();
 
         JmsCollector jmsCollector = new JmsCollector();
-        jmsCollector.setUnmarshaller(unmarshaller);
-        jmsCollector.setConnectionFactory(connectionFactory);
-        jmsCollector.setDispatcher(dispatcher);
+        jmsCollector.unmarshaller = unmarshaller;
+        jmsCollector.connectionFactory = connectionFactory;
+        jmsCollector.dispatcher = dispatcher;
 
         ComponentContext componentContext = new ComponentContextMock();
         componentContext.getProperties().put("destination.name", "decanter");

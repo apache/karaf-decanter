@@ -49,13 +49,16 @@ import org.slf4j.LoggerFactory;
 )
 public class RestCollector extends HttpServlet {
 
+    @Reference
+    public EventAdmin dispatcher;
+
+    @Reference
+    public Unmarshaller unmarshaller;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(RestCollector.class);
 
     private String baseTopic;
     private Dictionary<String, Object> properties;
-
-    private EventAdmin eventAdmin;
-    private Unmarshaller unmarshaller;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -83,7 +86,7 @@ public class RestCollector extends HttpServlet {
             }
 
             Event event = new Event(baseTopic, data);
-            eventAdmin.postEvent(event);
+            dispatcher.postEvent(event);
             resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -91,14 +94,5 @@ public class RestCollector extends HttpServlet {
         }
         
     }
-    
-    @Reference
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
-    }
 
-    @Reference
-    public void setUnmarshaller(Unmarshaller unmarshaller) {
-        this.unmarshaller = unmarshaller;
-    }
 }

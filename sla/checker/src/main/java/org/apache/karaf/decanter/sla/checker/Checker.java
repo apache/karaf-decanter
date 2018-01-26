@@ -42,12 +42,15 @@ import java.util.regex.Pattern;
 )
 public class Checker implements EventHandler {
 
+    @Reference
+    public EventAdmin dispatcher;
+
+    @Reference
+    public AlertStore alertStore;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(Checker.class);
 
     private Dictionary<String, Object> config;
-    private EventAdmin eventAdmin;
-
-    private AlertStore alertStore;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -73,17 +76,17 @@ public class Checker implements EventHandler {
                     if (!alertStore.known(name, "error")) {
                         alertStore.add(name, "error");
                         Event alertEvent = populateAlertEvent("error", collectEvent, name, errorPattern, false);
-                        eventAdmin.postEvent(alertEvent);
+                        dispatcher.postEvent(alertEvent);
                     }
                 } else {
                     if (alertStore.known(name, "error")) {
-                        eventAdmin.postEvent(populateAlertEvent("error", collectEvent, name, errorPattern, true));
+                        dispatcher.postEvent(populateAlertEvent("error", collectEvent, name, errorPattern, true));
                         alertStore.remove(name, "error");
                     }
                 }
             } else {
                 if (alertStore.known(name, "error")) {
-                    eventAdmin.postEvent(populateAlertEvent("error", collectEvent, name, "REMOVED", true));
+                    dispatcher.postEvent(populateAlertEvent("error", collectEvent, name, "REMOVED", true));
                 }
             }
 
@@ -100,17 +103,17 @@ public class Checker implements EventHandler {
                     if (!alertStore.known(name, "warn")) {
                         alertStore.add(name, "warn");
                         Event alertEvent = populateAlertEvent("warn", collectEvent, name, warnPattern, false);
-                        eventAdmin.postEvent(alertEvent);
+                        dispatcher.postEvent(alertEvent);
                     }
                 } else {
                     if (alertStore.known(name, "warn")) {
-                        eventAdmin.postEvent(populateAlertEvent("warn", collectEvent, name, warnPattern, true));
+                        dispatcher.postEvent(populateAlertEvent("warn", collectEvent, name, warnPattern, true));
                         alertStore.remove(name, "warn");
                     }
                 }
             } else {
                 if (alertStore.known(name, "warn")) {
-                    eventAdmin.postEvent(populateAlertEvent("warn", collectEvent, name, "REMOVED", true));
+                    dispatcher.postEvent(populateAlertEvent("warn", collectEvent, name, "REMOVED", true));
                     alertStore.remove(name, "warn");
                 }
             }
@@ -470,16 +473,6 @@ public class Checker implements EventHandler {
             // we use regex as we use a String
             return validateString(pattern, value.toString());
         }
-    }
-
-    @Reference
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
-    }
-
-    @Reference
-    public void setAlertStore(AlertStore alertStore) {
-        this.alertStore = alertStore;
     }
     
 }

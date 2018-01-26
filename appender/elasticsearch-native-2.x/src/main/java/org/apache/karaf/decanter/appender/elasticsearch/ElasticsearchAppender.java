@@ -53,13 +53,15 @@ public class ElasticsearchAppender implements EventHandler {
 
     final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
 
+    @Reference
+    public Marshaller marshaller;
+
     private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSS'Z'");
     private final SimpleDateFormat indexDateFormat = new SimpleDateFormat("yyyy.MM.dd");
 
     private final int concurrentRequests = 1;
     private BulkProcessor bulkProcessor;
     Client client;
-    private Marshaller marshaller;
     private WorkFinishedListener listener;
 
     private String indexPrefix;
@@ -154,8 +156,4 @@ public class ElasticsearchAppender implements EventHandler {
         }
     }
 
-    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=json)")
-    public void setMarshaller(Marshaller marshaller) {
-        this.marshaller = marshaller;
-    }
 }

@@ -46,19 +46,21 @@ import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component //
-( //
-  name = "org.apache.karaf.decanter.collector.log.socket", //
-  configurationPolicy = ConfigurationPolicy.REQUIRE, //
-  immediate = true //
+@Component(
+  name = "org.apache.karaf.decanter.collector.log.socket",
+  configurationPolicy = ConfigurationPolicy.REQUIRE,
+  immediate = true
 )
 public class SocketCollector implements Closeable, Runnable {
 
     public static final String PORT_NAME = "port";
     public static final String WORKERS_NAME = "workers";
+
+    @Reference
+    public EventAdmin dispatcher;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketCollector.class);
     private ServerSocket serverSocket;
-    private EventAdmin eventAdmin;
     private boolean open;
     private ExecutorService executor;
     private Dictionary<String, Object> properties;
@@ -145,7 +147,7 @@ public class SocketCollector implements Closeable, Runnable {
             data.put("karafName", karafName);
         }
         Event event = new Event(topic, data);
-        eventAdmin.postEvent(event);
+        dispatcher.postEvent(event);
     }
 
     static String loggerName2Topic(String loggerName) {
@@ -196,11 +198,6 @@ public class SocketCollector implements Closeable, Runnable {
             LOGGER.warn("Error shutting down Socket");
         }
         serverSocket.close();
-    }
-
-    @Reference
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
     }
 
     private class SocketRunnable implements Runnable {

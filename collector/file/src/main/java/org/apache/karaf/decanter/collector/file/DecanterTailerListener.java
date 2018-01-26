@@ -44,11 +44,13 @@ import org.slf4j.LoggerFactory;
 )
 public class DecanterTailerListener extends TailerListenerAdapter {
 
+    @Reference
+    public EventAdmin dispatcher;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(DecanterTailerListener.class);
 
     private String type;
     private String path;
-    private EventAdmin eventAdmin;
     
     /**
      * additional properties provided by the user
@@ -107,7 +109,7 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         data.put("line", line);
 
         Event event = new Event("decanter/collect/file/" + type, data);
-        eventAdmin.postEvent(event);
+        dispatcher.postEvent(event);
     }
 
     private void addPropertiesTo(Map<String, Object> data) {
@@ -136,8 +138,4 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         LOGGER.debug("File {} rotated", path);
     }
 
-    @Reference
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
-    }
 }

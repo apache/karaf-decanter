@@ -38,7 +38,9 @@ import java.util.Dictionary;
 )
 public class OrientDBAppender implements EventHandler {
 
-    private Marshaller marshaller;
+    @Reference
+    public Marshaller marshaller;
+
     private ODatabaseDocumentTx database;
 
     @Activate
@@ -65,11 +67,6 @@ public class OrientDBAppender implements EventHandler {
         String json = marshaller.marshal(event);
         ODocument document = new ODocument("decanter").fromJSON(json);
         document.save();
-    }
-
-    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=json)")
-    public void setMarshaller(Marshaller marshaller) {
-        this.marshaller = marshaller;
     }
 
 }

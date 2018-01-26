@@ -348,10 +348,10 @@ in the Camel Tracer:
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="eventAdmin" interface="org.osgi.service.event.EventAdmin"/>
+    <reference id="dispatcher" interface="org.osgi.service.event.EventAdmin"/>
 
     <bean id="traceHandler" class="org.apache.karaf.decanter.collector.camel.DecanterTraceEventHandler">
-        <property name="eventAdmin" ref="eventAdmin"/>
+        <property name="dispatcher" ref="dispatcher"/>
     </bean>
 
     <bean id="tracer" class="org.apache.camel.processor.interceptor.Tracer">

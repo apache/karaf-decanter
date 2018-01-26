@@ -45,6 +45,12 @@ import java.util.Map;
 )
 public class MqttCollector {
 
+    @Reference
+    public EventAdmin dispatcher;
+
+    @Reference
+    public Unmarshaller unmarshaller;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(MqttCollector.class);
 
     private Dictionary<String, Object> properties;
@@ -53,8 +59,6 @@ public class MqttCollector {
     private String dispatcherTopic;
     private boolean consuming = false;
 
-    private EventAdmin dispatcher;
-    private Unmarshaller unmarshaller;
 
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
@@ -121,16 +125,6 @@ public class MqttCollector {
 
     private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
         return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
-    }
-
-    @Reference
-    public void setDispatcher(EventAdmin dispatcher) {
-        this.dispatcher = dispatcher;
-    }
-
-    @Reference
-    public void setUnmarshaller(Unmarshaller unmarshaller) {
-        this.unmarshaller = unmarshaller;
     }
 
 }
