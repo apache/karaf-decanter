@@ -45,9 +45,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter.appender</groupId>
-            <artifactId>
-                org.apache.karaf.decanter.appender.kafka
-            </artifactId>
+            <artifactId>org.apache.karaf.decanter.appender.kafka</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
