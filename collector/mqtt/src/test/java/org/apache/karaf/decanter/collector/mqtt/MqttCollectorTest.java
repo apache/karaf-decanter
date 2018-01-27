@@ -61,8 +61,8 @@ public class MqttCollectorTest {
         componentContext.getProperties().put("topic", "decanter");
         JsonUnmarshaller unmarshaller = new JsonUnmarshaller();
         MqttCollector collector = new MqttCollector();
-        collector.setDispatcher(dispatcherMock);
-        collector.setUnmarshaller(unmarshaller);
+        collector.dispatcher = dispatcherMock;
+        collector.unmarshaller = unmarshaller;
         collector.activate(componentContext);
 
         MqttClient mqttClient = new MqttClient("tcp://localhost:11883", "client");

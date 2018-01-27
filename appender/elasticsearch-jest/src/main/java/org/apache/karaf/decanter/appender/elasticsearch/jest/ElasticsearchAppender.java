@@ -53,8 +53,10 @@ import io.searchbox.core.Index;
 )
 public class ElasticsearchAppender implements EventHandler {
 
+    @Reference
+    public Marshaller marshaller;
+
     private JestClient client;
-    private Marshaller marshaller;
     private String indexPrefix;
     private boolean indexTimestamped;
 
@@ -148,8 +150,4 @@ public class ElasticsearchAppender implements EventHandler {
         }
     }
 
-    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=json)")
-    public void setMarshaller(Marshaller marshaller) {
-        this.marshaller = marshaller;
-    }
 }

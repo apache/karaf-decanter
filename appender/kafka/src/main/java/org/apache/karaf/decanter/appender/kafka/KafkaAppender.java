@@ -43,11 +43,13 @@ import org.slf4j.LoggerFactory;
 )
 public class KafkaAppender implements EventHandler {
 
+    @Reference
+    public Marshaller marshaller;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaAppender.class);
 
     private Properties properties;
     private String topic;
-    private Marshaller marshaller;
     private KafkaProducer<String, String> producer;
 
     @Activate
@@ -91,8 +93,4 @@ public class KafkaAppender implements EventHandler {
         producer.close();
     }
 
-    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=json)")
-    public void setMarshaller(Marshaller marshaller) {
-        this.marshaller = marshaller;
-    }
 }

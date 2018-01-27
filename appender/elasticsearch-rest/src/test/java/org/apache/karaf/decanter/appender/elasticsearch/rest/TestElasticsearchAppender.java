@@ -77,7 +77,7 @@ public class TestElasticsearchAppender {
 
         Marshaller marshaller = new JsonMarshaller();
         ElasticsearchAppender appender = new ElasticsearchAppender();
-        appender.setMarshaller(marshaller);
+        appender.marshaller = marshaller;
         Dictionary<String, Object> config = new Hashtable<>();
         config.put("addresses", "http://" + HOST + ":" + HTTP_PORT);
         appender.open(config );

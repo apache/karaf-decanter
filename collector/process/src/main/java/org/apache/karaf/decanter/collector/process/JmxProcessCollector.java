@@ -54,12 +54,15 @@ import com.sun.tools.attach.VirtualMachineDescriptor;
 )
 public class JmxProcessCollector implements Runnable {
 
+    @Reference
+    public EventAdmin dispatcher;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(JmxProcessCollector.class);
 
     private String type;
     private String process;
     private String objectName;
-    private EventAdmin eventAdmin;
+
     private Dictionary<String, Object> properties;
 
     @SuppressWarnings("unchecked")
@@ -129,7 +132,7 @@ public class JmxProcessCollector implements Runnable {
                     Map<String, Object> data = harvester.harvestBean(name);
                     addUserProperties(data);
                     Event event = new Event("decanter/collect/jmx/" + type + "/" + getTopic(name), data);
-                    eventAdmin.postEvent(event);
+                    dispatcher.postEvent(event);
                 } catch (Exception e) {
                     LOGGER.warn("Can't read MBean {} ({})", name, type, e);
                 }
@@ -165,8 +168,4 @@ public class JmxProcessCollector implements Runnable {
         return name.getDomain().replace(".", "/").replace(" ", "_");
     }
 
-    @Reference
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
-    }
 }

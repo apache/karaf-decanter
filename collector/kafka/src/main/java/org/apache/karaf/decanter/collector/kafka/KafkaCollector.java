@@ -56,8 +56,11 @@ public class KafkaCollector implements Runnable {
     private String eventAdminTopic;
     private boolean consuming = false;
 
-    private EventAdmin dispatcher;
-    private Unmarshaller unmarshaller;
+    @Reference
+    public EventAdmin dispatcher;
+
+    @Reference
+    public Unmarshaller unmarshaller;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -196,16 +199,6 @@ public class KafkaCollector implements Runnable {
         }
         Event event = new Event(eventAdminTopic, data);
         dispatcher.postEvent(event);
-    }
-
-    @Reference
-    public void setDispatcher(EventAdmin dispatcher) {
-        this.dispatcher = dispatcher;
-    }
-    
-    @Reference
-    public void setUnmarshaller(Unmarshaller unmarshaller) {
-        this.unmarshaller = unmarshaller;
     }
 
     private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {

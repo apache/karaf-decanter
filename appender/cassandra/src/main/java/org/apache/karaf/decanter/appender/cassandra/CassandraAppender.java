@@ -49,7 +49,9 @@ public class CassandraAppender implements EventHandler {
 
     private String keyspace;
     private String tableName;
-    private Marshaller marshaller;
+
+    @Reference
+    public Marshaller marshaller;
 
     private final static String createTableTemplate = "CREATE TABLE IF NOT EXISTS %s (timeStamp timestamp PRIMARY KEY, content Text);";
 
@@ -135,8 +137,4 @@ public class CassandraAppender implements EventHandler {
         }
     }
 
-    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=json)")
-    public void setMarshaller(Marshaller marshaller) {
-        this.marshaller = marshaller;
-    }
 }

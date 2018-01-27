@@ -42,10 +42,10 @@ import java.util.HashMap;
 
 public class BundleCollector implements SynchronousBundleListener {
 
-    private EventAdmin eventAdmin;
+    private EventAdmin dispatcher;
 
-    public BundleCollector(Event eventAdmin) {
-      this.eventAdmin = eventAdmin;
+    public BundleCollector(Event dispatcher) {
+      this.dispatcher = dispatcher;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class BundleCollector implements SynchronousBundleListener {
       data.put("location", bundleEvent.getBundle().getLocation());
       data.put("symbolicName", bundleEvent.getBundle().getSymbolicName());
       Event event = new Event("decanter/collect/bundle", data);
-      eventAdmin.postEvent(event);
+      dispatcher.postEvent(event);
     }
 
 }
@@ -84,8 +84,8 @@ public class Activator implements BundleActivator {
 
        public void start(final BundleContext bundleContext) {
            ServiceTracker tracker = new ServiceTracker(bundleContext, EventAdmin.class.getName(), null);
-           EventAdmin eventAdmin = (EventAdmin) tracker.waitForService(10000);
-           collector = new BundleCollector(eventAdmin);
+           EventAdmin dispatcher = (EventAdmin) tracker.waitForService(10000);
+           collector = new BundleCollector(dispatcher);
        }
 
        public void stop(BundleContext bundleContext) {
@@ -192,10 +192,10 @@ import java.util.HashMap;
 
 public class HelloCollector implements Runnable {
 
-  private EventAdmin eventAdmin;
+  private EventAdmin dispatcher;
 
-  public HelloCollector(EventAdmin eventAdmin) {
-    this.eventAdmin = eventAdmin;
+  public HelloCollector(EventAdmin dispatcher) {
+    this.dispatcher = dispatcher;
   }
 
   @Override
@@ -204,7 +204,7 @@ public class HelloCollector implements Runnable {
     data.put("type", "hello");
     data.put("message", "Hello World");
     Event event = new Event("decanter/collect/hello", data);
-    eventAdmin.postEvent(event);
+    dispatcher.postEvent(event);
   }
 
 }
@@ -227,8 +227,8 @@ public class Activator implements BundleActivator {
 
     public void start(BundleContext bundleContext) {
        ServiceTracker tracker = new ServiceTracker(bundleContext, EventAdmin.class.getName(), null);
-       EventAdmin eventAdmin = tracker.waitForService(10000);
-       HelloCollector collector = new HelloCollector(eventAdmin);
+       EventAdmin dispatcher = tracker.waitForService(10000);
+       HelloCollector collector = new HelloCollector(dispatcher);
 
        Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
        serviceProperties.put("decanter.collector.name", "hello");

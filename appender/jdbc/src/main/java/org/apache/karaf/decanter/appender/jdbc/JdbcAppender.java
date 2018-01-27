@@ -41,6 +41,13 @@ import org.slf4j.LoggerFactory;
     property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
 )
 public class JdbcAppender implements EventHandler {
+
+    @Reference
+    public Marshaller marshaller;
+
+    @Reference
+    public DataSource dataSource;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(JdbcAppender.class);
 
     private final static String createTableQueryGenericTemplate =
@@ -53,9 +60,6 @@ public class JdbcAppender implements EventHandler {
     private final static String insertQueryTemplate =
             "INSERT INTO TABLENAME(timestamp, content) VALUES(?,?)";
 
-    private Marshaller marshaller;
-    private DataSource dataSource;
-    
     String tableName;
     String dialect;
     
@@ -117,14 +121,5 @@ public class JdbcAppender implements EventHandler {
             LOGGER.trace("Can't create table {}", e);
         }
     }
-    
-    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=json)")
-    public void setMarshaller(Marshaller marshaller) {
-        this.marshaller = marshaller;
-    }
 
-    @Reference(target="(osgi.jndi.service.name=jdbc/decanter)")
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 }

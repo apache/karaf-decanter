@@ -42,18 +42,24 @@ import java.util.Map;
 )
 public class JmsCollector {
 
+    @Reference
+    public ConnectionFactory connectionFactory;
+
+    @Reference
+    public Unmarshaller unmarshaller;
+
+    @Reference
+    public EventAdmin dispatcher;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(JmsCollector.class);
 
     private Dictionary<String, Object> properties;
     private String dispatcherTopic;
-    private ConnectionFactory connectionFactory;
     private String username;
     private String password;
     private String destinationName;
     private String destinationType;
 
-    private EventAdmin dispatcher;
-    private Unmarshaller unmarshaller;
     private Connection connection;
     private Session session;
 
@@ -114,21 +120,6 @@ public class JmsCollector {
     public void deactivate() {
         safeClose(session);
         safeClose(connection);
-    }
-
-    @Reference(target="(osgi.jndi.service.name=jms/decanter)")
-    public void setConnectionFactory(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
-    }
-
-    @Reference
-    public void setDispatcher(EventAdmin dispatcher) {
-        this.dispatcher = dispatcher;
-    }
-
-    @Reference
-    public void setUnmarshaller(Unmarshaller unmarshaller) {
-        this.unmarshaller = unmarshaller;
     }
 
     public class DecanterMessageListener implements MessageListener {

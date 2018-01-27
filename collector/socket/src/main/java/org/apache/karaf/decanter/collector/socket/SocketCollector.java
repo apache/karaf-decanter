@@ -49,17 +49,18 @@ import org.slf4j.LoggerFactory;
         immediate = true)
 public class SocketCollector implements Closeable, Runnable {
 
+    @Reference
+    public EventAdmin dispatcher;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketCollector.class);
 
     private ServerSocket serverSocket;
     private DatagramSocket datagramSocket;
     private Protocol protocol;
-    private EventAdmin eventAdmin;
     private boolean open;
     private ExecutorService executor;
     private Dictionary<String, Object> properties;
     private String eventAdminTopic;
-    private EventAdmin dispatcher;
     
     @Reference
     public Unmarshaller unmarshaller;
@@ -153,11 +154,6 @@ public class SocketCollector implements Closeable, Runnable {
         }
     }
 
-    @Reference
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
-    }
-
     private class SocketRunnable implements Runnable {
 
         private Socket clientSocket;
@@ -247,8 +243,4 @@ public class SocketCollector implements Closeable, Runnable {
         }
     }
 
-    @Reference
-    public void setDispatcher(EventAdmin dispatcher) {
-        this.dispatcher = dispatcher;
-    }
 }

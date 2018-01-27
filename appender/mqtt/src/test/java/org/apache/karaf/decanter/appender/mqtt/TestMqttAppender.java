@@ -19,10 +19,7 @@ package org.apache.karaf.decanter.appender.mqtt;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -44,7 +41,7 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 
 public class TestMqttAppender  {
-    private static final String SERRVER = "tcp://localhost:11883";
+    private static final String SERVER = "tcp://localhost:11883";
     private static final String TOPIC = "decanter";
     private static final long TIMESTAMP = 1454428780634L;
 
@@ -61,12 +58,18 @@ public class TestMqttAppender  {
         
         
         Marshaller marshaller = new JsonMarshaller();
-        MqttAppender appender = new MqttAppender(SERRVER, "my", TOPIC, marshaller);
-        
+        MqttAppender appender = new MqttAppender();
+        appender.marshaller = marshaller;
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put("server", SERVER);
+        config.put("clientId", "decanter");
+        config.put("topic", TOPIC);
+        appender.activate(config);
+
         Map<String, Object> properties = new HashMap<>();
         properties.put(EventConstants.TIMESTAMP, TIMESTAMP);
         Event event = new Event(TOPIC, properties);
-        appender.send(event);
+        appender.handleEvent(event);
         Thread.sleep(100);
         Assert.assertEquals(1, received.size());
         
@@ -77,14 +80,14 @@ public class TestMqttAppender  {
         Assert.assertEquals(TIMESTAMP, jsonO.getJsonNumber(EventConstants.TIMESTAMP).longValue());
         Assert.assertEquals("decanter", jsonO.getString(EventConstants.EVENT_TOPIC.replace('.', '_')));
         
-        appender.close();
+        appender.deactivate();
         client.disconnect();
         client.close();
         brokerService.stop();
     }
 
     private MqttClient receive(final List<MqttMessage> received) throws MqttException, MqttSecurityException {
-        MqttClient client = new MqttClient(SERRVER, "test");
+        MqttClient client = new MqttClient(SERVER, "test");
         MqttCallback callback = new MqttCallback() {
             
             @Override

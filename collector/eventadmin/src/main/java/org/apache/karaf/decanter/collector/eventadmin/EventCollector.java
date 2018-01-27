@@ -35,7 +35,8 @@ import java.util.*;
 )
 public class EventCollector implements EventHandler {
 
-    private EventAdmin eventAdmin;
+    @Reference
+    public EventAdmin dispatcher;
 
     private Dictionary<String, Object> properties;
 
@@ -83,7 +84,7 @@ public class EventCollector implements EventHandler {
             }
         }
         Event bridge = new Event("decanter/collect/eventadmin/" + topic, data);
-        eventAdmin.sendEvent(bridge);
+        dispatcher.sendEvent(bridge);
     }
 
     public Map<String, String> convertSubject(Subject subject) {
@@ -97,11 +98,6 @@ public class EventCollector implements EventHandler {
             }
         }
         return map;
-    }
-
-    @Reference
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
     }
 
 }

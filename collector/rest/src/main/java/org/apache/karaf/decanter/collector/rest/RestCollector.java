@@ -47,15 +47,18 @@ import org.slf4j.LoggerFactory;
 )
 public class RestCollector implements Runnable {
 
+    @Reference
+    public EventAdmin dispatcher;
+
+    @Reference
+    public Unmarshaller unmarshaller;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(RestCollector.class);
 
     private URL url;
     private String[] paths;
     private String baseTopic;
     private Dictionary<String, Object> properties;
-
-    private EventAdmin eventAdmin;
-    private Unmarshaller unmarshaller;
 
     private boolean repeatedError;
 
@@ -104,7 +107,7 @@ public class RestCollector implements Runnable {
                 }
 
                 addUserProperties(data);
-                eventAdmin.postEvent(new Event(toTopic(complete), data));
+                dispatcher.postEvent(new Event(toTopic(complete), data));
                 repeatedError = false;
             } catch (Exception e) {
                 if (repeatedError) {
@@ -132,14 +135,5 @@ public class RestCollector implements Runnable {
             }
         }
     }
-    
-    @Reference
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
-    }
 
-    @Reference
-    public void setUnmarshaller(Unmarshaller unmarshaller) {
-        this.unmarshaller = unmarshaller;
-    }
 }

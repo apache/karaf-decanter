@@ -76,7 +76,7 @@ public class CassandraAppenderTest {
         config.put("cassandra.port", CASSANDRA_PORT);
         config.put("keyspace.name", KEYSPACE);
         config.put("table.name", TABLE_NAME);
-        appender.setMarshaller(marshaller);
+        appender.marshaller = marshaller;
         appender.activate(config);
         
         Map<String, Object> properties = new HashMap<>();

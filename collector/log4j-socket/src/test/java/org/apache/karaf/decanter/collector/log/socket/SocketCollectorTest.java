@@ -56,7 +56,7 @@ public class SocketCollectorTest {
         port = SocketUtils.findAvailablePort();
         eventAdmin = new EventAdminStub();
         collector = new SocketCollector();
-        collector.setEventAdmin(eventAdmin);
+        collector.dispatcher = eventAdmin;
         componentContext = new ComponentContextStub();
         componentContext.getProperties().put(SocketCollector.PORT_NAME, String.valueOf(port));
         componentContext.getProperties().put(SocketCollector.WORKERS_NAME, "1");

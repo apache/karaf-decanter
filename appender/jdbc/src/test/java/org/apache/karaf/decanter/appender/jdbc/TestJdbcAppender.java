@@ -54,8 +54,8 @@ public class TestJdbcAppender {
         deleteTable(dataSource);
         
         JdbcAppender appender = new JdbcAppender();
-        appender.setMarshaller(marshaller);
-        appender.setDataSource(dataSource);
+        appender.marshaller = marshaller;
+        appender.dataSource = dataSource;
         Dictionary<String, Object> config = new Hashtable<>();
         config.put("dialect", "derby");
         appender.open(config);

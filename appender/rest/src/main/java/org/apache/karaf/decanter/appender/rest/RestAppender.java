@@ -44,8 +44,11 @@ import org.slf4j.LoggerFactory;
 )
 public class RestAppender implements EventHandler {
 
+    @Reference
+    public Marshaller marshaller;
+
     private final static Logger LOGGER = LoggerFactory.getLogger(RestAppender.class);
-    private Marshaller marshaller;
+
     private URI uri;
 
     @Activate
@@ -92,8 +95,4 @@ public class RestAppender implements EventHandler {
     public void close() {
     }
 
-    @Reference(target="(" + Marshaller.SERVICE_KEY_DATAFORMAT + "=json)")
-    public void setMarshaller(Marshaller marshaller) {
-        this.marshaller = marshaller;
-    }
 }

@@ -53,7 +53,7 @@ public class TestElasticsearchAppender {
        
        Marshaller marshaller = new JsonMarshaller();
        ElasticsearchAppender appender = new ElasticsearchAppender();
-       appender.setMarshaller(marshaller);
+       appender.marshaller = marshaller;
        Dictionary<String, Object> config = new Hashtable<>();
        config.put("clusterName", CLUSTER_NAME);
        config.put("port", "" + PORT);

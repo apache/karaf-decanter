@@ -47,15 +47,16 @@ import org.slf4j.LoggerFactory;
     immediate = true
 )
 public class LogAppender implements PaxAppender {
-    
+
+    @Reference
+    public EventAdmin dispatcher;
+
     private static final String MDC_IN_LOG_APPENDER = "inLogAppender";
     private final static Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
     private final static Pattern PATTERN = Pattern.compile("[^A-Za-z0-9]");
 
     private Dictionary<String, Object> properties;
     protected String[] ignoredCategories;
-
-    private EventAdmin dispatcher;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -170,8 +171,4 @@ public class LogAppender implements PaxAppender {
         return false;
     }
 
-    @Reference
-    public void setDispatcher(EventAdmin dispatcher) {
-        this.dispatcher = dispatcher;
-    }
 }
