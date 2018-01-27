@@ -19,7 +19,7 @@ and also to throw the alerts to the alerters:
 
 * `decanter/collect/*` EventAdmin topics are used by the collectors to send the harvested data. The appenders consume
 from these topics and insert the data in a backend.
-* `decanter/alert/*` EventAdmin topics are used by the SLA checker to send the alerts. The SLA alerters consume from
+* `decanter/alert/*` EventAdmin topics are used by the checker to send the alerts. The alerters consume from
 these topics.
 
 Decanter uses EventAdmin topics as monitoring events dispatcher.

@@ -30,7 +30,7 @@ include::user-guide/collectors.adoc[]
 
 include::user-guide/appenders.adoc[]
 
-include::user-guide/sla.adoc[]
+include::user-guide/alerting.adoc[]
 
 == Developer Guide
 

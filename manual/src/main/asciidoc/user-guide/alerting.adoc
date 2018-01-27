@@ -1,0 +1,217 @@
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+=== Alerting
+
+Decanter provides an alerting feature. It allows you to check values of harvested data (coming from
+the collectors) and send alerts when the data is not in the expected state.
+
+==== Checker
+
+The checker is automatically installed as soon as you install an alerter feature.
+
+It uses the `etc/org.apache.karaf.decanter.alerting.checker.cfg` configuration file.
+
+This file contains the check to perform on the collected properties.
+
+The format of this file is:
+
+----
+type.propertyName.alertLevel=checkType:value
+----
+
+where:
+
+* `type` is optional. It allows you to filter the check for a given type of collected data. It's particulary interesting
+when Decanter collects multiple JMX object names or servers. You may want to perform different checks depending of the type
+or source of the collected data.
+* `propertyName` is the data property key. For instance, `loggerName`, `message`, `HeapMemoryUsage.used`, etc.
+* `alertLevel` is the alerting level for this check. The only two possible values are `error` (critical alert), or
+`warn` (severe alert).
+* `checkType` is the check type. Possible values are `range`, `equal`, `notequal`, `match`, and `notmatch`.
+* `value` is the check value, where the data property value has to verify.
+
+The Decanter Checker supports numeric or string check.
+
+To verify a numeric value, you can use:
+
+* `range` to check if the metric is between two values
+* `equal` to check if the metric is equal to a value
+* `notequal` to check if the metric is not equal to a value
+
+For instance, if you want to check that the number of threads is between 0 and 70, you can use:
+
+----
+ThreadCount.error=range:[0,70]
+----
+
+You can also filter and specify the type on which we check:
+
+----
+jmx-local.ThreadCount.error=range:[0,70]
+----
+
+If the thread count is out of this range, Decanter will create an error alert sent to the alerters.
+
+Another example is if you want to check if the myValue is equal to 10:
+
+----
+myValue.warn=equal:10
+----
+
+If myValue is not equal to 10, Decanter will create a warn alert send to the alerters.
+
+To verify a string value, you can use:
+
+* `match` to check if the metric matches a regex
+* `notmatch` to check if the matric doesn't match a regex
+
+For instance, if you want to create an alert when an ERROR log message happens, you can use:
+
+----
+loggerLevel.error=match:ERROR
+----
+
+You can also use "complex" regex:
+
+----
+loggerName.warn=match:(.*)my\.loggger\.name\.(.*)
+----
+
+==== Alerters
+
+When the value doesn't verify the check in the checker configuration, an alert is created an sent to the alerters.
+
+Apache Karaf Decanter provides ready to use alerters.
+
+===== Log
+
+The Decanter Log alerter log a message for each alert.
+
+The `decanter-alerting-log` feature installs the log alerter:
+
+----
+karaf@root()> feature:install decanter-alerting-log
+----
+
+This alerter doesn't need any configuration.
+
+===== E-mail
+
+The Decanter e-mail alerter sends an e-mail for each alert.
+
+The `decanter-alerting-email` feature installs the e-mail alerter:
+
+----
+karaf@root()> feature:install decanter-alerting-email
+----
+
+This feature also installs the `etc/org.apache.karaf.decanter.alerting.email.cfg` configuration file where you can specify
+the SMTP server and e-mail addresses to use:
+
+----
+#
+# Decanter e-mail alerter configuration
+#
+
+# From e-mail address
+from=
+
+# To e-mail address
+to=
+
+# Hostname of the SMTP server
+host=smtp.gmail.com
+
+# Port of the SMTP server
+port=587
+
+# enable SMTP auth
+auth=true
+
+# enable starttls and ssl
+starttls=true
+ssl=false
+
+# Optionally, username for the SMTP server
+#username=
+
+# Optionally, password for the SMTP server
+#password=
+----
+
+* the `from` property specifies the from e-mail address (for instance dev@karaf.apache.org)
+* the `to` property specifies the to e-mail address (for instance dev@karaf.apache.org)
+* the `host` property specifies the SMTP server hostname or IP address
+* the `port` property specifies the SMTP server port number
+* the `auth` property (true or false) specifies if the SMTP server requires authentication (true) or not (false)
+* the `starttls` property (true or false) specifies if the SMTP server requires STARTTLS (true) or not (false)
+* the `ssl` property (true or false) specifies if the SMTP server requires SSL (true) or not (false)
+* the `username` property is optional and specifies the username to connect to the SMTP server
+* the `password` property is optional and specifies the password to connect to the SMTP server
+
+===== Camel
+
+The Decanter Camel alerter sends each alert to a Camel endpoint.
+
+It allows you to create a route which reacts to each alert. It's a very flexible alerter as you can apply transformation,
+use EIPs, Camel endpoints, etc.
+
+This alerter creates a Camel exchange. The body of the "in" message contains a Map with all alert details (including
+`alertLevel`, `alertAttribute`, `alertPattern` and all other details).
+
+The `decanter-alerting-camel` feature installs the Camel alerter:
+
+----
+karaf@root()> feature:install decanter-alerting-camel
+----
+
+This feature also installs the `etc/org.apache.karaf.decanter.alerting.camel.cfg` configuration file:
+
+----
+#
+# Decanter Camel alerter
+#
+
+# alert.destination.uri defines the Camel endpoint URI where
+# Decanter send the alerts
+alert.destination.uri=direct-vm:decanter-alert
+----
+
+This configuration file allows you to specify the Camel endpoint URI where to send the alert (using the
+`alert.destination.uri` property).
+
+For instance, in this configuration, if you define:
+
+----
+alert.destination.uri=direct-vm:decanter-alert
+----
+
+You can create the following Camel route which will react to the alert:
+
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <camelContext xmlns="http://camel.apache.org/schema/blueprint">
+    <route id="decanter-alert">
+      <from uri="direct-vm:decanter-alert"/>
+      ...
+      ANYTHING
+      ...
+    </route>
+  </camelContext>
+
+</blueprint>
+----
