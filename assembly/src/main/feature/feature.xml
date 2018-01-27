@@ -373,40 +373,40 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.socket.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.socket/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-sla-core" version="${project.version}" description="Karaf Decanter SLA support core">
+    <feature name="decanter-alerting-core" version="${project.version}" description="Karaf Decanter Alerting core">
         <feature>decanter-common</feature>
-        <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.checker/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.checker/${project.version}</bundle>
     </feature>
     
-    <feature name="decanter-sla" version="${project.version}" description="Karaf Decanter SLA support">
-        <feature>decanter-sla-core</feature>
-        <configfile finalname="/etc/org.apache.karaf.decanter.sla.checker.cfg">mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.checker/${project.version}/cfg</configfile>
+    <feature name="decanter-alerting" version="${project.version}" description="Karaf Decanter Alerting">
+        <feature>decanter-alerting-core</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.alerting.checker.cfg">mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.checker/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-sla-log" version="${project.version}" description="Karaf Decanter SLA log alerter">
-        <feature version="${project.version}">decanter-sla</feature>
-        <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.log/${project.version}</bundle>
+    <feature name="decanter-alerting-log" version="${project.version}" description="Karaf Decanter alerting log alerter">
+        <feature version="${project.version}">decanter-alerting</feature>
+        <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.log/${project.version}</bundle>
     </feature>
 
-    <feature name="decanter-sla-email-core" version="${project.version}" description="Karaf Decanter SLA email alerter core">
-        <feature version="${project.version}">decanter-sla</feature>
+    <feature name="decanter-alerting-email-core" version="${project.version}" description="Karaf Decanter alerting email alerter core">
+        <feature version="${project.version}">decanter-alerting</feature>
         <bundle>mvn:com.sun.mail/javax.mail/1.5.5</bundle>
-        <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.email/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.email/${project.version}</bundle>
     </feature>
     
-    <feature name="decanter-sla-email" version="${project.version}" description="Karaf Decanter SLA email alerter">
-        <feature version="${project.version}">decanter-sla-email-core</feature>
-        <configfile finalname="/etc/org.apache.karaf.decanter.sla.email.cfg">mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.email/${project.version}/cfg</configfile>
+    <feature name="decanter-alerting-email" version="${project.version}" description="Karaf Decanter alerting email alerter">
+        <feature version="${project.version}">decanter-alerting-email-core</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.alerting.email.cfg">mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.email/${project.version}/cfg</configfile>
     </feature>
 
-    <feature name="decanter-sla-camel-core" version="${project.version}" description="Karaf Decanter SLA Camel alerter core">
-        <feature version="${project.version}">decanter-sla</feature>
-        <bundle>mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.camel/${project.version}</bundle>
+    <feature name="decanter-alerting-camel-core" version="${project.version}" description="Karaf Decanter alerting Camel alerter core">
+        <feature version="${project.version}">decanter-alerting</feature>
+        <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.camel/${project.version}</bundle>
     </feature>
 
-    <feature name="decanter-sla-camel" version="${project.version}" description="Karaf Decanter SLA Camel alerter">
-        <feature version="${project.version}">decanter-sla-camel-core</feature>
-        <configfile finalname="/etc/org.apache.karaf.decanter.sla.camel.cfg">mvn:org.apache.karaf.decanter.sla/org.apache.karaf.decanter.sla.camel/${project.version}/cfg</configfile>
+    <feature name="decanter-alerting-camel" version="${project.version}" description="Karaf Decanter alerting Camel alerter">
+        <feature version="${project.version}">decanter-alerting-camel-core</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.alerting.camel.cfg">mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.camel/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="elasticsearch" version="${elasticsearch1.version}" description="Embedded Elasticsearch 1.x node">

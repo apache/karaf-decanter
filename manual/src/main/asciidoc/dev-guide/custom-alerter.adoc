@@ -12,17 +12,17 @@
 // limitations under the License.
 //
 
-=== Custom SLA Alerter
+=== Custom Alerter
 
-A Decanter SLA Alerter is basically a special kind of appender.
+A Decanter Alerter is basically a special kind of appender.
 
 It's an OSGi EventAdmin EventHandler: it's listening of `decanter/alert/*` EventAdmin topics, and
-receives the alerting data coming from the SLA checker.
+receives the alerting data coming from the checker.
 
 To enable a new Decanter Alerter, you just have to register an EventHandler OSGi service, like we do for an appender.
 
-For instance, if you want to create a very simple SystemOutAlerter that displays the alert (coming from the
-SLA checker) to System.out, you can create the following SystemOutAlerter class implementing EventHandler interface:
+For instance, if you want to create a very simple SystemOutAlerter that displays the alert (coming from the checker)
+to System.out, you can create the following SystemOutAlerter class implementing EventHandler interface:
 
 ----
 package org.apache.karaf.decanter.sample.alerter.systemout;

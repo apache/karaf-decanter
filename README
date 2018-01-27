@@ -21,29 +21,23 @@ Apache Karaf Decanter is a complete monitoring platform for Apache Karaf.
 It is very extensible, flexible, easy to install and use.
 
 Apache Karaf Decanter is composed into:
-    * Collectors and SLA Policies
+    * Collectors
       The collectors are OSGi services responsible of harvesting monitoring data.
       Two kinds of collectors are available:
       - the polling collectors are invoked periodically by a scheduler
       - the event driven collectors react to some events.
       It's very dynamic (thanks to the OSGi services), so it's possible to add
       a new custom collector (user/custom implementations).
-      The collectors are also responsible of checking the SLA, and delegate to
-      a notifier.
-    * Scheduler
-      The scheduler service is responsible to call the Polling Collectors,
-      gather the harvested data, and delegate to the dispatcher.
     * Dispatcher
       The dispatcher is called by the scheduler or the event driven collectors
       to dispatch the collected data to the appenders.
     * Appenders
       The appenders are responsible to send/store the collected data to target
       systems.
-    * Notifier
-      The notifier is called by the collectors' SLA. The notifier uses external
-      system to "publish" the SLA alert.
-    * Console & Web UI
-      The console is responsible of both SLA configuration and dashboard view.
+    * Alerting
+      The alerting layer provides a checker, responsible of testing values of
+      harvested data (coming from the collectors) and send alerts when the data
+      is not in the expected state.
 
 Getting Started
 ===============
@@ -101,11 +95,11 @@ Appenders
 * decanter-appender-rest
 * decanter-appender-orientdb
 
-SLA/Alerters
+Alerters
 ------------
-* decanter-sla-log
-* decanter-sla-email
-* decanter-sla-camel
+* decanter-alerting-log
+* decanter-alerting-email
+* decanter-alerting-camel
 
 Additional features
 -------------------
