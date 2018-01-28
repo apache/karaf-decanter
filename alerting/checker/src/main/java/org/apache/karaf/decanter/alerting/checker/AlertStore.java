@@ -16,12 +16,21 @@
  */
 package org.apache.karaf.decanter.alerting.checker;
 
+import java.util.Set;
+
 public interface AlertStore {
 
-    void add(String name, String level);
+    enum Level {
+        error,
+        warn
+    }
 
-    void remove(String name, String level);
+    void add(String name, Level level);
 
-    boolean known(String name, String level);
+    void remove(String name, Level level);
+
+    boolean known(String name, Level level);
+
+    Set<String> list(Level level);
 
 }

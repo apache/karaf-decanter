@@ -29,40 +29,53 @@
     </parent>
 
     <groupId>org.apache.karaf.decanter.alerting</groupId>
-    <artifactId>org.apache.karaf.decanter.alerting.checker</artifactId>
+    <artifactId>org.apache.karaf.decanter.alerting.command</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Alerting :: Checker</name>
+    <name>Apache Karaf :: Decanter :: Alerting :: Command</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.karaf.decanter.alerting</groupId>
+            <artifactId>org.apache.karaf.decanter.alerting.checker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.shell</groupId>
+            <artifactId>org.apache.karaf.shell.core</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>karaf-services-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>service-metadata-generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Export-Package>org.apache.karaf.decanter.alerting.checker</Export-Package>
+                        <Private-Package>
+                            org.apache.karaf.decanter.alerting.command,
+                            org.apache.karaf.decanter.alerting.command.completers
+                        </Private-Package>
+                        <Import-Package>
+                            org.apache.karaf.decanter.alerting.checker,
+                            org.apache.karaf.shell*;version="[4,5)",
+                            *
+                        </Import-Package>
                     </instructions>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>src/main/cfg/org.apache.karaf.decanter.alerting.checker.cfg</file>
-                                    <type>cfg</type>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

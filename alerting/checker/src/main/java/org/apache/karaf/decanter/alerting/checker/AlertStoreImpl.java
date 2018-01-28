@@ -36,32 +36,42 @@ public class AlertStoreImpl implements AlertStore {
         this.warnAlerts = new HashSet<>();
     }
 
-    public void add(String name, String level) {
-        if (level.equals("error")) {
+    public void add(String name, Level level) {
+        if (level == Level.error) {
             this.errorAlerts.add(name);
         }
-        if (level.equals("warn")) {
+        if (level == Level.warn) {
             this.warnAlerts.add(name);
         }
     }
 
-    public void remove(String name, String level) {
-        if (level.equals("error")) {
+    public void remove(String name, Level level) {
+        if (level == Level.error) {
             this.errorAlerts.remove(name);
         }
-        if (level.equals("warn")) {
+        if (level == Level.warn) {
             this.warnAlerts.remove(name);
         }
     }
 
-    public boolean known(String name, String level) {
-        if (level.equals("error")) {
+    public boolean known(String name, Level level) {
+        if (level == Level.error) {
             return this.errorAlerts.contains(name);
         }
-        if (level.equals("warn")) {
+        if (level == Level.warn) {
             return this.warnAlerts.contains(name);
         }
         return false;
+    }
+
+    public Set<String> list(Level level) {
+        if (level == Level.error) {
+            return this.errorAlerts;
+        }
+        if (level == Level.warn) {
+            return this.warnAlerts;
+        }
+        return null;
     }
 
 }

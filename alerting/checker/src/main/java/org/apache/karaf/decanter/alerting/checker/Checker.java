@@ -73,19 +73,19 @@ public class Checker implements EventHandler {
             if (errorPattern != null) {
                 Object value = collectEvent.getProperty(name);
                 if (!validate(errorPattern, value)) {
-                    if (!alertStore.known(name, "error")) {
-                        alertStore.add(name, "error");
+                    if (!alertStore.known(name, AlertStore.Level.error)) {
+                        alertStore.add(name, AlertStore.Level.error);
                         Event alertEvent = populateAlertEvent("error", collectEvent, name, errorPattern, false);
                         dispatcher.postEvent(alertEvent);
                     }
                 } else {
-                    if (alertStore.known(name, "error")) {
+                    if (alertStore.known(name, AlertStore.Level.error)) {
                         dispatcher.postEvent(populateAlertEvent("error", collectEvent, name, errorPattern, true));
-                        alertStore.remove(name, "error");
+                        alertStore.remove(name, AlertStore.Level.error);
                     }
                 }
             } else {
-                if (alertStore.known(name, "error")) {
+                if (alertStore.known(name, AlertStore.Level.error)) {
                     dispatcher.postEvent(populateAlertEvent("error", collectEvent, name, "REMOVED", true));
                 }
             }
@@ -100,21 +100,21 @@ public class Checker implements EventHandler {
             if (warnPattern != null) {
                 Object value = collectEvent.getProperty(name);
                 if (!validate(warnPattern, value)) {
-                    if (!alertStore.known(name, "warn")) {
-                        alertStore.add(name, "warn");
+                    if (!alertStore.known(name, AlertStore.Level.warn)) {
+                        alertStore.add(name, AlertStore.Level.warn);
                         Event alertEvent = populateAlertEvent("warn", collectEvent, name, warnPattern, false);
                         dispatcher.postEvent(alertEvent);
                     }
                 } else {
-                    if (alertStore.known(name, "warn")) {
+                    if (alertStore.known(name, AlertStore.Level.warn)) {
                         dispatcher.postEvent(populateAlertEvent("warn", collectEvent, name, warnPattern, true));
-                        alertStore.remove(name, "warn");
+                        alertStore.remove(name, AlertStore.Level.warn);
                     }
                 }
             } else {
-                if (alertStore.known(name, "warn")) {
+                if (alertStore.known(name, AlertStore.Level.warn)) {
                     dispatcher.postEvent(populateAlertEvent("warn", collectEvent, name, "REMOVED", true));
-                    alertStore.remove(name, "warn");
+                    alertStore.remove(name, AlertStore.Level.warn);
                 }
             }
         }
