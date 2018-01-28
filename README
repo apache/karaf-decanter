@@ -41,9 +41,8 @@ Apache Karaf Decanter is composed into:
 
 Getting Started
 ===============
-Apache Karaf Decanter is available as a Karaf features. The commands below start 
-the jmx collector, log collector and an appender to a local elasticsearch instance
-on the default port. Prerquisite is a running elasticsearch instance.
+Apache Karaf Decanter is available as a Karaf features. The following command registers
+the Karaf Decanter features repository.
 
 feature:repo-add decanter
 
@@ -57,43 +56,42 @@ See user guide for the details of Decanter features:
 
 Collectors
 -----------
-* decanter-collector-log
-* decanter-collector-log-socket
-* decanter-collector-file
+* decanter-collector-camel
+* decanter-collector-dropwizard
 * decanter-collector-eventadmin
+* decanter-collector-file
 * decanter-collector-jms
 * decanter-collector-jmx
 * decanter-collector-kafka
-* decanter-collector-rest
-* decanter-collector-jmx-activemq
-* decanter-collector-jmx-camel
-* decanter-collector-camel
+* decanter-collector-log
+* decanter-collector-log4j-socket
 * decanter-collector-mqtt
+* decanter-collector-process
 * decanter-collector-rest
 * decanter-collector-rest-servlet
 * decanter-collector-socket
 * decanter-collector-system
-* decanter-collector-process
 
 Appenders
 ---------
-* decanter-appender-log
+* decanter-appender-camel
+* decanter-appender-cassandra
+* decanter-appender-dropwizard
 * decanter-appender-elasticsearch-jest
-* decanter-appender-elasticsearch-rest
 * decanter-appender-elasticsearch-native-1.x
 * decanter-appender-elasticsearch-native-2.x
+* decanter-appender-elasticsearch-rest
 * decanter-appender-file
 * decanter-appender-jdbc
 * decanter-appender-jms
-* decanter-appender-camel
-* decanter-appender-mqtt
 * decanter-appender-kafka
-* decanter-appender-cassandra
+* decanter-appender-log
 * decanter-appender-mongodb
-* decanter-appender-socket
+* decanter-appender-mqtt
+* decanter-appender-orientdb
 * decanter-appender-redis
 * decanter-appender-rest
-* decanter-appender-orientdb
+* decanter-appender-socket
 
 Alerters
 ------------

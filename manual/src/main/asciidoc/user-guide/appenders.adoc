@@ -1358,3 +1358,16 @@ Most of the values can be let as they are, however, you can tweak some:
 
 * `<listener/>` allows you to configure the protocol and port numbers used by the OrientDB instance. You can define the IP address on which the instance is bound (`ip-address`), the port numbers range to use (`port-range`) for each protocol (`binary` or `http`).
 * the `db.pool.min` and `db.pool.max` can be increased if you have a large number of connections on the instance.
+
+==== Dropwizard Metrics
+
+The Dropwizard Metrics appender receives the harvested data from the dispatcher and push in a Dropwizard Metrics
+`MetricRegistry`. You can register this `MetricRegistry` in your own application or use a Dropwizard Metrics Reporter
+to "push" these metrics to some backend.
+
+The `decanter-appender-dropwizard` feature provides the Decanter event handler registering the harvested data ino the
+`MetricRegistry`:
+
+----
+karaf@root()> feature:install decanter-appender-dropwizard
+----

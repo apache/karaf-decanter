@@ -641,3 +641,16 @@ The `decanter-collector-rest-servlet` feature installs the collector:
 ----
 karaf@root()> feature:install decanter-collector-rest-servlet
 ----
+
+==== Dropwizard Metrics
+
+The Decanter Dropwizard Metrics collector get a `MetricSet` OSGi service and periodically get the metrics in the set.
+
+The `decanter-collector-dropwizard` feature installs the collector:
+
+----
+karaf@root()> feature:install decanter-collector-dropwizard
+----
+
+As soon as a `MetricSet` (like `MetricRegistry`) service will be available, the collector will get the metrics and
+send to the Decanter dispatcher.

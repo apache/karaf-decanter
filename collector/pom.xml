@@ -35,6 +35,7 @@
 
     <modules>
         <module>camel</module>
+        <module>dropwizard</module>
         <module>eventadmin</module>
         <module>file</module>
         <module>jms</module>
