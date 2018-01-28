@@ -35,6 +35,13 @@
         <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.csv/${project.version}</bundle>
     </feature>
 
+    <feature name="decanter-collector-dropwizard" version="${project.version}" description="Karaf Decanter Dropwizard Metrics Collector">
+        <feature>decanter-common</feature>
+        <feature>scheduler</feature>
+        <bundle dependency="true">mvn:io.dropwizard.metrics/metrics-core/4.0.0</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.dropwizard/${project.version}</bundle>
+    </feature>
+
     <feature name="decanter-collector-log" version="${project.version}" description="Karaf Decanter Log Messages Collector">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log/${project.version}</bundle>
@@ -371,6 +378,12 @@
     <feature name="decanter-appender-socket" version="${project.version}" description="Karaf Decanter Network Socket Appender">
         <feature>decanter-appender-socket-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.socket.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.socket/${project.version}/cfg</configfile>
+    </feature>
+
+    <feature name="decanter-appender-dropwizard" version="${project.version}" description="Karaf Decanter Dropwizard Metrics Appender">
+        <feature>decanter-common</feature>
+        <bundle dependency="true">mvn:io.dropwizard.metrics/metrics-core/4.0.0</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.dropwizard/${project.version}</bundle>
     </feature>
 
     <feature name="decanter-alerting-core" version="${project.version}" description="Karaf Decanter Alerting core">

@@ -36,6 +36,7 @@
     <modules>
         <module>camel</module>
         <module>cassandra</module>
+        <module>dropwizard</module>
         <module>elasticsearch-native-1.x</module>
         <module>elasticsearch-native-2.x</module>
         <module>elasticsearch-jest</module>
