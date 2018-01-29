@@ -15,6 +15,51 @@
  * limitations under the License.
  */
 
+		    Apache Karaf Decanter 2.0.0
+		    ===========================
+  Overview
+  --------
+Apache Karaf Decanter 2.0.0 is a new Decanter series, providing new features and bug fixes.
+
+It's designed to work specifically on Apache Karaf 4.x.
+
+Decanter is a completed monitoring and alerting solution for Apache Karaf container, and related applications
+running on it.
+
+You can use Decanter in Karaf version >= 4.
+
+NB: Apache Karaf Decanter 2.0.0 still provides embedded backend instances, like Elasticsearch 6, Kibana 6, OrientDB
+and much more. However, for production, we recommend to use a dedicated and isolatic instance of these backends.
+
+For details, see the ChangeLog:
+
+** Bug
+    * [KARAF-5492] - Increase collectors scheduler period
+
+** New Feature
+    * [KARAF-4818] - Remove Jest client to use "native" REST elasticsearch client
+    * [KARAF-5391] - Add decanter:alert* commands and MBeans
+    * [KARAF-5462] - Provide Decanter DropWizard Metric integration
+    * [KARAF-5479] - Provide a file appender
+    * [KARAF-5501] - Upgrade to Kibana 6.x
+    * [KARAF-5502] - Add OrientDB appender (with the corresponding inner feature)
+
+** Improvement
+    * [KARAF-5454] - Collector socket - Add UDP protocol support
+    * [KARAF-5510] - Add custom fields support in log collector and appenders
+    * [KARAF-5557] - Support custom unmarshaller in socket collector
+    * [KARAF-5575] - Upgrade file appender to use SCR config property
+    * [KARAF-5577] - Define the marshaller in collector/appender configuration
+
+** Task
+    * [KARAF-5576] - Move all backends in an unique module
+    * [KARAF-5579] - Rename SLA bundles to Alerting
+    * [KARAF-5580] - Rename tools-jar-wraper to tools-jar-wrapper
+
+** Dependency upgrade
+    * [KARAF-5500] - Upgrade to Elasticsearch 5.x & 6.x
+
+
                     Apache Karaf Decanter 1.4.0
                     ===========================
 
