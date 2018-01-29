@@ -1,5 +1,5 @@
 Apache Karaf Decanter
-Copyright 2015 The Apache Software Foundation
+Copyright 2015-2018 The Apache Software Foundation
 
 I. Included Software
 
@@ -9,6 +9,10 @@ Licensed under the Apache License 2.0.
 
 This product includes software developed at
 Elastic (https://www.elastic.co/).
+Licensed under the Apache License 2.0.
+
+This product includes software developed at
+OrientDB (http://orientdb.com).
 Licensed under the Apache License 2.0.
 
 II. Used Software
@@ -30,7 +34,24 @@ This product uses software developed at
 JUnit (http://www.junit.org/).
 Licensed under the Eclipse Public License 1.0.
 
+This product uses software developed at
+Redis (http://www.redis.io).
+Licensed under the BSD license.
+
+This product uses software developed at
+Dropwizard (http://www.dropwizard.io).
+Licensed under the Apache License 2.0.
+
+This product uses software developed at
+searchbox.io (https://github.com/searchbox-io)
+Licensed under the Apache License 2.0.
+
+This product uses software developed at
+MongoDB (https://www.mongodb.com/)
+Licensed under the Apache License 2.0.
+
 III. License Summary
 - Apache License 2.0
 - MIT License
 - Eclipse Public License 1.0
+- BSD License
