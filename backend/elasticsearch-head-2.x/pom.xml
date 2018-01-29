@@ -31,7 +31,7 @@
     <groupId>org.apache.karaf.decanter</groupId>
     <artifactId>org.apache.karaf.decanter.elasticsearch-head-2.x</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Elasticsearch Head 2.x</name>
+    <name>Apache Karaf :: Decanter :: Backend :: Elasticsearch Head 2.x</name>
 
     <build>
         <plugins>

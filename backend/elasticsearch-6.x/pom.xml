@@ -31,7 +31,7 @@
     <groupId>org.apache.karaf.decanter</groupId>
     <artifactId>org.apache.karaf.decanter.elasticsearch-6.x</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Elasticsearch 6.x</name>
+    <name>Apache Karaf :: Decanter :: Backend :: Elasticsearch 6.x</name>
 
     <dependencies>
         <dependency>

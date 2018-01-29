@@ -31,7 +31,7 @@
     <groupId>org.apache.karaf.decanter</groupId>
     <artifactId>org.apache.karaf.decanter.kibana-4.x</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Kibana 4.x</name>
+    <name>Apache Karaf :: Decanter :: Backend :: Kibana 4.x</name>
 
     <dependencies>
         <dependency>
