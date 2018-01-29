@@ -22,22 +22,23 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.apache.karaf</groupId>
-        <artifactId>decanter</artifactId>
+        <groupId>org.apache.karaf.decanter</groupId>
+        <artifactId>alerting</artifactId>
         <version>2.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.apache.karaf.decanter</groupId>
-    <artifactId>alerting</artifactId>
-    <packaging>pom</packaging>
-    <name>Apache Karaf :: Decanter :: Alerting</name>
+    <groupId>org.apache.karaf.decanter.alerting</groupId>
+    <artifactId>org.apache.karaf.decanter.alerting.management</artifactId>
+    <packaging>bundle</packaging>
+    <name>Apache Karaf :: Decanter :: Alerting :: Management</name>
 
-    <modules>
-        <module>checker</module>
-        <module>command</module>
-        <module>management</module>
-        <module>alerter</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.karaf.decanter.alerting</groupId>
+            <artifactId>org.apache.karaf.decanter.alerting.checker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>

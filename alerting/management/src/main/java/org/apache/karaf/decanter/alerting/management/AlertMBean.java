@@ -14,23 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.alerting.checker;
+package org.apache.karaf.decanter.alerting.management;
 
+import javax.management.MBeanException;
 import java.util.Set;
 
-public interface AlertStore {
+public interface AlertMBean {
 
-    enum Level {
-        error,
-        warn
-    }
+    Set<String> getAlerts(String level) throws MBeanException;
 
-    void add(String name, Level level);
+    void add(String name, String level) throws MBeanException;
 
-    void remove(String name, Level level);
-
-    boolean known(String name, Level level);
-
-    Set<String> list(Level level);
+    void remove(String name, String level) throws MBeanException;
 
 }
