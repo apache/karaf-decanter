@@ -35,6 +35,7 @@ For details, see the ChangeLog:
 
 ** Bug
     * [KARAF-5492] - Increase collectors scheduler period
+    * [KARAF-5587] - Deal with client error in appenders
 
 ** New Feature
     * [KARAF-4818] - Remove Jest client to use "native" REST elasticsearch client
@@ -58,7 +59,6 @@ For details, see the ChangeLog:
 
 ** Dependency upgrade
     * [KARAF-5500] - Upgrade to Elasticsearch 5.x & 6.x
-
 
                     Apache Karaf Decanter 1.4.0
                     ===========================
