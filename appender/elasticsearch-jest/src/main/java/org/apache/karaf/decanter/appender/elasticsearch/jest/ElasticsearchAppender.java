@@ -58,6 +58,7 @@ public class ElasticsearchAppender implements EventHandler {
     private JestClient client;
     private String indexPrefix;
     private boolean indexTimestamped;
+    private String indexType;
 
     private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSS'Z'");
     private final SimpleDateFormat indexDateFormat = new SimpleDateFormat("yyyy.MM.dd");
@@ -98,6 +99,7 @@ public class ElasticsearchAppender implements EventHandler {
 
         indexPrefix = getValue(config, "index.prefix", "karaf");
         indexTimestamped = Boolean.parseBoolean(getValue(config, "index.event.timestamped", "true"));
+        indexType = getValue(config, "index.type", "decanter");
     }
     
     private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
@@ -123,7 +125,7 @@ public class ElasticsearchAppender implements EventHandler {
         String indexName = getIndexName(indexPrefix, getDate(event));
         String jsonSt = marshaller.marshal(event);
 
-        JestResult result = client.execute(new Index.Builder(jsonSt).index(indexName).type(getType(event)).build());
+        JestResult result = client.execute(new Index.Builder(jsonSt).index(indexName).type(indexType).build());
 
         if (!result.isSucceeded()) {
             throw new IllegalStateException(result.getErrorMessage());
@@ -134,11 +136,6 @@ public class ElasticsearchAppender implements EventHandler {
         Long ts = (Long)event.getProperty("timestamp");
         Date date = ts != null ? new Date(ts) : new Date();
         return date;
-    }
-
-    private String getType(Event event) {
-        String type = (String)event.getProperty("type");
-        return type != null ? type : "karaf_event";
     }
 
     private String getIndexName(String prefix, Date date) {
