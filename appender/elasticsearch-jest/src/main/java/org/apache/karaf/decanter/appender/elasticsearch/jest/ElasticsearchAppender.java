@@ -46,9 +46,8 @@ import io.searchbox.client.config.HttpClientConfig.Builder;
 import io.searchbox.core.Index;
 
 @Component(
-    name ="org.apache.karaf.decanter.appender.elasticsearch.rest",
+    name ="org.apache.karaf.decanter.appender.elasticsearch.jest",
     immediate = true,
-    configurationPolicy = ConfigurationPolicy.REQUIRE,
     property=EventConstants.EVENT_TOPIC + "=decanter/collect/*"
 )
 public class ElasticsearchAppender implements EventHandler {
@@ -76,7 +75,7 @@ public class ElasticsearchAppender implements EventHandler {
         Set<String> addresses = new HashSet<String>(Arrays.asList(addressesString.split(";")));
         String username = getValue(config, "username", null);
         String password = getValue(config, "password", null);
-        Builder builder = new HttpClientConfig.Builder(addresses)
+        Builder builder = new HttpClientConfig.Builder(addresses).readTimeout(10000)
             .multiThreaded(true);
         
         if (addresses.size() > 1) {

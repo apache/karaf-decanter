@@ -21,6 +21,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
@@ -88,6 +89,14 @@ public class ElasticsearchAppender implements EventHandler {
             }
         }
         RestClientBuilder restClientBuilder = RestClient.builder(hosts);
+
+        restClientBuilder.setRequestConfigCallback(new RestClientBuilder.RequestConfigCallback() {
+            @Override
+            public RequestConfig.Builder customizeRequestConfig(RequestConfig.Builder requestConfigBuilder) {
+                return requestConfigBuilder.setConnectTimeout(1000)
+                        .setSocketTimeout(10000);
+            }
+        }).setMaxRetryTimeoutMillis(20000);
 
         if (username != null) {
             final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
