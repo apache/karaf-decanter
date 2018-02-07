@@ -69,7 +69,7 @@
                 <version>1.0-beta-2</version>
                 <configuration>
                     <checkinComment>[scm-publish] Updating main site with Karaf Decanter documentation</checkinComment>
-                    <pubScmUrl>scm:svn:https://svn.apache.org/repos/asf/karaf/site/production/manual/decanter/latest-1</pubScmUrl>
+                    <pubScmUrl>scm:svn:https://svn.apache.org/repos/asf/karaf/site/production/manual/decanter/latest-2</pubScmUrl>
                     <content>${project.build.directory}/generated-docs</content>
                 </configuration>
             </plugin>
