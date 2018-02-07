@@ -38,7 +38,8 @@ for production.
 
 Decanter provides three appenders for Elasticsearch:
 
-* decanter-appender-elasticsearch-rest (recommanded) is an appender which directly uses the Elasticsearch HTTP REST API. It's compliant with any Elasticsearch version (1.x and 2.x).
+* decanter-appender-elasticsearch-rest (recommanded) is an appender which directly uses the Elasticsearch HTTP REST API. It's compliant with any Elasticsearch version (1.x, 2.x, 5.x, 6.x).
+* decanter-appender-elasticsearch-jest (deprecated) is an appender which directly uses the Elasticsearch HTTP REST API, working with any Elasticsearch version (1.x, 2.x, 5.x, 6.x).
 * decanter-appender-elasticsearch-native-1.x is an appender which uses the Elasticsearch 1.x Java Client API. It's compliant only with Elasticsearch 1.x versions.
 * decanter-appender-elasticsearch-native-2.x is an appender which uses the Elasticsearch 2.x Java Client API. It's compliant only with Elasticsearch 2.x versions.
 
