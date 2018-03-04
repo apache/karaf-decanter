@@ -430,6 +430,11 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.alerting.camel.cfg">mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.camel/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-documentation" description="Documentation of Karaf Decanter sub-project in HTML" version="${project.version}">
+        <feature>war</feature>
+        <bundle>mvn:org.apache.karaf.decanter/manual/${project.version}</bundle>
+    </feature>
+
     <feature name="elasticsearch" version="${elasticsearch1.version}" description="Embedded Elasticsearch 1.x node">
         <feature>scr</feature>
         <feature prerequisite="true">war</feature>
