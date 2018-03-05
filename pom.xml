@@ -72,6 +72,7 @@
         <module>backend</module>
         <module>spring-boot-starter-decanter</module>
         <module>tools-jar-wrapper</module>
+        <module>manual</module>
         <module>assembly</module>
     </modules>
 
@@ -176,7 +177,7 @@
                         <useReleaseProfile>false</useReleaseProfile>
                         <preparationGoals>clean install</preparationGoals>
                         <goals>deploy</goals>
-                        <arguments>-Prelease,deploy,manual</arguments>
+                        <arguments>-Prelease,deploy</arguments>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                     </configuration>
                 </plugin>
@@ -396,9 +397,7 @@
     <profiles>
         <profile>
             <id>release</id>
-            <modules>
-                <module>manual</module>
-            </modules>
+
             <build>
                 <plugins>
                     <plugin>
