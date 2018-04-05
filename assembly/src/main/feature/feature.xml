@@ -186,6 +186,13 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.jdbc.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jdbc/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-collector-http-filter" version="${project.version}" description="Karaf Decanter Http servlet filter Collector">
+        <feature>decanter-common</feature>
+        <feature>http-whiteboard</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.httpfilter.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.httpfilter/${project.version}/cfg</configfile>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.httpfilter/${project.version}</bundle>
+    </feature>
+
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature>decanter-common</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.log.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}/cfg</configfile>

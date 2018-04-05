@@ -39,6 +39,7 @@
         <module>dropwizard</module>
         <module>eventadmin</module>
         <module>file</module>
+        <module>http-filter</module>
         <module>jms</module>
         <module>jmx</module>
         <module>kafka</module>
