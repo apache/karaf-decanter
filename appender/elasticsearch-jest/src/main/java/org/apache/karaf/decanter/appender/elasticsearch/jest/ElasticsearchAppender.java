@@ -16,6 +16,11 @@
  */
 package org.apache.karaf.decanter.appender.elasticsearch.jest;
 
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -24,6 +29,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+
+import org.apache.http.conn.ssl.DefaultHostnameVerifier;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.TrustStrategy;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.osgi.service.component.ComponentContext;
@@ -87,6 +102,24 @@ public class ElasticsearchAppender implements EventHandler {
             builder.discoveryEnabled(false);
         }
 
+        for (String address : addresses) {
+            if (address.startsWith("https")) {
+                try {
+                    SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
+                    sslContextBuilder.loadTrustMaterial(new TrustAny());
+                    SSLContext sslContext = sslContextBuilder.build();
+                    HostnameVerifier hostnameVerifier = NoopHostnameVerifier.INSTANCE;
+                    SSLConnectionSocketFactory sslSocketFactory = 
+                            new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
+                    builder.defaultSchemeForDiscoveredNodes("https").sslSocketFactory(sslSocketFactory);
+                } catch (KeyManagementException | KeyStoreException | NoSuchAlgorithmException ex) {
+                    throw new RuntimeException("SSL exception when connect to ElasticSearch", ex);
+                }
+
+                break;
+            }
+        }
+
         if (username != null) {
             builder = builder.defaultCredentials(username, password);
         }
@@ -144,6 +177,38 @@ public class ElasticsearchAppender implements EventHandler {
         } else {
             return prefix;
         }
+    }
+
+    private class TrustAny implements TrustStrategy {
+
+        public TrustAny() {
+            super();
+        }
+
+        @Override
+        public boolean isTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+            return true;
+        }
+    }
+
+    private class EsHostnameVerifier implements HostnameVerifier {
+
+        private final HostnameVerifier delegate;
+        private final String passHostname;
+
+        public EsHostnameVerifier(String passHostname) {
+            super();
+            this.delegate = new DefaultHostnameVerifier();
+            this.passHostname = passHostname == null || passHostname.length() == 0
+                    ? null : passHostname;
+        }
+
+        @Override
+        public boolean verify(String hostname, SSLSession session) {
+            return (passHostname != null && delegate.verify(passHostname, session));
+        }
+
     }
 
 }
