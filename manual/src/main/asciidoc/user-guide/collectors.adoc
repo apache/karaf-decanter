@@ -242,6 +242,55 @@ additional data, and create queries based on this data.
 You can retrieve multiple MBean servers. For that, you just create a new configuration file using the file name format
 `etc/org.apache.karaf.decanter.collector.jmx-[ANYNAME].cfg`.
 
+===== JMXMP
+
+The Karaf Decanter JMX collector by default uses RMI protocol for JMX. But it also supports JMXMP protocol.
+
+The features to install are the sames: `decanter-collector-jmx`.
+
+However, you have to enable the `jmxmp` protocol support in the Apache Karaf instance hosting Karaf Decanter.
+
+You can download the `jmxmp` protocol provider artifact on Maven Central: [http://repo.maven.apache.org/maven2/org/glassfish/external/opendmk_jmxremote_optional_jar/1.0-b01-ea/opendmk_jmxremote_optional_jar-1.0-b01-ea.jar]
+
+The `opendmk_jmxremote_optional_jar-1.0-b01-ea.jar` file has to be copied in the `lib/boot` folder of your Apache Karaf instance.
+
+Then, you have to add the new JMX remote packages by editing `etc/config.properties`, appending the following to the `org.osgi.framework.system.packages.extra` property:
+
+----
+org.osgi.framework.system.packages.extra = \
+    ...
+    javax.remote, \
+    com.sun.jmx, \
+    com.sun.jmx.remote, \
+    com.sun.jmx.remote.protocol, \
+    com.sun.jmx.remote.generic, \
+    com.sun.jmx.remote.opt, \
+    com.sun.jmx.remote.opt.internal, \
+    com.sun.jmx.remote.opt.security, \
+    com.sun.jmx.remote.opt.util, \
+    com.sun.jmx.remote.profile, \
+    com.sun.jmx.remote.profile.sasl, \
+    com.sun.jmx.remote.profile.tls, \
+    com.sun.jmx.remote.socket, \
+    javax.management, \
+    javax.management.remote, \
+    javax.management.remote.generic, \
+    javax.management.remote.jmxmp, \
+    javax.management.remote.message
+----
+
+Then, you can create a new Decanter JMX collector by creating a new file, like `etc/org.apache.karaf.decanter.collector.jmx-mycollector.cfg` containing something like:
+
+----
+type=jmx-mycollector
+url=service:jmx:jmxmp://host:port
+jmx.remote.protocol.provider.pkgs=com.sun.jmx.remote.protocol
+----
+
+You can see:
+* the `url` property contains an URL with `jmxmp` instead of `rmi`.
+* in order to support `jmxmp` protocol, you have to set the protocol provider via the `jmx.remote.protocol.provider.pkgs` property (by default, Karaf Decanter JMX collector uses the `rmi` protocol provider)
+
 ==== ActiveMQ (JMX)
 
 The ActiveMQ JMX collector is just a special configuration of the JMX collector.
