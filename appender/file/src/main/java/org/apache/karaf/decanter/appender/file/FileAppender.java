@@ -43,10 +43,13 @@ public class FileAppender implements EventHandler {
 
     private BufferedWriter writer;
 
+    private boolean append;
+
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
         Dictionary<String, Object> config = componentContext.getProperties();
         String filename = (config.get("filename") != null) ? (String) config.get("filename") : System.getProperty("karaf.data") + File.separator + "decanter";
+        append = (config.get("append") != null) ? Boolean.parseBoolean((String) config.get("append")) : true;
         open(filename);
     }
 
@@ -54,7 +57,7 @@ public class FileAppender implements EventHandler {
         File file = new File(filename);
         file.getParentFile().mkdirs();
         file.createNewFile();
-        this.writer = new BufferedWriter(new FileWriter(file));
+        this.writer = new BufferedWriter(new FileWriter(file, append));
     }
 
     @Override
