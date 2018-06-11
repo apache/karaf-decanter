@@ -62,6 +62,8 @@ public class JmxCollector implements Runnable {
     private String url;
     private String username;
     private String password;
+    private String remoteProtocolPkgs;
+
     private Set<String> objectNames;
     private Dictionary<String, Object> properties;
 
@@ -72,6 +74,7 @@ public class JmxCollector implements Runnable {
         String url = getProperty(this.properties, "url", "local");
         String username = getProperty(this.properties, "username", null);
         String password = getProperty(this.properties, "password", null);
+        String remoteProtocolPkgs = getProperty(this.properties, "jmx.remote.protocol.provider.pkgs", null);
         Dictionary<String, String> serviceProperties = new Hashtable<> ();
         serviceProperties.put("decanter.collector.name", type);
 
@@ -79,6 +82,7 @@ public class JmxCollector implements Runnable {
         this.url = url;
         this.username = username;
         this.password = password;
+        this.remoteProtocolPkgs = remoteProtocolPkgs;
 
         this.objectNames = new HashSet<> ();
         for (Enumeration<String> e = this.properties.keys(); e.hasMoreElements(); ) {
@@ -169,6 +173,9 @@ public class JmxCollector implements Runnable {
         Map<String,Object> env = new HashMap<> ();
         if (this.username != null && this.password != null) {
             env.put(JMXConnector.CREDENTIALS, new String[] { this.username, this.password });
+        }
+        if (this.remoteProtocolPkgs != null) {
+            env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, this.remoteProtocolPkgs);
         }
         return env;
     }
