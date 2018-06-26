@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,11 +35,14 @@ import javax.json.JsonObjectBuilder;
 import javax.json.JsonWriter;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 
 @Component(
+    name = "org.apache.karaf.decanter.marshaller.json",	
     immediate = true,
     property = Marshaller.SERVICE_KEY_DATAFORMAT + "=json"
 )
@@ -46,9 +50,18 @@ public class JsonMarshaller implements Marshaller {
 
     private SimpleDateFormat tsFormat;
     
+    boolean replaceDotsByUnderscores = true;
+    
     public JsonMarshaller() {
         tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSSX");
         tsFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    @Activate
+    public void activate(ComponentContext componentContext) {
+        Dictionary<String, Object> config = componentContext.getProperties();
+        replaceDotsByUnderscores = (config.get("replaceDotsByUnderscores") != null) ? 
+            Boolean.valueOf((String) config.get("replaceDotsByUnderscores")) : true;
     }
 
     @Override
@@ -69,7 +82,8 @@ public class JsonMarshaller implements Marshaller {
         addTimestamp(event, json);
         for (String key : event.getPropertyNames()) {
             Object value = event.getProperty(key);
-            marshalAttribute(json, key.replace('.','_'), value);
+            key = replaceDotsByUnderscores ? key.replace('.','_') : key;
+            marshalAttribute(json, key, value);
         }
         return json.build();
     }
@@ -82,7 +96,7 @@ public class JsonMarshaller implements Marshaller {
 
     @SuppressWarnings("unchecked")
     private void marshalAttribute(JsonObjectBuilder jsonObjectBuilder, String key, Object value) {
-        key = key.replace('.', '_');
+        key = replaceDotsByUnderscores ? key.replace('.', '_') : key;
         if (value instanceof Map) {
             jsonObjectBuilder.add(key, build((Map<String, Object>)value));
         } else if (value instanceof List) {
@@ -125,7 +139,8 @@ public class JsonMarshaller implements Marshaller {
     private JsonObject build(Map<String, Object> value) {
         JsonObjectBuilder json = Json.createObjectBuilder();
         for (Entry<String, Object> entries : value.entrySet()) {
-            addProperty(json, entries.getKey().replace('.','_'), entries.getValue());
+            addProperty(json, replaceDotsByUnderscores? entries.getKey().replace('.','_') : 
+                entries.getKey(), entries.getValue());
         }
         return json.build();
     }
@@ -162,7 +177,7 @@ public class JsonMarshaller implements Marshaller {
     }
 
     private void addProperty(JsonObjectBuilder json, String key, Object value) {
-        key = key.replace('.','_');
+        key = replaceDotsByUnderscores ? key.replace('.','_') : key;
         if (value instanceof BigDecimal) {
             json.add(key, (BigDecimal)value);
         } else if (value instanceof BigInteger) {
