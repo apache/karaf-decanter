@@ -22,6 +22,10 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListenerAdapter;
@@ -56,7 +60,7 @@ public class DecanterTailerListener extends TailerListenerAdapter {
      * additional properties provided by the user
      */
     private Dictionary<String, Object> properties;
-    private Tailer tailer;
+    private ExecutorService executorService;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -72,21 +76,21 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         String path = (String) properties.get("path");
 
         LOGGER.debug("Starting tail on {}", path);
-        tailer = new Tailer(new File(path), this);
-        Thread thread = new Thread(tailer, "Log Tailer for " + path);
-        thread.start();
+        Tailer tailer = Tailer.create(new File(path), this, 1000, true, true);
+        executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(tailer);
         this.type = type;
         this.path = path;
     }
     
     @Deactivate
     public void deactivate() {
-        tailer.stop();
+        executorService.shutdownNow();
     }
 
     @Override
     public void handle(String line) {
-        LOGGER.trace("Handle new line in {}", this.path);
+        LOGGER.debug("Handle new line in {}", path);
         Map<String, Object> data = new HashMap<>();
         data.put("type", type);
         data.put("path", path);
@@ -122,20 +126,26 @@ public class DecanterTailerListener extends TailerListenerAdapter {
 
     @Override
     public void handle(Exception e) {
-        super.handle(e);
         LOGGER.warn("Handle exception on file {}", path, e);
+        super.handle(e);
     }
 
     @Override
     public void fileNotFound() {
-        super.fileNotFound();
         LOGGER.warn("File {} is not found", path);
+        super.fileNotFound();
     }
 
     @Override
     public void fileRotated() {
-        super.fileRotated();
         LOGGER.debug("File {} rotated", path);
+        super.fileRotated();
+    }
+
+    @Override
+    public void endOfFileReached() {
+        LOGGER.debug("Reached end of file {}", path);
+        super.endOfFileReached();
     }
 
 }
