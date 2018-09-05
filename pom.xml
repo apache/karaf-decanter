@@ -487,6 +487,53 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>rat</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.rat</groupId>
+                        <artifactId>apache-rat-plugin</artifactId>
+                        <version>0.12</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <reportFile>${project.build.directory}/${project.build.finalName}.rat</reportFile>
+                            <excludeSubProjects>false</excludeSubProjects>
+                            <excludes>
+                                <exclude>**/target/**/*</exclude>
+                                <exclude>**/*.iml</exclude>
+                                <exclude>**/*.json</exclude>
+                                <exclude>**/*.css</exclude>
+                                <exclude>**/*.html</exclude>
+                                <exclude>**/*.js</exclude>
+                                <exclude>**/*.svg</exclude>
+                                <exclude>**/*.less</exclude>
+                                <exclude>**/build.txt</exclude>
+                                <exclude>**/components/**/*</exclude>
+                                <exclude>**/bower_components/**/*</exclude>
+                                <exclude>**/resources/config</exclude>
+                                <exclude>**/orientdb-server-config.xml</exclude>
+                                <exclude>/**/META-INF/services/*</exclude>
+                                <exclude>**/META-INF/spring.factories</exclude>
+                                <exclude>**/META-INF/decanter.bundles.default</exclude>
+                                <exclude>**/bundle8/**/*</exclude>
+                            </excludes>
+                            <consoleOutput>true</consoleOutput>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
 </project>
