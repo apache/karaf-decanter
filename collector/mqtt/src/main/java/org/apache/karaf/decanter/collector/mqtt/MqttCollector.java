@@ -17,6 +17,7 @@
 package org.apache.karaf.decanter.collector.mqtt;
 
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -33,9 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.net.InetAddress;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,28 +82,17 @@ public class MqttCollector {
                 }
 
                 Map<String, Object> data = new HashMap<>();
-                try {
-                    data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-                    data.put("hostName", InetAddress.getLocalHost().getHostName());
-                } catch (Exception e) {
-                    LOGGER.warn("Can't populate local host name and address", e);
-                }
-
-                // custom fields
-                Enumeration<String> keys = properties.keys();
-                while (keys.hasMoreElements()) {
-                    String key = keys.nextElement();
-                    data.put(key, properties.get(key));
-                }
+                data.put("type", "mqtt");
 
                 ByteArrayInputStream is = new ByteArrayInputStream(message.getPayload());
                 data.putAll(unmarshaller.unmarshal(is));
 
-                data.put("type", "mqtt");
-                String karafName = System.getProperty("karaf.name");
-                if (karafName != null) {
-                    data.put("karafName", karafName);
+                try {
+                    PropertiesPreparator.prepare(data, properties);
+                } catch (Exception e) {
+                    LOGGER.warn("Can't prepare data for the dispatcher", e);
                 }
+
                 Event event = new Event(dispatcherTopic, data);
                 dispatcher.postEvent(event);
             }

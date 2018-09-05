@@ -16,10 +16,11 @@
  */
 package org.apache.karaf.decanter.collector.rest;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Map;
 
 import javax.servlet.Servlet;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -77,13 +79,18 @@ public class RestCollector extends HttpServlet {
         throws ServletException, IOException {
         try {
             Map<String, Object> data = unmarshaller.unmarshal(req.getInputStream());
+            data.put("type", "restservlet");
 
-            // custom fields
-            Enumeration<String> keys = properties.keys();
-            while (keys.hasMoreElements()) {
-                String key = keys.nextElement();
-                data.put(key, properties.get(key));
+            StringBuilder builder = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
             }
+            reader.close();
+            data.put("payload", builder.toString());
+
+            PropertiesPreparator.prepare(data, properties);
 
             Event event = new Event(baseTopic, data);
             dispatcher.postEvent(event);

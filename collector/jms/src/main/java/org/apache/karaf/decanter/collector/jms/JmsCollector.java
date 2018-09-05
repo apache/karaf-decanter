@@ -17,6 +17,7 @@
 package org.apache.karaf.decanter.collector.jms;
 
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -30,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
 import java.io.ByteArrayInputStream;
-import java.net.InetAddress;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -144,20 +144,7 @@ public class JmsCollector {
 
                 try {
                     Map<String, Object> data = new HashMap<>();
-
-                    try {
-                        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-                        data.put("hostName", InetAddress.getLocalHost().getHostName());
-                    } catch (Exception e) {
-                        LOGGER.warn("Can't populate local host name and address", e);
-                    }
-
-                    // custom fields
-                    Enumeration<String> keys = properties.keys();
-                    while (keys.hasMoreElements()) {
-                        String key = keys.nextElement();
-                        data.put(key, properties.get(key));
-                    }
+                    data.put("type", "jms");
 
                     Enumeration names = mapMessage.getMapNames();
                     while (names.hasMoreElements()) {
@@ -165,11 +152,7 @@ public class JmsCollector {
                         data.put(name, mapMessage.getObject(name));
                     }
 
-                    data.put("type", "jms");
-                    String karafName = System.getProperty("karaf.name");
-                    if (karafName != null) {
-                        data.put("karafName", karafName);
-                    }
+                    PropertiesPreparator.prepare(data, properties);
 
                     Event event = new Event(dispatcherTopic, data);
                     dispatcher.postEvent(event);
@@ -182,29 +165,12 @@ public class JmsCollector {
 
                 try {
                     Map<String, Object> data = new HashMap<>();
-
-                    try {
-                        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-                        data.put("hostName", InetAddress.getLocalHost().getHostName());
-                    } catch (Exception e) {
-                        LOGGER.warn("Can't populate local host name and address", e);
-                    }
-
-                    // custom fields
-                    Enumeration<String> keys = properties.keys();
-                    while (keys.hasMoreElements()) {
-                        String key = keys.nextElement();
-                        data.put(key, properties.get(key));
-                    }
+                    data.put("type", "jms");
 
                     ByteArrayInputStream is = new ByteArrayInputStream(textMessage.getText().getBytes());
                     data.putAll(unmarshaller.unmarshal(is));
 
-                    data.put("type", "jms");
-                    String karafName = System.getProperty("karaf.name");
-                    if (karafName != null) {
-                        data.put("karafName", karafName);
-                    }
+                    PropertiesPreparator.prepare(data, properties);
 
                     Event event = new Event(dispatcherTopic, data);
                     dispatcher.postEvent(event);

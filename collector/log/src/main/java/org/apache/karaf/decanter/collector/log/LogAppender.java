@@ -16,17 +16,13 @@
  */
 package org.apache.karaf.decanter.collector.log;
 
-import java.net.InetAddress;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.apache.log4j.MDC;
 import org.ops4j.pax.logging.spi.PaxAppender;
 import org.ops4j.pax.logging.spi.PaxLocationInfo;
@@ -57,14 +53,9 @@ public class LogAppender implements PaxAppender {
     private static final String MDC_IN_LOG_APPENDER = "inLogAppender";
     private final static Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
     private final static Pattern PATTERN = Pattern.compile("[^A-Za-z0-9]");
-    private final static String FIELDS_ADD = "fields.add.";
-    private final static String FIELDS_RENAME = "fields.rename.";
-    private final static String FIELDS_REMOVE = "fields.remove.";
 
     private Dictionary<String, Object> properties;
     protected String[] ignoredCategories;
-
-    private SimpleDateFormat tsFormat;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -73,8 +64,6 @@ public class LogAppender implements PaxAppender {
         if (this.properties.get("ignored.categories") != null) {
             ignoredCategories = ((String)this.properties.get("ignored.categories")).split(",");
         }
-
-        tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
     }
     
     public void doAppend(PaxLoggingEvent event) {
@@ -101,14 +90,6 @@ public class LogAppender implements PaxAppender {
         LOGGER.debug("Publishing log event to the appenders ...");
 
         Map<String, Object> data = new HashMap<>();
-        data.put("type", "log");
-        String karafName = System.getProperty("karaf.name");
-        if (karafName != null) {
-            data.put("karafName", karafName);
-        }
-
-        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-        data.put("hostName", InetAddress.getLocalHost().getHostName());
 
         data.put("timestamp", event.getTimeStamp());
         data.put("loggerClass", event.getFQNOfLoggerClass());
@@ -124,34 +105,7 @@ public class LogAppender implements PaxAppender {
             data.put("throwable", join(throwableAr));
         }
 
-        // custom fields
-        Enumeration<String> keys = properties.keys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            if (key.startsWith(FIELDS_ADD)) {
-                if ("UUID".equals(properties.get(key).toString().trim())) {
-                    String uuid = UUID.randomUUID().toString();
-                    data.put(key.substring(FIELDS_ADD.length()), uuid);
-                } else if ("TIMESTAMP".equals(properties.get(key).toString().trim())) {
-                    Date date = new Date();
-                    data.put(key.substring(FIELDS_ADD.length()), tsFormat.format(date));
-                } else {
-                    data.put(key.substring(FIELDS_ADD.length()), properties.get(key));
-                }
-            } else if (key.startsWith(FIELDS_RENAME)) {
-                if (data.containsKey(key.substring(FIELDS_RENAME.length()))) {
-                    Object value = data.get(key.substring(FIELDS_RENAME.length()));
-                    data.remove(key.substring(FIELDS_RENAME.length()));
-                    data.put(properties.get(key).toString().trim(), value);
-                }
-            } else if (key.startsWith(FIELDS_REMOVE)) {
-                if (data.containsKey(key.substring(FIELDS_REMOVE.length()))) {
-                    data.remove(key.substring(FIELDS_REMOVE.length()));
-                }
-            } else {
-                data.put(key, properties.get(key));
-            }
-        }
+        PropertiesPreparator.prepare(data, properties);
 
         String loggerName = event.getLoggerName();
         if (loggerName == null || loggerName.isEmpty()) {

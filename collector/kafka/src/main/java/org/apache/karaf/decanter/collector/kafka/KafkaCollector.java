@@ -18,10 +18,8 @@ package org.apache.karaf.decanter.collector.kafka;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -31,6 +29,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -172,19 +171,7 @@ public class KafkaCollector implements Runnable {
             return;
         }
         Map<String, Object> data = new HashMap<>();
-        try {
-            data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-            data.put("hostName", InetAddress.getLocalHost().getHostName());
-        } catch (Exception e) {
-            LOGGER.warn("Can't populate local host name and address", e);
-        }
-
-        // custom fields
-        Enumeration<String> keys = properties.keys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            data.put(key, properties.get(key));
-        }
+        data.put("type", "kafka");
         
         for (ConsumerRecord<String, String> record : records) {
             String value = record.value();
@@ -192,11 +179,12 @@ public class KafkaCollector implements Runnable {
             data.putAll(unmarshaller.unmarshal(is));
         }
 
-        data.put("type", "kafka");
-        String karafName = System.getProperty("karaf.name");
-        if (karafName != null) {
-            data.put("karafName", karafName);
+        try {
+            PropertiesPreparator.prepare(data, properties);
+        } catch (Exception e) {
+            LOGGER.warn("Can't prepare data for the dispatcher", e);
         }
+
         Event event = new Event(eventAdminTopic, data);
         dispatcher.postEvent(event);
     }

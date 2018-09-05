@@ -24,6 +24,7 @@ import java.util.Enumeration;
 import java.util.Map;
 
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -96,7 +97,6 @@ public class RestCollector implements Runnable {
                 URLConnection connection = complete.openConnection();
                 Map<String, Object> data = unmarshaller.unmarshal(connection.getInputStream());
                 data.put("type", "rest");
-                data.put("hostName", url.getHost());
                 data.put("remote.url", complete);
 
                 // custom fields
@@ -106,7 +106,9 @@ public class RestCollector implements Runnable {
                     data.put(key, properties.get(key));
                 }
 
-                addUserProperties(data);
+                PropertiesPreparator.prepare(data, properties);
+
+                data.put("hostName", url.getHost());
                 dispatcher.postEvent(new Event(toTopic(complete), data));
                 repeatedError = false;
             } catch (Exception e) {
@@ -124,16 +126,6 @@ public class RestCollector implements Runnable {
 
     private String toTopic(URL url) {
         return baseTopic + "/" + url.getHost() + url.getPath();
-    }
-
-    private void addUserProperties(Map<String, Object> data) {
-        if (properties != null) {
-            Enumeration<String> keys = properties.keys();
-            while (keys.hasMoreElements()) {
-                String property = keys.nextElement();
-                data.put(property, properties.get(property));
-            }
-        }
     }
 
 }

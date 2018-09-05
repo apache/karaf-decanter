@@ -16,7 +16,6 @@
  */
 package org.apache.karaf.decanter.collector.jmx;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,23 +42,10 @@ class BeanHarvester {
 
     private MBeanServerConnection connection;
     private String type;
-    private String hostName;
-    private String hostAddress;
-    private String karafName;
     
-    BeanHarvester(MBeanServerConnection connection, String type, String hostName, String karafName) throws UnknownHostException {
+    BeanHarvester(MBeanServerConnection connection, String type) throws UnknownHostException {
         this.connection = connection;
         this.type = type;
-        this.hostName = hostName;
-        if (hostName == null || hostName.isEmpty()) {
-            this.karafName = karafName;
-            this.hostAddress = InetAddress.getLocalHost().getHostAddress();
-            this.hostName =InetAddress.getLocalHost().getHostName();
-        } else {
-            this.karafName = null;
-            this.hostAddress = null;
-            this.hostName = hostName;
-        }
     }
 
     Map<String, Object> harvestBean(ObjectName name) throws Exception {
@@ -68,13 +54,6 @@ class BeanHarvester {
         Map<String, Object> data = new HashMap<>();
         data.put("type", type);
         data.put("ObjectName", name.toString());
-        if (this.karafName != null) {
-            data.put("karafName", this.karafName);
-        }
-        if (this.hostAddress != null) {
-            data.put("hostAddress", this.hostAddress);
-        }
-        data.put("hostName", hostName);
 
         for (MBeanAttributeInfo attribute : attributes) {
             try {
