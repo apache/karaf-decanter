@@ -33,7 +33,7 @@ public class TestMapAttribute {
     @Test
     public void testOperatingSystemMBean() throws MalformedObjectNameException, Exception {
         MBeanServerConnection server = ManagementFactory.getPlatformMBeanServer();
-        BeanHarvester harvester = new BeanHarvester(server, "local", "local", "localhost");
+        BeanHarvester harvester = new BeanHarvester(server, "local");
         Map<String, Object> data = harvester.harvestBean(new ObjectName("java.lang:type=OperatingSystem"));
         Assert.assertTrue(data.size() >= 15);
         Object freeMem = data.get("FreePhysicalMemorySize");

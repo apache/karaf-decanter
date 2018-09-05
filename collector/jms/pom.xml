@@ -43,6 +43,10 @@
             <artifactId>geronimo-jms_1.1_spec</artifactId>
             <version>1.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.decanter.collector</groupId>
+            <artifactId>org.apache.karaf.decanter.collector.utils</artifactId>
+        </dependency>
 
         <!-- test -->
         <dependency>
@@ -85,7 +89,8 @@
                             *
                         </Import-Package>
                         <Private-Package>
-                            org.apache.karaf.decanter.collector.jms
+                            org.apache.karaf.decanter.collector.jms,
+                            org.apache.karaf.decanter.collector.utils
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                         <_dsannotations-options>nocapabilities,norequirements</_dsannotations-options>

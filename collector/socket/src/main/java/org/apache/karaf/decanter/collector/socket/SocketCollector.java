@@ -19,11 +19,9 @@ package org.apache.karaf.decanter.collector.socket;
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -31,6 +29,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -165,24 +164,17 @@ public class SocketCollector implements Closeable, Runnable {
         public void run() {
             try (BufferedInputStream bis = new BufferedInputStream(clientSocket.getInputStream())) {
                 Map<String, Object> data = new HashMap<>();
-                data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-                data.put("hostName", InetAddress.getLocalHost().getHostName());
                 data.put("type", "socket");
-                String karafName = System.getProperty("karaf.name");
-                if (karafName != null) {
-                    data.put("karafName", karafName);
-                }
                 try {
                     data.putAll(unmarshaller.unmarshal(bis));
                 } catch (Exception e) {
                     // nothing to do
                 }
 
-                // custom fields
-                Enumeration<String> keys = properties.keys();
-                while (keys.hasMoreElements()) {
-                    String key = keys.nextElement();
-                    data.put(key, properties.get(key));
+                try {
+                    PropertiesPreparator.prepare(data, properties);
+                } catch (Exception e) {
+                    LOGGER.warn("Can't prepare data for the dispatcher", e);
                 }
 
                 Event event = new Event(eventAdminTopic, data);
@@ -212,24 +204,17 @@ public class SocketCollector implements Closeable, Runnable {
             
             try (ByteArrayInputStream bais = new ByteArrayInputStream(packet.getData())) {
                 Map<String, Object> data = new HashMap<>();
-                data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-                data.put("hostName", InetAddress.getLocalHost().getHostName());
                 data.put("type", "socket");
-                String karafName = System.getProperty("karaf.name");
-                if (karafName != null) {
-                    data.put("karafName", karafName);
-                }
                 try {
                     data.putAll(unmarshaller.unmarshal(bais));
                 } catch (Exception e) {
                     // nothing to do
                 }
 
-                // custom fields
-                Enumeration<String> keys = properties.keys();
-                while (keys.hasMoreElements()) {
-                    String key = keys.nextElement();
-                    data.put(key, properties.get(key));
+                try {
+                    PropertiesPreparator.prepare(data, properties);
+                } catch (Exception e) {
+                    LOGGER.warn("Can't prepare data for the dispatcher", e);
                 }
 
                 Event event = new Event(eventAdminTopic, data);

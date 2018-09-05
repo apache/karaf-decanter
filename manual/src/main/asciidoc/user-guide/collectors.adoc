@@ -703,3 +703,30 @@ karaf@root()> feature:install decanter-collector-dropwizard
 
 As soon as a `MetricSet` (like `MetricRegistry`) service will be available, the collector will get the metrics and
 send to the Decanter dispatcher.
+
+==== Customizing properties in collectors
+
+You can add, rename or remove properties collected by the collectors before sending it to the dispatcher.
+
+In the collector configuration file (for instance `etc/org.apache.karaf.decanter.collector.jmx-local.cfg` for the local JMX collector), you
+can add any property. By default, the property is added to the data sent to the dispatcher.
+
+You can prefix the configuration property with the action you can perform before sending:
+
+* `fields.add.` adds a property to the data sent. The following add property `hello` with value `world`:
+
+    ----
+    fields.add.hello=world
+    ----
+
+* `fields.remove.` removes a property to the data sent:
+
+    ----
+    fields.remove.hello=
+    ----
+
+* `fields.rename.` rename a property with another name:
+
+    ----
+    fields.rename.helo=hello
+    ----

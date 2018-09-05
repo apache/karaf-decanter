@@ -17,18 +17,15 @@
 package org.apache.karaf.decanter.collector.file;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListenerAdapter;
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -94,34 +91,18 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         Map<String, Object> data = new HashMap<>();
         data.put("type", type);
         data.put("path", path);
-        String karafName = System.getProperty("karaf.name");
-        if (karafName != null) {
-            data.put("karafName", karafName);
-        }
-
-        try {
-            data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-            data.put("hostName", InetAddress.getLocalHost().getHostName());
-        } catch (Exception e) {
-            LOGGER.debug("Can't get host address and name", e);
-        }
-
-        // custom fields
-        addPropertiesTo(data);
 
         // TODO: try some line parsing
         data.put("line", line);
 
+        try {
+            PropertiesPreparator.prepare(data, properties);
+        } catch (Exception e) {
+            LOGGER.warn("Can't fully prepare data for the dispatcher", e);
+        }
+
         Event event = new Event("decanter/collect/file/" + type, data);
         dispatcher.postEvent(event);
-    }
-
-    private void addPropertiesTo(Map<String, Object> data) {
-        Enumeration<String> keys = properties.keys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            data.put(key, properties.get(key));
-        }
     }
 
     @Override

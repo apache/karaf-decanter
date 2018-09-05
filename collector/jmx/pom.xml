@@ -34,6 +34,12 @@
     <name>Apache Karaf :: Decanter :: Collector :: JMX</name>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.karaf.decanter.collector</groupId>
+            <artifactId>org.apache.karaf.decanter.collector.utils</artifactId>
+        </dependency>
+
+        <!-- test -->
     	<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
@@ -50,6 +56,27 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <inherited>true</inherited>
+                <extensions>true</extensions>
+                <configuration>
+                    <obrRepository>NONE</obrRepository>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Export-Package>!*</Export-Package>
+                        <Import-Package>
+                            *
+                        </Import-Package>
+                        <Private-Package>
+                            org.apache.karaf.decanter.collector.jmx,
+                            org.apache.karaf.decanter.collector.utils
+                        </Private-Package>
+                        <_dsannotations>*</_dsannotations>
+                    </instructions>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>

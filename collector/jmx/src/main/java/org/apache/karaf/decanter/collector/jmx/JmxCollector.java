@@ -32,6 +32,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -128,9 +129,8 @@ public class JmxCollector implements Runnable {
 
         String currentObjectName = null;
         try {
-            String karafName = System.getProperty("karaf.name");
             LOGGER.debug("Creating harvester");
-            BeanHarvester harvester = new BeanHarvester(connection, this.type, host, karafName);
+            BeanHarvester harvester = new BeanHarvester(connection, this.type);
 
             LOGGER.debug("Populating names ({})", this.objectNames);
             Set<ObjectName> names = new HashSet<> ();
@@ -148,7 +148,8 @@ public class JmxCollector implements Runnable {
                 LOGGER.debug("Harvesting {}", name);
                 try {
                     Map<String, Object> data = harvester.harvestBean(name);
-                    addUserProperties(data);
+                    PropertiesPreparator.prepare(data, properties);
+                    data.put("host", host);
                     Event event = new Event("decanter/collect/jmx/" + this.type + "/" + getTopic(name), data);
                     LOGGER.debug("Posting for {}", name);
                     this.dispatcher.postEvent(event);
@@ -178,16 +179,6 @@ public class JmxCollector implements Runnable {
             env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, this.remoteProtocolPkgs);
         }
         return env;
-    }
-
-    private void addUserProperties(Map<String, Object> data) {
-        if (this.properties != null) {
-            Enumeration<String> keys = this.properties.keys();
-            while (keys.hasMoreElements()) {
-                String property = keys.nextElement();
-                data.put(property, this.properties.get(property));
-            }
-        }
     }
 
     private ObjectName getObjectName(String objectName) throws MalformedObjectNameException {

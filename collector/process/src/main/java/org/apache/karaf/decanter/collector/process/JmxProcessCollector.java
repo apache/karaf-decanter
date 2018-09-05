@@ -18,7 +18,6 @@ package org.apache.karaf.decanter.collector.process;
 
 import java.io.File;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +29,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -125,12 +125,14 @@ public class JmxProcessCollector implements Runnable {
 
         try {
             String karafName = System.getProperty("karaf.name");
-            BeanHarvester harvester = new BeanHarvester(connection, type, host, karafName);
+            BeanHarvester harvester = new BeanHarvester(connection, type);
             Set<ObjectName> names = connection.queryNames(getObjectName(objectName), null);
             for (ObjectName name : names) {
                 try {
                     Map<String, Object> data = harvester.harvestBean(name);
-                    addUserProperties(data);
+
+                    PropertiesPreparator.prepare(data, properties);
+
                     Event event = new Event("decanter/collect/jmx/" + type + "/" + getTopic(name), data);
                     dispatcher.postEvent(event);
                 } catch (Exception e) {
@@ -148,16 +150,6 @@ public class JmxProcessCollector implements Runnable {
         }
 
         LOGGER.debug("Karaf Decanter  JMX Local Process Collector harvesting {} done", type);
-    }
-
-    private void addUserProperties(Map<String, Object> data) {
-        if (properties != null) {
-            Enumeration<String> keys = properties.keys();
-            while (keys.hasMoreElements()) {
-                String property = keys.nextElement();
-                data.put(property, properties.get(property));
-            }
-        }
     }
 
     private ObjectName getObjectName(String objectName) throws MalformedObjectNameException {

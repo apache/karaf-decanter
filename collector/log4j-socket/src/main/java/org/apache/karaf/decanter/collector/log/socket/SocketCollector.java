@@ -21,18 +21,17 @@ import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.apache.log4j.spi.LocationInfo;
 import org.apache.log4j.spi.LoggingEvent;
 import org.osgi.service.component.ComponentContext;
@@ -110,42 +109,32 @@ public class SocketCollector implements Closeable, Runnable {
         return executor;
     }
 
-    private void handleLog4j(LoggingEvent event) throws UnknownHostException {
-        LOGGER.debug("Received log event {}", event.getLoggerName());
+    private void handleLog4j(LoggingEvent loggingEvent) throws UnknownHostException {
+        LOGGER.debug("Received log event {}", loggingEvent.getLoggerName());
         Map<String, Object> data = new HashMap<>();
-        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-        data.put("hostName", InetAddress.getLocalHost().getHostName());
+        data.put("type", "log");
 
-        // custom fields
-        Enumeration<String> keys = properties.keys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            data.put(key, properties.get(key));
-        }
-
-        data.put("timestamp", event.getTimeStamp());
-        data.put("loggerClass", event.getFQNOfLoggerClass());
-        data.put("loggerName", event.getLoggerName());
-        data.put("threadName", event.getThreadName());
-        data.put("message", event.getMessage());
-        data.put("level", event.getLevel().toString());
-        data.put("renderedMessage", event.getRenderedMessage());
-        data.put("MDC", event.getProperties());
-        putLocation(data, event.getLocationInformation());
-        String[] throwableAr = event.getThrowableStrRep();
+        data.put("timestamp", loggingEvent.getTimeStamp());
+        data.put("loggerClass", loggingEvent.getFQNOfLoggerClass());
+        data.put("loggerName", loggingEvent.getLoggerName());
+        data.put("threadName", loggingEvent.getThreadName());
+        data.put("message", loggingEvent.getMessage());
+        data.put("level", loggingEvent.getLevel().toString());
+        data.put("renderedMessage", loggingEvent.getRenderedMessage());
+        data.put("MDC", loggingEvent.getProperties());
+        putLocation(data, loggingEvent.getLocationInformation());
+        String[] throwableAr = loggingEvent.getThrowableStrRep();
         if (throwableAr != null) {
             data.put("throwable", join(throwableAr));
         }
-        sendEvent(event.getLoggerName(), data);
-    }
 
-    private void sendEvent(String loggerName, Map<String, Object> data) {
-        String topic = loggerName2Topic(loggerName);
-        data.put("type", "log");
-        String karafName = System.getProperty("karaf.name");
-        if (karafName != null) {
-            data.put("karafName", karafName);
+        try {
+            PropertiesPreparator.prepare(data, properties);
+        } catch (Exception e) {
+            LOGGER.warn("Can't prepare data for the dispatcher", e);
         }
+
+        String topic = loggerName2Topic(loggingEvent.getLoggerName());
         Event event = new Event(topic, data);
         dispatcher.postEvent(event);
     }

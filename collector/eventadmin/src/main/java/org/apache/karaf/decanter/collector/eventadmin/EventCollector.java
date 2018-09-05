@@ -16,6 +16,7 @@
  */
 package org.apache.karaf.decanter.collector.eventadmin;
 
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -25,7 +26,6 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventHandler;
 
 import javax.security.auth.Subject;
-import java.net.InetAddress;
 import java.security.Principal;
 import java.util.*;
 
@@ -50,23 +50,6 @@ public class EventCollector implements EventHandler {
         String topic = event.getTopic();
         Map<String, Object> data = new HashMap<>();
         data.put("type", "eventadmin");
-        String karafName = System.getProperty("karaf.name");
-        if (karafName != null) {
-            data.put("karafName", karafName);
-        }
-        try {
-            data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-            data.put("hostName", InetAddress.getLocalHost().getHostName());
-        } catch (Exception e) {
-            // nothing to do
-        }
-
-        // custom fields
-        Enumeration<String> keys = properties.keys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            data.put(key, properties.get(key));
-        }
 
         for (String property : event.getPropertyNames()) {
             if (property.equals("type")) {
@@ -83,6 +66,13 @@ public class EventCollector implements EventHandler {
                 data.put(property, event.getProperty(property));
             }
         }
+
+        try {
+            PropertiesPreparator.prepare(data, properties);
+        } catch (Exception e) {
+            // nothing to do
+        }
+
         Event bridge = new Event("decanter/collect/eventadmin/" + topic, data);
         dispatcher.sendEvent(bridge);
     }
