@@ -42,7 +42,7 @@ public class JmsCollector {
     @Reference
     public ConnectionFactory connectionFactory;
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+    @Reference
     public Unmarshaller unmarshaller;
 
     @Reference
@@ -164,12 +164,8 @@ public class JmsCollector {
                     Map<String, Object> data = new HashMap<>();
                     data.put("type", "jms");
 
-                    if (unmarshaller != null) {
-                        ByteArrayInputStream is = new ByteArrayInputStream(textMessage.getText().getBytes());
-                        data.putAll(unmarshaller.unmarshal(is));
-                    } else {
-                        data.put("payload", textMessage.getText());
-                    }
+                    ByteArrayInputStream is = new ByteArrayInputStream(textMessage.getText().getBytes());
+                    data.putAll(unmarshaller.unmarshal(is));
 
                     PropertiesPreparator.prepare(data, properties);
 
