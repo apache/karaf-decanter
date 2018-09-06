@@ -170,6 +170,17 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.mqtt.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.mqtt/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-collector-jdbc-core" version="${project.version}" description="Karaf Decanter JDBC Collector core">
+        <feature>decanter-common</feature>
+        <feature>scheduler</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jdbc/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-collector-jdbc" version="${project.version}" description="Karaf Decanter JDBC Collector">
+        <feature>decanter-collector-jdbc-core</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.jdbc.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jdbc/${project.version}/cfg</configfile>
+    </feature>
+
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}</bundle>

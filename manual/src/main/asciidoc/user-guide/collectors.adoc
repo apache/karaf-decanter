@@ -725,6 +725,38 @@ karaf@root()> feature:install decanter-collector-dropwizard
 As soon as a `MetricSet` (like `MetricRegistry`) service will be available, the collector will get the metrics and
 send to the Decanter dispatcher.
 
+==== JDBC
+
+The Decanter JDBC collector periodically executes a query on a database and send the query result to the dispatcher.
+
+The `decanter-collector-jdbc` installs the JDBC collector:
+
+----
+karaf@root()> feature:install decanter-collector-jdbc
+----
+
+The feature also installs the `etc/org.apache.karaf.decanter.collector.jdbc.cfg` configuration file:
+
+----
+#######################################
+# Decanter JDBC Collector Configuration
+#######################################
+
+# DataSource to use
+dataSource.target=(osgi.jndi.service.name=jdbc/decanter)
+
+# SQL Query to retrieve data
+query=select * from TABLE
+----
+
+This configuration file allows you to configure the datasource to use and the SQL query to perform:
+
+* the `datasource.name` property contains the name of the JDBC datasource to use to connect to the database. You can
+  create this datasource using the Karaf `jdbc:create` command (provided by the `jdbc` feature).
+* the `query` property contains the SQL query to perform on the database and retrieve data.
+
+This collector is periodically executed by the Karaf scheduler.
+
 ==== Customizing properties in collectors
 
 You can add, rename or remove properties collected by the collectors before sending it to the dispatcher.
