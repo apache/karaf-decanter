@@ -46,7 +46,8 @@
                     <instructions>
                         <Export-Package>
                             org.apache.karaf.decanter.api,
-                            org.apache.karaf.decanter.api.marshaller
+                            org.apache.karaf.decanter.api.marshaller,
+                            org.apache.karaf.decanter.api.parser
                         </Export-Package>
                     </instructions>
                 </configuration>
