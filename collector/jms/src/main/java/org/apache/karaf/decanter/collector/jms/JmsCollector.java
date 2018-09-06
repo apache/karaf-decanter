@@ -19,10 +19,7 @@ package org.apache.karaf.decanter.collector.jms;
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
 import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.*;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
@@ -45,7 +42,7 @@ public class JmsCollector {
     @Reference
     public ConnectionFactory connectionFactory;
 
-    @Reference
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
     public Unmarshaller unmarshaller;
 
     @Reference
@@ -167,8 +164,12 @@ public class JmsCollector {
                     Map<String, Object> data = new HashMap<>();
                     data.put("type", "jms");
 
-                    ByteArrayInputStream is = new ByteArrayInputStream(textMessage.getText().getBytes());
-                    data.putAll(unmarshaller.unmarshal(is));
+                    if (unmarshaller != null) {
+                        ByteArrayInputStream is = new ByteArrayInputStream(textMessage.getText().getBytes());
+                        data.putAll(unmarshaller.unmarshal(is));
+                    } else {
+                        data.put("payload", textMessage.getText());
+                    }
 
                     PropertiesPreparator.prepare(data, properties);
 

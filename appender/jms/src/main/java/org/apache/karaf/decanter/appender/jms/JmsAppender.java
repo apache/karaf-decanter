@@ -21,10 +21,12 @@ import java.util.Map;
 
 import javax.jms.*;
 
+import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
@@ -40,6 +42,9 @@ public class JmsAppender implements EventHandler {
 
     @Reference
     public ConnectionFactory connectionFactory;
+
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+    public Marshaller marshaller;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(JmsAppender.class);
 
@@ -75,14 +80,17 @@ public class JmsAppender implements EventHandler {
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = createDestination(session);
             MessageProducer producer = session.createProducer(destination);
-            MapMessage message = session.createMapMessage();
-
-            for (String name : event.getPropertyNames()) {
-                Object value = event.getProperty(name);
-                setProperty(message, name, value);
+            if (marshaller != null) {
+                TextMessage message = session.createTextMessage(marshaller.marshal(event));
+                producer.send(message);
+            } else {
+                MapMessage message = session.createMapMessage();
+                for (String name : event.getPropertyNames()) {
+                    Object value = event.getProperty(name);
+                    setProperty(message, name, value);
+                }
+                producer.send(message);
             }
-
-            producer.send(message);
             producer.close();
         } catch (Exception e) {
             LOGGER.warn("Can't send to JMS broker", e);
