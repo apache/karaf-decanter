@@ -127,16 +127,27 @@ any=value
 * all other values (like `any`) will be part of the collected data. It means that you can add your own custom data, and
 easily create queries bases on this data.
 
+You can also filter the lines read from the file using the `regex` property.
+
+For instance:
+
+----
+regex=(.*foo.*)
+----
+
+Only the line matching the `regex` will be sent to the dispatcher.
+
 For instance, instead of the log collector, you can create the following `etc/org.apache.karaf.decanter.collector.file-karaf.cfg`
 file collector configuration file:
 
 ----
 type=karaf-log-file
 path=/path/to/karaf/data/log/karaf.log
+regex=(.*my.*)
 my=stuff
 ----
 
-The file collector will tail on karaf.log file, and send any new line in this log file as collected data.
+The file collector will tail on `karaf.log` file, and send any new line matching the `regex` in this log file as collected data.
 
 ==== EventAdmin
 

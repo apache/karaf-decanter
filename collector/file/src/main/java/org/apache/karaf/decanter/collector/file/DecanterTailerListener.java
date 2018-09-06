@@ -20,8 +20,8 @@ import java.io.File;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListenerAdapter;
@@ -52,12 +52,13 @@ public class DecanterTailerListener extends TailerListenerAdapter {
 
     private String type;
     private String path;
+    private String regex;
     
     /**
      * additional properties provided by the user
      */
     private Dictionary<String, Object> properties;
-    private ExecutorService executorService;
+    private Tailer tailer;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -73,16 +74,17 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         String path = (String) properties.get("path");
 
         LOGGER.debug("Starting tail on {}", path);
-        Tailer tailer = Tailer.create(new File(path), this, 1000, true, true);
-        executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(tailer);
+        tailer = new Tailer(new File(path), this, 1000, true, true);
+        Thread thread = new Thread(tailer, "File tailer for " + path);
         this.type = type;
         this.path = path;
+        this.regex = (String) properties.get("regex");
+        thread.start();
     }
     
     @Deactivate
     public void deactivate() {
-        executorService.shutdownNow();
+        tailer.stop();
     }
 
     @Override
@@ -91,9 +93,20 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         Map<String, Object> data = new HashMap<>();
         data.put("type", type);
         data.put("path", path);
+        data.put("regex", regex);
 
         // TODO: try some line parsing
-        data.put("line", line);
+        if (regex != null) {
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.matches()) {
+                data.put("line", line);
+            } else {
+                return;
+            }
+        } else {
+            data.put("line", line);
+        }
 
         try {
             PropertiesPreparator.prepare(data, properties);
