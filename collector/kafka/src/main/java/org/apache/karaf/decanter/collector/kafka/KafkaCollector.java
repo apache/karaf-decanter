@@ -54,6 +54,7 @@ public class KafkaCollector implements Runnable {
     private String topic;
     private String eventAdminTopic;
     private boolean consuming = false;
+    private String messageType;
 
     @Reference
     public EventAdmin dispatcher;
@@ -68,6 +69,7 @@ public class KafkaCollector implements Runnable {
 
         topic = getValue(properties, "topic", "decanter");
         eventAdminTopic = getValue(properties, EventConstants.EVENT_TOPIC, "decanter/collect/kafka/decanter");
+        messageType = getValue(properties, "message.type", "text");
 
         Properties config = new Properties();
 
@@ -175,8 +177,12 @@ public class KafkaCollector implements Runnable {
         
         for (ConsumerRecord<String, String> record : records) {
             String value = record.value();
-            ByteArrayInputStream is = new ByteArrayInputStream(value.getBytes("utf-8"));
-            data.putAll(unmarshaller.unmarshal(is));
+            if (messageType.equalsIgnoreCase("text")) {
+                ByteArrayInputStream is = new ByteArrayInputStream(value.getBytes("utf-8"));
+                data.putAll(unmarshaller.unmarshal(is));
+            } else {
+                data.put("payload", value);
+            }
         }
 
         try {
