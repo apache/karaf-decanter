@@ -90,6 +90,7 @@ public class LogAppender implements PaxAppender {
         LOGGER.debug("Publishing log event to the appenders ...");
 
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "log");
 
         data.put("timestamp", event.getTimeStamp());
         data.put("loggerClass", event.getFQNOfLoggerClass());
