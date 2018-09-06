@@ -40,6 +40,7 @@ public class JmsAppenderTest {
         JmsAppender appender = new JmsAppender();
         appender.connectionFactory = cf;
         Dictionary<String, Object> config = new Hashtable<>();
+        config.put("message.type", "map");
         appender.activate(config);
         
         Connection con = cf.createConnection();
@@ -47,7 +48,6 @@ public class JmsAppenderTest {
         Session sess = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
         
         MessageConsumer consumer = sess.createConsumer(sess.createQueue("decanter"));
-
         
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("timestamp", 1l);
