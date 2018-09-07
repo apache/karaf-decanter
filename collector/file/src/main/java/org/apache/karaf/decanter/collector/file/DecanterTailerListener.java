@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListenerAdapter;
+import org.apache.karaf.decanter.api.parser.Parser;
 import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -47,6 +48,9 @@ public class DecanterTailerListener extends TailerListenerAdapter {
 
     @Reference
     public EventAdmin dispatcher;
+
+    @Reference
+    public Parser parser;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DecanterTailerListener.class);
 
@@ -95,17 +99,16 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         data.put("path", path);
         data.put("regex", regex);
 
-        // TODO: try some line parsing
         if (regex != null) {
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(line);
             if (matcher.matches()) {
-                data.put("line", line);
+                data.putAll(this.parser.parse(line));
             } else {
                 return;
             }
         } else {
-            data.put("line", line);
+            data.putAll(this.parser.parse(line));
         }
 
         try {

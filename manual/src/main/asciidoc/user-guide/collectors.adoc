@@ -149,6 +149,16 @@ my=stuff
 
 The file collector will tail on `karaf.log` file, and send any new line matching the `regex` in this log file as collected data.
 
+By default, the collector use the `org.apache.karaf.decanter.impl.parser.IdentityParser` parser to parse the line into
+a typed Object (Long, Integer or String) before send it to the EventDispatcher data map.
+
+You can write your own parser by implementing the `org.apache.karaf.decanter.api.parser.Parser` interface and declare
+it into the file collector configuration file:
+
+----
+parser.target=(parserId=myParser)
+----
+
 ==== EventAdmin
 
 The Decanter EventAdmin Collector is an event-driven collector, listening for all internal events happening in
