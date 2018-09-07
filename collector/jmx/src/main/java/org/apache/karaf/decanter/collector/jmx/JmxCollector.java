@@ -66,6 +66,7 @@ public class JmxCollector implements Runnable {
     private String remoteProtocolPkgs;
 
     private Set<String> objectNames;
+    private Map<String, String> operations;
     private Dictionary<String, Object> properties;
 
     @SuppressWarnings("unchecked")
@@ -86,13 +87,17 @@ public class JmxCollector implements Runnable {
         this.remoteProtocolPkgs = remoteProtocolPkgs;
 
         this.objectNames = new HashSet<> ();
-        for (Enumeration<String> e = this.properties.keys(); e.hasMoreElements(); ) {
+        this.operations = new HashMap<>();
+        for (Enumeration<String> e = properties.keys(); e.hasMoreElements(); ) {
         	String key = e.nextElement();
         	if( "object.name".equals( key ) || key.startsWith( "object.name." )) {
         		Object value = this.properties.get( key );
         		if (value != null)
         			this.objectNames.add( value.toString());
         	}
+        	if (key.startsWith("operation.name.")) {
+        	    operations.put(key.substring("operation.name.".length()), (String) properties.get(key));
+            }
         }
     }
 
@@ -152,9 +157,27 @@ public class JmxCollector implements Runnable {
                     data.put("host", host);
                     Event event = new Event("decanter/collect/jmx/" + this.type + "/" + getTopic(name), data);
                     LOGGER.debug("Posting for {}", name);
-                    this.dispatcher.postEvent(event);
+                    dispatcher.postEvent(event);
                 } catch (Exception e) {
                     LOGGER.warn("Can't read MBean {} ({})", name, this.type, e);
+                }
+            }
+
+            for (String operation : operations.keySet()) {
+                String raw = operations.get(operation);
+                String[] split = raw.split("\\|");
+                if (split.length == 4) {
+                    ObjectName objectName = new ObjectName(split[0]);
+                    String operationName = split[1];
+                    String[] arguments = split[2].split(",");
+                    String[] signatures = split[3].split(",");
+                    Map<String, Object> data = harvester.executeOperation(operation, objectName, operationName, arguments, signatures);
+                    PropertiesPreparator.prepare(data, properties);
+                    data.put("host", host);
+                    Event event = new Event("decanter/collect/jmx/" + this.type + "/" + getTopic(objectName), data);
+                    dispatcher.postEvent(event);
+                } else {
+                    LOGGER.warn("{} is not well configured ({})", operation, raw);
                 }
             }
         } catch (Exception e) {

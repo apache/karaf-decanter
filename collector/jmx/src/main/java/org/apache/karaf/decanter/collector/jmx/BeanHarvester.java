@@ -109,10 +109,22 @@ class BeanHarvester {
             } catch (SecurityException se) {
                 LOGGER.error("SecurityException: ", se);
             } catch (Exception e) {
-                LOGGER.debug("Could not read attribute " + name.toString() + " " + attribute.getName());
+                LOGGER.debug("Could not read attribute {} {}", name.toString(), attribute.getName());
             }
 
         }
+        return data;
+    }
+
+    public Map<String, Object> executeOperation(String resultName, ObjectName objectName, String operation, Object[] arguments, String[] signatures) throws Exception {
+        LOGGER.debug("Executing operation {} on {}", operation, objectName);
+        Map<String, Object> data = new HashMap<>();
+        data.put("type", type);
+        data.put("operation.name", operation);
+        data.put("operation.arguments", arguments);
+        data.put("operation.signatures", signatures);
+        Object result = connection.invoke(objectName, operation, arguments, signatures);
+        data.put(resultName, result);
         return data;
     }
 }
