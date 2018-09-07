@@ -205,6 +205,8 @@ The Decanter JMX Collector is a polled collector, executed periodically by the D
 The JMX collector connects to a JMX MBeanServer (local or remote), and retrieves all attributes of each available MBeans.
 The JMX metrics (attribute values) are send to the appenders.
 
+In addition, the JMX collector also supports the execution of operations on dedicated ObjectName that you configure via `cfg` file.
+
 The `decanter-collector-jmx` feature installs the JMX collector, and a default configuration file:
 
 ----
@@ -241,6 +243,10 @@ url=local
 #object.name.system=java.lang:*
 #object.name.karaf=org.apache.karaf:type=http,name=*
 #object.name.3=org.apache.activemq:*
+
+# You can also execute operations on some MBeans, providing the object name, operation, arguments (separated by ,)
+# and signatures (separated by ,) for the arguments (separated by |)
+#operation.name.rootLogger=org.apache.karaf:type=log,name=root|getLevel|rootLogger|java.lang.String
 ----
 
 This file harvests the data of the local MBeanServer:
@@ -254,11 +260,12 @@ can also polled any remote MBean server (Karaf based or not) providing the servi
 is secured.
 * the `password` property contains the password to connect to the MBean server. It's only required if the MBean server
 is secured.
-* the `object.name` property is optional. If this property is not specified, the collector will retrieve the attributes
+* the `object.name` prefix is optional. If this property is not specified, the collector will retrieve the attributes
 of all MBeans. You can filter to consider only some MBeans. This property contains the ObjectName filter to retrieve
 the attributes only to some MBeans. Several object names can be listed, provided the property prefix is `object.name.`.
 * any other values will be part of the collected data. It means that you can add your own property if you want to add
 additional data, and create queries based on this data.
+* the `operation.name` prefix is also optional. You can use it to execute an operation. The value format is `objectName|operation|arguments|signatures`.
 
 You can retrieve multiple MBean servers. For that, you just create a new configuration file using the file name format
 `etc/org.apache.karaf.decanter.collector.jmx-[ANYNAME].cfg`.
