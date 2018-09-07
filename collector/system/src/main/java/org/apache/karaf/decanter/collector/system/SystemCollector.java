@@ -93,6 +93,7 @@ public class SystemCollector implements Runnable {
                         if (output.endsWith("\n")) {
                             output = output.substring(0, output.length() - 1);
                         }
+                        output = output.trim();
                         // try to convert to number
                         try {
                             if (output.contains(".")) {
@@ -103,7 +104,7 @@ public class SystemCollector implements Runnable {
                                 data.put(key, value);
                             }
                         } catch (NumberFormatException e) {
-                            data.put(key, outputStream.toString());
+                            data.put(key, output);
                         }
                         streamHandler.stop();
                         Event event = new Event("decanter/collect/system/" + key.replace(".", "_"), data);
