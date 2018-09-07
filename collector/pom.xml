@@ -50,6 +50,7 @@
         <module>rest-servlet</module>
         <module>system</module>
         <module>socket</module>
+        <module>jdbc</module>
     </modules>
 
 </project>
