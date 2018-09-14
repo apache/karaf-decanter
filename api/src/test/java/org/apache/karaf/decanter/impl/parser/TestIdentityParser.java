@@ -38,30 +38,30 @@ public class TestIdentityParser {
                 "uuid=e75146c3-f73c-46e3-878b-1b88e58d76cf] for service with service.id [16]";
 
         System.out.println("line String :: " + lineString);
-        data = parser.parse(lineString);
+        data = parser.parse("line_string", lineString);
         Assert.assertNotNull("parser result is null", data);
         Assert.assertEquals("parser size result is incorrect",1, data.size());
 
-        Assert.assertTrue("parser value is not a string",data.get("line") instanceof String);
+        Assert.assertTrue("parser value is not a string",data.get("line_string") instanceof String);
 
         // Integer type test
         String lineInteger = "512";
 
         System.out.println("line Integer :: " + lineInteger);
-        data = parser.parse(lineInteger);
+        data = parser.parse("line_integer", lineInteger);
         Assert.assertNotNull("parser result is null", data);
         Assert.assertEquals("parser size result is incorrect", 1, data.size());
 
-        Assert.assertTrue("parser value is not an integer",data.get("line") instanceof Integer);
+        Assert.assertTrue("parser value is not an integer",data.get("line_integer") instanceof Integer);
 
         // Long type test
         String lineLong = "9223372036854775806";
 
         System.out.println("line Long :: " + lineLong);
-        data = parser.parse(lineLong);
+        data = parser.parse("line_long", lineLong);
         Assert.assertNotNull("parser result is null", data);
         Assert.assertEquals("parser size result is incorrect", 1, data.size());
 
-        Assert.assertTrue("parser value is not a long",data.get("line") instanceof Long);
+        Assert.assertTrue("parser value is not a long",data.get("line_long") instanceof Long);
     }
 }
