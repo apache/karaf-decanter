@@ -26,24 +26,29 @@ import java.util.Map;
 public class IdentityParser implements Parser {
 
     @Override
-    public Map<String, Object> parse(String line) {
+    public Map<String, Object> parse(String key, String line) {
         Map<String, Object> data = new HashMap<>();
 
+        String datakey = "line";
+        if (key != null) {
+            datakey = key.trim();
+        }
+
         try {
-            data.put("line", Integer.parseInt(line));
+            data.put(datakey, Integer.parseInt(line));
             return data;
         } catch (Exception e) {
             // nothing to do
         }
 
         try {
-            data.put("line", Long.parseLong(line));
+            data.put(datakey, Long.parseLong(line));
             return data;
         } catch (Exception e) {
             // nothing to do
         }
 
-        data.put("line", line);
+        data.put(datakey, line);
         return data;
     }
 }

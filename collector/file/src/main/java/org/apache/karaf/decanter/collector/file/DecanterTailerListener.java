@@ -103,12 +103,12 @@ public class DecanterTailerListener extends TailerListenerAdapter {
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(line);
             if (matcher.matches()) {
-                data.putAll(this.parser.parse(line));
+                data.putAll(this.parser.parse("line_" + type, line));
             } else {
                 return;
             }
         } else {
-            data.putAll(this.parser.parse(line));
+            data.putAll(this.parser.parse("line_" + type, line));
         }
 
         try {

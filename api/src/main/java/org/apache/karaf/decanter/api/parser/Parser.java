@@ -22,5 +22,5 @@ public interface Parser {
 
     String SERVICE_KEY_ID = "parserId";
 
-    Map<String, Object> parse(String line);
+    Map<String, Object> parse(String key, String line);
 }
