@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -170,6 +171,10 @@ public class JdbcCollector implements Runnable {
                     }
                     if (columnType == Types.TIMESTAMP) {
                         Timestamp value = resultSet.getTimestamp(i);
+                        data.put(columnName, value);
+                    }
+                    if (columnType == Types.NUMERIC) {
+                        BigDecimal value = resultSet.getBigDecimal(i);
                         data.put(columnName, value);
                     }
                 }
