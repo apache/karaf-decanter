@@ -1372,3 +1372,51 @@ The `decanter-appender-dropwizard` feature provides the Decanter event handler r
 ----
 karaf@root()> feature:install decanter-appender-dropwizard
 ----
+
+==== TimescaleDB
+
+The Decanter TimescaleDB appender stores the collected data into TimescaleDB database.
+
+You have to install a TimescaleDB before using the appender.
+
+You can install a test database with Docker for dev:
+
+```
+docker run -d --name timescaledb -p 5432:5432 -e POSTGRES_PASSWORD=decanter -e POSTGRES_USER=decanter -e POSTGRES_DATABASE=decanter timescale/timescaledb
+```
+
+===== TimescaleDB appender
+
+The `decanter-appender-timescaledb` feature installs the TimescaleDB appender.
+
+As TimescaleDB is a PostgreSQL database extension, the *timescaledb* feature will install all required features to configure
+your datasource (jdbc, jndi, postgreSQL driver, pool datasource).
+
+This feature installs the `etc/org.apache.karaf.decanter.appender.timescaledb.cfg` configuration file allowing you to setup the location
+of the TimescaleDB database to use:
+
+----
+#################################
+# Decanter TimescaleDB Configuration
+#################################
+
+# DataSource to use
+dataSource.target=(osgi.jndi.service.name=jdbc/decanter-timescaledb)
+
+# Name of the table storing the collected data
+table.name=decanter
+
+# Marshaller to use (json is recommended)
+marshaller.target=(dataFormat=json)
+----
+
+where:
+
+* `datasource.target` property contains the name of the JDBC datasource to use to connect to the database. You can
+create this datasource using the Karaf `jdbc:create` command (provided by the `jdbc` feature).
+* `table.name` property contains the table name in the database. The Decanter JDBC appender automatically
+activates the Timescale extenssion, creates the table for you and migrates the table to a TimescaleDB hypertable.
+The table is simple and contains just two column:
+** `timestamp` as BIGINT
+** `content` as TEXT
+* `marshaller.target` is the marshaller used to serialize data into the table.
