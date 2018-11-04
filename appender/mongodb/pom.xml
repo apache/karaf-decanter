@@ -53,15 +53,16 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
-                            !com.mongodb*,
-                            !org.bson*,
                             !io.netty*,
                             org.slf4j;resolution:=optional,
                             javax.crypto*;resolution:=optional,
                             org.ietf*;resolution:=optional,
+                            org.osgi.service.component,
+                            org.osgi.service.event,
                             *
                         </Import-Package>
                         <Private-Package>
+                            org.apache.karaf.decanter.appender.mongodb,
                             com.mongodb*,
                             org.bson*,
                             io.netty*
