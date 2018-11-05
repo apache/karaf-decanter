@@ -52,6 +52,7 @@
         <module>redis</module>
         <module>rest</module>
         <module>socket</module>
+        <module>timescaledb</module>
     </modules>
 
 </project>
