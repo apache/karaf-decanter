@@ -61,6 +61,9 @@
         <paho.version>1.0.2</paho.version>
         <redisson.version>2.2.8</redisson.version>
         <slf4j.version>1.7.7</slf4j.version>
+        <websocket.api.version>1.1</websocket.api.version>
+        <jetty.version>9.4.11.v20180605</jetty.version>
+        <jetty.servlet.version>3.1.0</jetty.servlet.version>
     </properties>
 
     <modules>

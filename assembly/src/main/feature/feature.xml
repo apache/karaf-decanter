@@ -392,6 +392,27 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.socket.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.socket/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-appender-websocket-core" version="${project.version}" description="Karaf Decanter Network Socket Appender core">
+        <feature>decanter-common</feature>
+        <bundle>mvn:org.eclipse.jetty.websocket/websocket-client/${jetty.version}</bundle>
+        <bundle>mvn:org.eclipse.jetty.websocket/websocket-api/${jetty.version}</bundle>
+        <bundle>mvn:org.eclipse.jetty.websocket/websocket-common/${jetty.version}</bundle>
+        <bundle>mvn:org.eclipse.jetty.websocket/javax-websocket-client-impl/${jetty.version}</bundle>
+        <bundle>mvn:org.eclipse.jetty/jetty-client/${jetty.version}</bundle>
+        <bundle>mvn:org.eclipse.jetty/jetty-http/${jetty.version}</bundle>
+        <bundle>mvn:org.eclipse.jetty/jetty-io/${jetty.version}</bundle>
+        <bundle>mvn:org.eclipse.jetty/jetty-util/${jetty.version}</bundle>
+        <bundle>mvn:org.eclipse.jetty/jetty-xml/${jetty.version}</bundle>
+        <bundle>mvn:javax.servlet/javax.servlet-api/${jetty.servlet.version}</bundle>
+        <bundle>mvn:javax.websocket/javax.websocket-api/${websocket.api.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.websocket/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-appender-websocket" version="${project.version}" description="Karaf Decanter Network WebSocket Appender">
+        <feature>decanter-appender-websocket-core</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.websocket.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.websocket/${project.version}/cfg</configfile>
+    </feature>
+
     <feature name="decanter-appender-dropwizard" version="${project.version}" description="Karaf Decanter Dropwizard Metrics Appender">
         <feature>decanter-common</feature>
         <bundle dependency="true">mvn:io.dropwizard.metrics/metrics-core/4.0.0</bundle>
