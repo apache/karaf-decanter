@@ -81,13 +81,11 @@ public class WebSocketAppender implements EventHandler {
 
     @Deactivate
     public void deactivate(ComponentContext componentContext) throws Exception {
-        try
-        {
+        try {
             if(webSocketClient != null && webSocketClient.isStarted()) {
                 webSocketClient.stop();
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             LOGGER.error("error shutting down websocket appender", e);
         }
     }
@@ -116,6 +114,5 @@ public class WebSocketAppender implements EventHandler {
             throw e;
         }
     }
-
-
+    
 }
