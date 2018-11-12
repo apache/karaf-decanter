@@ -113,7 +113,7 @@
                         <configuration>
                             <artifacts>
                                 <artifact>
-                                    <file>src/main/cfg/org.apache.karaf.decanter.appender.elasticsearch.rest.cfg</file>
+                                    <file>src/main/cfg/org.apache.karaf.decanter.appender.elasticsearch.rest-default.cfg</file>
                                     <type>cfg</type>
                                 </artifact>
                             </artifacts>

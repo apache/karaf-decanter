@@ -56,6 +56,57 @@ The `decanter-appender-elasticsearch-rest` feature installs this appender:
 karaf@root()> feature:install decanter-appender-elasticsearch-rest
 ----
 
+This feature installs the appender and the `etc/org.apache.karaf.decanter.appender.elasticsearch.rest-default.cfg` configuration file
+containing:
+
+----
+####################################################
+# Decanter Elasticsearch Rest Appender Configuration
+####################################################
+
+# HTTP address of the elasticsearch nodes (separated with comma)
+addresses=http://localhost:9200
+
+# Basic username and password authentication
+# username=user
+# password=password
+
+# The index name.
+# The index prefix is a static string used to construct the index
+# index.prefix=karaf
+# If true, it creates an index per Decanter event day
+# index.event.timestamped=true
+# The index type.
+# index.type=decanter
+# The properties filters (regex)
+# if empty, allow to catch all collected events
+# properties.names.includes=*foo*,*bar*
+# properties.names.excludes=*xx*,*yy*
+# properties.values.includes=*foo*,*bar*
+# properties.values.excludes=*xx*,*yy*
+
+# Marshaller to use (json is heavily recommended)
+marshaller.target=(dataFormat=json)
+----
+
+This configuration file allows you to configure the index prefix to use and an optional filter on the collected data:
+
+* the `index.prefix` property contains the prefix of the index use to append in Elasticsearch.
+* the `index.event.timestamped` property allow you to create an index per event day. For example `karaf-2018.11.12`
+* the `properties.*` properties allow you to filter the collected data to append in Elascticsearch:
+** `properties.names.includes` to include data with property name that match regex.
+** `properties.names.excludes` to exclude data with property name that match regex.
+** `properties.values.includes` to include data with property value that match regex.
+** `properties.values.excludes` to exclude data with property value that match regex.
+
+For example:
+----
+index.filter=Name:G1 Old Gen,karafName:root
+----
+
+You can declared multiple appender Elasticsearch instances and/or index. For that, you just create a new configuration file using the file name format
+`etc/org.apache.karaf.decanter.appender.elasticsearch.rest-[ANYNAME].cfg`.
+
 ===== Elasticsearch HTTP REST Jest appender
 
 The Decanter Elasticsearch HTTP REST API appender uses the Elasticsearch REST API. It works with any Elasticsearch version (1.x and 2.x).

@@ -237,7 +237,7 @@
 
     <feature name="decanter-appender-elasticsearch-rest" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender">
         <feature>decanter-appender-elasticsearch-rest-core</feature>
-        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.rest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}/cfg</configfile>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.rest-default.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="decanter-appender-file-core" version="${project.version}" description="Karaf Decanter File Appender core">
