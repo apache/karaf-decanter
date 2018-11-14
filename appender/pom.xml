@@ -53,6 +53,7 @@
         <module>rest</module>
         <module>socket</module>
         <module>timescaledb</module>
+        <module>websocket-servlet</module>
     </modules>
 
 </project>

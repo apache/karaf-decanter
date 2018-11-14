@@ -1420,3 +1420,36 @@ The table is simple and contains just two column:
 ** `timestamp` as BIGINT
 ** `content` as TEXT
 * `marshaller.target` is the marshaller used to serialize data into the table.
+
+===== WebSocket Servlet
+
+The `decanter-appender-websocket-servlet` feature expose a websocket on wich client can register. Then, Decanter will send the collected data to the connected clients.
+
+It's very easy to use. First install the feature:
+
+```
+karaf@root()> feature:install decanter-appender-websocket-servlet
+```
+
+The feature register the WebSocket endpoint on `http://localhost:8181/decanter-websocket` by default:
+
+```
+karaf@root()> http:list
+ID │ Servlet                  │ Servlet-Name   │ State       │ Alias               │ Url
+───┼──────────────────────────┼────────────────┼─────────────┼─────────────────────┼────────────────────────
+55 │ DecanterWebSocketServlet │ ServletModel-2 │ Deployed    │ /decanter-websocket │ [/decanter-websocket/*]
+```
+
+You can now register your websocket client on this URL. You can use `curl` as client to test:
+
+```
+curl --include \
+     --no-buffer \
+     --header "Connection: Upgrade" \
+     --header "Upgrade: websocket" \
+     --header "Host: localhost:8181" \
+     --header "Origin: http://localhost:8181/decanter-websocket" \
+     --header "Sec-WebSocket-Key: SGVsbG8sIHdvcmxkIQ==" \
+     --header "Sec-WebSocket-Version: 13" \
+     http://localhost:8181/decanter-websocket
+```

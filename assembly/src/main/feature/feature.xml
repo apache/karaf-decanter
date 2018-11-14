@@ -409,6 +409,12 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.timescaledb.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.timescaledb/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-appender-websocket-servlet" version="${project.version}" description="Karaf Decanter WebSocket Servlet Appender">
+        <feature>decanter-common</feature>
+        <feature>http-whiteboard</feature>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.websocket-servlet/${project.version}</bundle>
+    </feature>
+
     <feature name="decanter-alerting-core" version="${project.version}" description="Karaf Decanter Alerting core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.checker/${project.version}</bundle>
