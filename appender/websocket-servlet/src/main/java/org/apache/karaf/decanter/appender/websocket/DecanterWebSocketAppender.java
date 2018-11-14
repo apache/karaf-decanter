@@ -49,6 +49,7 @@ public class DecanterWebSocketAppender implements EventHandler {
     private static final Logger LOG = LoggerFactory.getLogger(DecanterWebSocketAppender.class);
 
     private static final Set<Session> sessions = Collections.synchronizedSet(new HashSet<Session>());
+    private String alias;
 
     @Reference
     private Marshaller marshaller;
@@ -69,12 +70,16 @@ public class DecanterWebSocketAppender implements EventHandler {
 
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
-        httpService.registerServlet("/decanter-websocket", new DecanterWebSocketServlet(), null, null);
+        alias = (String) componentContext.getProperties().get("servlet.alias");
+        if (alias == null) {
+            alias = "/decanter-websocket";
+        }
+        httpService.registerServlet(alias, new DecanterWebSocketServlet(), null, null);
     }
 
     @Deactivate
     public void deactivate() throws Exception {
-        httpService.unregister("/decanter-websocket");
+        httpService.unregister(alias);
     }
 
     @Override

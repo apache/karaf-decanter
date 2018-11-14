@@ -1440,6 +1440,8 @@ ID │ Servlet                  │ Servlet-Name   │ State       │ Alias    
 55 │ DecanterWebSocketServlet │ ServletModel-2 │ Deployed    │ /decanter-websocket │ [/decanter-websocket/*]
 ```
 
+The alias can be configured via the `etc/org.apache.karaf.decanter.appender.websocket.servlet.cfg` configuration file installed by the feature.
+
 You can now register your websocket client on this URL. You can use `curl` as client to test:
 
 ```

@@ -63,7 +63,26 @@
                         </Private-Package>
                     </instructions>
                 </configuration>
-            </plugin>
+            </plugin>            <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>attach-artifact</goal>
+                    </goals>
+                    <configuration>
+                        <artifacts>
+                            <artifact>
+                                <file>src/main/cfg/org.apache.karaf.decanter.appender.websocket.servlet.cfg</file>
+                                <type>cfg</type>
+                            </artifact>
+                        </artifacts>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
         </plugins>
     </build>
 
