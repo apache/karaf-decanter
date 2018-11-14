@@ -413,6 +413,7 @@
         <feature>decanter-common</feature>
         <feature>http-whiteboard</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.websocket-servlet/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.websocket.servlet.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.websocket-servlet/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="decanter-alerting-core" version="${project.version}" description="Karaf Decanter Alerting core">
