@@ -29,6 +29,9 @@ public class PropertiesPreparator {
     private final static String FIELDS_ADD = "fields.add.";
     private final static String FIELDS_RENAME = "fields.rename.";
     private final static String FIELDS_REMOVE = "fields.remove.";
+    private final static String KARAF_NAME = "karafName";
+    private final static String HOST_ADDRESS = "hostAddress";
+    private final static String HOST_NAME = "hostName";
 
     private static SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
@@ -40,14 +43,25 @@ public class PropertiesPreparator {
      */
     public static void prepare(Map<String, Object> data, Dictionary<String, Object> properties) throws Exception {
         // add the karaf instance name
-        String karafName = System.getProperty("karaf.name");
-        if (karafName != null) {
-            data.put("karafName", karafName);
+
+        String karafName = (String) data.get(KARAF_NAME);
+        String hostAddress = (String) data.get(HOST_ADDRESS);
+        String hostName = (String) data.get(HOST_NAME);
+
+        if(null == karafName || karafName.isEmpty()) {
+            String karafNameLocal = System.getProperty("karaf.name");
+            if (karafNameLocal != null) {
+                data.put("karafName", karafNameLocal);
+            }
         }
 
-        // add the network details
-        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-        data.put("hostName", InetAddress.getLocalHost().getHostName());
+        if(null == hostAddress || hostAddress.isEmpty()) {
+            data.put(HOST_ADDRESS, InetAddress.getLocalHost().getHostAddress());
+        }
+
+        if(null == hostName || hostName.isEmpty()) {
+            data.put(HOST_NAME, InetAddress.getLocalHost().getHostName());
+        }
 
         // custom fields
         Enumeration<String> keys = properties.keys();
