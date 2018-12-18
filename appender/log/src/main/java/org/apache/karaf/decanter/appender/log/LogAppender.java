@@ -16,7 +16,10 @@
  */
 package org.apache.karaf.decanter.appender.log;
 
+import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
@@ -37,13 +40,20 @@ public class LogAppender implements EventHandler {
 
     private final Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
 
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+    public Marshaller marshaller;
+
     @Override
     public void handleEvent(Event event) {
-        StringBuilder builder = new StringBuilder();
-        for (String innerKey : event.getPropertyNames()) {
-            builder.append(innerKey).append(":").append(toString(event.getProperty(innerKey))).append(" | ");
+        if (marshaller != null) {
+            LOGGER.info(marshaller.marshal(event));
+        } else {
+            StringBuilder builder = new StringBuilder();
+            for (String innerKey : event.getPropertyNames()) {
+                builder.append(innerKey).append(":").append(toString(event.getProperty(innerKey))).append(" | ");
+            }
+            LOGGER.info(builder.toString());
         }
-        LOGGER.info(builder.toString());
     }
 
     private Object toString(Object value) {

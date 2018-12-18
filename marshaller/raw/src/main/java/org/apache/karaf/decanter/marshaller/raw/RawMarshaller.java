@@ -50,7 +50,9 @@ public class RawMarshaller implements Marshaller {
         StringBuilder builder = new StringBuilder();
         for (String propertyName : event.getPropertyNames()) {
             Object propertyValue = event.getProperty(propertyName);
-            builder.append(propertyName).append("=").append(propertyValue.toString()).append("\n");
+            if (propertyName != null && propertyValue != null) {
+                builder.append(propertyName).append("=").append(propertyValue.toString()).append("\n");
+            }
         }
         return builder.toString();
     }
