@@ -39,15 +39,26 @@ public class PropertiesPreparator {
      * @param properties Custom properties included in the data.
      */
     public static void prepare(Map<String, Object> data, Dictionary<String, Object> properties) throws Exception {
-        // add the karaf instance name
-        String karafName = System.getProperty("karaf.name");
-        if (karafName != null) {
-            data.put("karafName", karafName);
+        // add the karaf instance name if it doesn't exist in the data
+        String karafName = (String) data.get("karafName");
+        if (karafName == null) {
+            karafName = System.getProperty("karaf.name");
+            if (karafName != null) {
+                data.put("karafName", karafName);
+            }
         }
 
         // add the network details
-        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-        data.put("hostName", InetAddress.getLocalHost().getHostName());
+        String hostAddress = (String) data.get("hostAddress");
+        if (hostAddress == null) {
+            hostAddress =  InetAddress.getLocalHost().getHostAddress();
+        }
+        data.put("hostAddress", hostAddress);
+        String hostName = (String) data.get("hostName");
+        if (hostName == null) {
+            hostName = InetAddress.getLocalHost().getHostName();
+        }
+        data.put("hostName", hostName);
 
         // custom fields
         Enumeration<String> keys = properties.keys();
