@@ -83,20 +83,22 @@
                             joptsimple*,
                             org.apache.lucene*,
                             com.tdunning.math.stats,
-                            com.vividsolutions.jts.geom,
+                            com.vividsolutions.jts*,
                             org.HdrHistogram,
                             org.locationtech.spatial4j*,
                             org.tartarus.snowball*,
                             org.joda.time*,
                             org.joda.convert*,
+                            org.noggit,
                             !META-INF.services.org.apache.lucene.codecs.Codec,
                             META-INF.services.*
                         </Private-Package>
                         <Import-Package>
-                            !com.vividsolutions.jts.geom,
+                            !com.vividsolutions.jts*,
                             !org.locationtech.spatial4j*,
                             !org.joda.time*,
                             !org.joda.convert*,
+                            !org.noggit,
                             com.sun.jna*;resolution:=optional,
                             org.apache.logging.log4j*;version="[2.8,3)",
                             *
