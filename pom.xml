@@ -527,6 +527,7 @@
                                 <exclude>**/META-INF/spring.factories</exclude>
                                 <exclude>**/META-INF/decanter.bundles.default</exclude>
                                 <exclude>**/bundle8/**/*</exclude>
+                                <exclude>**/test.cfg</exclude>
                             </excludes>
                             <consoleOutput>true</consoleOutput>
                         </configuration>
