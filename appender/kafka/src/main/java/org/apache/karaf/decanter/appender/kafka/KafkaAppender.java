@@ -81,9 +81,9 @@ public class KafkaAppender implements EventHandler {
                         LOGGER.warn("Can't send event to Kafka broker", e);
                     }
                 }
-            });
+            }).get();
             producer.flush();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             LOGGER.warn("Error sending event to kafka", e);
         }
     }
