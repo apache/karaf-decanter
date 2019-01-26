@@ -22,6 +22,7 @@ import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -43,7 +44,9 @@ import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.transport.Netty4Plugin;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.event.Event;
 
@@ -56,9 +59,10 @@ public class TestElasticsearchAppender {
     private static final String HOST = "127.0.0.1";
     private static final int HTTP_PORT = 9201;
 
-    @Test
-    public void testAppender() throws Exception {
+    private Node node;
 
+    @Before
+    public void setup() throws Exception {
         Settings settings = Settings.builder()
                 .put("cluster.name", CLUSTER_NAME)
                 .put("node.name", "test")
@@ -71,19 +75,31 @@ public class TestElasticsearchAppender {
                 .build();
 
         Collection plugins = Arrays.asList(Netty4Plugin.class);
-        Node node = new PluginConfigurableNode(settings, plugins);
+        node = new PluginConfigurableNode(settings, plugins);
 
         node.start();
+    }
 
+    @After
+    public void teardown() throws Exception {
+        node.close();
+    }
+
+    @Test
+    public void test() throws Exception {
         Marshaller marshaller = new JsonMarshaller();
         ElasticsearchAppender appender = new ElasticsearchAppender();
         appender.marshaller = marshaller;
         Dictionary<String, Object> config = new Hashtable<>();
-        config.put("addresses", "http://" + HOST + ":" + HTTP_PORT);
-        appender.open(config );
+        config.put(ElasticsearchAppender.ADDRESSES_PROPERTY, "http://" + HOST + ":" + HTTP_PORT);
+        config.put(EventFilter.PROPERTY_NAME_EXCLUDE_CONFIG, ".*refused.*");
+        config.put(EventFilter.PROPERTY_VALUE_EXCLUDE_CONFIG, ".*refused.*");
+        appender.open(config);
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
+        appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("refused", "b").put("c", "d").map()));
+        appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "refused").put("c", "d").map()));
         appender.close();
 
         HttpHost host = new HttpHost(HOST, HTTP_PORT, "http");

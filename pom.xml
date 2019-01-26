@@ -52,7 +52,7 @@
         <elasticsearch6.bundle.version>6.2.4_1</elasticsearch6.bundle.version>
         <glassfish-json.version>1.0.4</glassfish-json.version>
         <json-api.version>1.0</json-api.version>
-        <kafka.version>1.1.1</kafka.version>
+        <kafka.version>2.1.0</kafka.version>
         <karaf.version>4.1.4</karaf.version>
         <kibana.version>3.1.1</kibana.version>
         <kibana4.version>4.1.2</kibana4.version>
@@ -293,6 +293,11 @@
             <dependency>
                 <groupId>org.apache.karaf.decanter.collector</groupId>
                 <artifactId>org.apache.karaf.decanter.collector.utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.karaf.decanter.appender</groupId>
+                <artifactId>org.apache.karaf.decanter.appender.utils</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

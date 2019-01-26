@@ -16,6 +16,7 @@
  */
 package org.apache.karaf.decanter.appender.kafka;
 
+import java.util.Dictionary;
 import java.util.Properties;
 
 import org.apache.kafka.clients.producer.Callback;
@@ -23,6 +24,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -48,6 +50,7 @@ public class KafkaAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaAppender.class);
 
+    private Dictionary<String, Object> config;
     private Properties properties;
     private String topic;
     private KafkaProducer<String, String> producer;
@@ -55,7 +58,12 @@ public class KafkaAppender implements EventHandler {
     @Activate
     @SuppressWarnings("unchecked")
     public void activate(ComponentContext context) {
-        this.properties = ConfigMapper.map(context.getProperties());
+        activate(context.getProperties());
+    }
+
+    public void activate(Dictionary<String, Object> config) {
+        this.config = config;
+        this.properties = ConfigMapper.map(config);
         this.topic = properties.getProperty("topic");
         properties.remove("topic");
 
@@ -71,20 +79,22 @@ public class KafkaAppender implements EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        try {
-            String type = (String)event.getProperty("type");
-            String data = marshaller.marshal(event);
-            producer.send(new ProducerRecord<>(topic, type, data), new Callback() {
-                @Override
-                public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                    if (e != null) {
-                        LOGGER.warn("Can't send event to Kafka broker", e);
+        if (EventFilter.match(event, config)) {
+            try {
+                String type = (String) event.getProperty("type");
+                String data = marshaller.marshal(event);
+                producer.send(new ProducerRecord<>(topic, type, data), new Callback() {
+                    @Override
+                    public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                        if (e != null) {
+                            LOGGER.warn("Can't send event to Kafka broker", e);
+                        }
                     }
-                }
-            }).get();
-            producer.flush();
-        } catch (Exception e) {
-            LOGGER.warn("Error sending event to kafka", e);
+                }).get();
+                producer.flush();
+            } catch (Exception e) {
+                LOGGER.warn("Error sending event to kafka", e);
+            }
         }
     }
     

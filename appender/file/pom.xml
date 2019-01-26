@@ -38,6 +38,10 @@
             <groupId>org.apache.karaf.decanter</groupId>
             <artifactId>org.apache.karaf.decanter.api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.decanter.appender</groupId>
+            <artifactId>org.apache.karaf.decanter.appender.utils</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.karaf.decanter.marshaller</groupId>
@@ -48,6 +52,25 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <inherited>true</inherited>
+                <extensions>true</extensions>
+                <configuration>
+                    <obrRepository>NONE</obrRepository>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Export-Package>!*</Export-Package>
+                        <Import-Package>*</Import-Package>
+                        <Private-Package>
+                            org.apache.karaf.decanter.appender.file,
+                            org.apache.karaf.decanter.appender.utils
+                        </Private-Package>
+                        <_dsannotations>*</_dsannotations>
+                    </instructions>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>

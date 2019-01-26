@@ -25,6 +25,7 @@ import java.util.Dictionary;
 import javax.sql.DataSource;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -41,6 +42,12 @@ import org.slf4j.LoggerFactory;
     property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
 )
 public class JdbcAppender implements EventHandler {
+
+    public static String TABLE_NAME_PROPERTY = "table.name";
+    public static String DIALECT_PROPERTY = "dialect";
+
+    public static String TABLE_NAME_DEFAULT = "decanter";
+    public static String DIALECT_DEFAULT = "generic";
 
     @Reference
     public Marshaller marshaller;
@@ -60,8 +67,7 @@ public class JdbcAppender implements EventHandler {
     private final static String insertQueryTemplate =
             "INSERT INTO TABLENAME(timestamp, content) VALUES(?,?)";
 
-    String tableName;
-    String dialect;
+    private Dictionary<String, Object> config;
     
     @SuppressWarnings("unchecked")
     @Activate
@@ -70,12 +76,11 @@ public class JdbcAppender implements EventHandler {
     }
     
     public void open(Dictionary<String, Object> config) {
-        this.tableName = getValue(config, "table.name", "decanter");
-        this.dialect = getValue(config, "dialect", "generic");
+        this.config = config;
         try (Connection connection = dataSource.getConnection()) {
             createTable(connection);
         } catch (Exception e) {
-            LOGGER.debug("Error creating table " + tableName, e);
+            LOGGER.debug("Error creating table " + getValue(config, TABLE_NAME_PROPERTY, TABLE_NAME_DEFAULT), e);
         } 
     }
     
@@ -86,37 +91,39 @@ public class JdbcAppender implements EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        try (Connection connection = dataSource.getConnection()) {
-            String jsonSt = marshaller.marshal(event);
-            String insertQuery = insertQueryTemplate.replaceAll("TABLENAME", tableName);
-            Long timestamp = (Long)event.getProperty(EventConstants.TIMESTAMP);
-            if (timestamp == null) {
-                timestamp = System.currentTimeMillis();
+        if (EventFilter.match(event, config)) {
+            try (Connection connection = dataSource.getConnection()) {
+                String jsonSt = marshaller.marshal(event);
+                String insertQuery = insertQueryTemplate.replaceAll("TABLENAME", getValue(config, TABLE_NAME_PROPERTY, TABLE_NAME_DEFAULT));
+                Long timestamp = (Long) event.getProperty(EventConstants.TIMESTAMP);
+                if (timestamp == null) {
+                    timestamp = System.currentTimeMillis();
+                }
+                try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+                    insertStatement.setLong(1, timestamp);
+                    insertStatement.setString(2, jsonSt);
+                    insertStatement.executeUpdate();
+                    LOGGER.trace("Data inserted into {} table", getValue(config, TABLE_NAME_PROPERTY, TABLE_NAME_DEFAULT));
+                }
+            } catch (Exception e) {
+                LOGGER.error("Can't store in the database", e);
             }
-            try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
-                insertStatement.setLong(1, timestamp);
-                insertStatement.setString(2, jsonSt);
-                insertStatement.executeUpdate();
-                LOGGER.trace("Data inserted into {} table", tableName);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Can't store in the database", e);
         }
     }
 
     private void createTable(Connection connection) {
         String createTemplate = null;
-        if (dialect.equalsIgnoreCase("mysql")) {
+        if (getValue(config, DIALECT_PROPERTY, DIALECT_DEFAULT).equalsIgnoreCase("mysql")) {
             createTemplate = createTableQueryMySQLTemplate;
-        } else if (dialect.equalsIgnoreCase("derby")) {
+        } else if (getValue(config, DIALECT_PROPERTY, DIALECT_DEFAULT).equalsIgnoreCase("derby")) {
             createTemplate = createTableQueryDerbyTemplate;
         } else {
             createTemplate = createTableQueryGenericTemplate;
         }
-        String createTableQuery = createTemplate.replaceAll("TABLENAME", tableName);
+        String createTableQuery = createTemplate.replaceAll("TABLENAME", getValue(config, TABLE_NAME_PROPERTY, TABLE_NAME_DEFAULT));
         try (Statement createStatement = connection.createStatement()) {
             createStatement.executeUpdate(createTableQuery);
-            LOGGER.debug("Table {} has been created", tableName);
+            LOGGER.debug("Table {} has been created", getValue(config, TABLE_NAME_PROPERTY, TABLE_NAME_DEFAULT));
         } catch (SQLException e) {
             LOGGER.trace("Can't create table {}", e);
         }

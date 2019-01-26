@@ -30,8 +30,10 @@ import java.util.Map;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.event.Event;
@@ -84,14 +86,14 @@ public class CassandraAppenderTest {
     }
 
     @Test
-    public void testHandleEvent() throws Exception {
+    public void test() throws Exception {
         Marshaller marshaller = new JsonMarshaller();
         CassandraAppender appender = new CassandraAppender();
         Dictionary<String, Object> config = new Hashtable<String, Object>();
-        config.put("cassandra.host", CASSANDRA_HOST);
-        config.put("cassandra.port", CASSANDRA_PORT);
-        config.put("keyspace.name", KEYSPACE);
-        config.put("table.name", TABLE_NAME);
+        config.put(CassandraAppender.CASSANDRA_PORT_PROPERTY, CASSANDRA_HOST);
+        config.put(CassandraAppender.CASSANDRA_PORT_PROPERTY, CASSANDRA_PORT);
+        config.put(CassandraAppender.KEYSPACE_PROPERTY, KEYSPACE);
+        config.put(CassandraAppender.TABLE_PROPERTY, TABLE_NAME);
         appender.marshaller = marshaller;
         appender.activate(config);
         
@@ -101,10 +103,11 @@ public class CassandraAppenderTest {
         
         appender.handleEvent(event);
         
-        Session session = getSesion();
+        Session session = getSession();
         
         ResultSet execute = session.execute("SELECT * FROM "+ KEYSPACE+"."+TABLE_NAME+";");
         List<Row> all = execute.all();
+        Assert.assertEquals(1, all.size());
         assertThat(all, not(nullValue()));
         
         assertThat(all.get(0).getTimestamp("timeStamp").getTime(), is(TIMESTAMP));
@@ -112,7 +115,54 @@ public class CassandraAppenderTest {
         session.close();
     }
 
-    private Session getSesion() {
+    @Test
+    public void testWithFilter() throws Exception {
+        Marshaller marshaller = new JsonMarshaller();
+        CassandraAppender appender = new CassandraAppender();
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put(CassandraAppender.CASSANDRA_PORT_PROPERTY, CASSANDRA_HOST);
+        config.put(CassandraAppender.CASSANDRA_PORT_PROPERTY, CASSANDRA_PORT);
+        config.put(CassandraAppender.KEYSPACE_PROPERTY, KEYSPACE);
+        config.put(CassandraAppender.TABLE_PROPERTY, TABLE_NAME);
+        config.put(EventFilter.PROPERTY_NAME_EXCLUDE_CONFIG, ".*refused.*");
+        config.put(EventFilter.PROPERTY_VALUE_EXCLUDE_CONFIG, ".*refused.*");
+        appender.marshaller = marshaller;
+        appender.activate(config);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(EventConstants.TIMESTAMP, TIMESTAMP);
+        data.put("this is a refused property", "value");
+        Event event = new Event(TOPIC, data);
+
+        appender.handleEvent(event);
+
+        data = new HashMap<>();
+        data.put(EventConstants.TIMESTAMP, TIMESTAMP);
+        data.put("property", "this is a refused value");
+        event = new Event(TOPIC, data);
+
+        appender.handleEvent(event);
+
+        data = new HashMap<>();
+        data.put(EventConstants.TIMESTAMP, TIMESTAMP);
+        data.put("accepted", "accepted");
+        event = new Event(TOPIC, data);
+
+        appender.handleEvent(event);
+
+        Session session = getSession();
+
+        ResultSet execute = session.execute("SELECT * FROM "+ KEYSPACE+"."+TABLE_NAME+";");
+        List<Row> all = execute.all();
+        Assert.assertEquals(1, all.size());
+        assertThat(all, not(nullValue()));
+
+        assertThat(all.get(0).getTimestamp("timeStamp").getTime(), is(TIMESTAMP));
+
+        session.close();
+    }
+
+    private Session getSession() {
         Builder clusterBuilder = Cluster.builder().addContactPoint(CASSANDRA_HOST);
         clusterBuilder.withPort(Integer.valueOf(CASSANDRA_PORT));
 

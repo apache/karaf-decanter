@@ -32,6 +32,7 @@ import javax.json.JsonReader;
 
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,12 +40,13 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 
 public class TestJdbcAppender {
+
     private static final String TABLE_NAME = "decanter";
     private static final String TOPIC = "decanter/collect/jmx";
     private static final long TIMESTAMP = 1454428780634L;
 
     @Test
-    public void testHandleEvent() throws SQLException {
+    public void test() throws SQLException {
         System.setProperty("derby.stream.error.file", "target/derby.log");
         Marshaller marshaller = new JsonMarshaller();
         EmbeddedDataSource dataSource = new EmbeddedDataSource();
@@ -60,9 +62,60 @@ public class TestJdbcAppender {
         config.put("dialect", "derby");
         appender.open(config);
         
-        Map<String, Object> properties = new HashMap<>();
-        properties.put(EventConstants.TIMESTAMP, TIMESTAMP);
-        Event event = new Event(TOPIC, properties);
+        Map<String, Object> data = new HashMap<>();
+        data.put(EventConstants.TIMESTAMP, TIMESTAMP);
+        Event event = new Event(TOPIC, data);
+        appender.handleEvent(event);
+
+        try (Connection con = dataSource.getConnection(); Statement statement = con.createStatement();) {
+            ResultSet res = statement.executeQuery("select timestamp, content from " + TABLE_NAME);
+            res.next();
+            long dbTimeStamp = res.getLong(1);
+            String json = res.getString(2);
+            JsonReader reader = Json.createReader(new StringReader(json));
+            JsonObject jsonO = reader.readObject();
+            Assert.assertEquals("Timestamp db", TIMESTAMP, dbTimeStamp);
+            Assert.assertEquals("Timestamp string", "2016-02-02T15:59:40,634Z",jsonO.getString("@timestamp"));
+            Assert.assertEquals("timestamp long", TIMESTAMP, jsonO.getJsonNumber(EventConstants.TIMESTAMP).longValue());
+            Assert.assertEquals("Topic", TOPIC, jsonO.getString(EventConstants.EVENT_TOPIC.replace('.','_')));
+            Assert.assertFalse(res.next());
+        }
+    }
+
+    @Test
+    public void testWithFilter() throws SQLException {
+        System.setProperty("derby.stream.error.file", "target/derby.log");
+        Marshaller marshaller = new JsonMarshaller();
+        EmbeddedDataSource dataSource = new EmbeddedDataSource();
+        dataSource.setDatabaseName("target/testFilterDB");
+        dataSource.setCreateDatabase("create");
+
+        deleteTable(dataSource);
+
+        JdbcAppender appender = new JdbcAppender();
+        appender.marshaller = marshaller;
+        appender.dataSource = dataSource;
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put("dialect", "derby");
+        config.put(EventFilter.PROPERTY_NAME_EXCLUDE_CONFIG, ".*refused.*");
+        config.put(EventFilter.PROPERTY_VALUE_EXCLUDE_CONFIG, ".*refused.*");
+        appender.open(config);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(EventConstants.TIMESTAMP, TIMESTAMP);
+        data.put("this_refused", "data");
+        Event event = new Event(TOPIC, data);
+        appender.handleEvent(event);
+
+        data = new HashMap<>();
+        data.put(EventConstants.TIMESTAMP, TIMESTAMP);
+        data.put("property", "this_refused");
+        event = new Event(TOPIC, data);
+        appender.handleEvent(event);
+
+        data = new HashMap<>();
+        data.put(EventConstants.TIMESTAMP, TIMESTAMP);
+        event = new Event(TOPIC, data);
         appender.handleEvent(event);
 
         try (Connection con = dataSource.getConnection(); Statement statement = con.createStatement();) {

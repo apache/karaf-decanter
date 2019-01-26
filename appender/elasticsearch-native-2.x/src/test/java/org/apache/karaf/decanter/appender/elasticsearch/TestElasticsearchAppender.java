@@ -24,49 +24,62 @@ import java.util.Hashtable;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.collect.MapBuilder;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.event.Event;
 
 public class TestElasticsearchAppender {
+
     private static final String CLUSTER_NAME = "elasticsearch-test";
     private static final int PORT = 9300;
+    private static final int MAX_TRIES = 10;
 
-   @Test
-   public void testAppender() throws Exception {
-       
-       Settings settings = Settings.settingsBuilder()
-               .put("cluster.name", "elasticsearch")
-               .put("http.enabled", "true")
-               .put("node.data", true)
-               .put("path.home", "target")
-               .put("path.data", "target/data")
-               .put("network.host", "127.0.0.1")
-               .put("index.store.type", "memory")
-               .put("index.store.fs.memory.enabled", "true")
-               .put("path.plugins", "target/plugins")
-               .build();
-       
-       Node node = nodeBuilder().settings(settings).node();
-       
-       Marshaller marshaller = new JsonMarshaller();
-       ElasticsearchAppender appender = new ElasticsearchAppender();
-       appender.marshaller = marshaller;
-       Dictionary<String, Object> config = new Hashtable<>();
-       config.put("clusterName", CLUSTER_NAME);
-       config.put("port", "" + PORT);
-       appender.open(config);
-       appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
-       appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
-       appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
-       appender.close();
+    private Node node;
 
-       SearchResponse response = node.client().prepareSearch().execute().actionGet();
-       System.out.println(response.toString());
+    @Before
+    public void setup() throws Exception {
+        Settings settings = Settings.settingsBuilder()
+                .put("cluster.name", "elasticsearch")
+                .put("http.enabled", "true")
+                .put("node.data", true)
+                .put("path.home", "target")
+                .put("path.data", "target/data")
+                .put("network.host", "127.0.0.1")
+                .put("index.store.type", "memory")
+                .put("index.store.fs.memory.enabled", "true")
+                .put("path.plugins", "target/plugins")
+                .build();
 
-       node.close();
-   }
+        node = nodeBuilder().settings(settings).node();
+    }
+
+    @After
+    public void teardown() throws Exception {
+        node.close();
+    }
+
+    @Test
+    public void test() throws Exception {
+        Marshaller marshaller = new JsonMarshaller();
+        ElasticsearchAppender appender = new ElasticsearchAppender();
+        appender.marshaller = marshaller;
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put(ElasticsearchAppender.CLUSTER_NAME_PROPERTY, CLUSTER_NAME);
+        config.put(ElasticsearchAppender.PORT_PROPERTY, "" + PORT);
+        appender.open(config);
+        appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
+        appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
+        appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
+        appender.close();
+
+        SearchResponse response = node.client().prepareSearch().execute().actionGet();
+        System.out.println(response.toString());
+    }
 
 }

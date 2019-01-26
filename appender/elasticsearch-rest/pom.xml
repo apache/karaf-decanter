@@ -39,6 +39,10 @@
             <artifactId>org.apache.karaf.decanter.api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.karaf.decanter.appender</groupId>
+            <artifactId>org.apache.karaf.decanter.appender.utils</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client</artifactId>
             <version>${elasticsearch6.version}</version>
@@ -86,18 +90,25 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <inherited>true</inherited>
+                <extensions>true</extensions>
                 <configuration>
+                    <obrRepository>NONE</obrRepository>
                     <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Export-Package>!*</Export-Package>
                         <Import-Package>
                             org.apache.log;resolution:=optional,
                             *
                         </Import-Package>
                         <Private-Package>
                             org.apache.karaf.decanter.appender.elasticsearch.rest,
+                            org.apache.karaf.decanter.appender.utils,
                             org.apache.http*,
                             org.apache.commons*,
                             org.elasticsearch*
                         </Private-Package>
+                        <_dsannotations>*</_dsannotations>
                     </instructions>
                 </configuration>
             </plugin>

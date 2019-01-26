@@ -17,6 +17,7 @@
 package org.apache.karaf.decanter.appender.socket;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.*;
 import org.osgi.service.event.Event;
@@ -37,44 +38,49 @@ import java.util.Dictionary;
 )
 public class SocketAppender implements EventHandler {
 
+    public static String HOST_PROPERTY = "host";
+    public static String PORT_PROPERTY = "port";
+
+    public static String HOST_DEFAULT = "localhost";
+    public static String PORT_DEFAULT = "34343";
+
     @Reference
     public Marshaller marshaller;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SocketAppender.class);
 
-    private String host;
-    private int port;
-
+    private Dictionary<String, Object> config;
 
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
-        Dictionary<String, Object> config = componentContext.getProperties();
-        host = getValue(config, "host", "localhost");
-        String portSt = getValue(config, "port", "34343");
-        port = Integer.parseInt(portSt);
+        this.config = componentContext.getProperties();
     }
 
     @Override
     public void handleEvent(Event event) {
-        Socket socket = null;
-        PrintWriter writer = null;
-        try {
-            socket = new Socket(host, port);
-            String data = marshaller.marshal(event);
-            writer = new PrintWriter(socket.getOutputStream(), true);
-            writer.println(data);
-        } catch (Exception e) {
-            LOGGER.warn("Error sending data on the socket", e);
-        } finally {
-            if (writer != null) {
-                writer.flush();
-                writer.close();
-            }
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (Exception e) {
-                    // nothing to do
+        if (EventFilter.match(event, config)) {
+            Socket socket = null;
+            PrintWriter writer = null;
+            try {
+                socket = new Socket(
+                        getValue(config, HOST_PROPERTY, HOST_DEFAULT),
+                        Integer.parseInt(getValue(config, PORT_PROPERTY, PORT_DEFAULT)));
+                String data = marshaller.marshal(event);
+                writer = new PrintWriter(socket.getOutputStream(), true);
+                writer.println(data);
+            } catch (Exception e) {
+                LOGGER.warn("Error sending data on the socket", e);
+            } finally {
+                if (writer != null) {
+                    writer.flush();
+                    writer.close();
+                }
+                if (socket != null) {
+                    try {
+                        socket.close();
+                    } catch (Exception e) {
+                        // nothing to do
+                    }
                 }
             }
         }

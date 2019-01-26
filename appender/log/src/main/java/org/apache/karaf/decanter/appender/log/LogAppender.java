@@ -17,6 +17,9 @@
 package org.apache.karaf.decanter.appender.log;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -25,6 +28,8 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Dictionary;
 
 /**
  * Karaf Decanter Log Appender
@@ -43,16 +48,25 @@ public class LogAppender implements EventHandler {
     @Reference(cardinality = ReferenceCardinality.OPTIONAL)
     public Marshaller marshaller;
 
+    private Dictionary<String, Object> config;
+
+    @Activate
+    public void activate(ComponentContext componentContext) {
+        this.config = componentContext.getProperties();
+    }
+
     @Override
     public void handleEvent(Event event) {
-        if (marshaller != null) {
-            LOGGER.info(marshaller.marshal(event));
-        } else {
-            StringBuilder builder = new StringBuilder();
-            for (String innerKey : event.getPropertyNames()) {
-                builder.append(innerKey).append(":").append(toString(event.getProperty(innerKey))).append(" | ");
+        if (EventFilter.match(event, config)) {
+            if (marshaller != null) {
+                LOGGER.info(marshaller.marshal(event));
+            } else {
+                StringBuilder builder = new StringBuilder();
+                for (String innerKey : event.getPropertyNames()) {
+                    builder.append(innerKey).append(":").append(toString(event.getProperty(innerKey))).append(" | ");
+                }
+                LOGGER.info(builder.toString());
             }
-            LOGGER.info(builder.toString());
         }
     }
 

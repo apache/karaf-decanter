@@ -16,6 +16,7 @@
  */
 package org.apache.karaf.decanter.appender.file;
 
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.apache.karaf.decanter.marshaller.csv.CsvMarshaller;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,31 +25,73 @@ import org.osgi.service.event.Event;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 public class TestFileAppender {
 
     @Test
-    public void testAppender() throws Exception {
+    public void test() throws Exception {
         FileAppender fileAppender = new FileAppender();
         fileAppender.marshaller = new CsvMarshaller();
-        fileAppender.open("target/test-classes/decanter");
-        Map<String, String> map = new HashMap<>();
-        map.put("a", "b");
-        map.put("c", "d");
-        fileAppender.handleEvent(new Event("testTopic", map));
-        fileAppender.handleEvent(new Event("testTopic", map));
-        fileAppender.handleEvent(new Event("testTopic", map));
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put(FileAppender.FILENAME_PROPERTY, "target/test-classes/decanter");
+        fileAppender.open(config);
+
+        Map<String, String> data = new HashMap<>();
+        data.put("a", "b");
+        data.put("c", "d");
+        fileAppender.handleEvent(new Event("testTopic", data));
+        fileAppender.handleEvent(new Event("testTopic", data));
+        fileAppender.handleEvent(new Event("testTopic", data));
         fileAppender.deactivate();
 
         File file = new File("target/test-classes/decanter");
+        int lineCount = 0;
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
+                lineCount++;
                 Assert.assertEquals("a=b,c=d,event.topics=testTopic", line);
             }
         }
+        Assert.assertEquals(3, lineCount);
+    }
+
+    @Test
+    public void testWithFilter() throws Exception {
+        FileAppender fileAppender = new FileAppender();
+        fileAppender.marshaller = new CsvMarshaller();
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put(FileAppender.FILENAME_PROPERTY, "target/test-classes/filtered");
+        config.put(EventFilter.PROPERTY_NAME_EXCLUDE_CONFIG, ".*refused.*");
+        config.put(EventFilter.PROPERTY_VALUE_EXCLUDE_CONFIG, ".*refused.*");
+        fileAppender.open(config);
+
+        Map<String, String> data = new HashMap<>();
+        data.put("refused_property", "test");
+        fileAppender.handleEvent(new Event("testTopic", data));
+
+        data = new HashMap<>();
+        data.put("property", "refused_value");
+        fileAppender.handleEvent(new Event("testTopic", data));
+
+        data = new HashMap<>();
+        data.put("a", "b");
+        fileAppender.handleEvent(new Event("testTopic", data));
+
+        File file = new File("target/test-classes/filtered");
+        int lineCount = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lineCount++;
+                Assert.assertEquals("a=b,event.topics=testTopic", line);
+            }
+        }
+        Assert.assertEquals(1, lineCount);
     }
 
 }

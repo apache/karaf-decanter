@@ -16,6 +16,7 @@
  */
 package org.apache.karaf.decanter.appender.redis;
 
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -26,8 +27,6 @@ import org.osgi.service.event.EventHandler;
 import org.redisson.Config;
 import org.redisson.Redisson;
 import org.redisson.RedissonClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.Map;
@@ -42,38 +41,46 @@ import java.util.Map;
 )
 public class RedisAppender implements EventHandler {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(RedisAppender.class);
+    public static String ADDRESS_PROPERTY = "address";
+    public static String MODE_PROPERTY = "mode";
+    public static String MAP_PROPERTY = "map";
+    public static String MASTER_ADDRESS_PROPERTY = "masterAddress";
+    public static String MASTER_NAME_PROPERTY = "masterName";
+    public static String SCAN_INTERVAL_PROPERTY = "scanInterval";
 
-    private String address;
-    private String mode;
-    private String map;
-    private String masterAddress;
-    private String masterName;
-    private int scanInterval;
+    public static String ADDRESS_DEFAULT = "localhost:6379";
+    public static String MODE_DEFAULT = "Single";
+    public static String MAP_DEFAULT = "Decanter";
+    public static String MASTER_ADDRESS_DEFAULT = null;
+    public static String MASTER_NAME_DEFAULT = null;
+    public static String SCAN_INTERVAL_DEFAULT = "2000";
 
     private RedissonClient redissonClient;
 
+    private Dictionary<String, Object> config;
+
     @Activate
     public void activate(ComponentContext componentContext) {
-        Dictionary<String, Object> properties = componentContext.getProperties();
-        address = getProperty(properties, "address", "localhost:6379");
-        mode = getProperty(properties, "mode", "Single");
-        map = getProperty(properties, "map", "Decanter");
-        masterAddress = getProperty(properties, "masterAddress", null);
-        masterName = getProperty(properties, "masterName", null);
-        scanInterval = Integer.parseInt(getProperty(properties, "scanInterval", "2000"));
+        config = componentContext.getProperties();
 
-        Config config = new Config();
+        String address = getValue(config, ADDRESS_PROPERTY, ADDRESS_DEFAULT);
+        String mode = getValue(config, MODE_PROPERTY, MODE_DEFAULT);
+        String map = getValue(config, MAP_PROPERTY, MAP_DEFAULT);
+        String masterAddress = getValue(config, MASTER_ADDRESS_PROPERTY, MASTER_ADDRESS_DEFAULT);
+        String masterName = getValue(config, MASTER_NAME_PROPERTY, MASTER_NAME_DEFAULT);
+        int scanInterval = Integer.parseInt(getValue(config, SCAN_INTERVAL_PROPERTY, SCAN_INTERVAL_DEFAULT));
+
+        Config redissonConfig = new Config();
         if (mode.equalsIgnoreCase("Single")) {
-            config.useSingleServer().setAddress(address);
+            redissonConfig.useSingleServer().setAddress(address);
         } else if (mode.equalsIgnoreCase("Master_Slave")) {
-            config.useMasterSlaveServers().setMasterAddress(masterAddress).addSlaveAddress(address);
+            redissonConfig.useMasterSlaveServers().setMasterAddress(masterAddress).addSlaveAddress(address);
         } else if (mode.equalsIgnoreCase("Sentinel")) {
-            config.useSentinelServers().addSentinelAddress(masterName).addSentinelAddress(address);
+            redissonConfig.useSentinelServers().addSentinelAddress(masterName).addSentinelAddress(address);
         } else if (mode.equalsIgnoreCase("Cluster")) {
-            config.useClusterServers().setScanInterval(scanInterval).addNodeAddress(address);
+            redissonConfig.useClusterServers().setScanInterval(scanInterval).addNodeAddress(address);
         }
-        redissonClient = Redisson.create(config);
+        redissonClient = Redisson.create(redissonConfig);
     }
 
     @Deactivate
@@ -85,13 +92,15 @@ public class RedisAppender implements EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        Map<String, Object> redisMap = redissonClient.getMap(this.map);
-        for (String name : event.getPropertyNames()) {
-            redisMap.put(name, event.getProperty(name));
+        if (EventFilter.match(event, config)) {
+            Map<String, Object> redisMap = redissonClient.getMap(getValue(config, MAP_PROPERTY, MAP_DEFAULT));
+            for (String name : event.getPropertyNames()) {
+                redisMap.put(name, event.getProperty(name));
+            }
         }
     }
 
-    private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
+    private String getValue(Dictionary<String, Object> properties, String key, String defaultValue) {
         return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
     }
 

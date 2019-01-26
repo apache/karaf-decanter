@@ -17,6 +17,7 @@
 package org.apache.karaf.decanter.appender.websocket;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -34,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,16 +48,21 @@ import java.util.Set;
 @WebSocket
 public class DecanterWebSocketAppender implements EventHandler {
 
+    public static String ALIAS_PROPERTY = "servlet.alias";
+
+    public static String ALIAS_DEFAULT = "/decanter-websocket";
+
     private static final Logger LOG = LoggerFactory.getLogger(DecanterWebSocketAppender.class);
 
     private static final Set<Session> sessions = Collections.synchronizedSet(new HashSet<Session>());
-    private String alias;
 
     @Reference
     private Marshaller marshaller;
 
     @Reference
     private HttpService httpService;
+
+    private Dictionary<String, Object> config;
 
     @OnWebSocketConnect
     public void onOpen(Session session) {
@@ -70,27 +77,34 @@ public class DecanterWebSocketAppender implements EventHandler {
 
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
-        alias = (String) componentContext.getProperties().get("servlet.alias");
+        this.config = componentContext.getProperties();
+        String alias = (String) config.get(ALIAS_PROPERTY);
         if (alias == null) {
-            alias = "/decanter-websocket";
+            alias = ALIAS_DEFAULT;
         }
         httpService.registerServlet(alias, new DecanterWebSocketServlet(), null, null);
     }
 
     @Deactivate
     public void deactivate() throws Exception {
+        String alias = (String) config.get(ALIAS_PROPERTY);
+        if (alias == null) {
+            alias = ALIAS_DEFAULT;
+        }
         httpService.unregister(alias);
     }
 
     @Override
     public void handleEvent(Event event) {
-        String message = marshaller.marshal(event);
-        synchronized (sessions) {
-            for (Session session : sessions) {
-                try {
-                    session.getRemote().sendString(message);
-                } catch (Exception e) {
-                    LOG.warn("Can't publish to remote websocket endpoint",  e);
+        if (EventFilter.match(event, config)) {
+            String message = marshaller.marshal(event);
+            synchronized (sessions) {
+                for (Session session : sessions) {
+                    try {
+                        session.getRemote().sendString(message);
+                    } catch (Exception e) {
+                        LOG.warn("Can't publish to remote websocket endpoint", e);
+                    }
                 }
             }
         }

@@ -19,6 +19,7 @@ package org.apache.karaf.decanter.appender.camel;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -40,8 +41,10 @@ import java.util.HashMap;
 )
 public class CamelAppender implements EventHandler {
 
+    public static final String DESTINATION_URI_KEY = "destination.uri";
+
     private CamelContext camelContext;
-    private String destinationUri;
+    private Dictionary<String, Object> config;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CamelAppender.class);
 
@@ -52,24 +55,26 @@ public class CamelAppender implements EventHandler {
     }
     
     public void open(Dictionary<String, Object> config) throws ConfigurationException {
-        LOGGER.debug("Creating CamelContext, and use the {} URI", destinationUri);
-        this.camelContext = new DefaultCamelContext();
-        this.destinationUri = (String) config.get("destination.uri");
-        if (this.destinationUri == null) {
-            throw new ConfigurationException("destination.uri", "destination.uri is not defined");
+        this.config = config;
+        if (config.get(DESTINATION_URI_KEY) == null) {
+            throw new ConfigurationException(DESTINATION_URI_KEY, DESTINATION_URI_KEY + " is not defined");
         }
+        LOGGER.debug("Creating CamelContext, and use the {} URI", config.get(DESTINATION_URI_KEY));
+        this.camelContext = new DefaultCamelContext();
     }
 
     @Override
     public void handleEvent(Event event) {
-        HashMap<String, Object> data = new HashMap<>();
-        for (String name : event.getPropertyNames()) {
-            data.put(name, event.getProperty(name));
+        if (EventFilter.match(event, config)) {
+            HashMap<String, Object> data = new HashMap<>();
+            for (String name : event.getPropertyNames()) {
+                data.put(name, event.getProperty(name));
+            }
+            LOGGER.debug("Creating producer template");
+            ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
+            LOGGER.debug("Sending event data on {}", config.get(DESTINATION_URI_KEY));
+            producerTemplate.sendBody((String) config.get(DESTINATION_URI_KEY), data);
         }
-        LOGGER.debug("Creating producer template");
-        ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
-        LOGGER.debug("Sending event data on {}", destinationUri);
-        producerTemplate.sendBody(destinationUri, data);
     }
 
     @Deactivate
