@@ -16,16 +16,14 @@
  */
 package org.apache.karaf.decanter.appender.mqtt;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
-import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -45,47 +43,59 @@ import org.slf4j.LoggerFactory;
 )
 public class MqttAppender implements EventHandler {
 
+    public static String SERVER_PROPERTY = "server";
+    public static String CLIENT_ID_PROPERTY = "clientId";
+    public static String TOPIC_PROPERTY = "topic";
+
+    public static String SERVER_DEFAULT = "tcp://localhost:9300";
+    public static String CLIENT_ID_DEFAULT = "decanter";
+    public static String TOPIC_DEFAULT = "decanter";
+
     @Reference
     public Marshaller marshaller;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(MqttAppender.class);
 
     private MqttClient client;
-    private String server;
-    private String clientId;
-    private String topic;
+
+    private Dictionary<String, Object> config;
 
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
         activate(componentContext.getProperties());
     }
 
-    public void activate(Dictionary<String, Object> dictionary) throws Exception {
-        this.server = getProperty(dictionary, "server", "tcp://localhost:9300");
-        this.clientId = getProperty(dictionary, "clientId", "decanter");
-        this.topic = getProperty(dictionary, "topic", "decanter");
-        client = new MqttClient(server, clientId, new MemoryPersistence());
+    public void activate(Dictionary<String, Object> config) throws Exception {
+        this.config = config;
+        client = new MqttClient(
+                getValue(config, SERVER_PROPERTY, SERVER_DEFAULT),
+                getValue(config, CLIENT_ID_PROPERTY, CLIENT_ID_DEFAULT),
+                new MemoryPersistence());
         client.connect();
     }
 
-    private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
-        return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
+    private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
+        return (config.get(key) != null) ? (String) config.get(key) : defaultValue;
     }
 
     @Override
     public void handleEvent(Event event) {
-        try {
-            MqttMessage message = new MqttMessage();
-            String jsonSt = marshaller.marshal(event);
-            message.setPayload(jsonSt.getBytes(StandardCharsets.UTF_8));
-            client.publish(topic, message);
-        } catch (Exception e) {
-            LOGGER.warn("Error sending to MQTT server " + client.getServerURI(), e);
+        if (EventFilter.match(event, config)) {
             try {
-                client.disconnect();
-                client.connect();
-            } catch (MqttException e1) {
-                e1.printStackTrace();
+                MqttMessage message = new MqttMessage();
+                String jsonSt = marshaller.marshal(event);
+                message.setPayload(jsonSt.getBytes(StandardCharsets.UTF_8));
+                client.publish(
+                        getValue(config, TOPIC_PROPERTY, TOPIC_DEFAULT),
+                        message);
+            } catch (Exception e) {
+                LOGGER.warn("Error sending to MQTT server " + client.getServerURI(), e);
+                try {
+                    client.disconnect();
+                    client.connect();
+                } catch (MqttException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
     }

@@ -39,6 +39,10 @@
             <artifactId>org.apache.karaf.decanter.api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.karaf.decanter.appender</groupId>
+            <artifactId>org.apache.karaf.decanter.appender.utils</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>3.2.2</version>
@@ -51,7 +55,9 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
+                    <obrRepository>NONE</obrRepository>
                     <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>
                             !io.netty*,
                             org.slf4j;resolution:=optional,
@@ -63,10 +69,12 @@
                         </Import-Package>
                         <Private-Package>
                             org.apache.karaf.decanter.appender.mongodb,
+                            org.apache.karaf.decanter.appender.utils,
                             com.mongodb*,
                             org.bson*,
                             io.netty*
                         </Private-Package>
+                        <_dsannotations>*</_dsannotations>
                     </instructions>
                 </configuration>
             </plugin>

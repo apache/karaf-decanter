@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.jms.*;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -39,6 +40,18 @@ import org.slf4j.LoggerFactory;
 )
 public class JmsAppender implements EventHandler {
 
+    public static String USERNAME_PROPERTY = "username";
+    public static String PASSWORD_PROPERTY = "password";
+    public static String DESTINATION_NAME_PROPERTY = "destination.name";
+    public static String DESTINATION_TYPE_PROPERTY = "destination.type";
+    public static String MESSAGE_TYPE_PROPERTY = "message.type";
+
+    public static String USERNAME_DEFAULT = null;
+    public static String PASSWORD_DEFAULT = null;
+    public static String DESTINATION_NAME_DEFAULT = "decanter";
+    public static String DESTINATION_TYPE_DEFAULT = "queue";
+    public static String MESSAGE_TYPE_DEFAULT = "text";
+
     @Reference
     public ConnectionFactory connectionFactory;
 
@@ -47,11 +60,8 @@ public class JmsAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(JmsAppender.class);
 
-    private String username;
-    private String password;
-    private String destinationName;
-    private String destinationType;
-    private String messageType;
+    private Dictionary<String, Object> config;
+
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -60,45 +70,42 @@ public class JmsAppender implements EventHandler {
     }
     
     void activate(Dictionary<String, Object> config) {
-        username = getProperty(config, "username", null);
-        password = getProperty(config, "password", null);
-        destinationName = getProperty(config, "destination.name", "decanter");
-        destinationType = getProperty(config, "destination.type", "queue");
-        messageType = getProperty(config, "message.type", "text");
-        LOGGER.info("Decanter JMS Appender started sending to {} {}",destinationType, destinationName);
+        this.config = config;
+        LOGGER.info("Decanter JMS Appender started sending to {} {}", getValue(config, DESTINATION_TYPE_PROPERTY, DESTINATION_TYPE_DEFAULT), getValue(config, DESTINATION_NAME_PROPERTY, DESTINATION_NAME_DEFAULT));
     }
 
-    private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
+    private String getValue(Dictionary<String, Object> properties, String key, String defaultValue) {
         return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
     }
 
     @Override
     public void handleEvent(Event event) {
-        Connection connection = null;
-        Session session = null;
-        try {
-            connection = createConnection();
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination destination = createDestination(session);
-            MessageProducer producer = session.createProducer(destination);
-            if (messageType.equalsIgnoreCase("text")) {
-                TextMessage message = session.createTextMessage(marshaller.marshal(event));
-                producer.send(message);
-            } else {
-                MapMessage message = session.createMapMessage();
-                for (String name : event.getPropertyNames()) {
-                    Object value = event.getProperty(name);
-                    setProperty(message, name, value);
+        if (EventFilter.match(event, config)) {
+            Connection connection = null;
+            Session session = null;
+            try {
+                connection = createConnection();
+                session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                Destination destination = createDestination(session);
+                MessageProducer producer = session.createProducer(destination);
+                if (getValue(config, MESSAGE_TYPE_PROPERTY, MESSAGE_TYPE_DEFAULT).equalsIgnoreCase("text")) {
+                    TextMessage message = session.createTextMessage(marshaller.marshal(event));
+                    producer.send(message);
+                } else {
+                    MapMessage message = session.createMapMessage();
+                    for (String name : event.getPropertyNames()) {
+                        Object value = event.getProperty(name);
+                        setProperty(message, name, value);
+                    }
+                    producer.send(message);
                 }
-                producer.send(message);
+                producer.close();
+            } catch (Exception e) {
+                LOGGER.warn("Can't send to JMS broker", e);
+            } finally {
+                safeClose(session);
+                safeClose(connection);
             }
-            producer.close();
-        } catch (Exception e) {
-            LOGGER.warn("Can't send to JMS broker", e);
-        }
-        finally {
-            safeClose(session);
-            safeClose(connection);
         }
     }
 
@@ -125,12 +132,16 @@ public class JmsAppender implements EventHandler {
     }
 
     private Destination createDestination(Session session) throws JMSException {
+        String destinationType = getValue(config, DESTINATION_TYPE_PROPERTY, DESTINATION_TYPE_DEFAULT);
+        String destinationName = getValue(config, DESTINATION_NAME_PROPERTY, DESTINATION_NAME_DEFAULT);
         return (destinationType.equalsIgnoreCase("topic"))
             ? session.createTopic(destinationName)
             : session.createQueue(destinationName);
     }
 
     private Connection createConnection() throws JMSException {
+        String username = getValue(config, USERNAME_PROPERTY, USERNAME_DEFAULT);
+        String password = getValue(config, PASSWORD_PROPERTY, PASSWORD_DEFAULT);
         return (username != null) 
             ? connectionFactory.createConnection(username, password)
             : connectionFactory.createConnection();

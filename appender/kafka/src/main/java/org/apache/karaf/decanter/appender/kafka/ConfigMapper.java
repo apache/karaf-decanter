@@ -62,7 +62,7 @@ public class ConfigMapper {
     }
 
     private void process(String key, String defaultValue) {
-        String value = (String)confSource.get(key);
+        String value = (String) confSource.get(key);
         String usedValue = (value != null) ? value : defaultValue;
         if (usedValue != null) {
             config.put(key, usedValue);

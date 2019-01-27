@@ -20,6 +20,7 @@ import java.util.Dictionary;
 import java.util.List;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -45,10 +46,19 @@ import com.datastax.driver.core.exceptions.InvalidQueryException;
 )
 public class CassandraAppender implements EventHandler {
 
+    public static String KEYSPACE_PROPERTY = "keyspace.name";
+    public static String TABLE_PROPERTY = "table.name";
+    public static String CASSANDRA_HOST_PROPERTY = "cassandra.host";
+    public static String CASSANDRA_PORT_PROPERTY = "cassandra.port";
+
+    public static String KEYSPACE_DEFAULT = "decanter";
+    public static String TABLE_DEFAULT = "decanter";
+    public static String CASSANDRA_HOST_DEFAULT = "localhost";
+    public static String CASSANDRA_PORT_DEFAULT = "9042";
+
     private final static Logger LOGGER = LoggerFactory.getLogger(CassandraAppender.class);
 
-    private String keyspace;
-    private String tableName;
+    private Dictionary<String, Object> config;
 
     @Reference
     public Marshaller marshaller;
@@ -70,10 +80,9 @@ public class CassandraAppender implements EventHandler {
     }
 
     void activate(Dictionary<String, Object> config) {
-        this.keyspace = getValue(config, "keyspace.name", "decanter");
-        this.tableName = getValue(config, "table.name", "decanter");
-        String host = getValue(config, "cassandra.host", "localhost");
-        Integer port = Integer.parseInt(getValue(config, "cassandra.port", "9042"));
+        this.config = config;
+        String host = getValue(config, CASSANDRA_HOST_PROPERTY, CASSANDRA_HOST_DEFAULT);
+        Integer port = Integer.parseInt(getValue(config, CASSANDRA_PORT_PROPERTY, CASSANDRA_PORT_DEFAULT));
         Builder clusterBuilder = Cluster.builder().addContactPoint(host);
         if (port != null) {
             clusterBuilder.withPort(port);
@@ -93,21 +102,25 @@ public class CassandraAppender implements EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        LOGGER.trace("Looking for the Cassandra datasource");
-        try (Session session = cluster.connect()){
-            useKeyspace(session, keyspace);
-            createTable(session, keyspace, tableName);
+        if (EventFilter.match(event, config)) {
+            LOGGER.trace("Looking for the Cassandra datasource");
+            try (Session session = cluster.connect()) {
+                String keyspace = getValue(config, KEYSPACE_PROPERTY, KEYSPACE_DEFAULT);
+                String tableName = getValue(config, TABLE_PROPERTY, TABLE_DEFAULT);
+                useKeyspace(session, keyspace);
+                createTable(session, keyspace, tableName);
 
-            Long timestamp = (Long) event.getProperty("timestamp");
-            if (timestamp == null) {
-                timestamp = System.currentTimeMillis();
+                Long timestamp = (Long) event.getProperty("timestamp");
+                if (timestamp == null) {
+                    timestamp = System.currentTimeMillis();
+                }
+                String jsonSt = marshaller.marshal(event);
+                session.execute(String.format(insertTemplate, tableName), timestamp, jsonSt);
+
+                LOGGER.trace("Data inserted into {} table", tableName);
+            } catch (Exception e) {
+                LOGGER.error("Can't store in the database", e);
             }
-            String jsonSt = marshaller.marshal(event);
-            session.execute(String.format(insertTemplate, tableName), timestamp, jsonSt);
-
-            LOGGER.trace("Data inserted into {} table", tableName);
-        } catch (Exception e) {
-            LOGGER.error("Can't store in the database", e);
         }
     }
 

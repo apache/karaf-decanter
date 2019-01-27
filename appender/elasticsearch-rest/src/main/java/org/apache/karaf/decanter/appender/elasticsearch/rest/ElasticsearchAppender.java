@@ -28,6 +28,7 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -51,13 +52,26 @@ import java.util.*;
 )
 public class ElasticsearchAppender implements EventHandler {
 
+    public static String ADDRESSES_PROPERTY = "addresses";
+    public static String USERNAME_PROPERTY = "username";
+    public static String PASSWORD_PROPERTY = "password";
+    public static String INDEX_PREFIX_PROPERTY = "index.prefix";
+    public static String INDEX_TYPE_PROPERTY = "index.type";
+    public static String INDEX_EVENT_TIMESTAMPED_PROPERTY = "index.event.timestamped";
+
+    public static String ADDRESSES_DEFAULT = "http://localhost:9200";
+    public static String USERNAME_DEFAULT = null;
+    public static String PASSWORD_DEFAULT = null;
+    public static String INDEX_PREFIX_DEFAULT = "karaf";
+    public static String INDEX_TYPE_DEFAULT = "decanter";
+    public static String INDEX_EVENT_TIMESTAMPED_DEFAULT = "true";
+
     @Reference
     public Marshaller marshaller;
 
     private RestClient client;
-    private String indexPrefix;
-    private boolean indexTimestamped;
-    private String indexType;
+
+    private Dictionary<String, Object> config;
 
     private final SimpleDateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSS'Z'");
     private final SimpleDateFormat indexDateFormat = new SimpleDateFormat("yyyy.MM.dd");
@@ -71,9 +85,11 @@ public class ElasticsearchAppender implements EventHandler {
     }
     
     public void open(Dictionary<String, Object> config) {
-        String addressesString = getValue(config, "addresses", "http://localhost:9200");
-        String username = getValue(config, "username", null);
-        String password = getValue(config, "password", null);
+        this.config = config;
+
+        String addressesString = getValue(config, ADDRESSES_PROPERTY, ADDRESSES_DEFAULT);
+        String username = getValue(config, USERNAME_PROPERTY, USERNAME_DEFAULT);
+        String password = getValue(config, PASSWORD_PROPERTY, PASSWORD_DEFAULT);
 
         Set<String> addresses = new HashSet<String>(Arrays.asList(addressesString.split(",")));
 
@@ -116,10 +132,6 @@ public class ElasticsearchAppender implements EventHandler {
         TimeZone tz = TimeZone.getTimeZone( "UTC" );
         tsFormat.setTimeZone(tz);
         indexDateFormat.setTimeZone(tz);
-
-        indexPrefix = getValue(config, "index.prefix", "karaf");
-        indexTimestamped = Boolean.parseBoolean(getValue(config, "index.event.timestamped", "true"));
-        indexType = getValue(config, "index.type", "decanter");
     }
     
     private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {
@@ -138,19 +150,21 @@ public class ElasticsearchAppender implements EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        try {
-            send(event);
-        } catch (Exception e) {
-            LOGGER.warn("Can't append into Elasticsearch", e);
+        if (EventFilter.match(event, config)) {
+            try {
+                send(event);
+            } catch (Exception e) {
+                LOGGER.warn("Can't append into Elasticsearch", e);
+            }
         }
     }
 
     private void send(Event event) throws Exception {
-        String indexName = getIndexName(indexPrefix, getDate(event));
+        String indexName = getIndexName(getValue(config, INDEX_PREFIX_PROPERTY, INDEX_PREFIX_DEFAULT), getDate(event));
         String jsonSt = marshaller.marshal(event);
 
         // elasticsearch 6.x only allows one type per index mapping, the _type is part of the document
-        String endpoint = String.format("/%s/%s", indexName, indexType);
+        String endpoint = String.format("/%s/%s", indexName, getValue(config, INDEX_TYPE_PROPERTY, INDEX_TYPE_DEFAULT));
         HttpEntity request = new NStringEntity(jsonSt, ContentType.APPLICATION_JSON);
 
         client.performRequest("POST", endpoint, Collections.singletonMap("refresh", "true"), request);
@@ -163,6 +177,7 @@ public class ElasticsearchAppender implements EventHandler {
     }
 
     private String getIndexName(String prefix, Date date) {
+        boolean indexTimestamped = Boolean.parseBoolean(getValue(config, INDEX_EVENT_TIMESTAMPED_PROPERTY, INDEX_EVENT_TIMESTAMPED_DEFAULT));
         if (indexTimestamped) {
             return prefix + "-" + indexDateFormat.format(date);
         } else {

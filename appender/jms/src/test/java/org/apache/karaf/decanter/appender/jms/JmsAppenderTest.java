@@ -28,6 +28,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.service.event.Event;
@@ -35,7 +36,7 @@ import org.osgi.service.event.Event;
 public class JmsAppenderTest {
 
     @Test
-    public void testHandleEvent() throws JMSException {
+    public void test() throws JMSException {
         ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
         JmsAppender appender = new JmsAppender();
         appender.connectionFactory = cf;
@@ -70,4 +71,52 @@ public class JmsAppenderTest {
         Object map = message.getObject("map");
         Assert.assertTrue(map instanceof Map);
     }
+
+    @Test
+    public void testWithFilter() throws JMSException {
+        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
+        JmsAppender appender = new JmsAppender();
+        appender.connectionFactory = cf;
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put("message.type", "map");
+        config.put(EventFilter.PROPERTY_NAME_EXCLUDE_CONFIG, ".*refused.*");
+        config.put(EventFilter.PROPERTY_VALUE_EXCLUDE_CONFIG, ".*refused.*");
+        appender.activate(config);
+
+        Connection con = cf.createConnection();
+        con.start();
+        Session sess = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+        MessageConsumer consumer = sess.createConsumer(sess.createQueue("decanter"));
+
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("timestamp", 1l);
+        data.put("string", "test");
+        data.put("boolean", true);
+        data.put("integer", 1);
+        data.put("testnull", null);
+        data.put("map", new HashMap<String, String>());
+        appender.handleEvent(new Event("decanter/collect", data));
+
+        data = new HashMap<>();
+        data.put("refused_property", "value");
+        appender.handleEvent(new Event("decanter/collect", data));
+
+        data = new HashMap<>();
+        data.put("property", "refused_value");
+        appender.handleEvent(new Event("decanter/collect", data));
+
+        MapMessage message = (MapMessage)consumer.receive(1000);
+        consumer.close();
+        sess.close();
+        con.close();
+
+        Assert.assertEquals(1l, message.getObject("timestamp"));
+        Assert.assertEquals("test", message.getObject("string"));
+        Assert.assertEquals(true, message.getObject("boolean"));
+        Assert.assertEquals(1, message.getObject("integer"));
+        Object map = message.getObject("map");
+        Assert.assertTrue(map instanceof Map);
+    }
+
 }

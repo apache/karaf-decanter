@@ -39,6 +39,10 @@
             <artifactId>org.apache.karaf.decanter.api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.karaf.decanter.appender</groupId>
+            <artifactId>org.apache.karaf.decanter.appender.utils</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jms_1.1_spec</artifactId>
             <version>1.1.1</version>
@@ -71,7 +75,8 @@
                             *
                         </Import-Package>
                         <Private-Package>
-                            org.apache.karaf.decanter.appender.jms
+                            org.apache.karaf.decanter.appender.jms,
+                            org.apache.karaf.decanter.appender.utils
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                         <_dsannotations-options>nocapabilities,norequirements</_dsannotations-options>

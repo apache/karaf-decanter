@@ -39,6 +39,10 @@
             <artifactId>redisson</artifactId>
             <version>${redisson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.decanter.appender</groupId>
+            <artifactId>org.apache.karaf.decanter.appender.utils</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -46,14 +50,20 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <inherited>true</inherited>
+                <extensions>true</extensions>
                 <configuration>
+                    <obrRepository>NONE</obrRepository>
                     <instructions>
+                        <Export-Package>!*</Export-Package>
                         <Import-Package>
                             com.esotericsoftware.kryo;resolution:=optional
                         </Import-Package>
                         <Private-Package>
                             org.redisson*,
+                            org.apache.karaf.decanter.appender.utils
                         </Private-Package>
+                        <_dsannotations>*</_dsannotations>
                     </instructions>
                 </configuration>
             </plugin>

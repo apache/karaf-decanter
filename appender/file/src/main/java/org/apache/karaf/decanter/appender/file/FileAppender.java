@@ -17,6 +17,7 @@
 package org.apache.karaf.decanter.appender.file;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -38,22 +39,28 @@ import java.util.Dictionary;
 )
 public class FileAppender implements EventHandler {
 
+    public static String FILENAME_PROPERTY = "filename";
+    public static String APPEND_PROPERTY = "append";
+
     @Reference
     public Marshaller marshaller;
 
     private BufferedWriter writer;
 
-    private boolean append;
+    private Dictionary<String, Object> config;
 
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
         Dictionary<String, Object> config = componentContext.getProperties();
-        String filename = (config.get("filename") != null) ? (String) config.get("filename") : System.getProperty("karaf.data") + File.separator + "decanter";
-        append = (config.get("append") != null) ? Boolean.parseBoolean((String) config.get("append")) : true;
-        open(filename);
+        open(config);
     }
 
-    public void open(String filename) throws Exception {
+    public void open(Dictionary<String, Object> config) throws Exception {
+        this.config = config;
+
+        String filename = (config.get(FILENAME_PROPERTY) != null) ? (String) config.get(FILENAME_PROPERTY) : System.getProperty("karaf.data") + File.separator + "decanter";
+        boolean append = (config.get(APPEND_PROPERTY) != null) ? Boolean.parseBoolean((String) config.get(APPEND_PROPERTY)) : true;
+
         File file = new File(filename);
         file.getParentFile().mkdirs();
         file.createNewFile();
@@ -62,13 +69,15 @@ public class FileAppender implements EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        try {
-            String marshalled = marshaller.marshal(event);
-            writer.write(marshalled);
-            writer.newLine();
-            writer.flush();
-        } catch (Exception e) {
-            // nothing to do
+        if (EventFilter.match(event, config)) {
+            try {
+                String marshalled = marshaller.marshal(event);
+                writer.write(marshalled);
+                writer.newLine();
+                writer.flush();
+            } catch (Exception e) {
+                // nothing to do
+            }
         }
     }
 

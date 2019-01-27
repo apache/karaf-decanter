@@ -34,6 +34,7 @@
     <name>Apache Karaf :: Decanter :: Appender</name>
 
     <modules>
+        <module>utils</module>
         <module>camel</module>
         <module>cassandra</module>
         <module>dropwizard</module>

@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.util.Dictionary;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -44,12 +45,16 @@ import org.slf4j.LoggerFactory;
 )
 public class RestAppender implements EventHandler {
 
+    public static String URI_PROPERTY = "uri";
+
     @Reference
     public Marshaller marshaller;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(RestAppender.class);
 
     private URI uri;
+
+    private Dictionary<String, Object> config;
 
     @Activate
     @SuppressWarnings("unchecked")
@@ -59,7 +64,8 @@ public class RestAppender implements EventHandler {
     }
 
     void activate(Dictionary<String, Object> config) throws URISyntaxException {
-        uri = new URI(getMandatoryValue(config, "uri"));
+        this.config = config;
+        uri = new URI(getMandatoryValue(config, URI_PROPERTY));
     }
 
     private String getMandatoryValue(Dictionary<String, Object> config, String key) {
@@ -73,21 +79,23 @@ public class RestAppender implements EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        try {
-            HttpURLConnection connection = (HttpURLConnection)uri.toURL().openConnection();
-            connection.setDoOutput(true); 
-            connection.setInstanceFollowRedirects(false); 
-            connection.setRequestMethod("POST"); 
-            connection.setRequestProperty("Content-Type", "application/json"); 
-            connection.setRequestProperty("charset", "utf-8");
-            OutputStream out = connection.getOutputStream();
-            marshaller.marshal(event, out);
-            out.close();
-            InputStream is = connection.getInputStream();
-            is.read();
-            is.close();
-        } catch (Exception e) {
-            LOGGER.warn("Error sending event to rest service", e);
+        if (EventFilter.match(event, config)) {
+            try {
+                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+                connection.setDoOutput(true);
+                connection.setInstanceFollowRedirects(false);
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("charset", "utf-8");
+                OutputStream out = connection.getOutputStream();
+                marshaller.marshal(event, out);
+                out.close();
+                InputStream is = connection.getInputStream();
+                is.read();
+                is.close();
+            } catch (Exception e) {
+                LOGGER.warn("Error sending event to rest service", e);
+            }
         }
     }
     

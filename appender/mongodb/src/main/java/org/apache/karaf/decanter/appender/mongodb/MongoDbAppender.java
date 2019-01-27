@@ -21,6 +21,7 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.bson.Document;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.*;
@@ -40,6 +41,14 @@ import java.util.Dictionary;
 )
 public class MongoDbAppender implements EventHandler {
 
+    public static String URI_PROPERTY = "uri";
+    public static String DATABASE_PROPERTY = "database";
+    public static String COLLECTION_PROPERTY = "collection";
+
+    public static String URI_DEFAULT = "mongodb://localhost";
+    public static String DATABASE_DEFAULT = "decanter";
+    public static String COLLECTION_DEFAULT = "decanter";
+
     @Reference
     public Marshaller marshaller;
 
@@ -49,13 +58,15 @@ public class MongoDbAppender implements EventHandler {
     private MongoDatabase mongoDatabase;
     private MongoCollection mongoCollection;
 
+    private Dictionary<String, Object> config;
+
     @Activate
     public void activate(ComponentContext componentContext) {
-        Dictionary<String, Object> config = componentContext.getProperties();
+        config = componentContext.getProperties();
 
-        String uri = getValue(config, "uri", "mongodb://localhost");
-        String database = getValue(config, "database", "decanter");
-        String collection = getValue(config, "collection", "decanter");
+        String uri = getValue(config, URI_PROPERTY, URI_DEFAULT);
+        String database = getValue(config, DATABASE_PROPERTY, DATABASE_DEFAULT);
+        String collection = getValue(config, COLLECTION_PROPERTY, COLLECTION_DEFAULT);
 
         mongoClient = new MongoClient(new MongoClientURI(uri));
         mongoDatabase = mongoClient.getDatabase(database);
@@ -69,11 +80,13 @@ public class MongoDbAppender implements EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        try {
-            String data = marshaller.marshal(event);
-            mongoCollection.insertOne(Document.parse(data));
-        } catch (Exception e) {
-            LOGGER.warn("Error storing event in MongoDB", e);
+        if (EventFilter.match(event, config)) {
+            try {
+                String data = marshaller.marshal(event);
+                mongoCollection.insertOne(Document.parse(data));
+            } catch (Exception e) {
+                LOGGER.warn("Error storing event in MongoDB", e);
+            }
         }
     }
 

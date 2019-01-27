@@ -18,11 +18,14 @@ package org.apache.karaf.decanter.appender.elasticsearch.jest;
 
 import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
 
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.collect.MapBuilder;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.event.Event;
 
@@ -30,6 +33,7 @@ import static org.elasticsearch.node.NodeBuilder.*;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
@@ -41,9 +45,10 @@ public class TestElasticsearchAppender {
     private static final int PORT = 9301;
     private static final int HTTP_PORT = 9201;
 
-    @Test
-    public void testAppender() throws Exception {
+    private Node node;
 
+    @Before
+    public void setup() throws Exception {
         Settings settings = settingsBuilder()
                 .put("cluster.name", CLUSTER_NAME)
                 .put("http.enabled", "true")
@@ -57,14 +62,22 @@ public class TestElasticsearchAppender {
                 .put("path.plugins", "target/plugins")
                 .build();
 
-        Node node = nodeBuilder().settings(settings).node();
+        node = nodeBuilder().settings(settings).node();
+    }
 
+    @After
+    public void teardown() throws Exception {
+        node.close();
+    }
+
+    @Test
+    public void test() throws Exception {
         Marshaller marshaller = new JsonMarshaller();
         ElasticsearchAppender appender = new ElasticsearchAppender();
         appender.marshaller = marshaller;
         Dictionary<String, Object> config = new Hashtable<>();
-        config.put("address", "http://" + HOST + ":" + HTTP_PORT);
-        appender.open(config );
+        config.put(ElasticsearchAppender.ADDRESS_PROPERTY, "http://" + HOST + ":" + HTTP_PORT);
+        appender.open(config);
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
         appender.handleEvent(new Event("testTopic", MapBuilder.<String, String>newMapBuilder().put("a", "b").put("c", "d").map()));
@@ -76,7 +89,37 @@ public class TestElasticsearchAppender {
         }
 
         Assert.assertEquals(3L, node.client().count(Requests.countRequest()).actionGet().getCount());
-        node.close();
+    }
+
+    @Test
+    public void testWithFilter() throws Exception {
+        Marshaller marshaller = new JsonMarshaller();
+        ElasticsearchAppender appender = new ElasticsearchAppender();
+        appender.marshaller = marshaller;
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put(ElasticsearchAppender.ADDRESS_PROPERTY, "http://" + HOST + ":" + HTTP_PORT);
+        config.put(EventFilter.PROPERTY_NAME_EXCLUDE_CONFIG, ".*refused.*");
+        config.put(EventFilter.PROPERTY_VALUE_EXCLUDE_CONFIG, ".*refused.*");
+        appender.open(config);
+
+        Map<String, String> data = MapBuilder.<String, String>newMapBuilder().put("refused_property", "test").map();
+        Event event = new Event("testTopic", data);
+        appender.handleEvent(event);
+
+        data = MapBuilder.<String, String>newMapBuilder().put("property", "refused_value").map();
+        event = new Event("testTopic", data);
+        appender.handleEvent(event);
+
+        data = MapBuilder.<String, String>newMapBuilder().put("foo", "bar").map();
+        event = new Event("testTopic", data);
+        appender.handleEvent(event);
+
+        int maxTryCount = 10;
+        for(int i=0; node.client().count(Requests.countRequest()).actionGet().getCount() == 0 && i< maxTryCount; i++) {
+            Thread.sleep(500);
+        }
+
+        Assert.assertEquals(1L, node.client().count(Requests.countRequest()).actionGet().getCount());
     }
 
 }

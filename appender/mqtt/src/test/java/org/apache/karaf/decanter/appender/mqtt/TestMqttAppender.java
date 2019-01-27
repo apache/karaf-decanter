@@ -28,6 +28,7 @@ import javax.json.JsonReader;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -41,12 +42,13 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 
 public class TestMqttAppender  {
+
     private static final String SERVER = "tcp://localhost:11883";
     private static final String TOPIC = "decanter";
     private static final long TIMESTAMP = 1454428780634L;
 
     @Test
-    public void testSend() throws URISyntaxException, Exception {
+    public void test() throws URISyntaxException, Exception {
         BrokerService brokerService = new BrokerService();
         brokerService.setUseJmx(false);
         brokerService.setPersistenceAdapter(new MemoryPersistenceAdapter());
@@ -61,15 +63,30 @@ public class TestMqttAppender  {
         MqttAppender appender = new MqttAppender();
         appender.marshaller = marshaller;
         Dictionary<String, Object> config = new Hashtable<>();
-        config.put("server", SERVER);
-        config.put("clientId", "decanter");
-        config.put("topic", TOPIC);
+        config.put(MqttAppender.SERVER_PROPERTY, SERVER);
+        config.put(MqttAppender.CLIENT_ID_PROPERTY, "decanter");
+        config.put(MqttAppender.TOPIC_PROPERTY, TOPIC);
+        config.put(EventFilter.PROPERTY_NAME_EXCLUDE_CONFIG, ".*refused.*");
+        config.put(EventFilter.PROPERTY_VALUE_EXCLUDE_CONFIG, ".*refused.*");
         appender.activate(config);
 
-        Map<String, Object> properties = new HashMap<>();
-        properties.put(EventConstants.TIMESTAMP, TIMESTAMP);
-        Event event = new Event(TOPIC, properties);
+        Map<String, Object> data = new HashMap<>();
+        data.put(EventConstants.TIMESTAMP, TIMESTAMP);
+        data.put("property_refused", "data");
+        Event event = new Event(TOPIC, data);
         appender.handleEvent(event);
+
+        data = new HashMap<>();
+        data.put(EventConstants.TIMESTAMP, TIMESTAMP);
+        data.put("property", "refused_value");
+        event = new Event(TOPIC, data);
+        appender.handleEvent(event);
+
+        data = new HashMap<>();
+        data.put(EventConstants.TIMESTAMP, TIMESTAMP);
+        event = new Event(TOPIC, data);
+        appender.handleEvent(event);
+
         Thread.sleep(100);
         Assert.assertEquals(1, received.size());
         

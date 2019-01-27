@@ -20,6 +20,7 @@ package org.apache.karaf.decanter.appender.orientdb;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -38,17 +39,27 @@ import java.util.Dictionary;
 )
 public class OrientDBAppender implements EventHandler {
 
+    public static String URL_PROPERTY = "url";
+    public static String USERNAME_PROPERTY = "username";
+    public static String PASSWORD_PROPERTY = "password";
+
+    public static String URL_DEFAULT = "remote:localhost/decanter";
+    public static String USERNAME_DEFAULT = "root";
+    public static String PASSWORD_DEFAULT = "decanter";
+
     @Reference
     public Marshaller marshaller;
 
     private ODatabaseDocumentTx database;
 
+    private Dictionary<String, Object> config;
+
     @Activate
     public void activate(ComponentContext componentContext) {
-        Dictionary<String, Object> config = componentContext.getProperties();
-        String url = getValue(config, "url", "remote:localhost/decanter");
-        String username = getValue(config, "username", "root");
-        String password = getValue(config, "password", "decanter");
+        config = componentContext.getProperties();
+        String url = getValue(config, URL_PROPERTY, URL_DEFAULT);
+        String username = getValue(config, USERNAME_PROPERTY, USERNAME_DEFAULT);
+        String password = getValue(config, PASSWORD_PROPERTY, PASSWORD_DEFAULT);
         database = new ODatabaseDocumentTx(url).open(username, password);
     }
 
@@ -64,9 +75,11 @@ public class OrientDBAppender implements EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        String json = marshaller.marshal(event);
-        ODocument document = new ODocument("decanter").fromJSON(json);
-        document.save();
+        if (EventFilter.match(event, config)) {
+            String json = marshaller.marshal(event);
+            ODocument document = new ODocument("decanter").fromJSON(json);
+            document.save();
+        }
     }
 
 }

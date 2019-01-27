@@ -24,6 +24,7 @@ import java.util.Dictionary;
 import java.util.TimeZone;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
+import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.transport.TransportClient;
@@ -52,6 +53,18 @@ import org.slf4j.LoggerFactory;
 )
 public class ElasticsearchAppender implements EventHandler {
 
+    public static String HOST_PROPERTY = "host";
+    public static String PORT_PROPERTY = "port";
+    public static String CLUSTER_NAME_PROPERTY = "clusterName";
+    public static String INDEX_PREFIX_PROPERTY = "index.prefix";
+    public static String INDEX_EVENT_TIMESTAMPED_PROPERTY = "index.event.timestamped";
+
+    public static String HOST_DEFAULT = "localhost";
+    public static String PORT_DEFAULT = "9300";
+    public static String CLUSTER_NAME_DEFAULT = "elasticsearch";
+    public static String INDEX_PREFIX_DEFAULT = "karaf";
+    public static String INDEX_EVENT_TIMESTAMPED_DEFAULT = "true";
+
     final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
 
     @Reference
@@ -66,8 +79,7 @@ public class ElasticsearchAppender implements EventHandler {
 
     private WorkFinishedListener listener;
 
-    private String indexPrefix;
-    private boolean indexTimestamped;
+    private Dictionary<String, Object> config;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -76,12 +88,11 @@ public class ElasticsearchAppender implements EventHandler {
     }
     
     public void open(Dictionary<String, Object> config) {
+        this.config = config;
         try {
-            String host = getValue(config, "host", "localhost");
-            int port = Integer.parseInt(getValue(config, "port", "9300"));
-            String cluster = getValue(config, "clusterName", "elasticsearch");
-            indexPrefix = getValue(config, "index.prefix", "karaf");
-            indexTimestamped = Boolean.parseBoolean(getValue(config, "index.event.timestamped", "true"));
+            String host = getValue(config, HOST_PROPERTY, HOST_DEFAULT);
+            int port = Integer.parseInt(getValue(config, PORT_PROPERTY, PORT_DEFAULT));
+            String cluster = getValue(config, CLUSTER_NAME_PROPERTY, CLUSTER_NAME_DEFAULT);
             TimeZone tz = TimeZone.getTimeZone( "UTC" );
             tsFormat.setTimeZone(tz);
             indexDateFormat.setTimeZone(tz);
@@ -130,15 +141,17 @@ public class ElasticsearchAppender implements EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        try {
-            send(event);
-        } catch (Exception e) {
-            LOGGER.warn("Can't append into Elasticsearch", e);
+        if (EventFilter.match(event, config)) {
+            try {
+                send(event);
+            } catch (Exception e) {
+                LOGGER.warn("Can't append into Elasticsearch", e);
+            }
         }
     }
 
     private void send(Event event) {
-        String indexName = getIndexName(indexPrefix, getDate(event));
+        String indexName = getIndexName(getValue(config, INDEX_PREFIX_PROPERTY, INDEX_PREFIX_DEFAULT), getDate(event));
         String jsonSt = marshaller.marshal(event);
         LOGGER.debug("Sending event to elastic search with content: {}", jsonSt);
         bulkProcessor.add(new IndexRequest(indexName, getType(event)).source(jsonSt));
@@ -156,6 +169,7 @@ public class ElasticsearchAppender implements EventHandler {
     }
 
     private String getIndexName(String prefix, Date date) {
+        boolean indexTimestamped = Boolean.parseBoolean(getValue(config, INDEX_EVENT_TIMESTAMPED_PROPERTY, INDEX_EVENT_TIMESTAMPED_DEFAULT));
         if (indexTimestamped) {
             return prefix + "-" + indexDateFormat.format(date);
         } else {
