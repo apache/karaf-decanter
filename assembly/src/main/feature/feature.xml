@@ -34,6 +34,8 @@
         <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.raw/${project.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.json/${project.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.csv/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.parser/org.apache.karaf.decanter.parser.split/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.parser.split.cfg">mvn:org.apache.karaf.decanter.parser/org.apache.karaf.decanter.parser.split/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="decanter-collector-dropwizard" version="${project.version}" description="Karaf Decanter Dropwizard Metrics Collector">

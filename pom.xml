@@ -68,6 +68,7 @@
         <module>collector</module>
         <module>appender</module>
         <module>marshaller</module>
+        <module>parser</module>
         <module>alerting</module>
         <module>backend</module>
         <module>spring-boot-starter-decanter</module>
