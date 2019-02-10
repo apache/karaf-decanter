@@ -54,7 +54,7 @@ public class EventCollector implements EventHandler {
         for (String property : event.getPropertyNames()) {
             if (property.equals("type")) {
                 if (event.getProperty(property) != null) {
-                    data.put("eventType", event.getProperty(property).toString());
+                    data.put("eventType", (event.getProperty(property) != null) ? event.getProperty(property).toString() : null);
                 } else {
                     data.put("eventType", "eventadmin");
                 }

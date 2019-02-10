@@ -35,7 +35,8 @@ public class Logger implements EventHandler {
     public void handleEvent(Event event) {
         StringBuilder builder = new StringBuilder();
         for (String innerKey : event.getPropertyNames()) {
-            builder.append(innerKey).append(":").append(event.getProperty(innerKey).toString()).append(" | ");
+            String value = (event.getProperty(innerKey) != null) ? event.getProperty(innerKey).toString() : null;
+            builder.append(innerKey).append(":").append(value).append(" | ");
         }
         boolean backToNormal = (boolean) event.getProperty("alertBackToNormal");
         if (event.getProperty("alertLevel") != null && ((String) event.getProperty("alertLevel")).equalsIgnoreCase("error")) {
