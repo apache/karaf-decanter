@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.impl.parser;
+package org.apache.karaf.decanter.parser.identity;
 
 import org.apache.karaf.decanter.api.parser.Parser;
 import org.osgi.service.component.annotations.Component;
@@ -22,7 +22,10 @@ import org.osgi.service.component.annotations.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component(immediate = true, property = Parser.SERVICE_KEY_ID + "=identify")
+@Component(
+        name = "org.apache.karaf.decanter.parser.identity",
+        immediate = true,
+        property = Parser.SERVICE_KEY_ID + "=identity")
 public class IdentityParser implements Parser {
 
     @Override

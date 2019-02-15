@@ -34,6 +34,7 @@
     <name>Apache Karaf :: Decanter :: Parser</name>
 
     <modules>
+        <module>identity</module>
         <module>split</module>
     </modules>
 
