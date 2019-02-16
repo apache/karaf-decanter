@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
-public class TestIdentityParser {
+public class IdentityParserTest {
 
     @Test
     public void testParse() {
