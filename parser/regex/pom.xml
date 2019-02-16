@@ -23,24 +23,20 @@
 
     <parent>
         <groupId>org.apache.karaf.decanter</groupId>
-        <artifactId>collector</artifactId>
+        <artifactId>parser</artifactId>
         <version>2.2.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.apache.karaf.decanter.collector</groupId>
-    <artifactId>org.apache.karaf.decanter.collector.rest</artifactId>
+    <groupId>org.apache.karaf.decanter.parser</groupId>
+    <artifactId>org.apache.karaf.decanter.parser.regex</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Collector :: REST</name>
+    <name>Apache Karaf :: Decanter :: Parser :: Regex</name>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.karaf.decanter</groupId>
             <artifactId>org.apache.karaf.decanter.api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.karaf.decanter.collector</groupId>
-            <artifactId>org.apache.karaf.decanter.collector.utils</artifactId>
         </dependency>
     </dependencies>
 
@@ -56,12 +52,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>!*</Export-Package>
-                        <Import-Package>
-                            *
-                        </Import-Package>
+                        <Import-Package>*</Import-Package>
                         <Private-Package>
-                            org.apache.karaf.decanter.collector.rest,
-                            org.apache.karaf.decanter.collector.utils
+                            org.apache.karaf.decanter.parser.regex
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                     </instructions>
@@ -79,7 +72,7 @@
                         <configuration>
                             <artifacts>
                                 <artifact>
-                                    <file>src/main/cfg/org.apache.karaf.decanter.collector.rest.cfg</file>
+                                    <file>src/main/cfg/org.apache.karaf.decanter.parser.regex.cfg</file>
                                     <type>cfg</type>
                                 </artifact>
                             </artifacts>
@@ -89,4 +82,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

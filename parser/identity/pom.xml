@@ -23,24 +23,20 @@
 
     <parent>
         <groupId>org.apache.karaf.decanter</groupId>
-        <artifactId>collector</artifactId>
+        <artifactId>parser</artifactId>
         <version>2.2.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.apache.karaf.decanter.collector</groupId>
-    <artifactId>org.apache.karaf.decanter.collector.rest</artifactId>
+    <groupId>org.apache.karaf.decanter.parser</groupId>
+    <artifactId>org.apache.karaf.decanter.parser.identity</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Collector :: REST</name>
+    <name>Apache Karaf :: Decanter :: Parser :: Identity</name>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.karaf.decanter</groupId>
             <artifactId>org.apache.karaf.decanter.api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.karaf.decanter.collector</groupId>
-            <artifactId>org.apache.karaf.decanter.collector.utils</artifactId>
         </dependency>
     </dependencies>
 
@@ -56,37 +52,15 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>!*</Export-Package>
-                        <Import-Package>
-                            *
-                        </Import-Package>
+                        <Import-Package>*</Import-Package>
                         <Private-Package>
-                            org.apache.karaf.decanter.collector.rest,
-                            org.apache.karaf.decanter.collector.utils
+                            org.apache.karaf.decanter.parser.identity
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                     </instructions>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>src/main/cfg/org.apache.karaf.decanter.collector.rest.cfg</file>
-                                    <type>cfg</type>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
+
 </project>

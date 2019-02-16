@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.karaf.decanter.impl.parser;
+package org.apache.karaf.decanter.parser.identity;
 
 import org.apache.karaf.decanter.api.parser.Parser;
 import org.junit.Assert;
@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
-public class TestIdentityParser {
+public class IdentityParserTest {
 
     @Test
     public void testParse() {

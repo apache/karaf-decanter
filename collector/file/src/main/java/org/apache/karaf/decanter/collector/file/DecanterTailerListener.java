@@ -49,7 +49,7 @@ public class DecanterTailerListener extends TailerListenerAdapter {
     @Reference
     public EventAdmin dispatcher;
 
-    @Reference
+    @Reference(target = "(" + Parser.SERVICE_KEY_ID + "=identity)")
     public Parser parser;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DecanterTailerListener.class);

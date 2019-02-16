@@ -149,8 +149,68 @@ my=stuff
 
 The file collector will tail on `karaf.log` file, and send any new line matching the `regex` in this log file as collected data.
 
+===== Parser
+
 By default, the collector use the `org.apache.karaf.decanter.impl.parser.IdentityParser` parser to parse the line into
 a typed Object (Long, Integer or String) before send it to the EventDispatcher data map.
+
+====== Identity parser
+
+The identity parser doesn't actually parse the line, it just pass through. It's the default parser used by the file collector.
+
+====== Split parser
+
+The split parser split the line using a separator (`,` by default). Optionally, it can take `keys` used a property name in the event.
+
+For instance, you can have the following `etc/org.apache.karaf.decanter.parser.split.cfg` configuration file:
+
+----
+separator=,
+keys=first,second,third,fourth
+----
+
+If the parser gets a line (collected by the file collector) like `this,is,a,test`, the line will be parsed as follow (the file collector will send the following data to the dispatcher):
+
+----
+first->this
+second->is
+third->a
+fourth->test
+----
+
+If the `keys` configuration is not set, then `key-0`, `key-1`, etc will be used.
+
+To use this parser in the file collector, you have to define it in the `parser.target` configuration (in `etc/org.apache.karaf.decanter.collector.file-XXXX.cfg`):
+
+----
+parser.target=(parserId=split)
+----
+
+====== Regex parser
+
+The regex parser is similar to the split parser but instead of using a separator, it uses regex groups.
+
+The configuration contains the `regex` and the `keys` in the `etc/org.apache.karaf.decanter.parser.regex.cfg` configuration file:
+
+----
+regex=(t.*t)
+----
+
+If the parser gets a line (collected by the file collector) like `a test here`, the linbe will be parsed as follow (the file collector will send the following data to the dispatcher):
+
+----
+key-0->test
+----
+
+It's also possible to use `keys` to identify each regex group.
+
+To use this parser in the file collector, you have to define it in the `parser.target` configuration (in `etc/org.apache.karaf.decanter.collector.file-XXXX.cfg`):
+
+----
+parser.target=(parserId=regex)
+----
+
+====== Custom parser
 
 You can write your own parser by implementing the `org.apache.karaf.decanter.api.parser.Parser` interface and declare
 it into the file collector configuration file:
