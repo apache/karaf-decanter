@@ -36,6 +36,7 @@
     <modules>
         <module>identity</module>
         <module>split</module>
+        <module>regex</module>
     </modules>
 
 </project>

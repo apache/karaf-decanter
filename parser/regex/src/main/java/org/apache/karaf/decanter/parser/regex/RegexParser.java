@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.parser.split;
-
+package org.apache.karaf.decanter.parser.regex;
 
 import org.apache.karaf.decanter.api.parser.Parser;
 import org.osgi.service.component.ComponentContext;
@@ -27,16 +26,19 @@ import org.slf4j.LoggerFactory;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component(
-        name = "org.apache.karaf.decanter.parser.split",
+        name = "org.apache.karaf.decanter.parser.regex",
         immediate = true,
-        property = Parser.SERVICE_KEY_ID + "=split")
-public class SplitParser implements Parser {
+        property = Parser.SERVICE_KEY_ID + "=regex"
+)
+public class RegexParser implements Parser {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(SplitParser.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(RegexParser.class);
 
-    private String separator;
+    private Pattern pattern;
     private String keys = null;
 
     @Activate
@@ -45,37 +47,40 @@ public class SplitParser implements Parser {
     }
 
     public void activate(Dictionary<String, Object> config) {
-        this.separator = (config.get("separator") != null) ? (String) config.get("separator") : ",";
+        if (config.get("regex") == null) {
+            throw new IllegalStateException("regex property is required");
+        }
+        this.pattern = Pattern.compile((String) config.get("regex"));
         this.keys = (config.get("keys") != null) ? (String) config.get("keys") : null;
     }
 
     @Override
     public Map<String, Object> parse(String key, String line) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
         if (line != null) {
-            String[] valuesArray = line.split(separator);
+            Matcher matcher = pattern.matcher(line);
             String[] keysArray;
-
-            if (this.keys != null) {
-                keysArray = this.keys.split(",");
-                if (keysArray.length != valuesArray.length) {
-                    LOGGER.warn("keys count and values count don't match, using default keys ID");
-                    keysArray = new String[valuesArray.length];
-                    for (int i = 0; i < valuesArray.length; i++) {
+            if (keys != null) {
+                keysArray = keys.split(",");
+                if (keysArray.length != matcher.groupCount()) {
+                    LOGGER.warn("keys count and regex groups count don't match, using default keys ID");
+                    keysArray = new String[matcher.groupCount()];
+                    for (int i = 0; i < keysArray.length; i++) {
                         keysArray[i] = "key-" + i;
                     }
                 }
             } else {
-                keysArray = new String[valuesArray.length];
-                for (int i = 0; i < valuesArray.length; i++) {
+                keysArray = new String[matcher.groupCount()];
+                for (int i = 0; i < keysArray.length; i++) {
                     keysArray[i] = "key-" + i;
                 }
             }
-            for (int i = 0; i < valuesArray.length; i++) {
-                map.put(keysArray[i], valuesArray[i]);
+            if (matcher.find()) {
+                for (int i = 0; i < matcher.groupCount(); i++) {
+                    data.put(keysArray[i], matcher.group(i + 1));
+                }
             }
         }
-        return map;
+        return data;
     }
-
 }
