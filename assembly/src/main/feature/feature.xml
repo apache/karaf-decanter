@@ -107,6 +107,17 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.rest-1.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-collector-soap-core" version="${project.version}" description="Karaf Decanter SOAP Collector Core">
+        <feature>decanter-common</feature>
+        <feature>scheduler</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.soap/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-collector-soap" version="${project.version}" description="Karaf Decanter SOAP Collector">
+        <feature>decanter-collector-soap-core</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.soap-1.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.soap/${project.version}/cfg</configfile>
+    </feature>
+
     <feature name="decanter-collector-system" version="${project.version}" description="Karaf Decanter OS Collector">
         <feature>decanter-common</feature>
         <feature>scheduler</feature>

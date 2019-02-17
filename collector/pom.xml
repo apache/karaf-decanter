@@ -48,6 +48,7 @@
         <module>process</module>
         <module>rest</module>
         <module>rest-servlet</module>
+        <module>soap</module>
         <module>system</module>
         <module>socket</module>
         <module>jdbc</module>

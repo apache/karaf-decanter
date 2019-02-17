@@ -779,6 +779,33 @@ The `decanter-collector-rest-servlet` feature installs the collector:
 karaf@root()> feature:install decanter-collector-rest-servlet
 ----
 
+==== SOAP
+
+The Decanter SOAP collector periodically requests a SOAP service and returns the result (the SOAP Response, or error details if it failed).
+
+The `decanter-collector-soap` feature installs the collector:
+
+----
+karaf@root()> feature:install decanter-collector-soap
+----
+
+This feature also installs `etc/org.apache.karaf.decanter.collector.soap.cfg` configuration file where you can setup the URL of the service and the SOAP request to use:
+
+----
+#
+# Decanter SOAP collector
+#
+
+url=http://localhost:8080/cxf/service
+soap.request=
+----
+
+The collector send several collected properties to the dispatcher, especially:
+
+* `soap.response` property contains the actual SOAP response
+* `error` is only populated when the service request failed, containing the error detail
+* `http.response.code` contains the HTTP status code of the service request
+
 ==== Dropwizard Metrics
 
 The Decanter Dropwizard Metrics collector get a `MetricSet` OSGi service and periodically get the metrics in the set.
