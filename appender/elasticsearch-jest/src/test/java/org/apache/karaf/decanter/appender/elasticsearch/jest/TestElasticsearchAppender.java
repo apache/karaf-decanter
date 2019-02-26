@@ -89,6 +89,8 @@ public class TestElasticsearchAppender {
         }
 
         Assert.assertEquals(3L, node.client().count(Requests.countRequest()).actionGet().getCount());
+
+        appender.close();
     }
 
     @Test
@@ -120,6 +122,8 @@ public class TestElasticsearchAppender {
         }
 
         Assert.assertEquals(1L, node.client().count(Requests.countRequest()).actionGet().getCount());
+
+        appender.close();
     }
 
 }
