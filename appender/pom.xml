@@ -43,6 +43,7 @@
         <module>elasticsearch-jest</module>
         <module>elasticsearch-rest</module>
         <module>file</module>
+        <module>influxdb</module>
         <module>jdbc</module>
         <module>jms</module>
         <module>kafka</module>
