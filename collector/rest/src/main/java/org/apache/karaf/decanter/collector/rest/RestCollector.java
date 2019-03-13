@@ -16,11 +16,12 @@
  */
 package org.apache.karaf.decanter.collector.rest;
 
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
@@ -58,24 +59,19 @@ public class RestCollector implements Runnable {
 
     private URL url;
     private String[] paths;
-    private String baseTopic;
-    private Dictionary<String, Object> properties;
+    private String topic;
+    private Dictionary<String, Object> config;
 
-    private boolean repeatedError;
-
-    @SuppressWarnings("unchecked")
     @Activate
-    public void activate(ComponentContext context) throws MalformedURLException {
-        Dictionary<String, Object> props = context.getProperties();
-        this.url = new URL(getProperty(props, "url", null));
-        getProperty(props, "username", null);
-        getProperty(props, "password", null);
-        this.paths = getProperty(props, "paths", "").split(",");
-        this.baseTopic = getProperty(props, "topic", "decanter/collect");
-        //props.remove("password");
-        //props.remove("username");
-        this.properties = props;
-        this.repeatedError = false;
+    public void activate(ComponentContext componentContext) throws Exception {
+        activate(componentContext.getProperties());
+    }
+
+    public void activate(Dictionary<String, Object> config) throws MalformedURLException {
+        this.config = config;
+        this.url = new URL(getProperty(config, "url", null));
+        this.paths = getProperty(config, "paths", "").split(",");
+        this.topic = getProperty(config, "topic", "decanter/collect");
     }
     
     private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
@@ -86,46 +82,45 @@ public class RestCollector implements Runnable {
     public void run() {
         LOGGER.debug("Karaf Decanter REST Collector starts harvesting from {} ...", url);
         for (String path : paths) {
-            URL complete;
+            URL urlWithPath;
             try {
-                complete = new URL(url, path);
+                urlWithPath = new URL(url, path);
             } catch (MalformedURLException e) {
                 LOGGER.warn("Invalid URL. Stopping collector", e);
                 throw new IllegalArgumentException(e);
             }
+            LOGGER.debug("\tpath {}", urlWithPath);
+            HttpURLConnection connection = null;
+            Map<String, Object> data = new HashMap<>();
             try {
-                URLConnection connection = complete.openConnection();
-                Map<String, Object> data = unmarshaller.unmarshal(connection.getInputStream());
+                connection = (HttpURLConnection) urlWithPath.openConnection();
+                data.putAll(unmarshaller.unmarshal(connection.getInputStream()));
+                data.put("http.response.code", connection.getResponseCode());
+                data.put("http.response.message", connection.getResponseMessage());
                 data.put("type", "rest");
-                data.put("remote.url", complete);
+                data.put("url", urlWithPath);
 
                 // custom fields
-                Enumeration<String> keys = properties.keys();
+                Enumeration<String> keys = config.keys();
                 while (keys.hasMoreElements()) {
                     String key = keys.nextElement();
-                    data.put(key, properties.get(key));
+                    data.put(key, config.get(key));
                 }
 
-                PropertiesPreparator.prepare(data, properties);
+                PropertiesPreparator.prepare(data, config);
 
-                data.put("hostName", url.getHost());
-                dispatcher.postEvent(new Event(toTopic(complete), data));
-                repeatedError = false;
+                data.put("service.hostName", url.getHost());
             } catch (Exception e) {
-                if (repeatedError) {
-                    LOGGER.warn("Error fetching " + complete, e);
-                    repeatedError = true;
-                } else {
-                    LOGGER.debug("Repeated Error fetching " + complete, e);
+                LOGGER.warn("Can't request REST service", e);
+                data.put("error", e.getClass().getName() + ": " + e.getMessage());
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
                 }
-                
             }
+            dispatcher.postEvent(new Event(topic, data));
         }
         LOGGER.debug("Karaf Decanter REST Collector harvesting done");
-    }
-
-    private String toTopic(URL url) {
-        return baseTopic + "/" + url.getHost() + url.getPath();
     }
 
 }
