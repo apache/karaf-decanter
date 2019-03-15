@@ -320,6 +320,17 @@
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.mqtt.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.mqtt/${project.version}/cfg</configfile>
     </feature>
 
+    <feature name="decanter-appender-influxdb-core" version="${project.version}" description="Karaf Decanter InfluxDB Appender core">
+        <feature>decanter-common</feature>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.influxdb/2.15_1</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.influxdb/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-appender-influxdb" version="${project.version}" description="Karaf Decanter InfluxDB Appender">
+        <feature>decanter-appender-influxdb-core</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.influxdb.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.influxdb/${project.version}/cfg</configfile>
+    </feature>
+
     <feature name="decanter-appender-cassandra-core" version="${project.version}" description="Karaf Decanter Cassandra Appender core">
         <feature>decanter-common</feature>
         <bundle dependency="true">mvn:com.google.guava/guava/16.0.1</bundle>

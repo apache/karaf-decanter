@@ -1192,6 +1192,40 @@ cassandra.port=9042
 * the `cassandra.host` property contains the hostname or IP address where the Cassandra instance is running (default is localhost)
 * the `cassandra.port` property contains the port number of the Cassandra instance (default is 9042)
 
+==== InfluxDB
+
+The Decanter InfluxDB appender allows you to store the data (coming from the collectors) as a time series into a InfluxDB database.
+
+The `decanter-appender-influxdb` feature installs this appender:
+
+----
+karaf@root()> feature:install decanter-appender-influxdb
+----
+
+This feature installs the appender and a default `etc/org.apache.karaf.decanter.appender.influxdb.cfg` configuration file containing:
+
+----
+##########################################
+# Decanter InfluxDB Appender Configuration
+##########################################
+
+# URL of the InfluxDB database
+url=
+
+# InfluxDB server username
+#username=
+
+# InfluxDB server password
+#password=
+
+# InfluxDB database name
+database=decanter
+----
+
+* `url` property is mandatory and define the location of the InfluxDB server
+* `database` property contains the name of the InfluxDB database. Default is `decanter`.
+* `username` and `password` are optional and define the authentication to the InfluxDB server.
+
 ==== MongoDB
 
 The Decanter MongoDB appender allows you to store the data (coming from the collectors) into a MongoDB database.
