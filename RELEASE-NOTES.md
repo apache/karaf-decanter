@@ -17,6 +17,55 @@
     under the License.
 -->
 
+## Apache Karaf Decanter 2.2.0
+
+### Overview
+
+Apache Karaf Decanter 2.2.0 is a maintenance release on the 2.x series. It provides improvements and bug fixes.
+
+Especially:
+
+* New InfluxDB appender
+* New TimescaleDB appender
+* New websocket appender
+* New SOAP collector
+* File collector row parser support
+* Appender property selector
+
+Take a look on ChangeLog for details.
+
+### ChangeLog
+
+#### Bug
+    * [KARAF-5998] - MongoDB appender component doesn't activate correctly
+    * [KARAF-6047] - can not install feature elasticsearch
+    * [KARAF-6146] - Decanter log alerter throws a NullPointerException
+
+#### New Feature
+    * [KARAF-6002] - Add websocket appender
+
+#### Improvement
+    * [KARAF-4777] - Add InfluxDB appender
+    * [KARAF-5915] - Improve the API Parser adding key data as parameter
+    * [KARAF-5972] - Add the row data collect type Numeric for the collector-jdbc
+    * [KARAF-5976] - Add TimescaleDB appender
+    * [KARAF-6009] - Be able to add property filters on appenders
+    * [KARAF-6053] - Be able to define the marshaller in log appender
+    * [KARAF-6054] - Reuse existing karafName, hostAddress, hostName if exist in "bridgeable" collectors
+    * [KARAF-6055] - Kafka appender should perform send().get()
+    * [KARAF-6117] - Provide split and regex parsers
+    * [KARAF-6118] - Add SOAP collector
+    * [KARAF-6161] - REST collector should populate the status code when connection doesn't work
+
+#### Dependency upgrade
+    * [KARAF-5905] - Update netty and netty handler versions in Karaf Decanter Cassandra
+    * [KARAF-5924] - Update spring-boot starter to spring-boot 2.x
+    * [KARAF-5936] - Upgrade to maven-scm-publish-plugin 3.0.0 and asciidoctor-maven-plugin 1.5.6
+    * [KARAF-5960] - Upgrade to Apache POM 21
+
+#### Documentation
+    * [KARAF-5904] - Use the asciidoctor-maven-plugin and custom ASF theme for the manual generation
+
 ## Apache Karaf Decanter 2.1.0
 
 ### Overview
