@@ -72,6 +72,20 @@ public class SplitParser implements Parser {
                 }
             }
             for (int i = 0; i < valuesArray.length; i++) {
+                try {
+                    map.put(keysArray[i], Integer.parseInt(valuesArray[i]));
+                    continue;
+                } catch (Exception e) {
+                    // nothing to do
+                }
+
+                try {
+                    map.put(keysArray[i], Long.parseLong(valuesArray[i]));
+                    continue;
+                } catch (Exception e) {
+                    // nothing to do
+                }
+                // if not integer and long value
                 map.put(keysArray[i], valuesArray[i]);
             }
         }

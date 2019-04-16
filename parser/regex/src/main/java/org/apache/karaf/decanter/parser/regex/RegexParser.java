@@ -77,6 +77,19 @@ public class RegexParser implements Parser {
             }
             if (matcher.find()) {
                 for (int i = 0; i < matcher.groupCount(); i++) {
+                    try {
+                        data.put(keysArray[i], Integer.parseInt(matcher.group(i + 1)));
+                        continue;
+                    } catch (Exception e) {
+                        // nothing to do
+                    }
+
+                    try {
+                        data.put(keysArray[i], Long.parseLong(matcher.group(i + 1)));
+                        continue;
+                    } catch (Exception e) {
+                        // nothing to do
+                    }
                     data.put(keysArray[i], matcher.group(i + 1));
                 }
             }
