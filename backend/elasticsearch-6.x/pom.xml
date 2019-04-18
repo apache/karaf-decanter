@@ -84,7 +84,7 @@
                             org.apache.lucene*,
                             com.tdunning.math.stats,
                             com.vividsolutions.jts*,
-                            org.HdrHistogram,
+                            org.HdrHistogram,   
                             org.locationtech.spatial4j*,
                             org.tartarus.snowball*,
                             org.joda.time*,
@@ -101,6 +101,8 @@
                             !org.noggit,
                             com.sun.jna*;resolution:=optional,
                             org.apache.logging.log4j*;version="[2.8,3)",
+                            com.google.common.geometry;resolution:=optional,
+                            org.locationtech.jts.geom;resolution:=optional,
                             *
                         </Import-Package>
                     </instructions>
