@@ -47,10 +47,8 @@ public class RegexParser implements Parser {
     }
 
     public void activate(Dictionary<String, Object> config) {
-        if (config.get("regex") == null) {
-            throw new IllegalStateException("regex property is required");
-        }
-        this.pattern = Pattern.compile((String) config.get("regex"));
+        String regex = (config.get("regex") != null) ? (String) config.get("regex") : "(.*)";
+        this.pattern = Pattern.compile(regex);
         this.keys = (config.get("keys") != null) ? (String) config.get("keys") : null;
     }
 
