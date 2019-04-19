@@ -27,6 +27,11 @@
     </feature>
 
     <feature name="decanter-common" version="${project.version}" description="Karaf Decanter API">
+        <config name="org.apache.felix.eventadmin.impl.EventAdmin" append="true">
+org.apache.felix.eventadmin.ThreadPoolSize=40
+org.apache.felix.eventadmin.Timeout=0
+org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
+        </config>
         <feature>eventadmin</feature>
         <feature>scr</feature>
         <bundle>mvn:org.glassfish/javax.json/${glassfish-json.version}</bundle>
