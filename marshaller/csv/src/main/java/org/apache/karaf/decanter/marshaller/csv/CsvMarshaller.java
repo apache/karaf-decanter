@@ -65,7 +65,9 @@ public class CsvMarshaller implements Marshaller {
         StringBuilder builder = new StringBuilder();
         for (String propertyName : event.getPropertyNames()) {
             Object propertyValue = event.getProperty(propertyName);
-            builder.append(propertyName).append("=").append(propertyValue.toString()).append(separator);
+            if (propertyValue != null) {
+                builder.append(propertyName).append("=").append(propertyValue.toString()).append(separator);
+            }
         }
         String result = builder.toString();
         result = result.substring(0, result.length() - 1);
