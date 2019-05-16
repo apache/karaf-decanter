@@ -80,6 +80,7 @@
                             org.apache.karaf.decanter.elasticsearch,
                             org.elasticsearch*,
                             com.carrotsearch.hppc*,
+                            com.carrotsearch.randomizedtesting,
                             joptsimple*,
                             org.apache.lucene*,
                             com.tdunning.math.stats,
@@ -99,9 +100,11 @@
                             !org.joda.time*,
                             !org.joda.convert*,
                             !org.noggit,
-                            com.sun.jna*;resolution:=optional,
+                            !com.carrotsearch.randomizedtesting,
                             org.apache.logging.log4j*;version="[2.8,3)",
                             com.google.common.geometry;resolution:=optional,
+                            com.sun.jna*;resolution:=optional,
+                            com.sun.management;resolution:=optional,
                             org.locationtech.jts.geom;resolution:=optional,
                             *
                         </Import-Package>
