@@ -71,7 +71,7 @@ public class RestCollector implements Runnable {
         this.config = config;
         this.url = new URL(getProperty(config, "url", null));
         this.paths = getProperty(config, "paths", "").split(",");
-        this.topic = getProperty(config, "topic", "decanter/collect");
+        this.topic = getProperty(config, "topic", "decanter/collect/rest");
     }
     
     private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
