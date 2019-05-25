@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.collector.rest;
+package org.apache.karaf.decanter.collector.rest.servlet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
     immediate = true,
     property = { "decanter.collector.name=rest-servlet", "alias=/decanter/collect" }
 )
-public class RestCollector extends HttpServlet {
+public class RestServletCollector extends HttpServlet {
 
     @Reference
     public EventAdmin dispatcher;
@@ -57,7 +57,7 @@ public class RestCollector extends HttpServlet {
     @Reference
     public Unmarshaller unmarshaller;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(RestCollector.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(RestServletCollector.class);
 
     private String baseTopic;
     private Dictionary<String, Object> properties;
@@ -66,7 +66,7 @@ public class RestCollector extends HttpServlet {
     @Activate
     public void activate(ComponentContext context) throws MalformedURLException {
         Dictionary<String, Object> props = context.getProperties();
-        this.baseTopic = getProperty(props, "topic", "decanter/collect/rest");
+        this.baseTopic = getProperty(props, "topic", "decanter/collect/rest-servlet");
         this.properties = props;
     }
 
@@ -77,6 +77,7 @@ public class RestCollector extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
+        LOGGER.debug("Karaf Decanter REST Servlet Collector request received from {}", req.getRequestURI());
         try {
             Map<String, Object> data = unmarshaller.unmarshal(req.getInputStream());
             data.put("type", "restservlet");
@@ -95,6 +96,7 @@ public class RestCollector extends HttpServlet {
             Event event = new Event(baseTopic, data);
             dispatcher.postEvent(event);
             resp.setStatus(HttpServletResponse.SC_CREATED);
+            LOGGER.debug("Karaf Decanter REST Servlet Collector harvesting done");
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             LOGGER.warn("Error processing event from servlet", e);

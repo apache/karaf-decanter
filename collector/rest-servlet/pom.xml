@@ -64,7 +64,7 @@
                             *
                         </Import-Package>
                         <Private-Package>
-                            org.apache.karaf.decanter.collector.rest,
+                            org.apache.karaf.decanter.collector.rest.servlet,
                             org.apache.karaf.decanter.collector.utils
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
