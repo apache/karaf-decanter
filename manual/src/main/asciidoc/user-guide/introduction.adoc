@@ -14,19 +14,18 @@
 
 === Introduction
 
-Apache Karaf Decanter is monitoring solution running in Apache Karaf.
+Apache Karaf Decanter is a monitoring solution running in Apache Karaf.
 
-It's composed in three parts:
+It's composed of three parts:
 
-* Collectors are responsible of harvesting monitoring data. Decanter provides collectors to harvest different kind
+* Collectors are responsible for harvesting monitoring data. Decanter provides collectors to harvest different kinds
 of data. We have two kinds of collectors:
 ** Event Driven Collectors automatically react to events and send the event data to the Decanter appenders.
 ** Polled Collectors are periodically called by the Decanter Scheduler. They harvest data and send it to the Decanter
 appenders
 * Appenders receive the data from the collectors and are responsible to store the data into a given backend. Decanter
-provides appenders depending of the backend storage that you want to use.
-* Alerters is a special kind of appender. It receives all harvested data and checks on it. If a check fails, an alert event
-is created and sent to alerters. Decanter provides alerters depending of the kind of notification that you want.
+provides appenders depending on the backend storage that you want to use.
+* Alerters are a special kind of appender. A check is performed on all harvested data. If a check fails, an alert event is created and sent to the alerters. Decanter provides alerters depending on the kind of notification that you want.
 
 Apache Karaf Decanter provides Karaf features for each collector, appender, alerter.
 

@@ -14,7 +14,7 @@
 
 === Custom Appender
 
-A Decanter Appender is an OSGi EventAdmin EventHandler: it's listening of `decanter/collect/*` EventAdmin topics, and
+A Decanter Appender is an OSGi EventAdmin EventHandler: it listens to `decanter/collect/*` EventAdmin topics, and
 receives the monitoring data coming from the collectors.
 
 It's responsible to store the data into a target backend.
@@ -45,7 +45,7 @@ public class SystemOutAppender implements EventHandler {
 
 ----
 
-Now, we create a BundleActivator that register our SystemOutAppender as an EventHandler OSGi service:
+Now, we create a BundleActivator that registers our SystemOutAppender as an EventHandler OSGi service:
 
 ----
 package org.apache.karaf.decanter.sample.appender.systemout;

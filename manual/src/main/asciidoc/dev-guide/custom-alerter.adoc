@@ -16,7 +16,7 @@
 
 A Decanter Alerter is basically a special kind of appender.
 
-It's an OSGi EventAdmin EventHandler: it's listening of `decanter/alert/*` EventAdmin topics, and
+It's an OSGi EventAdmin EventHandler: it listens to `decanter/alert/*` EventAdmin topics, and
 receives the alerting data coming from the checker.
 
 To enable a new Decanter Alerter, you just have to register an EventHandler OSGi service, like we do for an appender.
