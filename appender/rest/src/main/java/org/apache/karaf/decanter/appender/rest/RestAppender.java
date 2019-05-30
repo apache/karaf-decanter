@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 )
 public class RestAppender implements EventHandler {
 
-    public static String URI_PROPERTY = "uri";
+    public static final String URI_PROPERTY = "uri";
 
     @Reference
     public Marshaller marshaller;

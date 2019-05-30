@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import javax.management.remote.*;
+
+import java.net.ServerSocket;
 import java.rmi.registry.LocateRegistry;
 import java.util.Dictionary;
 import java.util.LinkedList;
@@ -39,19 +41,30 @@ public class TestProtocol {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(TestProtocol.class);
 
-    private final static String JMX_RMI_SERVICE_URL = "service:jmx:rmi:///jndi/rmi://localhost:8888/decanter";
-
+    private static String jmxRMIServiceURL;
+    private static String jmxMPServiceURL;
     private static JMXConnectorServer rmiConnectorServer;
     private static JMXConnectorServer jmxmpConnectorServer;
     private static MBeanServer mBeanServer;
 
     @BeforeClass
     public static void setup() throws Exception {
-        LOGGER.info("Using JMX service URL: {}", JMX_RMI_SERVICE_URL);
-        JMXServiceURL serviceURL = new JMXServiceURL(JMX_RMI_SERVICE_URL);
+        // Allocate random ports
+        ServerSocket serverSocket = new ServerSocket(0);
+        int rmiPort = serverSocket.getLocalPort();
+        serverSocket.close();
+        serverSocket = new ServerSocket(0);
+        int mpPort = serverSocket.getLocalPort();
+        serverSocket.close();
+
+        jmxRMIServiceURL = "service:jmx:rmi:///jndi/rmi://localhost:" + rmiPort + "/decanter";
+        jmxMPServiceURL = "service:jmx:jmxmp://localhost:" + mpPort;
+
+        LOGGER.info("Using JMX service URL: {}", jmxRMIServiceURL);
+        JMXServiceURL serviceURL = new JMXServiceURL(jmxRMIServiceURL);
 
         LOGGER.info("Creating the RMI registry");
-        LocateRegistry.createRegistry(8888);
+        LocateRegistry.createRegistry(rmiPort);
 
         LOGGER.info("Creating MBeanServer");
         mBeanServer = MBeanServerFactory.createMBeanServer();
@@ -61,7 +74,7 @@ public class TestProtocol {
         rmiConnectorServer.start();
 
         LOGGER.info("Creating JMXMP connector server");
-        jmxmpConnectorServer = JMXConnectorServerFactory.newJMXConnectorServer(new JMXServiceURL("jmxmp", null, 9999), null, mBeanServer);
+        jmxmpConnectorServer = JMXConnectorServerFactory.newJMXConnectorServer(new JMXServiceURL("jmxmp", null, mpPort), null, mBeanServer);
         jmxmpConnectorServer.start();
 
         ObjectName testObjectName = new ObjectName("decanter.test:type=test");
@@ -76,7 +89,7 @@ public class TestProtocol {
 
         ComponentContextMock componentContextMock = new ComponentContextMock();
         componentContextMock.getProperties().put("type", "jmx-test");
-        componentContextMock.getProperties().put("url", "service:jmx:rmi:///jndi/rmi://localhost:8888/decanter");
+        componentContextMock.getProperties().put("url", jmxRMIServiceURL);
 
         DispatcherMock dispatcherMock = new DispatcherMock();
         collector.dispatcher = dispatcherMock;
@@ -90,7 +103,7 @@ public class TestProtocol {
         Assert.assertEquals("decanter/collect/jmx/jmx-test/decanter/test", event.getTopic());
         Assert.assertEquals("Test", event.getProperty("Test"));
         Assert.assertEquals("decanter.test:type=test", event.getProperty("ObjectName"));
-        Assert.assertEquals("service:jmx:rmi:///jndi/rmi://localhost:8888/decanter", event.getProperty("url"));
+        Assert.assertEquals(jmxRMIServiceURL, event.getProperty("url"));
     }
 
     @Test
@@ -99,7 +112,7 @@ public class TestProtocol {
 
         ComponentContextMock componentContextMock = new ComponentContextMock();
         componentContextMock.getProperties().put("type", "jmx-test");
-        componentContextMock.getProperties().put("url", "service:jmx:jmxmp://localhost:9999");
+        componentContextMock.getProperties().put("url", jmxMPServiceURL);
 
         DispatcherMock dispatcherMock = new DispatcherMock();
         collector.dispatcher = dispatcherMock;
@@ -113,7 +126,7 @@ public class TestProtocol {
         Assert.assertEquals("decanter/collect/jmx/jmx-test/decanter/test", event.getTopic());
         Assert.assertEquals("Test", event.getProperty("Test"));
         Assert.assertEquals("decanter.test:type=test", event.getProperty("ObjectName"));
-        Assert.assertEquals("service:jmx:jmxmp://localhost:9999", event.getProperty("url"));
+        Assert.assertEquals(jmxMPServiceURL, event.getProperty("url"));
     }
 
     @AfterClass

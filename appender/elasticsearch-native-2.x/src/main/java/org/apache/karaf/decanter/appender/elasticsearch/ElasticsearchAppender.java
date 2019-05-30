@@ -52,17 +52,17 @@ import org.slf4j.LoggerFactory;
 )
 public class ElasticsearchAppender implements EventHandler {
 
-    public static String HOST_PROPERTY = "host";
-    public static String PORT_PROPERTY = "port";
-    public static String CLUSTER_NAME_PROPERTY = "clusterName";
-    public static String INDEX_PREFIX_PROPERTY = "index.prefix";
-    public static String INDEX_EVENT_TIMESTAMPED_PROPERTY = "index.event.timestamped";
+    public static final String HOST_PROPERTY = "host";
+    public static final String PORT_PROPERTY = "port";
+    public static final String CLUSTER_NAME_PROPERTY = "clusterName";
+    public static final String INDEX_PREFIX_PROPERTY = "index.prefix";
+    public static final String INDEX_EVENT_TIMESTAMPED_PROPERTY = "index.event.timestamped";
 
-    public static String HOST_DEFAULT = "localhost";
-    public static String PORT_DEFAULT = "9300";
-    public static String CLUSTER_NAME_DEFAULT = "elasticsearch";
-    public static String INDEX_PREFIX_DEFAULT = "karaf";
-    public static String INDEX_EVENT_TIMESTAMPED_DEFAULT = "true";
+    public static final String HOST_DEFAULT = "localhost";
+    public static final String PORT_DEFAULT = "9300";
+    public static final String CLUSTER_NAME_DEFAULT = "elasticsearch";
+    public static final String INDEX_PREFIX_DEFAULT = "karaf";
+    public static final String INDEX_EVENT_TIMESTAMPED_DEFAULT = "true";
 
     final static Logger LOGGER = LoggerFactory.getLogger(ElasticsearchAppender.class);
 

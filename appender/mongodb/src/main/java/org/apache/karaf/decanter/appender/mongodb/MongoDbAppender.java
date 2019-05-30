@@ -41,13 +41,13 @@ import java.util.Dictionary;
 )
 public class MongoDbAppender implements EventHandler {
 
-    public static String URI_PROPERTY = "uri";
-    public static String DATABASE_PROPERTY = "database";
-    public static String COLLECTION_PROPERTY = "collection";
+    public static final String URI_PROPERTY = "uri";
+    public static final String DATABASE_PROPERTY = "database";
+    public static final String COLLECTION_PROPERTY = "collection";
 
-    public static String URI_DEFAULT = "mongodb://localhost";
-    public static String DATABASE_DEFAULT = "decanter";
-    public static String COLLECTION_DEFAULT = "decanter";
+    public static final String URI_DEFAULT = "mongodb://localhost";
+    public static final String DATABASE_DEFAULT = "decanter";
+    public static final String COLLECTION_DEFAULT = "decanter";
 
     @Reference
     public Marshaller marshaller;

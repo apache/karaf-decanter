@@ -48,9 +48,9 @@ import java.util.Set;
 @WebSocket
 public class DecanterWebSocketAppender implements EventHandler {
 
-    public static String ALIAS_PROPERTY = "servlet.alias";
+    public static final String ALIAS_PROPERTY = "servlet.alias";
 
-    public static String ALIAS_DEFAULT = "/decanter-websocket";
+    public static final String ALIAS_DEFAULT = "/decanter-websocket";
 
     private static final Logger LOG = LoggerFactory.getLogger(DecanterWebSocketAppender.class);
 

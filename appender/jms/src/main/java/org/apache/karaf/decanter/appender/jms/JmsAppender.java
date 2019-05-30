@@ -40,17 +40,17 @@ import org.slf4j.LoggerFactory;
 )
 public class JmsAppender implements EventHandler {
 
-    public static String USERNAME_PROPERTY = "username";
-    public static String PASSWORD_PROPERTY = "password";
-    public static String DESTINATION_NAME_PROPERTY = "destination.name";
-    public static String DESTINATION_TYPE_PROPERTY = "destination.type";
-    public static String MESSAGE_TYPE_PROPERTY = "message.type";
+    public static final String USERNAME_PROPERTY = "username";
+    public static final String PASSWORD_PROPERTY = "password";
+    public static final String DESTINATION_NAME_PROPERTY = "destination.name";
+    public static final String DESTINATION_TYPE_PROPERTY = "destination.type";
+    public static final String MESSAGE_TYPE_PROPERTY = "message.type";
 
-    public static String USERNAME_DEFAULT = null;
-    public static String PASSWORD_DEFAULT = null;
-    public static String DESTINATION_NAME_DEFAULT = "decanter";
-    public static String DESTINATION_TYPE_DEFAULT = "queue";
-    public static String MESSAGE_TYPE_DEFAULT = "text";
+    public static final String USERNAME_DEFAULT = null;
+    public static final String PASSWORD_DEFAULT = null;
+    public static final String DESTINATION_NAME_DEFAULT = "decanter";
+    public static final String DESTINATION_TYPE_DEFAULT = "queue";
+    public static final String MESSAGE_TYPE_DEFAULT = "text";
 
     @Reference
     public ConnectionFactory connectionFactory;

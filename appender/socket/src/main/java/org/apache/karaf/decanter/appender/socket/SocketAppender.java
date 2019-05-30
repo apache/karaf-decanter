@@ -38,11 +38,11 @@ import java.util.Dictionary;
 )
 public class SocketAppender implements EventHandler {
 
-    public static String HOST_PROPERTY = "host";
-    public static String PORT_PROPERTY = "port";
+    public static final String HOST_PROPERTY = "host";
+    public static final String PORT_PROPERTY = "port";
 
-    public static String HOST_DEFAULT = "localhost";
-    public static String PORT_DEFAULT = "34343";
+    public static final String HOST_DEFAULT = "localhost";
+    public static final String PORT_DEFAULT = "34343";
 
     @Reference
     public Marshaller marshaller;

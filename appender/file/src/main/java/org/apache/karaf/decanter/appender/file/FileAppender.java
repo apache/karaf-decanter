@@ -39,8 +39,8 @@ import java.util.Dictionary;
 )
 public class FileAppender implements EventHandler {
 
-    public static String FILENAME_PROPERTY = "filename";
-    public static String APPEND_PROPERTY = "append";
+    public static final String FILENAME_PROPERTY = "filename";
+    public static final String APPEND_PROPERTY = "append";
 
     @Reference
     public Marshaller marshaller;

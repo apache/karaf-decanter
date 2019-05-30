@@ -503,7 +503,7 @@
                     <plugin>
                         <groupId>org.apache.rat</groupId>
                         <artifactId>apache-rat-plugin</artifactId>
-                        <version>0.12</version>
+                        <version>0.13</version>
                         <executions>
                             <execution>
                                 <phase>verify</phase>
@@ -534,6 +534,9 @@
                                 <exclude>**/META-INF/decanter.bundles.default</exclude>
                                 <exclude>**/bundle8/**/*</exclude>
                                 <exclude>**/test.cfg</exclude>
+                                <exclude>**/.classpath</exclude>
+                                <exclude>**/.settings/**/*</exclude>
+                                <exclude>**/.project</exclude>
                             </excludes>
                             <consoleOutput>true</consoleOutput>
                         </configuration>

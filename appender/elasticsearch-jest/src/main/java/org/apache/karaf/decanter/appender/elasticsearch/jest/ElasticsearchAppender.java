@@ -68,22 +68,22 @@ import io.searchbox.core.Index;
 )
 public class ElasticsearchAppender implements EventHandler {
 
+    public static final String ADDRESS_PROPERTY = "address";
+    public static final String USERNAME_PROPERTY = "username";
+    public static final String PASSWORD_PROPERTY = "password";
+    public static final String INDEX_PREFIX_PROPERTY = "index.prefix";
+    public static final String INDEX_TYPE_PROPERTY = "index.type";
+    public static final String INDEX_EVENT_TIMESTAMPED_PROPERTY = "index.event.timestamped";
+
+    public static final String ADDRESS_DEFAULT = "http://localhost:9200";
+    public static final String USERNAME_DEFAULT = null;
+    public static final String PASSWORD_DEFAULT = null;
+    public static final String INDEX_PREFIX_DEFAULT = "karaf";
+    public static final String INDEX_TYPE_DEFAULT = "decanter";
+    public static final String INDEX_EVENT_TIMESTAMPED_DEFAULT = "true";
+
     @Reference
     public Marshaller marshaller;
-
-    public static String ADDRESS_PROPERTY = "address";
-    public static String USERNAME_PROPERTY = "username";
-    public static String PASSWORD_PROPERTY = "password";
-    public static String INDEX_PREFIX_PROPERTY = "index.prefix";
-    public static String INDEX_TYPE_PROPERTY = "index.type";
-    public static String INDEX_EVENT_TIMESTAMPED_PROPERTY = "index.event.timestamped";
-
-    public static String ADDRESS_DEFAULT = "http://localhost:9200";
-    public static String USERNAME_DEFAULT = null;
-    public static String PASSWORD_DEFAULT = null;
-    public static String INDEX_PREFIX_DEFAULT = "karaf";
-    public static String INDEX_TYPE_DEFAULT = "decanter";
-    public static String INDEX_EVENT_TIMESTAMPED_DEFAULT = "true";
 
     private Dictionary<String, Object> config;
 

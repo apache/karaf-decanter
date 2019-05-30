@@ -57,6 +57,7 @@ public class DecanterTailerListener extends TailerListenerAdapter {
     private String type;
     private String path;
     private String regex;
+    private Pattern compiledRegex;
     
     /**
      * additional properties provided by the user
@@ -84,6 +85,9 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         this.path = path;
         this.regex = (String) properties.get("regex");
         thread.start();
+        if (regex != null) {
+            compiledRegex  = Pattern.compile(regex);
+        }
     }
     
     @Deactivate
@@ -99,9 +103,8 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         data.put("path", path);
         data.put("regex", regex);
 
-        if (regex != null) {
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(line);
+        if (compiledRegex != null) {
+            Matcher matcher = compiledRegex.matcher(line);
             if (matcher.matches()) {
                 data.putAll(this.parser.parse("line_" + type, line));
             } else {
