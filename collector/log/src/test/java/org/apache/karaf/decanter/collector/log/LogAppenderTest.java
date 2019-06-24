@@ -20,7 +20,10 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 
+import org.apache.log4j.Category;
+import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Test;
+import org.ops4j.pax.logging.service.internal.PaxLoggingEventImpl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -66,6 +69,30 @@ public class LogAppenderTest {
         assertFalse(appender.isIgnored("org.apache.karaf.decanter.other"));
         assertTrue(appender.isIgnored("org.apache.karaf.decanter.collector.log"));
         assertTrue(appender.isIgnored("org.apache.karaf.decanter.collector.log.LogEvent"));
+    }
+
+    @Test
+    public void testDisabledLocation() {
+        LogAppender appender = new LogAppender();
+
+        ComponentContext componentContext = new ComponentContextMock();
+        componentContext.getProperties().put("location.disabled", "false");
+
+        appender.activate(componentContext);
+
+        assertEquals(false, appender.disableLocationInformation);
+    }
+
+    @Test
+    public void testEnabledLocation() {
+        LogAppender appender = new LogAppender();
+
+        ComponentContext componentContext = new ComponentContextMock();
+        componentContext.getProperties().put("location.disabled", "true");
+
+        appender.activate(componentContext);
+
+        assertEquals(true, appender.disableLocationInformation);
     }
 
     private class ComponentContextMock implements ComponentContext {

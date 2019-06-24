@@ -56,6 +56,7 @@ public class LogAppender implements PaxAppender {
 
     private Dictionary<String, Object> properties;
     protected String[] ignoredCategories;
+    protected boolean disableLocationInformation = false;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -63,6 +64,9 @@ public class LogAppender implements PaxAppender {
         this.properties = context.getProperties();
         if (this.properties.get("ignored.categories") != null) {
             ignoredCategories = ((String)this.properties.get("ignored.categories")).split(",");
+        }
+        if (this.properties.get("location.disabled") != null) {
+            this.disableLocationInformation = Boolean.valueOf((String) this.properties.get("location.disabled"));
         }
     }
     
@@ -100,7 +104,9 @@ public class LogAppender implements PaxAppender {
         data.put("level", event.getLevel().toString());
         data.put("renderedMessage", event.getRenderedMessage());
         data.put("MDC", event.getProperties());
-        putLocation(data, event.getLocationInformation());
+        if (!disableLocationInformation) {
+            putLocation(data, event.getLocationInformation());
+        }
         String[] throwableAr = event.getThrowableStrRep();
         if (throwableAr != null) {
             data.put("throwable", join(throwableAr));
