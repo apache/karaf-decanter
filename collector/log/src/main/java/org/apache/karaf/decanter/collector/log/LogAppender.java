@@ -104,7 +104,7 @@ public class LogAppender implements PaxAppender {
         data.put("level", event.getLevel().toString());
         data.put("renderedMessage", event.getRenderedMessage());
         data.put("MDC", event.getProperties());
-        if (isIgnored(event.getLoggerName(), locationDisabledCategories)) {
+        if (locationDisabledCategories == null || !isIgnored(event.getLoggerName(), locationDisabledCategories)) {
             putLocation(data, event.getLocationInformation());
         }
         String[] throwableAr = event.getThrowableStrRep();
