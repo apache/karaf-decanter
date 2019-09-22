@@ -16,24 +16,72 @@
  */
 package org.apache.karaf.decanter.alerting.checker;
 
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component(
         immediate = true
 )
 public class AlertStoreImpl implements AlertStore {
 
+    private Logger logger = LoggerFactory.getLogger(AlertStoreImpl.class);
+
     private Set<String> errorAlerts;
     private Set<String> warnAlerts;
+    private File file;
 
     @Activate
     public void activate() {
         this.errorAlerts = new HashSet<>();
         this.warnAlerts = new HashSet<>();
+
+        // store the data file in $KARAF_DATA/decanter/alerter.db
+        file = new File(System.getProperty("karaf.data") + File.separator + "decanter" + File.separator + "alerter.db");
+
+        if (file.exists()) {
+            try {
+                Files.lines(file.toPath())
+                        .forEach(line -> {
+                            if (line.startsWith(Level.error.name().concat(":"))) {
+                                this.errorAlerts.add(line.replaceFirst(Level.error.name().concat(":"), ""));
+                            } else if (line.startsWith(Level.warn.name().concat(":"))) {
+                                this.warnAlerts.add(line.replaceFirst(Level.warn.name().concat(":"), ""));
+                            } else {
+                                logger.error("Level unknow in line '{}'", line);
+                            }
+                        });
+            } catch (IOException exception) {
+                logger.error("Error while reading alerter store file!");
+            }
+        }
+    }
+
+    @Deactivate
+    public void deactivate() {
+        try {
+            // build data to write based on level for prefix
+            Set<String> data = new HashSet<>();
+            this.errorAlerts.stream().forEach(value -> data.add(Level.error.name().concat(":").concat(value)));
+            this.warnAlerts.stream().forEach(value -> data.add(Level.warn.name().concat(":").concat(value)));
+
+            // create directories if not exists
+            Files.createDirectories(file.getParentFile().toPath());
+
+            // write data
+            Files.write(file.toPath(), data.stream().collect(Collectors.toSet()), StandardOpenOption.CREATE);
+        } catch (IOException exception) {
+            logger.error("Error while writing alerter store file!");
+        }
     }
 
     public void add(String name, Level level) {
