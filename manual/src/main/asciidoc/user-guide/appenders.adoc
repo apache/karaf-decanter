@@ -38,17 +38,17 @@ for production.
 
 Decanter provides three appenders for Elasticsearch:
 
-* decanter-appender-elasticsearch-rest (recommanded) is an appender which directly uses the Elasticsearch HTTP REST API. It's compliant with any Elasticsearch version (1.x, 2.x, 5.x, 6.x).
+* decanter-appender-elasticsearch-rest (recommended) is an appender which directly uses the Elasticsearch HTTP REST API. It's compliant with any Elasticsearch version (1.x, 2.x, 5.x, 6.x).
 * decanter-appender-elasticsearch-jest (deprecated) is an appender which directly uses the Elasticsearch HTTP REST API, working with any Elasticsearch version (1.x, 2.x, 5.x, 6.x).
 * decanter-appender-elasticsearch-native-1.x is an appender which uses the Elasticsearch 1.x Java Client API. It's compliant only with Elasticsearch 1.x versions.
 * decanter-appender-elasticsearch-native-2.x is an appender which uses the Elasticsearch 2.x Java Client API. It's compliant only with Elasticsearch 2.x versions.
 
 These appenders store the data (coming from the collectors) into an Elasticsearch node.
-They transformm the data as a json document, stored into Elasticsearch.
+They transform the data as a json document, stored into Elasticsearch.
 
 ===== Elasticsearch 5.x/6.x Rest Appender
 
-The Decanter Elasticsearch Rest appender uses the Elasticsearch Rest client provided since Elasticsearch 5.x. It can be use with Elasticsearch 5.x or 6.x versions.
+The Decanter Elasticsearch Rest appender uses the Elasticsearch Rest client provided since Elasticsearch 5.x. It can be used with Elasticsearch 5.x or 6.x versions.
 
 The `decanter-appender-elasticsearch-rest` feature installs this appender:
 
@@ -670,7 +670,7 @@ Decanter elasticsearch bundle in order to load the changes.
 
 The Decanter elasticsearch node also supports loading and override of the settings using a
 `etc/org.apache.karaf.decanter.elasticsearch.cfg` configuration file.
-This file is not provided by default, as it's used for override of the default settings.
+This file is not provided by default, as it's used to override the default settings.
 
 You can override the following elasticsearch properties in this configuration file:
 
@@ -750,9 +750,9 @@ The default dashboard displayed is the "System" dashboard, requiring the jmx col
 
 ===== Kibana 6.x
 
-The `kibana` 6.x feature doesn't really embeds Kibana like Kibana 3 or 4 features.
+The `kibana` 6.x feature doesn't really embed Kibana like the Kibana 3 or 4 features.
 
-However, it's a convenient feature that download and starts a Kibana instance for you.
+However, it's a convenient feature that downloads and starts a Kibana instance for you.
 
 ----
 karaf@root()> feature:install kibana/6.1.1
@@ -771,7 +771,7 @@ However, in order to work, the only setup you have to do is to create an index p
 
 ===== Elasticsearch Head console
 
-In addition of the embedded elasticsearch instance, Decanter also provides a web console allowing you to monitor and
+In addition to the embedded elasticsearch instance, Decanter also provides a web console allowing you to monitor and
 manage your elasticsearch cluster. It's a ready to use elastisearch-head console, directly embedded in Karaf.
 
 The `elasticsearch-head` feature installs the embedded elasticsearch-head web console, corresponding to the
@@ -809,7 +809,7 @@ using the `marshaller.target` property in `etc/org.apache.karaf.decanter.appende
 
 ==== JDBC
 
-The Decanter JDBC appender allows your to store the data (coming from the collectors) into a database.
+The Decanter JDBC appender allows you to store the data (coming from the collectors) into a database.
 
 The Decanter JDBC appender transforms the data as a json string. The appender stores the json string and the timestamp
 into the database.
@@ -845,7 +845,7 @@ This configuration file allows you to specify the connection to the database:
 * the `datasource.name` property contains the name of the JDBC datasource to use to connect to the database. You can
 create this datasource using the Karaf `jdbc:create` command (provided by the `jdbc` feature).
 * the `table.name` property contains the table name in the database. The Decanter JDBC appender automatically creates
-the table for you, but you can create the table by yourself. The table is simple and contains just two column:
+the table for you, but you can create the table by yourself. The table is simple and contains just two columns:
 ** timestamp as INTEGER
 ** content as VARCHAR or CLOB
 * the `dialect` property allows you to specify the database type (generic, mysql, derby). This property is only used for
@@ -926,7 +926,7 @@ This file allows you to specify the Camel endpoint where to send the data:
 
 * the `destination.uri` property specifies the URI of the Camel endpoint where to send the data.
 
-The Camel appender send an exchange. The "in" message body contains a Map of the harvested data.
+The Camel appender sends an exchange. The "in" message body contains a Map of the harvested data.
 
 For instance, in this configuration file, you can specify:
 
@@ -1048,18 +1048,18 @@ This feature installs a default `etc/org.apache.karaf.decanter.appender.kafka.cf
 
 This file allows you to define how the messages are sent to the Kafka broker:
 
-* the `bootstrap.servers` contains a lit of host:port of the Kafka brokers. Default value is `localhost:9092`.
+* the `bootstrap.servers` contains a list of host:port of the Kafka brokers. Default value is `localhost:9092`.
 * the `client.id` is optional. It identifies the client on the Kafka broker.
 * the `compression.type` defines if the messages have to be compressed on the Kafka broker. Default value is `none` meaning no compression.
 * the `acks` defines the acknowledgement policy. Default value is `all`. Possible values are:
-** `0` means the appender doesn't wait acknowledge from the Kafka broker. Basically, it means there's no guarantee that messages have been received completely by the broker.
-** `1` means the appender waits the acknowledge only from the leader. If the leader falls down, it's possible messages are lost if the replicas are not yet be created on the followers.
-** `all` means the appender waits the acknowledge from the leader and all followers. This mode is the most reliable as the appender will receive the acknowledge only when all replicas have been created. NB: this mode doesn't make sense if you have a single node Kafka broker or a replication factor set to 1.
+** `0` means the appender doesn't wait for an acknowledge from the Kafka broker. Basically, it means there's no guarantee that messages have been received completely by the broker.
+** `1` means the appender waits for the acknowledge only from the leader. If the leader falls down, its possible messages are lost if the replicas have not yet been created on the followers.
+** `all` means the appender waits for the acknowledge from the leader and all followers. This mode is the most reliable as the appender will receive the acknowledge only when all replicas have been created. NB: this mode doesn't make sense if you have a single node Kafka broker or a replication factor set to 1.
 * the `retries` defines the number of retries performed by the appender in case of error. The default value is `0` meaning no retry at all.
 * the `batch.size` defines the size of the batch records. The appender will attempt to batch records together into fewer requests whenever multiple records are being sent to the same Kafka partition. The default value is 16384.
 * the `buffer.memory` defines the size of the buffer the appender uses to send to the Kafka broker. The default value is 33554432.
-* the `key.serializer` defines the full qualified class name of the Serializer used to serializer the keys. The default is a String serializer (`org.apache.kafka.common.serialization.StringSerializer`).
-* the `value.serializer` defines the full qualified class name of the Serializer used to serializer the values. The default is a String serializer (`org.apache.kafka.common.serialization.StringSerializer`).
+* the `key.serializer` defines the fully qualified class name of the Serializer used to serialize the keys. The default is a String serializer (`org.apache.kafka.common.serialization.StringSerializer`).
+* the `value.serializer` defines the full qualified class name of the Serializer used to serialize the values. The default is a String serializer (`org.apache.kafka.common.serialization.StringSerializer`).
 * the `request.timeout.ms` is the time the producer wait before considering the message production on the broker fails (default is 5s).
 * the `max.request.size` is the max size of the request sent to the broker (default is 2097152 bytes).
 * the `topic` defines the name of the topic where to send data on the Kafka broker.
@@ -1260,7 +1260,7 @@ containing:
 
 ==== Network socket
 
-The Decanter network socket appender send the collected data to a remote Decanter network socket collector.
+The Decanter network socket appender sends the collected data to a remote Decanter network socket collector.
 
 The use case could be to dedicate a Karaf instance as a central monitoring platform, receiving collected data from
 the other nodes.
@@ -1396,7 +1396,7 @@ Most of the values can be let as they are, however, you can tweak some:
 
 ==== Dropwizard Metrics
 
-The Dropwizard Metrics appender receives the harvested data from the dispatcher and push in a Dropwizard Metrics
+The Dropwizard Metrics appender receives the harvested data from the dispatcher and pushes to a Dropwizard Metrics
 `MetricRegistry`. You can register this `MetricRegistry` in your own application or use a Dropwizard Metrics Reporter
 to "push" these metrics to some backend.
 
@@ -1457,7 +1457,7 @@ The table is simple and contains just two column:
 
 ===== WebSocket Servlet
 
-The `decanter-appender-websocket-servlet` feature expose a websocket on wich client can register. Then, Decanter will send the collected data to the connected clients.
+The `decanter-appender-websocket-servlet` feature exposes a websocket on which clients can register. Then, Decanter will send the collected data to the connected clients.
 
 It's very easy to use. First install the feature:
 
@@ -1465,7 +1465,7 @@ It's very easy to use. First install the feature:
 karaf@root()> feature:install decanter-appender-websocket-servlet
 ```
 
-The feature register the WebSocket endpoint on `http://localhost:8181/decanter-websocket` by default:
+The feature registers the WebSocket endpoint on `http://localhost:8181/decanter-websocket` by default:
 
 ```
 karaf@root()> http:list

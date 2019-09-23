@@ -34,7 +34,7 @@ type.propertyName.alertLevel=checkType:value
 where:
 
 * `type` is optional. It allows you to filter the check for a given type of collected data. It's particulary interesting
-when Decanter collects multiple JMX object names or servers. You may want to perform different checks depending of the type
+when Decanter collects multiple JMX object names or servers. You may want to perform different checks depending on the type
 or source of the collected data.
 * `propertyName` is the data property key. For instance, `loggerName`, `message`, `HeapMemoryUsage.used`, etc.
 * `alertLevel` is the alerting level for this check. The only two possible values are `error` (critical alert), or
@@ -42,7 +42,7 @@ or source of the collected data.
 * `checkType` is the check type. Possible values are `range`, `equal`, `notequal`, `match`, and `notmatch`.
 * `value` is the check value, where the data property value has to verify.
 
-The Decanter Checker supports numeric or string check.
+The Decanter Checker supports numeric or string checks.
 
 To verify a numeric value, you can use:
 
@@ -70,7 +70,7 @@ Another example is if you want to check if the myValue is equal to 10:
 myValue.warn=equal:10
 ----
 
-If myValue is not equal to 10, Decanter will create a warn alert send to the alerters.
+If myValue is not equal to 10, Decanter will create a warn alert sent to the alerters.
 
 To verify a string value, you can use:
 
@@ -91,13 +91,13 @@ loggerName.warn=match:(.*)my\.loggger\.name\.(.*)
 
 ==== Alerters
 
-When the value doesn't verify the check in the checker configuration, an alert is created an sent to the alerters.
+When the value doesn't verify the check in the checker configuration, an alert is created and sent to the alerters.
 
 Apache Karaf Decanter provides ready to use alerters.
 
 ===== Log
 
-The Decanter Log alerter log a message for each alert.
+The Decanter Log alerter logs a message for each alert.
 
 The `decanter-alerting-log` feature installs the log alerter:
 

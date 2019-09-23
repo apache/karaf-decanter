@@ -25,7 +25,7 @@ data and send to the appenders.
 ==== Log
 
 The Decanter Log Collector is an event driven collector. It automatically reacts when a log occurs, and
-send the log details (level, logger name, message, etc) to the appenders.
+sends the log details (level, logger name, message, etc) to the appenders.
 
 The `decanter-collector-log` feature installs the log collector:
 
@@ -98,9 +98,9 @@ containing:
 
 The Decanter File Collector is an event driven collector. It automatically reacts when new lines are appended into
 a file (especially a log file). It acts like the tail Unix command. Basically, it's an alternative to the log collector.
-The log collector reacts for local Karaf log messages, whereas the file collector can react to any files, included log
-file from other system than Karaf. It means that you can monitor and send collected data for any system (even not Java
-base, or whatever).
+The log collector reacts to local Karaf log messages, whereas the file collector can react to any file, including log
+files from other systems to Karaf. It means that you can monitor and send collected data for any system (even if it is not Java
+based).
 
 The file collector deals with file rotation, file not found.
 
@@ -123,7 +123,7 @@ any=value
 ----
 
 * `type` is an ID (mandatory) that allows you to easily identify the monitored file
-* `path` is the location of the file that you want to monitore
+* `path` is the location of the file that you want to monitor
 * all other values (like `any`) will be part of the collected data. It means that you can add your own custom data, and
 easily create queries bases on this data.
 
@@ -156,11 +156,11 @@ a typed Object (Long, Integer or String) before send it to the EventDispatcher d
 
 ====== Identity parser
 
-The identity parser doesn't actually parse the line, it just pass through. It's the default parser used by the file collector.
+The identity parser doesn't actually parse the line, it just passes through. It's the default parser used by the file collector.
 
 ====== Split parser
 
-The split parser split the line using a separator (`,` by default). Optionally, it can take `keys` used a property name in the event.
+The split parser splits the line using a separator (`,` by default). Optionally, it can take `keys` used a property name in the event.
 
 For instance, you can have the following `etc/org.apache.karaf.decanter.parser.split.cfg` configuration file:
 
@@ -169,7 +169,7 @@ separator=,
 keys=first,second,third,fourth
 ----
 
-If the parser gets a line (collected by the file collector) like `this,is,a,test`, the line will be parsed as follow (the file collector will send the following data to the dispatcher):
+If the parser gets a line (collected by the file collector) like `this,is,a,test`, the line will be parsed as follows (the file collector will send the following data to the dispatcher):
 
 ----
 first->this
@@ -196,7 +196,7 @@ The configuration contains the `regex` and the `keys` in the `etc/org.apache.kar
 regex=(t.*t)
 ----
 
-If the parser gets a line (collected by the file collector) like `a test here`, the linbe will be parsed as follow (the file collector will send the following data to the dispatcher):
+If the parser gets a line (collected by the file collector) like `a test here`, the line will be parsed as follows (the file collector will send the following data to the dispatcher):
 
 ----
 key-0->test
@@ -312,7 +312,7 @@ url=local
 This file harvests the data of the local MBeanServer:
 
 * the `type` property is a name (of your choice) allowing you to easily identify the harvested data
-* the `url` property is the MBeanServer to connect. "local" is reserved keyword to specify the local MBeanServer.
+* the `url` property is the MBeanServer to connect to. "local" is a reserved keyword to specify the local MBeanServer.
 Instead of "local", you can use the JMX service URL. For instance, for Karaf version 3.0.0, 3.0.1, 3.0.2, and 3.0.3,
 as the local MBeanServer is secured, you can specify `service:jmx:rmi:///jndi/rmi://localhost:1099/karaf-root`. You
 can also polled any remote MBean server (Karaf based or not) providing the service URL.
@@ -322,7 +322,7 @@ is secured.
 is secured.
 * the `object.name` prefix is optional. If this property is not specified, the collector will retrieve the attributes
 of all MBeans. You can filter to consider only some MBeans. This property contains the ObjectName filter to retrieve
-the attributes only to some MBeans. Several object names can be listed, provided the property prefix is `object.name.`.
+the attributes only of some MBeans. Several object names can be listed, provided the property prefix is `object.name.`.
 * any other values will be part of the collected data. It means that you can add your own property if you want to add
 additional data, and create queries based on this data.
 * the `operation.name` prefix is also optional. You can use it to execute an operation. The value format is `objectName|operation|arguments|signatures`.
@@ -334,7 +334,7 @@ You can retrieve multiple MBean servers. For that, you just create a new configu
 
 The Karaf Decanter JMX collector by default uses RMI protocol for JMX. But it also supports JMXMP protocol.
 
-The features to install are the sames: `decanter-collector-jmx`.
+The features to install are the same: `decanter-collector-jmx`.
 
 However, you have to enable the `jmxmp` protocol support in the Apache Karaf instance hosting Karaf Decanter.
 
@@ -389,7 +389,7 @@ The `decanter-collector-activemq` feature installs the default JMX collector, wi
 karaf@root()> feature:install decanter-collector-jmx-activemq
 ----
 
-This feature installs the same collector as the `decanter-collector-jmx`, but also add the
+This feature installs the same collector as the `decanter-collector-jmx`, but also adds the
 `etc/org.apache.karaf.decanter.collector.jmx-activemq.cfg` configuration file.
 
 This file contains:
@@ -430,7 +430,7 @@ The `decanter-collector-jmx-camel` feature installs the default JMX collector, w
 karaf@root()> feature:install decanter-collector-jmx-camel
 ----
 
-This feature installs the same collector as the `decanter-collector-jmx`, but also add the
+This feature installs the same collector as the `decanter-collector-jmx`, but also adds the
 `etc/org.apache.karaf.decanter.collector.jmx-camel.cfg` configuration file.
 
 This file contains:
@@ -467,7 +467,7 @@ Decanter provides a Camel Tracer Handler that you can set on a Camel Tracer. It 
 
 ===== Camel Tracer
 
-If you enable the tracer on a Camel route, all tracer events (exchanges on each step of the route) are send to the
+If you enable the tracer on a Camel route, all tracer events (exchanges on each step of the route) are sent to the
 appenders.
 
 The `decanter-collector-camel` feature provides the Camel Tracer Handler:
@@ -526,7 +526,7 @@ call your extender to populate extra properties.
 
 Decanter also provides `DecanterEventNotifier` implementing a Camel event notifier: http://camel.apache.org/eventnotifier-to-log-details-about-all-sent-exchanges.html
 
-It's very similar to the Decanter Camel Tracer. You can control the camel contexts and routes to which you want to trap event.
+It's very similar to the Decanter Camel Tracer. You can control the camel contexts and routes to which you want to trap events.
 
 ==== System
 
@@ -616,15 +616,15 @@ unmarshaller.target=(dataFormat=json)
 ----
 
 * the `port` property contains the port number where the network socket collector is listening
-* the `workers` property contains the number of worker thread the socket collector is using for connection
+* the `workers` property contains the number of worker threads the socket collector is using for the connection
 * the `protocol` property contains the protocol used by the collector for transferring data with the client
 * the `unmarshaller.target` property contains the unmarshaller used by the collector to transform the data
-sended by the client.
+sent by the client.
 
 ==== JMS
 
 The Decanter JMS collector consumes the data from a JMS queue or topic. It's a way to aggregate collected data coming
-from remote and several machines.
+from (several) remote machines.
 
 The `decanter-collector-jms` feature installs the JMS collector:
 
@@ -663,7 +663,7 @@ destination.type=queue
 ==== MQTT
 
 The Decanter MQTT collector receives collected messages from a MQTT broker. It's a way to aggregate collected data coming
-from remote and several machines.
+from (several) remote machines.
 
 The `decanter-collector-mqtt` feature installs the MQTT collector:
 
@@ -695,7 +695,7 @@ topic=decanter
 ==== Kafka
 
 The Decanter Kafka collector receives collected messages from a Kafka broker. It's a way to aggregate collected data coming
-from remote and several machines.
+from (several) remote machines.
 
 The `decanter-collector-kafka` feature installs the Kafka collector:
 
@@ -765,7 +765,7 @@ This feature also installs a default `etc/org.apache.karaf.decanter.collector.ka
 # For SASL, you have to configure Java System property as explained in http://kafka.apache.org/documentation.html#security_ssl
 ----
 
-The configuration is similar to the Decanter Kafka appender. Please, see Kafka collector for details.
+The configuration is similar to the Decanter Kafka appender. Please, see the Kafka collector for details.
 
 ==== Rest Servlet
 
@@ -800,7 +800,7 @@ url=http://localhost:8080/cxf/service
 soap.request=
 ----
 
-The collector send several collected properties to the dispatcher, especially:
+The collector sends several collected properties to the dispatcher, especially:
 
 * `soap.response` property contains the actual SOAP response
 * `error` is only populated when the service request failed, containing the error detail
@@ -821,7 +821,7 @@ send to the Decanter dispatcher.
 
 ==== JDBC
 
-The Decanter JDBC collector periodically executes a query on a database and send the query result to the dispatcher.
+The Decanter JDBC collector periodically executes a query on a database and sends the query result to the dispatcher.
 
 The `decanter-collector-jdbc` installs the JDBC collector:
 
