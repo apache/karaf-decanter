@@ -50,11 +50,16 @@ public class SystemCollector implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(SystemCollector.class);
 
     private Dictionary<String, Object> properties;
+    private String topic;
 
     @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext context) {
         this.properties = context.getProperties();
+        this.topic = context.getProperties().get("topic") != null ? String.class.cast(context.getProperties().get("topic")) : "decanter/collect/system/";
+        if (!this.topic.endsWith("/")) {
+            this.topic = this.topic + "/";
+        }
     }
 
     @Override
@@ -107,7 +112,7 @@ public class SystemCollector implements Runnable {
                             data.put(key, output);
                         }
                         streamHandler.stop();
-                        Event event = new Event("decanter/collect/system/" + key.replace(".", "_"), data);
+                        Event event = new Event(this.topic + key.replace(".", "_"), data);
                         dispatcher.postEvent(event);
                         try {
                             outputStream.close();
