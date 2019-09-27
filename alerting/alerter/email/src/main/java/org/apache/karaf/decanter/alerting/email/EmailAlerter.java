@@ -42,20 +42,29 @@ public class EmailAlerter implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(EmailAlerter.class);
 
-    private String from;
-    private String to;
+    private String from = null;
+    private String to = null;
+    private String cc = null;
+    private String bcc = null;
+    private String subject = null;
+    private String body = null;
+    private String bodyType = null;
 
     private Properties properties;
 
     @SuppressWarnings("unchecked")
     public void activate(ComponentContext context) throws ConfigurationException {
-        Dictionary<String, Object> config = context.getProperties();
-        requireProperty(config, "from");
-        requireProperty(config, "to");
-        requireProperty(config, "host");
+        activate(context.getProperties());
+    }
 
-        this.from = (String) config.get("from");
-        this.to = (String) config.get("to");
+    protected void activate(Dictionary<String, Object> config) throws ConfigurationException {
+        from = (config.get("from") != null) ? config.get("from").toString() : null;
+        to = (config.get("to") != null) ? config.get("to").toString() : null;
+        subject = (config.get("subject") != null) ? config.get("subject").toString() : null;
+        body = (config.get("body") != null) ? config.get("body").toString() : null;
+        bodyType = (config.get("body.type") != null) ? config.get("body.type").toString() : "text/plain";
+        cc = (config.get("cc") != null) ? config.get("cc").toString() : null;
+        bcc = (config.get("bcc")  != null) ? config.get("bcc").toString() : null;
 
         properties = new Properties();
         properties.put("mail.smtp.host", config.get("host"));
@@ -84,18 +93,106 @@ public class EmailAlerter implements EventHandler {
         Session session = Session.getDefaultInstance(properties);
         MimeMessage message = new MimeMessage(session);
         try {
-            message.setFrom(new InternetAddress(from));
-            message.addRecipients(Message.RecipientType.TO, to);
+            // set from
+            if (event.getProperty("from") != null) {
+                message.setFrom(new InternetAddress(event.getProperty("from").toString()));
+            } else if (event.getProperty("alert.email.from") != null) {
+                message.setFrom(new InternetAddress(event.getProperty("alert.email.from").toString()));
+            } else if (from != null){
+                message.setFrom(from);
+            } else {
+                message.setFrom("decanter@karaf.apache.org");
+            }
+            // set to
+            if (event.getProperty("to") != null) {
+                message.addRecipients(Message.RecipientType.TO, event.getProperty("to").toString());
+            } else if (event.getProperty("alert.email.to") != null) {
+                message.addRecipients(Message.RecipientType.TO, event.getProperty("alert.email.to").toString());
+            } else if (to != null) {
+                message.addRecipients(Message.RecipientType.TO, to);
+            } else {
+                LOGGER.warn("to destination is not defined");
+                return;
+            }
+            // set cc
+            if (event.getProperty("cc") != null) {
+                message.addRecipients(Message.RecipientType.CC, event.getProperty("cc").toString());
+            } else if (event.getProperty("alert.email.cc") != null) {
+                message.addRecipients(Message.RecipientType.CC, event.getProperty("alert.email.cc").toString());
+            } else if (cc != null) {
+                message.addRecipients(Message.RecipientType.CC, cc);
+            }
+            // set bcc
+            if (event.getProperty("bcc") != null) {
+                message.addRecipients(Message.RecipientType.BCC, event.getProperty("bcc").toString());
+            } else if (event.getProperty("alert.email.bcc") != null) {
+                message.addRecipients(Message.RecipientType.BCC, event.getProperty("alert.email.bcc").toString());
+            } else if (bcc != null) {
+                message.addRecipients(Message.RecipientType.BCC, bcc);
+            }
+            // set subject
+            setSubject(message, event);
+            // set body
+            setBody(message, event);
+            // send email
+            if (properties.get("mail.smtp.user") != null) {
+                Transport.send(message, (String) properties.get("mail.smtp.user"), (String) properties.get("mail.smtp.password"));
+            } else {
+                Transport.send(message);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Can't send the alert e-mail", e);
+        }
+    }
+
+    /**
+     * Visible for testing.
+     */
+    protected void setSubject(MimeMessage message, Event event) throws Exception {
+        if (event.getProperty("subject") != null) {
+            message.setSubject(interpolation(event.getProperty("subject").toString(), event));
+        } else if (event.getProperty("alert.email.subject") != null) {
+            message.setSubject(interpolation(event.getProperty("alert.email.subject").toString(), event));
+        } else if (subject != null) {
+            message.setSubject(interpolation(subject, event));
+        } else {
             String alertLevel = (String) event.getProperty("alertLevel");
             String alertAttribute = (String) event.getProperty("alertAttribute");
             String alertPattern = (String) event.getProperty("alertPattern");
-            boolean recovery = (boolean) event.getProperty("alertBackToNormal");
+            boolean recovery = false;
+            if (event.getProperty("alertBackToNormal") != null) {
+                recovery = (boolean) event.getProperty("alertBackToNormal");
+            }
             if (!recovery) {
                 message.setSubject("[" + alertLevel + "] Alert on " + alertAttribute);
             } else {
                 message.setSubject("Alert on " + alertAttribute + " back to normal");
             }
-            StringBuilder builder = new StringBuilder();
+        }
+    }
+
+    /**
+     * Visible for testing.
+     */
+    protected void setBody(MimeMessage message, Event event) throws Exception {
+        String contentType = bodyType;
+        contentType = (event.getProperty("body.type") != null) ? event.getProperty("body.type").toString() : contentType;
+        contentType = (event.getProperty("alert.email.body.type") != null) ? event.getProperty("alert.email.body.type").toString() : contentType;
+        StringBuilder builder = new StringBuilder();
+        if (event.getProperty("body") != null) {
+            builder.append(interpolation(event.getProperty("body").toString(), event));
+        } else if (event.getProperty("alert.email.body") != null) {
+            builder.append(interpolation(event.getProperty("alert.email.body").toString(), event));
+        } else if (body != null) {
+            builder.append(interpolation(body, event));
+        } else {
+            String alertLevel = (String) event.getProperty("alertLevel");
+            String alertAttribute = (String) event.getProperty("alertAttribute");
+            String alertPattern = (String) event.getProperty("alertPattern");
+            boolean recovery = false;
+            if (event.getProperty("alertBackToNormal") != null) {
+                recovery = (boolean) event.getProperty("alertBackToNormal");
+            }
             if (!recovery) {
                 builder.append(alertLevel + " alert: " + alertAttribute + " is out of the pattern " + alertPattern + "\n");
             } else {
@@ -106,15 +203,20 @@ public class EmailAlerter implements EventHandler {
             for (String name : event.getPropertyNames()) {
                 builder.append("\t").append(name).append(": ").append(event.getProperty(name)).append("\n");
             }
-            message.setText(builder.toString());
-            if (properties.get("mail.smtp.user") != null) {
-                Transport.send(message, (String) properties.get("mail.smtp.user"), (String) properties.get("mail.smtp.password"));
-            } else {
-                Transport.send(message);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Can't send the alert e-mail", e);
         }
+        message.setText(builder.toString(), contentType);
+    }
+
+    /**
+     * Visible for testing
+     * @return the interpolated string
+     */
+    protected static String interpolation(String source, Event event) {
+        String interpolated = source;
+        for (String propertyName : event.getPropertyNames()) {
+            interpolated = interpolated.replaceAll("\\$\\{" + propertyName + "\\}", event.getProperty(propertyName).toString());
+        }
+        return interpolated;
     }
 
 }
