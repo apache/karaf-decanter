@@ -161,6 +161,21 @@ ssl=false
 * the `username` property is optional and specifies the username to connect to the SMTP server
 * the `password` property is optional and specifies the password to connect to the SMTP server
 
+Optionally, you can add:
+
+* `cc` to add email carbon copy
+* `bcc` to add email blind carbon copy
+* `subject` if you want to customize the email subject sent by the alerter
+* `body` if you want to customize the email body sent by the alerter
+* `body.type` if you want to customize the email body type sent by the alerter
+
+The email alerter is also able to use collected data properties.
+
+For instance, `subject` can look like `This is my ${property}` where `${property}` is replaced by the `property` value.
+
+The email alerter is also able to use collected data properties for subject or body (including replacement). It looks for
+`body`, `subject`, `alert.email.body`, `alert.email.subject` collected data properties.
+
 ===== Camel
 
 The Decanter Camel alerter sends each alert to a Camel endpoint.
