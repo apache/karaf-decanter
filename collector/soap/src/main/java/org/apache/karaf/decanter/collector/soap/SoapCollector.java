@@ -16,6 +16,17 @@
  */
 package org.apache.karaf.decanter.collector.soap;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.Instant;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -25,20 +36,6 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component(
         service = Runnable.class,
@@ -112,11 +109,14 @@ public class SoapCollector implements Runnable {
             connection.setDoInput(true);
             connection.setRequestProperty("Content-Type", "text/xml");
             connection.setRequestProperty("Accept", "text/xml");
+            Instant startTime = Instant.now();
             try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream())) {
+                Instant responseTime = Instant.now().minusMillis(startTime.toEpochMilli());
                 writer.write(soapRequest);
                 writer.flush();
                 data.put("http.response.code", connection.getResponseCode());
                 data.put("http.response.message", connection.getResponseMessage());
+                data.put("http.response.time", responseTime.toEpochMilli());
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                     StringBuffer buffer = new StringBuffer();
                     String line;
