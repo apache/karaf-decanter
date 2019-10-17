@@ -16,6 +16,20 @@
  */
 package org.apache.karaf.decanter.collector.system;
 
+import java.io.ByteArrayOutputStream;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -27,12 +41,6 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayOutputStream;
-import java.net.InetAddress;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
 
 @Component(
     name = "org.apache.karaf.decanter.collector.system",
@@ -51,6 +59,7 @@ public class SystemCollector implements Runnable {
 
     private Dictionary<String, Object> properties;
     private String topic;
+    private int threadNumber;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -60,12 +69,18 @@ public class SystemCollector implements Runnable {
         if (!this.topic.endsWith("/")) {
             this.topic = this.topic + "/";
         }
+        try {
+            this.threadNumber = context.getProperties().get("thread.number") != null ? Integer.class.cast(context.getProperties().get("thread.number")) : 1;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("invalid parameter 'thread.number' is not a number");
+        }
     }
 
     @Override
     public void run() {
         if (properties != null) {
-            String karafName = System.getProperty("karaf.name");
+            final String karafName = System.getProperty("karaf.name");
+            final String topic = this.topic;
             String hostAddress = null;
             String hostName = null;
             try {
@@ -74,56 +89,77 @@ public class SystemCollector implements Runnable {
             } catch (Exception e) {
                 // nothing to do
             }
+
+            Collection<Callable<Object>> callables = new ArrayList<>();
+
             Enumeration<String> keys = properties.keys();
             while (keys.hasMoreElements()) {
-                String key = (String) keys.nextElement();
-                try {
-                    if (key.startsWith("command.")) {
-                        HashMap<String, Object> data = new HashMap<>();
-                        String command = (String) properties.get(key);
-                        LOGGER.debug("Executing {} ({})", command, key);
-                        CommandLine cmdLine = CommandLine.parse(command);
-                        DefaultExecutor executor = new DefaultExecutor();
-                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
-                        executor.setStreamHandler(streamHandler);
-                        data.put("timestamp", System.currentTimeMillis());
-                        data.put("type", "system");
-                        data.put("karafName", karafName);
-                        data.put("hostAddress", hostAddress);
-                        data.put("hostName", hostName);
-                        executor.execute(cmdLine);
-                        outputStream.flush();
-                        String output = outputStream.toString();
-                        if (output.endsWith("\n")) {
-                            output = output.substring(0, output.length() - 1);
-                        }
-                        output = output.trim();
-                        // try to convert to number
-                        try {
-                            if (output.contains(".")) {
-                                Double value = Double.parseDouble(output);
-                                data.put(key, value);
-                            } else {
-                                Integer value = Integer.parseInt(output);
-                                data.put(key, value);
+                String key = keys.nextElement();
+                if (key.startsWith("command.")) {
+                    String finalHostAddress = hostAddress;
+                    String finalHostName = hostName;
+                    callables.add(() -> {
+                        Event event = null;
+                        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                            String command = (String) properties.get(key);
+                            LOGGER.debug("Executing {} ({})", command, key);
+                            CommandLine cmdLine = CommandLine.parse(command);
+                            DefaultExecutor executor = new DefaultExecutor();
+                            PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+                            executor.setStreamHandler(streamHandler);
+                            HashMap<String, Object> data = new HashMap<>();
+                            data.put("timestamp", System.currentTimeMillis());
+                            data.put("type", "system");
+                            data.put("karafName", karafName);
+                            data.put("hostAddress", finalHostAddress);
+                            data.put("hostName", finalHostName);
+                            executor.execute(cmdLine);
+                            outputStream.flush();
+                            String output = outputStream.toString();
+                            if (output.endsWith("\n")) {
+                                output = output.substring(0, output.length() - 1);
                             }
-                        } catch (NumberFormatException e) {
-                            data.put(key, output);
-                        }
-                        streamHandler.stop();
-                        Event event = new Event(this.topic + key.replace(".", "_"), data);
-                        dispatcher.postEvent(event);
-                        try {
-                            outputStream.close();
+                            output = output.trim();
+                            // try to convert to number
+                            try {
+                                if (output.contains(".")) {
+                                    Double value = Double.parseDouble(output);
+                                    data.put(key, value);
+                                } else {
+                                    Integer value = Integer.parseInt(output);
+                                    data.put(key, value);
+                                }
+                            } catch (NumberFormatException e) {
+                                data.put(key, output);
+                            }
+                            streamHandler.stop();
+                            event = new Event(topic + key.replace(".", "_"), data);
                         } catch (Exception e) {
-                            // nothing to do
+                            LOGGER.warn("Command {} execution failed", key, e);
                         }
-                    }
-                } catch (Exception e) {
-                    LOGGER.warn("Command {} execution failed", key, e);
+                        return event;
+                    });
                 }
             }
+
+            ExecutorService executorService = Executors.newFixedThreadPool(this.threadNumber);
+            try {
+                LOGGER.debug("Start invoking system commands...");
+                List<Future<Object>> results = executorService.invokeAll(callables);
+                results.stream().forEach(objectFuture -> {
+                    try {
+                        Event event = Event.class.cast(objectFuture.get());
+                        if (Optional.ofNullable(event).isPresent()) {
+                            dispatcher.postEvent(event);
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
+                        LOGGER.warn("Thread executor for the collector system failed", e);
+                    }
+                });
+            } catch (InterruptedException e) {
+                LOGGER.warn("Thread executor for the collector system failed", e);
+            }
+            LOGGER.debug("Invoking system commands done");
         }
     }
 
