@@ -39,13 +39,13 @@ import java.util.Dictionary;
 )
 public class OrientDBAppender implements EventHandler {
 
-    public static String URL_PROPERTY = "url";
-    public static String USERNAME_PROPERTY = "username";
-    public static String PASSWORD_PROPERTY = "password";
+    public static final String URL_PROPERTY = "url";
+    public static final String USERNAME_PROPERTY = "username";
+    public static final String PASSWORD_PROPERTY = "password";
 
-    public static String URL_DEFAULT = "remote:localhost/decanter";
-    public static String USERNAME_DEFAULT = "root";
-    public static String PASSWORD_DEFAULT = "decanter";
+    public static final String URL_DEFAULT = "remote:localhost/decanter";
+    public static final String USERNAME_DEFAULT = "root";
+    public static final String PASSWORD_DEFAULT = "decanter";
 
     @Reference
     public Marshaller marshaller;

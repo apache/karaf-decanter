@@ -41,19 +41,19 @@ import java.util.Map;
 )
 public class RedisAppender implements EventHandler {
 
-    public static String ADDRESS_PROPERTY = "address";
-    public static String MODE_PROPERTY = "mode";
-    public static String MAP_PROPERTY = "map";
-    public static String MASTER_ADDRESS_PROPERTY = "masterAddress";
-    public static String MASTER_NAME_PROPERTY = "masterName";
-    public static String SCAN_INTERVAL_PROPERTY = "scanInterval";
+    public static final String ADDRESS_PROPERTY = "address";
+    public static final String MODE_PROPERTY = "mode";
+    public static final String MAP_PROPERTY = "map";
+    public static final String MASTER_ADDRESS_PROPERTY = "masterAddress";
+    public static final String MASTER_NAME_PROPERTY = "masterName";
+    public static final String SCAN_INTERVAL_PROPERTY = "scanInterval";
 
-    public static String ADDRESS_DEFAULT = "localhost:6379";
-    public static String MODE_DEFAULT = "Single";
-    public static String MAP_DEFAULT = "Decanter";
-    public static String MASTER_ADDRESS_DEFAULT = null;
-    public static String MASTER_NAME_DEFAULT = null;
-    public static String SCAN_INTERVAL_DEFAULT = "2000";
+    public static final String ADDRESS_DEFAULT = "localhost:6379";
+    public static final String MODE_DEFAULT = "Single";
+    public static final String MAP_DEFAULT = "Decanter";
+    public static final String MASTER_ADDRESS_DEFAULT = null;
+    public static final String MASTER_NAME_DEFAULT = null;
+    public static final String SCAN_INTERVAL_DEFAULT = "2000";
 
     private RedissonClient redissonClient;
 

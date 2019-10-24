@@ -43,13 +43,13 @@ import org.slf4j.LoggerFactory;
 )
 public class MqttAppender implements EventHandler {
 
-    public static String SERVER_PROPERTY = "server";
-    public static String CLIENT_ID_PROPERTY = "clientId";
-    public static String TOPIC_PROPERTY = "topic";
+    public static final String SERVER_PROPERTY = "server";
+    public static final String CLIENT_ID_PROPERTY = "clientId";
+    public static final String TOPIC_PROPERTY = "topic";
 
-    public static String SERVER_DEFAULT = "tcp://localhost:9300";
-    public static String CLIENT_ID_DEFAULT = "decanter";
-    public static String TOPIC_DEFAULT = "decanter";
+    public static final String SERVER_DEFAULT = "tcp://localhost:9300";
+    public static final String CLIENT_ID_DEFAULT = "decanter";
+    public static final String TOPIC_DEFAULT = "decanter";
 
     @Reference
     public Marshaller marshaller;

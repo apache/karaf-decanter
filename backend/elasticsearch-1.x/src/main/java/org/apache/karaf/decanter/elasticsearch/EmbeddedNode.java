@@ -44,21 +44,21 @@ public class EmbeddedNode {
     
     private static Node node;
     
-    public static String PLUGINS_DIRECTORY = "plugins.directory";
-    public static String ELASTIC_YAML_FILE = "elasticsearch.yaml";
+    public static final String PLUGINS_DIRECTORY = "plugins.directory";
+    public static final String ELASTIC_YAML_FILE = "elasticsearch.yaml";
 
-    public static String CLUSTER_NAME = "cluster.name";
-    public static String HTTP_ENABLED = "http.enabled";
-    public static String NODE_DATA = "node.data";
-    public static String NODE_NAME = "node.name";
-    public static String NODE_MASTER = "node.master";
-    public static String PATH_DATA = "path.data";
-    public static String NETWORK_HOST = "network.host";
-    public static String PORT = "port";
-    public static String CLUSTER_ROUTING_SCHEDULE = "cluster.routing.schedule";
-    public static String PATH_PLUGINS = "path.plugins";
-    public static String HTTP_CORS_ENABLED = "http.cors.enabled";
-    public static String HTTP_CORS_ALLOW_ORIGIN = "http.cors.allow-origin";
+    public static final String CLUSTER_NAME = "cluster.name";
+    public static final String HTTP_ENABLED = "http.enabled";
+    public static final String NODE_DATA = "node.data";
+    public static final String NODE_NAME = "node.name";
+    public static final String NODE_MASTER = "node.master";
+    public static final String PATH_DATA = "path.data";
+    public static final String NETWORK_HOST = "network.host";
+    public static final String PORT = "port";
+    public static final String CLUSTER_ROUTING_SCHEDULE = "cluster.routing.schedule";
+    public static final String PATH_PLUGINS = "path.plugins";
+    public static final String HTTP_CORS_ENABLED = "http.cors.enabled";
+    public static final String HTTP_CORS_ALLOW_ORIGIN = "http.cors.allow-origin";
 
     private static final boolean IS_WINDOWS = System.getProperty("os.name").contains("indow");
 

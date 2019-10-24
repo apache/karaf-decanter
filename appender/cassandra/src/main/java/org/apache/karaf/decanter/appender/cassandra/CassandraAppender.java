@@ -51,15 +51,15 @@ import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.literal;
 )
 public class CassandraAppender implements EventHandler {
 
-    public static String KEYSPACE_PROPERTY = "keyspace.name";
-    public static String TABLE_PROPERTY = "table.name";
-    public static String CASSANDRA_HOST_PROPERTY = "cassandra.host";
-    public static String CASSANDRA_PORT_PROPERTY = "cassandra.port";
+    public static final String KEYSPACE_PROPERTY = "keyspace.name";
+    public static final String TABLE_PROPERTY = "table.name";
+    public static final String CASSANDRA_HOST_PROPERTY = "cassandra.host";
+    public static final String CASSANDRA_PORT_PROPERTY = "cassandra.port";
 
-    public static String KEYSPACE_DEFAULT = "decanter";
-    public static String TABLE_DEFAULT = "decanter";
-    public static String CASSANDRA_HOST_DEFAULT = "localhost";
-    public static String CASSANDRA_PORT_DEFAULT = "9042";
+    public static final String KEYSPACE_DEFAULT = "decanter";
+    public static final String TABLE_DEFAULT = "decanter";
+    public static final String CASSANDRA_HOST_DEFAULT = "localhost";
+    public static final String CASSANDRA_PORT_DEFAULT = "9042";
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CassandraAppender.class);
 

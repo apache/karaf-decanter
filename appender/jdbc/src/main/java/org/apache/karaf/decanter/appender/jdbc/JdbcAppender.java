@@ -43,11 +43,11 @@ import org.slf4j.LoggerFactory;
 )
 public class JdbcAppender implements EventHandler {
 
-    public static String TABLE_NAME_PROPERTY = "table.name";
-    public static String DIALECT_PROPERTY = "dialect";
+    public static final String TABLE_NAME_PROPERTY = "table.name";
+    public static final String DIALECT_PROPERTY = "dialect";
 
-    public static String TABLE_NAME_DEFAULT = "decanter";
-    public static String DIALECT_DEFAULT = "generic";
+    public static final String TABLE_NAME_DEFAULT = "decanter";
+    public static final String DIALECT_DEFAULT = "generic";
 
     @Reference
     public Marshaller marshaller;

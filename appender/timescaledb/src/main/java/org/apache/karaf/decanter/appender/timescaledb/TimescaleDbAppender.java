@@ -41,9 +41,9 @@ import org.slf4j.LoggerFactory;
 )
 public class TimescaleDbAppender implements EventHandler {
 
-    public static String TABLE_NAME_PROPERTY = "table.name";
+    public static final String TABLE_NAME_PROPERTY = "table.name";
 
-    public static String TABLE_NAME_DEFAULT = "decanter";
+    public static final String TABLE_NAME_DEFAULT = "decanter";
 
     @Reference
     public Marshaller marshaller;

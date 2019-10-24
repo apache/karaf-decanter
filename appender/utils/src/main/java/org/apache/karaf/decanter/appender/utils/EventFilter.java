@@ -22,10 +22,10 @@ import java.util.Dictionary;
 
 public class EventFilter {
 
-    public static String PROPERTY_NAME_EXCLUDE_CONFIG = "event.property.name.exclude";
-    public static String PROPERTY_NAME_INCLUDE_CONFIG = "event.property.name.include";
-    public static String PROPERTY_VALUE_EXCLUDE_CONFIG = "event.property.value.exclude";
-    public static String PROPERTY_VALUE_INCLUDE_CONFIG = "event.property.value.include";
+    public static final String PROPERTY_NAME_EXCLUDE_CONFIG = "event.property.name.exclude";
+    public static final String PROPERTY_NAME_INCLUDE_CONFIG = "event.property.name.include";
+    public static final String PROPERTY_VALUE_EXCLUDE_CONFIG = "event.property.value.exclude";
+    public static final String PROPERTY_VALUE_INCLUDE_CONFIG = "event.property.value.include";
 
     public static boolean match(Event event, Dictionary<String, Object> config) {
         if (config == null) {

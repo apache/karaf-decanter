@@ -118,7 +118,7 @@ public class SoapCollector implements Runnable {
                 data.put("http.response.message", connection.getResponseMessage());
                 data.put("http.response.time", responseTime.toEpochMilli());
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                    StringBuffer buffer = new StringBuffer();
+                    StringBuilder buffer = new StringBuilder();
                     String line;
                     while ((line = reader.readLine()) != null) {
                         buffer.append(line).append("\n");

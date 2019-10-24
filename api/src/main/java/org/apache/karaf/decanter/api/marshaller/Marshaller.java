@@ -19,7 +19,7 @@ package org.apache.karaf.decanter.api.marshaller;
 import java.io.OutputStream;
 
 public interface Marshaller {
-    public static String SERVICE_KEY_DATAFORMAT = "dataFormat";
+    public static final String SERVICE_KEY_DATAFORMAT = "dataFormat";
 
     void marshal(Object obj, OutputStream out);
     String marshal(Object obj);

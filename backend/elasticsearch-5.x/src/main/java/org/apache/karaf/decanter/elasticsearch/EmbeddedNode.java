@@ -46,19 +46,19 @@ public class EmbeddedNode {
     private final static Logger LOGGER = LoggerFactory.getLogger(EmbeddedNode.class);
     private static Node node;
     
-    public static String PLUGINS_DIRECTORY = "plugins.directory";
-    public static String ELASTIC_YAML_FILE = "elasticsearch.yaml";
+    public static final String PLUGINS_DIRECTORY = "plugins.directory";
+    public static final String ELASTIC_YAML_FILE = "elasticsearch.yaml";
 
-    public static String CLUSTER_NAME = "cluster.name";
-    public static String TRANSPORT_TYPE = "transport.type";
-    public static String HTTP_TYPE = "http.type";
-    public static String HTTP_ENABLED = "http.enabled";
-    public static String NODE_NAME = "node.name";
-    public static String PATH_DATA = "path.data";
-    public static String PATH_HOME = "path.home";
-    public static String NETWORK_HOST = "network.host";
-    public static String HTTP_CORS_ENABLED = "http.cors.enabled";
-    public static String HTTP_CORS_ALLOW_ORIGIN = "http.cors.allow-origin";
+    public static final String CLUSTER_NAME = "cluster.name";
+    public static final String TRANSPORT_TYPE = "transport.type";
+    public static final String HTTP_TYPE = "http.type";
+    public static final String HTTP_ENABLED = "http.enabled";
+    public static final String NODE_NAME = "node.name";
+    public static final String PATH_DATA = "path.data";
+    public static final String PATH_HOME = "path.home";
+    public static final String NETWORK_HOST = "network.host";
+    public static final String HTTP_CORS_ENABLED = "http.cors.enabled";
+    public static final String HTTP_CORS_ALLOW_ORIGIN = "http.cors.allow-origin";
 
     @SuppressWarnings("unchecked")
     @Activate
