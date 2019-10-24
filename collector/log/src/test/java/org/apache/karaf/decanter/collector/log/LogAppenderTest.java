@@ -16,10 +16,6 @@
  */
 package org.apache.karaf.decanter.collector.log;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -33,6 +29,10 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Properties;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.*;
 
 public class LogAppenderTest {
 
@@ -63,9 +63,45 @@ public class LogAppenderTest {
         assertEquals("test", appender.ignoredCategories[1]);
         assertEquals("other", appender.ignoredCategories[2]);
 
-        assertFalse(appender.isIgnored("org.apache.karaf.decanter.other"));
-        assertTrue(appender.isIgnored("org.apache.karaf.decanter.collector.log"));
-        assertTrue(appender.isIgnored("org.apache.karaf.decanter.collector.log.LogEvent"));
+        assertFalse(appender.isIgnored("org.apache.karaf.decanter.other", appender.ignoredCategories));
+        assertTrue(appender.isIgnored("org.apache.karaf.decanter.collector.log", appender.ignoredCategories));
+        assertTrue(appender.isIgnored("org.apache.karaf.decanter.collector.log.LogEvent", appender.ignoredCategories));
+    }
+
+    @Test
+    public void testDisabledLocationCategories() {
+        LogAppender appender = new LogAppender();
+
+        ComponentContext componentContext = new ComponentContextMock();
+        componentContext.getProperties().put("location.disabled", "org.apache.karaf.decanter.collector.log.*,test,other");
+
+        appender.activate(componentContext);
+
+        assertEquals("org.apache.karaf.decanter.collector.log.*", appender.locationDisabledCategories[0]);
+        assertEquals("test", appender.locationDisabledCategories[1]);
+        assertEquals("other", appender.locationDisabledCategories[2]);
+
+        assertFalse(appender.isIgnored("org.apache.karaf.decanter.other", appender.locationDisabledCategories));
+        assertTrue(appender.isIgnored("org.apache.karaf.decanter.collector.log", appender.locationDisabledCategories));
+        assertTrue(appender.isIgnored("org.apache.karaf.decanter.collector.log.LogEvent", appender.locationDisabledCategories));
+    }
+
+    @Test
+    public void testDisabledLocationCategoriesAllWildcard() {
+        LogAppender appender = new LogAppender();
+
+        ComponentContext componentContext = new ComponentContextMock();
+        componentContext.getProperties().put("location.disabled", ".*,test,other");
+
+        appender.activate(componentContext);
+
+        assertEquals(".*", appender.locationDisabledCategories[0]);
+        assertEquals("test", appender.locationDisabledCategories[1]);
+        assertEquals("other", appender.locationDisabledCategories[2]);
+
+        assertTrue(appender.isIgnored("org.apache.karaf.decanter.other", appender.locationDisabledCategories));
+        assertTrue(appender.isIgnored("org.apache.karaf.decanter.collector.log", appender.locationDisabledCategories));
+        assertTrue(appender.isIgnored("org.apache.karaf.decanter.collector.log.LogEvent", appender.locationDisabledCategories));
     }
 
     private class ComponentContextMock implements ComponentContext {
