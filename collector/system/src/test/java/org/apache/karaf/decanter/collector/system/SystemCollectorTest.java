@@ -53,7 +53,7 @@ public class SystemCollectorTest {
         this.eventAdmin = new EventAdminStub();
         collector.dispatcher = eventAdmin;
         componentContext = new ComponentContextStub();
-        componentContext.getProperties().put("thread.number", 5);
+        componentContext.getProperties().put("thread.number", "5");
         componentContext.getProperties().put("command.df1", "df -h");
         componentContext.getProperties().put("command.df2", "df -h");
         componentContext.getProperties().put("command.df3", "df -h");
@@ -71,7 +71,7 @@ public class SystemCollectorTest {
         this.eventAdmin = new EventAdminStub();
         collector.dispatcher = eventAdmin;
         componentContext = new ComponentContextStub();
-        componentContext.getProperties().put("thread.number", 5);
+        componentContext.getProperties().put("thread.number", "5");
         for (int cpt = 0; cpt < 1000; cpt++) {
             componentContext.getProperties().put("command.df" + cpt, "df -h");
         }

@@ -70,7 +70,7 @@ public class SystemCollector implements Runnable {
             this.topic = this.topic + "/";
         }
         try {
-            this.threadNumber = context.getProperties().get("thread.number") != null ? Integer.class.cast(context.getProperties().get("thread.number")) : 1;
+            this.threadNumber = context.getProperties().get("thread.number") != null ? Integer.parseInt(String.class.cast(context.getProperties().get("thread.number"))) : 1;
         } catch (Exception e) {
             throw new IllegalArgumentException("invalid parameter 'thread.number' is not a number");
         }
