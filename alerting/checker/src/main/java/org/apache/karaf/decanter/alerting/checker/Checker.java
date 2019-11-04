@@ -57,69 +57,17 @@ public class Checker implements EventHandler {
     public void activate(ComponentContext context) {
         this.config = context.getProperties();
     }
-
+  
     @Override
     public void handleEvent(Event collectEvent) {
         String type = (String) collectEvent.getProperty("type");
+        
         for (String name : collectEvent.getPropertyNames()) {
-
-            // error
-            String errorPattern = null;
-            if (config.get(name + ".error") != null) {
-                errorPattern = (String) config.get(name + ".error");
-            } else if (config.get(type + "." + name + ".error") != null) {
-                errorPattern = (String) config.get(type + "." + name + ".error");
-            }
-            if (errorPattern != null) {
-                Object value = collectEvent.getProperty(name);
-                if (!validate(errorPattern, value)) {
-                    if (!alertStore.known(name, AlertStore.Level.error)) {
-                        alertStore.add(name, AlertStore.Level.error);
-                        Event alertEvent = populateAlertEvent("error", collectEvent, name, errorPattern, false);
-                        dispatcher.postEvent(alertEvent);
-                    }
-                } else {
-                    if (alertStore.known(name, AlertStore.Level.error)) {
-                        dispatcher.postEvent(populateAlertEvent("error", collectEvent, name, errorPattern, true));
-                        alertStore.remove(name, AlertStore.Level.error);
-                    }
-                }
-            } else {
-                if (alertStore.known(name, AlertStore.Level.error)) {
-                    dispatcher.postEvent(populateAlertEvent("error", collectEvent, name, "REMOVED", true));
-                }
-            }
-
-            // warn
-            String warnPattern = null;
-            if (config.get(name + ".warn") != null) {
-                warnPattern = (String) config.get(name + ".warn");
-            } else if (config.get(type + "." + name + ".warn") != null) {
-                warnPattern = (String) config.get(type + "." + name + ".warn");
-            }
-            if (warnPattern != null) {
-                Object value = collectEvent.getProperty(name);
-                if (!validate(warnPattern, value)) {
-                    if (!alertStore.known(name, AlertStore.Level.warn)) {
-                        alertStore.add(name, AlertStore.Level.warn);
-                        Event alertEvent = populateAlertEvent("warn", collectEvent, name, warnPattern, false);
-                        dispatcher.postEvent(alertEvent);
-                    }
-                } else {
-                    if (alertStore.known(name, AlertStore.Level.warn)) {
-                        dispatcher.postEvent(populateAlertEvent("warn", collectEvent, name, warnPattern, true));
-                        alertStore.remove(name, AlertStore.Level.warn);
-                    }
-                }
-            } else {
-                if (alertStore.known(name, AlertStore.Level.warn)) {
-                    dispatcher.postEvent(populateAlertEvent("warn", collectEvent, name, "REMOVED", true));
-                    alertStore.remove(name, AlertStore.Level.warn);
-                }
-            }
+            checkBySeverity(name, type, collectEvent, AlertStore.Level.error);
+            checkBySeverity(name, type, collectEvent, AlertStore.Level.warn);
         }
     }
-
+  
     private Event populateAlertEvent(String level, Event collectEvent, String attribute, String pattern, boolean recovery) {
         Map<String, Object> data = new HashMap<>();
         data.put("alertLevel", level);
@@ -459,7 +407,13 @@ public class Checker implements EventHandler {
         }
         return false;
     }
-
+    
+    /**
+     * Method shold validate, if the configured pattern matches the given value.
+     * @param pattern Pattern which should be evaluated
+     * @param value current value, matching the configuration.
+     * @return false in case an alert shuold be generated, true if not.
+     */
     private boolean validate(String pattern, Object value) {
         if (value instanceof Double ||
                 value instanceof Float ||
@@ -475,4 +429,61 @@ public class Checker implements EventHandler {
         }
     }
     
+    protected void checkBySeverity(String name, String type, Event collectEvent, AlertStore.Level severity) {
+        String alertStoreUK = buildAlertStoreUK(type, name, collectEvent);
+        
+        String severityPattern = null;
+        if (config.get(name + "." + severity.name()) != null) {
+            severityPattern = (String) config.get(name + "." + severity.name());
+        } else if (config.get(type + "." + name + "." + severity.name()) != null) {
+            severityPattern = (String) config.get(type + "." + name + "." + severity.name());
+        }
+        
+        if (severityPattern != null) {
+            Object value = collectEvent.getProperty(name);
+            if (!validate(severityPattern, value)) {
+                if (!alertStore.known(alertStoreUK, severity)) {
+                    alertStore.add(alertStoreUK, severity);
+                    Event alertEvent = populateAlertEvent(severity.name(), collectEvent, alertStoreUK, severityPattern, false);
+                    dispatcher.postEvent(alertEvent);
+                }
+            } else {
+                if (alertStore.known(alertStoreUK, severity)) {
+                    dispatcher.postEvent(populateAlertEvent(severity.name(), collectEvent, alertStoreUK, severityPattern, true));
+                    alertStore.remove(alertStoreUK, severity);
+                }
+            }
+        } else {
+            if (alertStore.known(alertStoreUK, severity)) {
+                dispatcher.postEvent(populateAlertEvent(severity.name(), collectEvent, alertStoreUK, "REMOVED", true));
+            }
+        }
+    }
+    
+    /**
+     * Method build a unique key, to store the alert in corresponding registry.
+     * @param type configured alert type
+     * @param name property name of CollectEvent
+     * @param collectEvent event message
+     * @return unique alert id.
+     */
+    protected String buildAlertStoreUK(String type, String name, Event collectEvent)
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        if (type != null) {
+            stringBuilder.append(type)
+              .append("-")
+              .append(name);
+            
+            String uuidProperty = (String) config.get(type + ".alertUUID");
+            if (uuidProperty != null)
+                stringBuilder.append("-")
+                  .append(collectEvent.getProperty(uuidProperty));
+        }
+        else
+            stringBuilder.append(name);
+        
+        return stringBuilder.toString();
+    }
 }
