@@ -109,8 +109,7 @@ public class JdbcCollector implements Runnable {
     public List<Map<String, Object>> query() {
         List<Map<String, Object>> dataRows = new ArrayList<>();
 
-        try {
-            ResultSet resultSet = preparedStatement.executeQuery();
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             int columnCount = resultSetMetaData.getColumnCount();
             int rowId = 1;
