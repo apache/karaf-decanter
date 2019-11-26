@@ -159,6 +159,7 @@ public class SystemCollector implements Runnable {
             } catch (InterruptedException e) {
                 LOGGER.warn("Thread executor for the collector system failed", e);
             }
+            executorService.shutdown();
             LOGGER.debug("Invoking system commands done");
         }
     }
