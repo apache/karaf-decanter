@@ -69,7 +69,7 @@ public class RestCollector implements Runnable {
 
     public void activate(Dictionary<String, Object> config) throws MalformedURLException {
         this.config = config;
-        this.url = new URL(getProperty(config, "url", null));
+        this.url = new URL(getProperty(config, "url", "http://localhost:8181"));
         this.paths = getProperty(config, "paths", "").split(",");
         this.topic = getProperty(config, "topic", "decanter/collect/rest");
     }

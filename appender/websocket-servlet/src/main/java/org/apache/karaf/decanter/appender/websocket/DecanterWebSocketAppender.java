@@ -54,7 +54,7 @@ public class DecanterWebSocketAppender implements EventHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(DecanterWebSocketAppender.class);
 
-    private static final Set<Session> sessions = Collections.synchronizedSet(new HashSet<Session>());
+    private static final Set<Session> sessions = Collections.synchronizedSet(new HashSet<>());
 
     @Reference
     private Marshaller marshaller;

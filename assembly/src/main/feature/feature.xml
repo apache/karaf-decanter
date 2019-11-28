@@ -55,8 +55,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-collector-log" version="${project.version}" description="Karaf Decanter Log Messages Collector">
         <feature>decanter-common</feature>
-        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.log.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log/${project.version}/cfg</configfile>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log/${project.version}</bundle>
     </feature>
     
     <feature name="decanter-collector-log-socket-core" version="${project.version}" description="Karaf Decanter Log4j socket Collector core">
@@ -65,8 +65,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-collector-log-socket" version="${project.version}" description="Karaf Decanter Log4j socket Collector">
-        <feature>decanter-collector-log-socket-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.log.socket.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.log.socket/${project.version}/cfg</configfile>
+        <feature>decanter-collector-log-socket-core</feature>
     </feature>
 
     <feature name="decanter-collector-file" version="${project.version}" description="Karaf Decanter Log File Collector">
@@ -82,18 +82,18 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-collector-jmx" version="${project.version}" description="Karaf Decanter JMX Collector">
-        <feature>decanter-collector-jmx-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.jmx-local.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}/cfg/local</configfile>
+        <feature>decanter-collector-jmx-core</feature>
     </feature>
 
     <feature name="decanter-collector-jmx-camel" version="${project.version}" description="Karaf Decanter Camel JMX Collector">
-        <feature version="${project.version}">decanter-collector-jmx-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.jmx-camel.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}/cfg/camel</configfile>
+        <feature version="${project.version}">decanter-collector-jmx-core</feature>
     </feature>
 
     <feature name="decanter-collector-jmx-activemq" version="${project.version}" description="Karaf Decanter ActiveMQ JMX Collector">
-        <feature version="${project.version}">decanter-collector-jmx-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.jmx-activemq.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jmx/${project.version}/cfg/activemq</configfile>
+        <feature version="${project.version}">decanter-collector-jmx-core</feature>
     </feature>
 
     <feature name="decanter-collector-camel" version="${project.version}" description="Karaf Decanter Camel Collector">
@@ -108,8 +108,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-collector-rest" version="${project.version}" description="Karaf Decanter REST Collector">
-        <feature>decanter-collector-rest-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.rest-1.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest/${project.version}/cfg</configfile>
+        <feature>decanter-collector-rest-core</feature>
     </feature>
 
     <feature name="decanter-collector-soap-core" version="${project.version}" description="Karaf Decanter SOAP Collector Core">
@@ -119,33 +119,33 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
 
     <feature name="decanter-collector-soap" version="${project.version}" description="Karaf Decanter SOAP Collector">
-        <feature>decanter-collector-soap-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.soap-1.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.soap/${project.version}/cfg</configfile>
+        <feature>decanter-collector-soap-core</feature>
     </feature>
 
     <feature name="decanter-collector-system" version="${project.version}" description="Karaf Decanter OS Collector">
         <feature>decanter-common</feature>
         <feature>scheduler</feature>
-        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.system/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.system.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.system/${project.version}/cfg</configfile>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.system/${project.version}</bundle>
     </feature>
 
     <feature name="decanter-collector-eventadmin" version="${project.version}" description="Karaf Decanter EventAdmin Collector">
         <feature>decanter-common</feature>
-        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.eventadmin/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.eventadmin-framework.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.eventadmin/${project.version}/cfg/framework</configfile>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.eventadmin-karaf.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.eventadmin/${project.version}/cfg/karaf</configfile>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.eventadmin/${project.version}</bundle>
     </feature>
 
 	<feature name="decanter-collector-kafka-core" version="${project.version}" description="Karaf Decanter Kafka Collector core">
         <feature>decanter-common</feature>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.kafka-clients/1.1.1_1</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.kafka-clients/2.1.1_2</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.kafka/${project.version}</bundle>
     </feature>
     
     <feature name="decanter-collector-kafka" version="${project.version}" description="Karaf Decanter Kafka Collector">
-        <feature>decanter-collector-kafka-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.kafka.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.kafka/${project.version}/cfg</configfile>
+        <feature>decanter-collector-kafka-core</feature>
     </feature>
 
     <feature name="decanter-collector-jms-core" version="${project.version}" description="Karaf Decanter JMS Collector core">
@@ -155,21 +155,21 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-collector-jms" version="${project.version}" description="Karaf Decanter JMS Collector">
-        <feature>decanter-collector-jms-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.jms.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jms/${project.version}/cfg</configfile>
+        <feature>decanter-collector-jms-core</feature>
     </feature>
     
     <feature name="decanter-collector-rest-servlet" version="${project.version}" description="Karaf Decanter REST servlet Collector">
         <feature>decanter-common</feature>
         <feature>http-whiteboard</feature>
-        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest.servlet/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.rest.servlet.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest.servlet/${project.version}/cfg</configfile>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest.servlet/${project.version}</bundle>
     </feature>
 
     <feature name="decanter-collector-socket" version="${project.version}" description="Karaf Decanter Network Socket Collector">
         <feature>decanter-common</feature>
-        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.socket/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.socket.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.socket/${project.version}/cfg</configfile>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.socket/${project.version}</bundle>
     </feature>
     
     <feature name="decanter-collector-process-core" version="${project.version}" description="Karaf Decanter JMX Process Collector core">
@@ -180,15 +180,15 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-collector-process" version="${project.version}" description="Karaf Decanter JMX Process Collector">
-        <feature>decanter-collector-process-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.process-jmx.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.process/${project.version}/cfg/process</configfile>
+        <feature>decanter-collector-process-core</feature>
     </feature>
 
     <feature name="decanter-collector-mqtt" version="${project.version}" description="Karaf Decanter MQTT Collector">
         <feature>decanter-common</feature>
         <bundle dependency="true">mvn:org.eclipse.paho/org.eclipse.paho.client.mqttv3/${paho.version}</bundle>
-        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.mqtt/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.mqtt.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.mqtt/${project.version}/cfg</configfile>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.mqtt/${project.version}</bundle>
     </feature>
 
     <feature name="decanter-collector-jdbc-core" version="${project.version}" description="Karaf Decanter JDBC Collector core">
@@ -198,8 +198,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
 
     <feature name="decanter-collector-jdbc" version="${project.version}" description="Karaf Decanter JDBC Collector">
-        <feature>decanter-collector-jdbc-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.jdbc.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jdbc/${project.version}/cfg</configfile>
+        <feature>decanter-collector-jdbc-core</feature>
     </feature>
 
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
@@ -219,8 +219,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-appender-elasticsearch-native-1.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 1.x Appender">
-        <feature>decanter-appender-elasticsearch-native-core-1.x</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-1.x/${project.version}/cfg</configfile>
+        <feature>decanter-appender-elasticsearch-native-core-1.x</feature>
     </feature>
 
     <feature name="decanter-appender-elasticsearch-native-core-2.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender core">
@@ -237,8 +237,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-appender-elasticsearch-native-2.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender">
-        <feature>decanter-appender-elasticsearch-native-core-2.x</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-2.x/${project.version}/cfg</configfile>
+        <feature>decanter-appender-elasticsearch-native-core-2.x</feature>
     </feature>
 
     <feature name="decanter-appender-elasticsearch-jest-core" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Jest Appender core">
@@ -247,8 +247,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
 
     <feature name="decanter-appender-elasticsearch-jest" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Jest Appender">
-        <feature>decanter-appender-elasticsearch-jest-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.jest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.jest/${project.version}/cfg</configfile>
+        <feature>decanter-appender-elasticsearch-jest-core</feature>
     </feature>
 
     <feature name="decanter-appender-elasticsearch-rest-core" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender core">
@@ -258,8 +258,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
 
     <feature name="decanter-appender-elasticsearch-rest" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender">
-        <feature>decanter-appender-elasticsearch-rest-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.rest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}/cfg</configfile>
+        <feature>decanter-appender-elasticsearch-rest-core</feature>
     </feature>
 
     <feature name="decanter-appender-file-core" version="${project.version}" description="Karaf Decanter File Appender core">
@@ -278,8 +278,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
 
 	<feature name="decanter-appender-jdbc" version="${project.version}" description="Karaf Decanter JDBC Appender">
-        <feature>decanter-appender-jdbc-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.jdbc.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jdbc/${project.version}/cfg</configfile>
+        <feature>decanter-appender-jdbc-core</feature>
     </feature>
     
     <feature name="decanter-appender-jms-core" version="${project.version}" description="Karaf Decanter JMS Appender core">
@@ -289,8 +289,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-appender-jms" version="${project.version}" description="Karaf Decanter JMS Appender">
-        <feature>decanter-appender-jms-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.jms.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jms/${project.version}/cfg</configfile>
+        <feature>decanter-appender-jms-core</feature>
     </feature>
 
     <feature name="decanter-appender-camel-core" version="${project.version}" description="Karaf Decanter Camel Appender core">
@@ -299,19 +299,19 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-appender-camel" version="${project.version}" description="Karaf Decanter Camel Appender">
-        <feature>decanter-appender-camel-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.camel.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.camel/${project.version}/cfg</configfile>
+        <feature>decanter-appender-camel-core</feature>
     </feature>
 
     <feature name="decanter-appender-kafka-core" version="${project.version}" description="Karaf Decanter Kafka Appender core">
         <feature>decanter-common</feature>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.kafka-clients/1.1.1_1</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.kafka-clients/2.1.1_2</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.kafka/${project.version}</bundle>
     </feature>
 
     <feature name="decanter-appender-kafka" version="${project.version}" description="Karaf Decanter Kafka Appender">
-        <feature>decanter-appender-kafka-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.kafka.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.kafka/${project.version}/cfg</configfile>
+        <feature>decanter-appender-kafka-core</feature>
     </feature>
     
     <feature name="decanter-appender-mqtt-core" version="${project.version}" description="Karaf Decanter MQTT Appender core">
@@ -321,8 +321,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-appender-mqtt" version="${project.version}" description="Karaf Decanter MQTT Appender">
-        <feature>decanter-appender-mqtt-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.mqtt.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.mqtt/${project.version}/cfg</configfile>
+        <feature>decanter-appender-mqtt-core</feature>
     </feature>
 
     <feature name="decanter-appender-influxdb-core" version="${project.version}" description="Karaf Decanter InfluxDB Appender core">
@@ -331,8 +331,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
 
     <feature name="decanter-appender-influxdb" version="${project.version}" description="Karaf Decanter InfluxDB Appender">
-        <feature>decanter-appender-influxdb-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.influxdb.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.influxdb/${project.version}/cfg</configfile>
+        <feature>decanter-appender-influxdb-core</feature>
     </feature>
 
     <feature name="decanter-appender-cassandra-core" version="${project.version}" description="Karaf Decanter Cassandra Appender core">
@@ -360,8 +360,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-appender-cassandra" version="${project.version}" description="Karaf Decanter Cassandra Appender">
-        <feature>decanter-appender-cassandra-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.cassandra.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.cassandra/${project.version}/cfg</configfile>
+        <feature>decanter-appender-cassandra-core</feature>
     </feature>
 
     <feature name="decanter-appender-redis-core" version="${project.version}" description="Karaf Decanter Redis Appender core">
@@ -370,8 +370,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-appender-redis" version="${project.version}" description="Karaf Decanter Redis Appender">
-        <feature>decanter-appender-redis-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.redis.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.redis/${project.version}/cfg</configfile>
+        <feature>decanter-appender-redis-core</feature>
     </feature>
     
     <feature name="decanter-appender-rest-core" version="${project.version}" description="Karaf Decanter REST Appender core">
@@ -380,8 +380,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
 
 	<feature name="decanter-appender-rest" version="${project.version}" description="Karaf Decanter REST Appender">
-        <feature>decanter-appender-rest-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.rest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.rest/${project.version}/cfg</configfile>
+        <feature>decanter-appender-rest-core</feature>
     </feature>
 
     <feature name="decanter-appender-mongodb-core" version="${project.version}" description="Karaf Decanter MongoDB Appender core">
@@ -390,8 +390,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
 
     <feature name="decanter-appender-mongodb" version="${project.version}" description="Karaf Decanter MongoDB Appender">
-        <feature>decanter-appender-mongodb-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.mongodb.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.mongodb/${project.version}/cfg</configfile>
+        <feature>decanter-appender-mongodb-core</feature>
     </feature>
 
     <feature name="decanter-appender-orientdb-core" version="${project.version}" description="Karaf Decanter OrientDB Appender core">
@@ -416,8 +416,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
 
     <feature name="decanter-appender-orientdb" version="${project.version}" description="Karaf Decanter OrientDB Appender">
-        <feature>decanter-appender-orientdb-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.orientdb.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.orientdb/${project.version}/cfg</configfile>
+        <feature>decanter-appender-orientdb-core</feature>
     </feature>
 
     <feature name="decanter-appender-socket-core" version="${project.version}" description="Karaf Decanter Network Socket Appender core">
@@ -426,8 +426,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
 
     <feature name="decanter-appender-socket" version="${project.version}" description="Karaf Decanter Network Socket Appender">
-        <feature>decanter-appender-socket-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.socket.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.socket/${project.version}/cfg</configfile>
+        <feature>decanter-appender-socket-core</feature>
     </feature>
 
     <feature name="decanter-appender-dropwizard" version="${project.version}" description="Karaf Decanter Dropwizard Metrics Appender">
@@ -443,15 +443,15 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>pax-jdbc-postgresql</feature>
         <feature>pax-jdbc-pool-hikaricp</feature>
         <feature>jdbc</feature>
-        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.timescaledb/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.timescaledb.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.timescaledb/${project.version}/cfg</configfile>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.timescaledb/${project.version}</bundle>
     </feature>
 
     <feature name="decanter-appender-websocket-servlet" version="${project.version}" description="Karaf Decanter WebSocket Servlet Appender">
         <feature>decanter-common</feature>
         <feature>http-whiteboard</feature>
-        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.websocket-servlet/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.websocket.servlet.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.websocket-servlet/${project.version}/cfg</configfile>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.websocket-servlet/${project.version}</bundle>
     </feature>
 
     <feature name="decanter-alerting-core" version="${project.version}" description="Karaf Decanter Alerting core">
@@ -484,8 +484,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
     
     <feature name="decanter-alerting-email" version="${project.version}" description="Karaf Decanter alerting email alerter">
-        <feature version="${project.version}">decanter-alerting-email-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.alerting.email.cfg">mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.email/${project.version}/cfg</configfile>
+        <feature version="${project.version}">decanter-alerting-email-core</feature>
     </feature>
 
     <feature name="decanter-alerting-camel-core" version="${project.version}" description="Karaf Decanter alerting Camel alerter core">
@@ -494,8 +494,8 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     </feature>
 
     <feature name="decanter-alerting-camel" version="${project.version}" description="Karaf Decanter alerting Camel alerter">
-        <feature version="${project.version}">decanter-alerting-camel-core</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.alerting.camel.cfg">mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.camel/${project.version}/cfg</configfile>
+        <feature version="${project.version}">decanter-alerting-camel-core</feature>
     </feature>
 
     <feature name="decanter-documentation" description="Documentation of Karaf Decanter sub-project in HTML" version="${project.version}">

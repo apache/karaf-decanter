@@ -18,6 +18,7 @@ package org.apache.karaf.decanter.collector.kafka;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public class KafkaCollector implements Runnable {
         String autoCommitIntervalMs = getValue(properties, "auto.commit.interval.ms", "1000");
         config.put("auto.commit.interval.ms", autoCommitIntervalMs);
 
-        String sessionTimeoutMs = getValue(properties, "session.timeout.ms", "30000");
+        String sessionTimeoutMs = getValue(properties, "session.timeout.ms", "10000");
         config.put("session.timeout.ms", sessionTimeoutMs);
 
         String keyDeserializer = getValue(properties, "key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
@@ -168,7 +169,7 @@ public class KafkaCollector implements Runnable {
     }
 
     private void consume() throws UnsupportedEncodingException {
-        ConsumerRecords<String, String> records = consumer.poll(10000);
+        ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
         if (records.isEmpty()) {
             return;
         }

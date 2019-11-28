@@ -37,7 +37,6 @@
     <properties>
         <baseline>1.0.0</baseline>
         <baseline.skip>true</baseline.skip>
-
         <activemq.version>5.15.10</activemq.version>
         <camel.version>2.16.2</camel.version>
         <cassandra.version>3.11.4</cassandra.version>
@@ -52,8 +51,8 @@
         <elasticsearch6.bundle.version>6.6.2_1-SNAPSHOT</elasticsearch6.bundle.version>
         <glassfish-json.version>1.0.4</glassfish-json.version>
         <json-api.version>1.0</json-api.version>
-        <kafka.version>2.1.0</kafka.version>
-        <karaf.version>4.1.4</karaf.version>
+        <kafka.version>2.1.1</kafka.version>
+        <karaf.version>4.2.8-SNAPSHOT</karaf.version>
         <kibana.version>3.1.1</kibana.version>
         <kibana4.version>4.1.2</kibana4.version>
         <kibana6.version>6.1.1</kibana6.version>
@@ -407,8 +406,13 @@
 
     <profiles>
         <profile>
+            <id>itests</id>
+            <modules>
+                <module>itest</module>
+            </modules>
+        </profile>
+        <profile>
             <id>release</id>
-
             <build>
                 <plugins>
                     <plugin>

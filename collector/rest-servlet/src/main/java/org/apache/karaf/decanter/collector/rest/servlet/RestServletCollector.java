@@ -17,6 +17,7 @@
 package org.apache.karaf.decanter.collector.rest.servlet;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -79,17 +80,18 @@ public class RestServletCollector extends HttpServlet {
         throws ServletException, IOException {
         LOGGER.debug("Karaf Decanter REST Servlet Collector request received from {}", req.getRequestURI());
         try {
-            Map<String, Object> data = unmarshaller.unmarshal(req.getInputStream());
-            data.put("type", "restservlet");
-
             StringBuilder builder = new StringBuilder();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    builder.append(line);
+                }
             }
-            reader.close();
-            data.put("payload", builder.toString());
+            String payload = builder.toString();
+
+            Map<String, Object> data = unmarshaller.unmarshal(new ByteArrayInputStream(payload.getBytes()));
+            data.put("type", "restservlet");
+            data.put("payload", payload);
 
             PropertiesPreparator.prepare(data, properties);
 
