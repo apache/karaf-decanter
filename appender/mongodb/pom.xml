@@ -61,6 +61,7 @@
                         <Import-Package>
                             !io.netty*,
                             org.slf4j;resolution:=optional,
+                            org.slf4j.impl;resolution:=optional,
                             javax.crypto*;resolution:=optional,
                             org.ietf*;resolution:=optional,
                             org.osgi.service.component,
