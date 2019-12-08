@@ -24,9 +24,9 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
-import org.redisson.Config;
 import org.redisson.Redisson;
-import org.redisson.RedissonClient;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 
 import java.util.Dictionary;
 import java.util.Map;
