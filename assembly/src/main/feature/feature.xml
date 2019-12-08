@@ -397,21 +397,6 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     <feature name="decanter-appender-orientdb-core" version="${project.version}" description="Karaf Decanter OrientDB Appender core">
         <feature>decanter-common</feature>
         <feature>http</feature>
-        <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-smile/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.googlecode.concurrentlinkedhashmap/concurrentlinkedhashmap-lru/1.4.2</bundle>
-        <bundle dependency="true">mvn:com.google.code.findbugs/jsr305/3.0.2</bundle>
-        <bundle dependency="true">mvn:net.java.dev.jna/jna/4.0.0</bundle>
-        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jpa_2.0_spec/1.1</bundle>
-        <bundle dependency="true">mvn:org.javassist/javassist/3.18.1-GA</bundle>
-        <bundle dependency="true">mvn:com.orientechnologies/orientdb-core/${orientdb.version}</bundle>
-        <bundle dependency="true">mvn:com.orientechnologies/orientdb-object/${orientdb.version}</bundle>
-        <bundle dependency="true">mvn:com.orientechnologies/orientdb-tools/${orientdb.version}</bundle>
-        <bundle dependency="true">mvn:com.orientechnologies/orientdb-client/${orientdb.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.orientdb/${project.version}</bundle>
     </feature>
 
@@ -609,23 +594,6 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>scr</feature>
         <feature>http</feature>
         <configfile finalname="/etc/orientdb-server-config.xml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.orientdb/${project.version}/xml</configfile>
-        <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-smile/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.googlecode.concurrentlinkedhashmap/concurrentlinkedhashmap-lru/1.4.2</bundle>
-        <bundle dependency="true">mvn:com.google.code.findbugs/jsr305/3.0.2</bundle>
-        <bundle dependency="true">mvn:net.java.dev.jna/jna/4.0.0</bundle>
-        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jpa_2.0_spec/1.1</bundle>
-        <bundle dependency="true">mvn:org.javassist/javassist/3.18.1-GA</bundle>
-        <bundle dependency="true">mvn:com.orientechnologies/orientdb-core/${orientdb.version}</bundle>
-        <bundle dependency="true">mvn:com.orientechnologies/orientdb-object/${orientdb.version}</bundle>
-        <bundle dependency="true">mvn:com.orientechnologies/orientdb-tools/${orientdb.version}</bundle>
-        <bundle dependency="true">mvn:com.orientechnologies/orientdb-server/${orientdb.version}</bundle>
-        <bundle dependency="true">mvn:com.orientechnologies/orientdb-client/${orientdb.version}</bundle>
-        <bundle dependency="true">mvn:com.orientechnologies/orientdb-graphdb/${orientdb.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.orientdb/${project.version}</bundle>
     </feature>
 
