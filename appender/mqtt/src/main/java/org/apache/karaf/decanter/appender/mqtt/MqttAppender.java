@@ -22,6 +22,7 @@ import java.util.Dictionary;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
@@ -47,8 +48,8 @@ public class MqttAppender implements EventHandler {
     public static final String CLIENT_ID_PROPERTY = "clientId";
     public static final String TOPIC_PROPERTY = "topic";
 
-    public static final String SERVER_DEFAULT = "tcp://localhost:9300";
-    public static final String CLIENT_ID_DEFAULT = "decanter";
+    public static final String SERVER_DEFAULT = "tcp://localhost:1883";
+    public static final String CLIENT_ID_DEFAULT = "d:decanter:appender:default";
     public static final String TOPIC_DEFAULT = "decanter";
 
     @Reference
@@ -71,7 +72,17 @@ public class MqttAppender implements EventHandler {
                 getValue(config, SERVER_PROPERTY, SERVER_DEFAULT),
                 getValue(config, CLIENT_ID_PROPERTY, CLIENT_ID_DEFAULT),
                 new MemoryPersistence());
-        client.connect();
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setCleanSession(true);
+        String username = getValue(config, "username", null);
+        String password = getValue(config, "password", null);
+        if (username != null) {
+            options.setUserName(username);
+        }
+        if (password != null) {
+            options.setPassword(password.toCharArray());
+        }
+        client.connect(options);
     }
 
     private String getValue(Dictionary<String, Object> config, String key, String defaultValue) {

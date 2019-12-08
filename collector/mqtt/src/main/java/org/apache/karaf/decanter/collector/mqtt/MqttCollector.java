@@ -21,6 +21,7 @@ import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -62,12 +63,22 @@ public class MqttCollector {
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
         properties = componentContext.getProperties();
-        String serverUri =  getProperty(properties, "server.uri", "tcp://localhost:61616");
-        String clientId = getProperty(properties, "client.id", "decanter");
+        String serverUri = getProperty(properties, "server.uri", "tcp://localhost:1883");
+        String clientId = getProperty(properties, "client.id", "d:decanter:collector:default");
         String topic = getProperty(properties, "topic", "decanter");
+        String username = getProperty(properties, "userName", null);
+        String password = getProperty(properties, "password", null);
         dispatcherTopic = getProperty(properties, EventConstants.EVENT_TOPIC, "decanter/collect/mqtt/decanter");
         client = new MqttClient(serverUri, clientId);
-        client.connect();
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setCleanSession(true);
+        if (username != null) {
+            options.setUserName(username);
+        }
+        if (password != null) {
+            options.setPassword(password.toCharArray());
+        }
+        client.connect(options);
         client.subscribe(topic);
         client.setCallback(new MqttCallback() {
             @Override

@@ -45,11 +45,15 @@ public class SoapCollectorTest {
         factory.setAddress("http://localhost:9090/test");
         cxfServer = factory.create();
         cxfServer.start();
+
+        Thread.sleep(1000);
     }
 
     @After
     public void teardown() throws Exception {
-        cxfServer.stop();
+        if (cxfServer != null) {
+            cxfServer.stop();
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
