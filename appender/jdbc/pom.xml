@@ -53,6 +53,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbytools</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.karaf.decanter.marshaller</groupId>
             <artifactId>org.apache.karaf.decanter.marshaller.json</artifactId>
             <scope>test</scope>
