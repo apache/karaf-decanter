@@ -37,12 +37,12 @@
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orientdb-core</artifactId>
-            <version>${orientdb.version}</version>
+            <version>3.0.26</version>
         </dependency>
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orientdb-server</artifactId>
-            <version>${orientdb.version}</version>
+            <version>3.0.26</version>
         </dependency>
     </dependencies>
 

@@ -45,7 +45,7 @@
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orientdb-client</artifactId>
-            <version>${orientdb.version}</version>
+            <version>3.0.26</version>
         </dependency>
 
         <!-- test -->
@@ -73,10 +73,24 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>!*</Export-Package>
-                        <Import-Package>*</Import-Package>
+                        <Import-Package>
+                            !com.orientechnologies*,
+                            !com.googlecode.concurrentlinkedhashmap,
+                            !net.jpountz.lz4,
+                            !net.jpountz.util,
+                            !net.jpountz.xxhash,
+                            com.sun.jna*;resolution:=optional,
+                            jdk.nashorn*;resolution:=optional,
+                            *
+                        </Import-Package>
                         <Private-Package>
                             org.apache.karaf.decanter.appender.orientdb,
-                            org.apache.karaf.decanter.appender.utils
+                            org.apache.karaf.decanter.appender.utils,
+                            com.orientechnologies*,
+                            com.googlecode.concurrentlinkedhashmap,
+                            net.jpountz.lz4,
+                            net.jpountz.util,
+                            net.jpountz.xxhash
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                     </instructions>
