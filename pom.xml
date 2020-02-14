@@ -48,11 +48,11 @@
         <elasticsearch5.version>5.6.3</elasticsearch5.version>
         <elasticsearch5.bundle.version>5.6.3_1</elasticsearch5.bundle.version>
         <elasticsearch6.version>6.6.2</elasticsearch6.version>
-        <elasticsearch6.bundle.version>6.6.2_1-SNAPSHOT</elasticsearch6.bundle.version>
+        <elasticsearch6.bundle.version>6.6.2_2</elasticsearch6.bundle.version>
         <glassfish-json.version>1.1.4</glassfish-json.version>
         <json-api.version>1.1.4</json-api.version>
         <kafka.version>2.1.1</kafka.version>
-        <karaf.version>4.2.8-SNAPSHOT</karaf.version>
+        <karaf.version>4.2.8</karaf.version>
         <kibana.version>3.1.1</kibana.version>
         <kibana4.version>4.1.2</kibana4.version>
         <kibana6.version>6.1.1</kibana6.version>
