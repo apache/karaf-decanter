@@ -208,58 +208,16 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}</bundle>
     </feature>
 
-    <feature name="decanter-appender-elasticsearch" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender">
-        <feature>decanter-appender-elasticsearch-rest</feature>
-    </feature>
 
-    <feature name="decanter-appender-elasticsearch-native-core-1.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 1.x Appender core">
-        <feature>decanter-common</feature>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch1.bundle.version}</bundle>
-        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-1.x/${project.version}</bundle>
-    </feature>
-    
-    <feature name="decanter-appender-elasticsearch-native-1.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 1.x Appender">
-        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-1.x/${project.version}/cfg</configfile>
-        <feature>decanter-appender-elasticsearch-native-core-1.x</feature>
-    </feature>
-
-    <feature name="decanter-appender-elasticsearch-native-core-2.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender core">
-        <feature>decanter-common</feature>
-        <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-smile/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.ning/compress-lzf/1.0.2</bundle>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch22.bundle.version}</bundle>
-        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-2.x/${project.version}</bundle>
-    </feature>
-    
-    <feature name="decanter-appender-elasticsearch-native-2.x" version="${project.version}" description="Karaf Decanter Elasticsearch Native 2.x Appender">
-        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch-native-2.x/${project.version}/cfg</configfile>
-        <feature>decanter-appender-elasticsearch-native-core-2.x</feature>
-    </feature>
-
-    <feature name="decanter-appender-elasticsearch-jest-core" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Jest Appender core">
-        <feature>decanter-common</feature>
-        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.jest/${project.version}</bundle>
-    </feature>
-
-    <feature name="decanter-appender-elasticsearch-jest" version="${project.version}" description="Karaf Decanter Elasticsearch HTTP REST Jest Appender">
-        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.jest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.jest/${project.version}/cfg</configfile>
-        <feature>decanter-appender-elasticsearch-jest-core</feature>
-    </feature>
-
-    <feature name="decanter-appender-elasticsearch-rest-core" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender core">
+    <feature name="decanter-appender-elasticsearch-core" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender core">
         <feature>decanter-common</feature>
         <feature>http</feature>
-        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch/${project.version}</bundle>
     </feature>
 
-    <feature name="decanter-appender-elasticsearch-rest" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender">
-        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.rest.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch.rest/${project.version}/cfg</configfile>
-        <feature>decanter-appender-elasticsearch-rest-core</feature>
+    <feature name="decanter-appender-elasticsearch" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender">
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.elasticsearch.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.elasticsearch/${project.version}/cfg</configfile>
+        <feature>decanter-appender-elasticsearch-core</feature>
     </feature>
 
     <feature name="decanter-appender-file-core" version="${project.version}" description="Karaf Decanter File Appender core">
@@ -486,115 +444,6 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     <feature name="decanter-documentation" description="Documentation of Karaf Decanter sub-project in HTML" version="${project.version}">
         <feature>war</feature>
         <bundle>mvn:org.apache.karaf.decanter/manual/${project.version}</bundle>
-    </feature>
-
-    <feature name="elasticsearch" version="${elasticsearch1.version}" description="Embedded Elasticsearch 1.x node">
-        <feature>scr</feature>
-        <feature prerequisite="true">war</feature>
-        <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-1.x/${project.version}/yml</configfile>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch1.bundle.version}</bundle>
-        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-1.x/${project.version}</bundle>
-    </feature>
-
-    <feature name="elasticsearch" version="${elasticsearch22.version}" description="Embedded Elasticsearch 2.2.x node">
-        <feature>scr</feature>
-        <feature prerequisite="true">war</feature>
-        <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-2.x/${project.version}/yml</configfile>
-        <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-smile/2.6.3</bundle>
-        <bundle dependency="true">mvn:com.ning/compress-lzf/1.0.2</bundle>
-        <bundle dependency="true">mvn:io.netty/netty/3.10.5.Final</bundle>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch22.bundle.version}</bundle>
-        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-2.x/${project.version}</bundle>
-    </feature>
-
-    <feature name="elasticsearch" version="${elasticsearch5.version}" description="Embedded Elasticsearch 5.x node">
-        <feature>scr</feature>
-        <feature prerequisite="true">war</feature>
-        <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-5.x/${project.version}/yml</configfile>
-        <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
-        <bundle dependency="true">mvn:org.yaml/snakeyaml/1.18</bundle>
-        <bundle dependency="true">mvn:joda-time/joda-time/2.9.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-smile/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.ning/compress-lzf/1.0.2</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-common/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-transport/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-buffer/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-resolver/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-handler/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-codec/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-codec-http/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch5.bundle.version}</bundle>
-        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-5.x/${project.version}</bundle>
-    </feature>
-
-    <feature name="elasticsearch" version="${elasticsearch6.version}" description="Embedded Elasticsearch 6.x node">
-        <feature>scr</feature>
-        <feature prerequisite="true">war</feature>
-        <configfile finalname="/etc/elasticsearch.yml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-6.x/${project.version}/yml</configfile>
-        <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
-        <bundle dependency="true">mvn:org.yaml/snakeyaml/1.18</bundle>
-        <bundle dependency="true">mvn:joda-time/joda-time/2.9.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-smile/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.8.9</bundle>
-        <bundle dependency="true">mvn:com.ning/compress-lzf/1.0.2</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-common/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-transport/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-buffer/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-resolver/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-handler/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-codec/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-codec-http/4.1.19.Final</bundle>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/${elasticsearch6.bundle.version}</bundle>
-        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-6.x/${project.version}</bundle>
-    </feature>
-
-    <feature name="elasticsearch-head" version="${elasticsearch1.version}" description="Elasticsearch Head web frontend">
-        <feature prerequisite="true">war</feature>
-        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-head-1.x/${project.version}</bundle>
-    </feature>
-
-    <feature name="elasticsearch-head" version="${elasticsearch22.version}" description="Elasticsearch Head web frontend">
-        <feature prerequisite="true">war</feature>
-        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.elasticsearch-head-2.x/${project.version}</bundle>
-    </feature>
-
-    <feature name="kibana" version="${kibana.version}" description="Embedded Kibana dashboard">
-        <feature prerequisite="true">war</feature>
-        <feature version="[${elasticsearch1.version},2.0)" prerequisite="true">elasticsearch</feature>
-        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana-3.x/${project.version}</bundle>
-    </feature>
-
-    <feature name="kibana" version="${kibana4.version}" description="Embedded Kibana 4.x dashboard">
-        <feature prerequisite="true">war</feature>
-        <feature version="[${elasticsearch22.version},3.0)" prerequisite="true">elasticsearch</feature>
-        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana-4.x/${project.version}</bundle>
-    </feature>
-
-    <feature name="kibana" version="${kibana6.version}" description="Kibana 6.x bootstrapper">
-        <feature prerequisite="true">http</feature>
-        <feature version="[${elasticsearch6.version},7)" prerequisite="true">elasticsearch</feature>
-        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.kibana-6.x/${project.version}</bundle>
-    </feature>
-
-    <feature name="orientdb" version="${orientdb.version}" description="Embedded OrientDB instance">
-        <feature>scr</feature>
-        <feature>http</feature>
-        <configfile finalname="/etc/orientdb-server-config.xml">mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.orientdb/${project.version}/xml</configfile>
-        <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.orientdb/${project.version}</bundle>
     </feature>
 
 </features>
