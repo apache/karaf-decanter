@@ -17,6 +17,7 @@
 package org.apache.karaf.decanter.appender.influxdb;
 
 import org.apache.karaf.decanter.appender.utils.EventFilter;
+import org.influxdb.BatchOptions;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
@@ -29,6 +30,7 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +43,8 @@ import java.util.concurrent.TimeUnit;
 public class InfluxDbAppender implements EventHandler {
 
     private Dictionary<String, Object> config;
+
+    private Map<String, String> tags = new HashMap<>();
 
     private InfluxDB influxDB;
 
@@ -72,8 +76,33 @@ public class InfluxDbAppender implements EventHandler {
         if (config.get("database") != null) {
             database = (String) config.get("database");
         }
-        this.influxDB.enableBatch(100, 200, TimeUnit.MILLISECONDS);
-        this.influxDB.setRetentionPolicy("defaultPolicy");
+
+        BatchOptions batchOptions = BatchOptions.DEFAULTS;
+        if (config.get("batchActionsLimit") != null) {
+            int batchActionsLimit = Integer.parseInt((String) config.get("batchActionsLimit"));
+            batchOptions = batchOptions.actions(batchActionsLimit);
+        }
+        if (config.get("precision") != null) {
+            TimeUnit timeUnit = TimeUnit.valueOf((String) config.get("precision"));
+            batchOptions = batchOptions.precision(timeUnit);
+        }
+
+        if (config.get("flushDuration") != null) {
+            int flushDuration = Integer.parseInt((String) config.get("flushDuration"));
+            batchOptions = batchOptions.flushDuration(flushDuration);
+        }
+
+        String prefix = "tag.";
+        for (Enumeration<String> e = config.keys(); e.hasMoreElements(); ) {
+            String key = e.nextElement();
+            if (key.startsWith(prefix)) {
+                Object value = this.config.get(key);
+                if (value != null)
+                    tags.put(key.substring(4), value.toString());
+            }
+        }
+
+        this.influxDB.enableBatch(batchOptions);
         this.influxDB.setDatabase(database);
     }
 
@@ -94,9 +123,13 @@ public class InfluxDbAppender implements EventHandler {
             Map<String, Object> data = new HashMap<>();
             for (String propertyName : event.getPropertyNames()) {
                 Object propertyValue = event.getProperty(propertyName);
-                data.put(propertyName, propertyValue);
+                if (propertyValue != null) {
+                    if (propertyValue instanceof Number || propertyValue instanceof String || propertyValue instanceof Boolean) {
+                        data.put(propertyName, propertyValue);
+                    }
+                }
             }
-            Point point = Point.measurement(type).fields(data).build();
+            Point point = Point.measurement(type).fields(data).tag(tags).build();
             influxDB.write(point);
         }
     }
