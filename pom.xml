@@ -58,7 +58,6 @@
         <module>marshaller</module>
         <module>parser</module>
         <module>alerting</module>
-        <module>spring-boot-starter-decanter</module>
         <module>tools-jar-wrapper</module>
         <module>manual</module>
         <module>assembly</module>
