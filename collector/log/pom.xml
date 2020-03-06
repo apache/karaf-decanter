@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.ops4j.pax.logging</groupId>
             <artifactId>pax-logging-service</artifactId>
-            <version>1.7.3</version>
+            <version>1.11.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter.collector</groupId>
@@ -58,6 +58,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>!*</Export-Package>
                         <Import-Package>
+                            org.ops4j.pax.logging*;version="[1,2)",
                             *
                         </Import-Package>
                         <Private-Package>
