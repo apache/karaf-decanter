@@ -20,7 +20,10 @@ import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
+import java.io.ObjectStreamClass;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -197,7 +200,7 @@ public class SocketCollector implements Closeable, Runnable {
         }
 
         public void run() {
-            try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(clientSocket
+            try (ObjectInputStream ois = new LoggingEventObjectInputStream(new BufferedInputStream(clientSocket
                 .getInputStream()))) {
                 while (open) {
                     try {
@@ -219,6 +222,30 @@ public class SocketCollector implements Closeable, Runnable {
             } catch (IOException e) {
                 LOGGER.info("Error closing socket", e);
             }
+        }
+    }
+
+    private static class LoggingEventObjectInputStream extends ObjectInputStream {
+
+        public LoggingEventObjectInputStream(InputStream is) throws IOException {
+            super(is);
+        }
+
+        @Override
+        protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+            if (!isAllowedByDefault(desc.getName())) {
+                throw new InvalidClassException("Unauthorized deserialization attempt", desc.getName());
+            }
+            return super.resolveClass(desc);
+        }
+
+        // Note: Based off the internals of LoggingEvent. Will need to be
+        // adjusted for Log4J 2
+        private static boolean isAllowedByDefault(final String name) {
+            return name.startsWith("java.lang.")
+                || name.startsWith("[Ljava.lang.")
+                || name.startsWith("org.apache.log4j.")
+                || name.equals("java.util.Hashtable");
         }
     }
 }
