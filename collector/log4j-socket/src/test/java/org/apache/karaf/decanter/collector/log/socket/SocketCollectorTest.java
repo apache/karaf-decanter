@@ -29,9 +29,11 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Level;
+import org.apache.log4j.spi.LocationInfo;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.NOPLogger;
 import org.apache.log4j.spi.NOPLoggerRepository;
+import org.apache.log4j.spi.ThrowableInformation;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -86,6 +88,22 @@ public class SocketCollectorTest {
         assertEquals("Event(s) should have been correctly handled", 1, eventAdmin.getPostEvents().size());
     }
 
+    @Test
+    public void testUnknownEvent() throws Exception {
+        activate();
+        sendEventOnSocket(new UnknownClass());
+        waitUntilEventCountHandled(1);
+        assertEquals("Event(s) should have been correctly handled", 0, eventAdmin.getPostEvents().size());
+    }
+
+    private static final class UnknownClass implements java.io.Serializable {
+        String someValue = "12345";
+
+        public String getValue() {
+            return someValue;
+        }
+    }
+
     /**
      * Test event handling with multiple clients
      */
@@ -129,7 +147,8 @@ public class SocketCollectorTest {
     private LoggingEvent newLoggingEvent(String message) {
         return new LoggingEvent(this.getClass().getName(), new NOPLogger(new NOPLoggerRepository(), "NOP"),
                                 System.currentTimeMillis(), Level.INFO, message,
-                                Thread.currentThread().getName(), null, null, null, new Properties());
+                                Thread.currentThread().getName(), new ThrowableInformation((Throwable)null), null, 
+                                new LocationInfo(null, null), new Properties());
     }
 
     /**
@@ -142,7 +161,7 @@ public class SocketCollectorTest {
         Thread.sleep(200L);
     }
 
-    private void sendEventOnSocket(LoggingEvent event) throws IOException {
+    private void sendEventOnSocket(Object event) throws IOException {
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress("localhost", port), 5000);
             try (ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
