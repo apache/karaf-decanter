@@ -16,6 +16,11 @@
  */
 package org.apache.karaf.decanter.appender.elasticsearch;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import org.apache.http.HttpHost;
 import org.apache.http.util.EntityUtils;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
@@ -30,12 +35,9 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.transport.Netty4Plugin;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.event.Event;
-
-import java.util.*;
 
 
 public class TestElasticsearchAppender {
@@ -70,7 +72,7 @@ public class TestElasticsearchAppender {
         node.close();
     }
 
-    @Test
+    @Test(timeout = 60000L)
     public void test() throws Exception {
         Marshaller marshaller = new JsonMarshaller();
         ElasticsearchAppender appender = new ElasticsearchAppender();
@@ -89,13 +91,13 @@ public class TestElasticsearchAppender {
 
         HttpHost host = new HttpHost(HOST, HTTP_PORT, "http");
         RestClient client = RestClient.builder(new HttpHost[]{ host }).build();
-        Response response = client.performRequest("GET", "/_count", Collections.EMPTY_MAP);
 
-        String responseString = EntityUtils.toString(response.getEntity());
-
-        System.out.println(responseString);
-
-        Assert.assertTrue(responseString.contains("\"count\":3"));
+        String responseString = "";
+        while (!responseString.contains("\"count\":3")) {
+            Thread.sleep(200);
+            Response response = client.performRequest("GET", "/_count", Collections.EMPTY_MAP);
+            responseString = EntityUtils.toString(response.getEntity());
+        }
     }
 
     private static class PluginConfigurableNode extends Node {
