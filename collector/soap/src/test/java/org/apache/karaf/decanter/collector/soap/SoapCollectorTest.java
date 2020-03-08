@@ -46,7 +46,9 @@ public class SoapCollectorTest {
         cxfServer = factory.create();
         cxfServer.start();
 
-        Thread.sleep(1000);
+        while (!cxfServer.isStarted()) {
+            Thread.sleep(200);
+        }
     }
 
     @After
@@ -128,7 +130,7 @@ public class SoapCollectorTest {
         Assert.assertNull(event.getProperty("error"));
         Assert.assertEquals(200, event.getProperty("http.response.code"));
         Assert.assertEquals("OK", event.getProperty("http.response.message"));
-        Assert.assertTrue(Long.class.cast(event.getProperty("http.response.time")) > 0L);
+        Assert.assertTrue("http.response.time should be greater or equal to 0", Long.class.cast(event.getProperty("http.response.time")) >= 0L);
         Assert.assertTrue(((String) event.getProperty("soap.response")).contains("hello This is a test"));
     }
 
