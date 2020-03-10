@@ -37,7 +37,7 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>javax.mail-api</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.2</version>
         </dependency>
 
         <!-- testing -->
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

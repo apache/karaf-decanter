@@ -422,7 +422,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-alerting-email-core" version="${project.version}" description="Karaf Decanter alerting email alerter core">
         <feature version="${project.version}">decanter-alerting</feature>
-        <bundle>mvn:com.sun.mail/javax.mail/1.5.5</bundle>
+        <bundle>mvn:com.sun.mail/javax.mail/1.6.2</bundle>
         <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.email/${project.version}</bundle>
     </feature>
     
