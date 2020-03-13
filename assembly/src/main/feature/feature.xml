@@ -139,7 +139,6 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
 	<feature name="decanter-collector-kafka-core" version="${project.version}" description="Karaf Decanter Kafka Collector core">
         <feature>decanter-common</feature>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.kafka-clients/2.1.1_2</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.kafka/${project.version}</bundle>
     </feature>
     
@@ -263,7 +262,6 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-appender-kafka-core" version="${project.version}" description="Karaf Decanter Kafka Appender core">
         <feature>decanter-common</feature>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.kafka-clients/2.1.1_2</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.kafka/${project.version}</bundle>
     </feature>
 
