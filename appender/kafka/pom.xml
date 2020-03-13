@@ -60,26 +60,6 @@
             <artifactId>kafka_2.11</artifactId>
             <version>${kafka.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.25</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -95,10 +75,20 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>!*</Export-Package>
-                        <Import-Package>*</Import-Package>
+                        <Import-Package>
+                            !org.apache.kafka*,
+                            !com.fasterxml.jackson*,
+                            !net.jpountz*,
+                            com.ibm.security.krb5.internal;resolution:=optional,
+                            sun.security.krb5;resolution:=optional,
+                            *
+                        </Import-Package>
                         <Private-Package>
                             org.apache.karaf.decanter.appender.kafka,
-                            org.apache.karaf.decanter.appender.utils
+                            org.apache.karaf.decanter.appender.utils,
+                            org.apache.kafka*,
+                            com.fasterxml.jackson*,
+                            net.jpountz*
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                     </instructions>

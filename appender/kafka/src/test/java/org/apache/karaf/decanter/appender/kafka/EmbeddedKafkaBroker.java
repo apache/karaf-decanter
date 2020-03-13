@@ -19,7 +19,6 @@ package org.apache.karaf.decanter.appender.kafka;
 import kafka.metrics.KafkaMetricsReporter;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;
-import kafka.utils.ZkUtils;
 import org.apache.kafka.common.utils.SystemTime;
 import org.junit.rules.ExternalResource;
 import scala.Option;
@@ -41,7 +40,6 @@ public class EmbeddedKafkaBroker extends ExternalResource {
 
     private KafkaServer kafkaServer;
     private File logDir;
-    private ZkUtils zkUtils;
 
     public EmbeddedKafkaBroker(int brokerId, int port, String zkConnection, Properties baseProperties) {
         this.brokerId = brokerId;
@@ -72,11 +70,6 @@ public class EmbeddedKafkaBroker extends ExternalResource {
     }
 
     private KafkaServer startBroker(Properties props) {
-        zkUtils = ZkUtils.apply(
-                zkConnection,
-                30000,
-                30000,
-                false);
         List<KafkaMetricsReporter> kmrList = new ArrayList<>();
         Buffer<KafkaMetricsReporter> metricsList = scala.collection.JavaConversions.asScalaBuffer(kmrList);
         KafkaServer server = new KafkaServer(new KafkaConfig(props), new SystemTime(), Option.<String>empty(), metricsList);

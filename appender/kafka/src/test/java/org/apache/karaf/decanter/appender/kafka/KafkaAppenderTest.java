@@ -16,9 +16,9 @@
  */
 package org.apache.karaf.decanter.appender.kafka;
 
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.*;
 import org.osgi.service.event.Event;
 import org.slf4j.Logger;
@@ -63,6 +63,7 @@ public class KafkaAppenderTest {
         Properties kafkaConfig = new Properties();
         kafkaConfig.put("topic", "test");
         kafkaConfig.put("bootstrap.servers", kafkaBroker.getBrokerList());
+        kafkaConfig.put("key.deserializer", new StringDeserializer());
         KafkaConsumer consumer = new KafkaConsumer<String, String>(kafkaConfig);
         consumer.subscribe(Arrays.asList("test"));
         ConsumerRecords<String, String> records = consumer.poll(1000);
