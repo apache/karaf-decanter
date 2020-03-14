@@ -28,6 +28,7 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.appender.utils.EventFilter;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.osgi.service.component.ComponentContext;
@@ -54,14 +55,12 @@ public class ElasticsearchAppender implements EventHandler {
     public static final String USERNAME_PROPERTY = "username";
     public static final String PASSWORD_PROPERTY = "password";
     public static final String INDEX_PREFIX_PROPERTY = "index.prefix";
-    public static final String INDEX_TYPE_PROPERTY = "index.type";
     public static final String INDEX_EVENT_TIMESTAMPED_PROPERTY = "index.event.timestamped";
 
     public static final String ADDRESSES_DEFAULT = "http://localhost:9200";
     public static final String USERNAME_DEFAULT = null;
     public static final String PASSWORD_DEFAULT = null;
     public static final String INDEX_PREFIX_DEFAULT = "karaf";
-    public static final String INDEX_TYPE_DEFAULT = "decanter";
     public static final String INDEX_EVENT_TIMESTAMPED_DEFAULT = "true";
 
     @Reference
@@ -110,7 +109,7 @@ public class ElasticsearchAppender implements EventHandler {
                 return requestConfigBuilder.setConnectTimeout(1000)
                         .setSocketTimeout(10000);
             }
-        }).setMaxRetryTimeoutMillis(20000);
+        });
 
         if (username != null) {
             final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -161,11 +160,16 @@ public class ElasticsearchAppender implements EventHandler {
         String indexName = getIndexName(getValue(config, INDEX_PREFIX_PROPERTY, INDEX_PREFIX_DEFAULT), getDate(event));
         String jsonSt = marshaller.marshal(event);
 
-        // elasticsearch 6.x only allows one type per index mapping, the _type is part of the document
-        String endpoint = String.format("/%s/%s", indexName, getValue(config, INDEX_TYPE_PROPERTY, INDEX_TYPE_DEFAULT));
-        HttpEntity request = new NStringEntity(jsonSt, ContentType.APPLICATION_JSON);
-
-        client.performRequest("POST", endpoint, Collections.EMPTY_MAP, request);
+        String endpoint;
+        if (config.get("index.type") != null) {
+            endpoint = String.format("/%s/%s", indexName, config.get("index.type"));
+        } else {
+            endpoint = String.format("/%s/_doc/", indexName);
+        }
+        HttpEntity entity = new NStringEntity(jsonSt, ContentType.APPLICATION_JSON);
+        Request request = new Request("POST", endpoint);
+        request.setEntity(entity);
+        client.performRequest(request);
     }
 
     private Date getDate(Event event) {

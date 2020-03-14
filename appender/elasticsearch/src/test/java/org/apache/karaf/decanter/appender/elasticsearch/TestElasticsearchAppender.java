@@ -18,52 +18,58 @@ package org.apache.karaf.decanter.appender.elasticsearch;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
+
+import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
 import org.apache.http.HttpHost;
 import org.apache.http.util.EntityUtils;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.appender.utils.EventFilter;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.cluster.ClusterName;
 import org.elasticsearch.common.collect.MapBuilder;
+import org.elasticsearch.common.network.NetworkModule;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.node.InternalSettingsPreparer;
+import org.elasticsearch.env.Environment;
+import org.elasticsearch.node.MockNode;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.transport.Netty4Plugin;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.osgi.service.event.Event;
 
-
+@RunWith(com.carrotsearch.randomizedtesting.RandomizedRunner.class)
+@ThreadLeakScope(value = ThreadLeakScope.Scope.NONE)
 public class TestElasticsearchAppender {
 
     private static final String CLUSTER_NAME = "elasticsearch-test";
     private static final String HOST = "127.0.0.1";
     private static final int HTTP_PORT = 9201;
+    private static final int TRANSPORT_PORT = 9301;
 
     private Node node;
 
     @Before
     public void setup() throws Exception {
+        Collection plugins = Arrays.asList(Netty4Plugin.class);
         Settings settings = Settings.builder()
-                .put("cluster.name", CLUSTER_NAME)
-                .put("node.name", "test")
-                .put("http.enabled", "true")
-                .put("http.type", "netty4")
-                .put("path.home", "target/data")
-                .put("path.data", "target/data")
+                .put(ClusterName.CLUSTER_NAME_SETTING.getKey(), CLUSTER_NAME)
+                .put(Node.NODE_NAME_SETTING.getKey(), "test")
+                .put(NetworkModule.HTTP_TYPE_KEY, Netty4Plugin.NETTY_HTTP_TRANSPORT_NAME)
+                .put(Environment.PATH_HOME_SETTING.getKey(), "target/data")
+                .put(Environment.PATH_DATA_SETTING.getKey(), "target/data")
                 .put("network.host", HOST)
                 .put("http.port", HTTP_PORT)
+                .put(NetworkModule.TRANSPORT_TYPE_KEY, Netty4Plugin.NETTY_TRANSPORT_NAME)
+                .put("transport.port", TRANSPORT_PORT)
                 .build();
-
-        Collection plugins = Arrays.asList(Netty4Plugin.class);
-        node = new PluginConfigurableNode(settings, plugins);
-
+        node = new MockNode(settings, plugins);
         node.start();
     }
 
@@ -95,19 +101,9 @@ public class TestElasticsearchAppender {
         String responseString = "";
         while (!responseString.contains("\"count\":3")) {
             Thread.sleep(200);
-            Response response = client.performRequest("GET", "/_count", Collections.EMPTY_MAP);
+            Request request = new Request("GET", "/_count");
+            Response response = client.performRequest(request);
             responseString = EntityUtils.toString(response.getEntity());
-        }
-    }
-
-    private static class PluginConfigurableNode extends Node {
-        public PluginConfigurableNode(Settings settings, Collection<Class<? extends Plugin>> classpathPlugins) {
-            super(InternalSettingsPreparer.prepareEnvironment(settings, null), classpathPlugins, true);
-        }
-
-        @Override
-        protected void registerDerivedNodeNameWithLogger(String nodeName) {
-            // nothing to do
         }
     }
 
