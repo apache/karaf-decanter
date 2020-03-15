@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-servlet</artifactId>
-            <version>9.4.22.v20191022</version>
+            <version>9.4.27.v20200227</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -64,6 +64,7 @@
                         <Import-Package>
                             org.osgi.service.component,
                             org.osgi.service.event,
+                            org.eclipse.jetty.websocket*;version="[8,11)",
                             *
                         </Import-Package>
                         <Private-Package>
