@@ -17,7 +17,7 @@
 ##
 ################################################################################
 #if ($event.get("alertBackToNormal") == true)
-Alert on $event.get("alertAttribute") is back to normal
+Alert on $event.get("alertPattern") is back to normal
 #else
-[$event.get("alertLevel")] Alert on $event.get("alertAttribute")
+[$event.get("alertLevel")] Alert $event.get("alertPattern")
 #end

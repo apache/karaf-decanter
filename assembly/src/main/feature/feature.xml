@@ -397,20 +397,12 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-alerting-core" version="${project.version}" description="Karaf Decanter Alerting core">
         <feature>decanter-common</feature>
-        <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.checker/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.service/${project.version}</bundle>
     </feature>
     
     <feature name="decanter-alerting" version="${project.version}" description="Karaf Decanter Alerting">
         <feature prerequisite="true">decanter-alerting-core</feature>
-        <conditional>
-            <condition>shell</condition>
-            <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.command/${project.version}</bundle>
-        </conditional>
-        <conditional>
-            <condition>management</condition>
-            <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.management/${project.version}</bundle>
-        </conditional>
-        <configfile finalname="/etc/org.apache.karaf.decanter.alerting.checker.cfg">mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.checker/${project.version}/cfg</configfile>
+        <configfile finalname="/etc/org.apache.karaf.decanter.alerting.service.cfg">mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.service/${project.version}/cfg</configfile>
     </feature>
 
     <feature name="decanter-alerting-log" version="${project.version}" description="Karaf Decanter alerting log alerter">

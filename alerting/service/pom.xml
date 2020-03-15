@@ -23,58 +23,56 @@
 
     <parent>
         <groupId>org.apache.karaf.decanter</groupId>
-        <artifactId>collector</artifactId>
+        <artifactId>alerting</artifactId>
         <version>2.3.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.apache.karaf.decanter.collector</groupId>
-    <artifactId>org.apache.karaf.decanter.collector.mqtt</artifactId>
+    <groupId>org.apache.karaf.decanter.alerting</groupId>
+    <artifactId>org.apache.karaf.decanter.alerting.service</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Collector :: MQTT</name>
+    <name>Apache Karaf :: Decanter :: Alerting :: Service</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.karaf.decanter</groupId>
-            <artifactId>org.apache.karaf.decanter.api</artifactId>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.cmpn</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>8.4.1</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.karaf.decanter.collector</groupId>
-            <artifactId>org.apache.karaf.decanter.collector.utils</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>8.4.1</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.paho</groupId>
-            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-            <version>${paho.version}</version>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>8.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-codecs</artifactId>
+            <version>8.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.shell</groupId>
+            <artifactId>org.apache.karaf.shell.core</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- test -->
         <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-            <version>${activemq.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-mqtt</artifactId>
-            <version>${activemq.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-kahadb-store</artifactId>
-            <version>${activemq.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.karaf.decanter.marshaller</groupId>
-            <artifactId>org.apache.karaf.decanter.marshaller.json</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -82,33 +80,44 @@
             <artifactId>johnzon-mapper</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.johnzon</groupId>
-            <artifactId>johnzon-core</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>karaf-services-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>service-metadata-generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <inherited>true</inherited>
-                <extensions>true</extensions>
                 <configuration>
-                    <obrRepository>NONE</obrRepository>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Export-Package>!*</Export-Package>
+                        <Export-Package>
+                            !*
+                        </Export-Package>
                         <Import-Package>
+                            !org.apache.lucene*,
+                            !org.tartarus.snowball*,
+                            com.sun.management;resolution:=optional,
+                            org.apache.karaf.shell*;version="[4,5)",
                             *
                         </Import-Package>
                         <Private-Package>
-                            org.apache.karaf.decanter.collector.mqtt,
-                            org.apache.karaf.decanter.collector.utils
+                            org.apache.karaf.decanter.alerting.service*,
+                            org.apache.lucene*,
+                            org.tartarus.snowball*,
+                            META-INF.versions.*,
+                            META-INF.services.*
                         </Private-Package>
-                        <_dsannotations>*</_dsannotations>
                     </instructions>
                 </configuration>
             </plugin>
@@ -124,7 +133,7 @@
                         <configuration>
                             <artifacts>
                                 <artifact>
-                                    <file>src/main/cfg/org.apache.karaf.decanter.collector.mqtt.cfg</file>
+                                    <file>src/main/cfg/org.apache.karaf.decanter.alerting.service.cfg</file>
                                     <type>cfg</type>
                                 </artifact>
                             </artifacts>

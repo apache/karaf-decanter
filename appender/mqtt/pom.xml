@@ -53,6 +53,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-mapper</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
             <scope>test</scope>
