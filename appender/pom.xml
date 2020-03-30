@@ -48,6 +48,7 @@
         <module>orientdb</module>
         <module>mongodb</module>
         <module>mqtt</module>
+        <module>prometheus</module>
         <module>redis</module>
         <module>rest</module>
         <module>socket</module>
