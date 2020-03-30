@@ -40,11 +40,12 @@ import java.util.concurrent.TimeUnit;
         immediate = true,
         property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
 )
+
 public class InfluxDbAppender implements EventHandler {
 
     private Dictionary<String, Object> config;
 
-    private Map<String, String> tags = new HashMap<>();
+    private Map<String, String> globalTags = new HashMap<>();
 
     private InfluxDB influxDB;
 
@@ -95,10 +96,10 @@ public class InfluxDbAppender implements EventHandler {
         String prefix = "tag.";
         for (Enumeration<String> e = config.keys(); e.hasMoreElements(); ) {
             String key = e.nextElement();
-            if (key.startsWith(prefix)) {
+            if( key.startsWith(prefix)) {
                 Object value = this.config.get(key);
                 if (value != null)
-                    tags.put(key.substring(4), value.toString());
+                    globalTags.put(key.substring(4),value.toString());
             }
         }
 
@@ -120,16 +121,23 @@ public class InfluxDbAppender implements EventHandler {
             if (event.getProperty("type") != null) {
                 type = (String) event.getProperty("type");
             }
-            Map<String, Object> data = new HashMap<>();
+
+            Map<String, Object> eventFields = new HashMap<>();
+            Map<String, String> eventTags = new HashMap<>();
+            eventTags.putAll(globalTags);
+
             for (String propertyName : event.getPropertyNames()) {
                 Object propertyValue = event.getProperty(propertyName);
                 if (propertyValue != null) {
-                    if (propertyValue instanceof Number || propertyValue instanceof String || propertyValue instanceof Boolean) {
-                        data.put(propertyName, propertyValue);
+                    if (propertyValue instanceof Number || propertyValue instanceof Boolean) {
+                        eventFields.put(propertyName, propertyValue);
+                    }
+                    else if(propertyValue instanceof String){
+                        eventTags.put(propertyName, (String) propertyValue);
                     }
                 }
             }
-            Point point = Point.measurement(type).fields(data).tag(tags).build();
+            Point point = Point.measurement(type).fields(eventFields).tag(eventTags).build();
             influxDB.write(point);
         }
     }
