@@ -70,6 +70,10 @@
                         <Export-Package>
                             org.apache.karaf.decanter.collector.camel
                         </Export-Package>
+                        <Import-Package>
+                            org.apache.camel*;version="[2,4)",
+                            *
+                        </Import-Package>
                     </instructions>
                 </configuration>
             </plugin>
