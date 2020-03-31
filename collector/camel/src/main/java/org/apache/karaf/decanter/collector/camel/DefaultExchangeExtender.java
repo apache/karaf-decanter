@@ -16,11 +16,12 @@
  */
 package org.apache.karaf.decanter.collector.camel;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.MessageHistory;
 import org.apache.camel.RouteNode;
-import org.apache.camel.spi.TracedRouteNodes;
 import org.apache.camel.util.MessageHelper;
 
 /**
@@ -34,8 +35,7 @@ public class DefaultExchangeExtender implements DecanterCamelEventExtender {
     @Override
     public void extend(Map<String, Object> data, Exchange exchange) {
         data.put("fromEndpointUri", exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : null);
-        data.put("previousNode", extractFromNode(exchange));
-        data.put("toNode", extractToNode(exchange));
+        setHistory(data, exchange);
         data.put("exchangeId", exchange.getExchangeId());
         data.put("routeId", exchange.getFromRouteId());
         data.put("camelContextName", exchange.getContext().getName());
@@ -67,22 +67,18 @@ public class DefaultExchangeExtender implements DecanterCamelEventExtender {
         return exchange.getExchangeId().substring(exchange.getExchangeId().indexOf("/") + 1);
     }
 
-    private static String extractFromNode(Exchange exchange) {
-        if (exchange.getUnitOfWork() == null) {
-            return null;
+    private static void setHistory(Map<String, Object> data, Exchange exchange) {
+        List<MessageHistory> messageHistory = exchange.getProperty(Exchange.MESSAGE_HISTORY, List.class);
+        if (messageHistory != null) {
+            for (MessageHistory history : messageHistory) {
+                String nodeId = history.getNode().getId();
+                data.put(nodeId + ".route", history.getRouteId());
+                data.put(nodeId + ".time", history.getTime());
+                data.put(nodeId + ".elapsed", history.getElapsed());
+                data.put(nodeId + ".label", history.getNode().getLabel());
+                data.put(nodeId + ".shortName", history.getNode().getShortName());
+            }
         }
-        TracedRouteNodes traced = exchange.getUnitOfWork().getTracedRouteNodes();
-        RouteNode last = traced.getSecondLastNode();
-        return last != null ? last.getLabel(exchange) : null;
-    }
-
-    private static String extractToNode(Exchange exchange) {
-        if (exchange.getUnitOfWork() == null) {
-            return null;
-        }
-        TracedRouteNodes traced = exchange.getUnitOfWork().getTracedRouteNodes();
-        RouteNode last = traced.getLastNode();
-        return last != null ? last.getLabel(exchange) : null;
     }
 
     private static String extractCausedByException(Exchange exchange) {
