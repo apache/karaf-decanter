@@ -40,7 +40,7 @@ public class DecanterEventNotifierTest {
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         producerTemplate.sendBodyAndHeader("direct:start", "TEST", "foo", "bar");
 
-        Assert.assertEquals(7, eventAdmin.getPostEvents().size());
+        Assert.assertEquals(10, eventAdmin.getPostEvents().size());
 
         Event camelContextStartingEvent = eventAdmin.getPostEvents().get(0);
         Assert.assertEquals("test-context", camelContextStartingEvent.getProperty("camelContextName"));
@@ -123,7 +123,7 @@ public class DecanterEventNotifierTest {
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         producerTemplate.sendBodyAndHeader("direct:start", "TEST", "foo", "bar");
 
-        Assert.assertEquals(5, eventAdmin.getPostEvents().size());
+        Assert.assertEquals(8, eventAdmin.getPostEvents().size());
     }
 
     @Test
@@ -140,7 +140,7 @@ public class DecanterEventNotifierTest {
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         producerTemplate.sendBodyAndHeader("direct:start", "TEST", "foo", "bar");
 
-        Assert.assertEquals(3, eventAdmin.getPostEvents().size());
+        Assert.assertEquals(6, eventAdmin.getPostEvents().size());
 
         Assert.assertEquals("test", eventAdmin.getPostEvents().get(0).getProperty("extender-test"));
     }
