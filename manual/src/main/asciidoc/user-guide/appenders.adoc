@@ -741,3 +741,74 @@ curl --include \
      --header "Sec-WebSocket-Version: 13" \
      http://localhost:8181/decanter-websocket
 ```
+
+===== Prometheus
+
+The `decanter-appender-prometheus` feature collects and exposes metrics on prometheus:
+
+```
+karaf@root()> feature:install decanter-appender-prometheus
+```
+
+The feature registers the Prometheus HTTP servlet on `http://localhost:8181/decanter/prometheus` by default:
+
+```
+karaf@root()> http:list
+ID │ Servlet        │ Servlet-Name   │ State       │ Alias                │ Url
+───┼────────────────┼────────────────┼─────────────┼──────────────────────┼─────────────────────────
+51 │ MetricsServlet │ ServletModel-2 │ Deployed    │ /decanter/prometheus │ [/decanter/prometheus/*]
+```
+
+You can change the servlet alias in `etc/org.apache.karaf.decanter.appender.prometheus.cfg` configuration file:
+
+```
+################################################################################
+#
+#    Licensed to the Apache Software Foundation (ASF) under one or more
+#    contributor license agreements.  See the NOTICE file distributed with
+#    this work for additional information regarding copyright ownership.
+#    The ASF licenses this file to You under the Apache License, Version 2.0
+#    (the "License"); you may not use this file except in compliance with
+#    the License.  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+################################################################################
+
+################################################
+# Decanter Prometheus Appender Configuration
+################################################
+
+# Prometheus HTTP servlet alias
+#alias=/decanter/prometheus
+```
+
+The Decanter Prometheus appender exports `io.prometheus*` packages, meaning that you can simple add your metrics to the Decanter Prometheus servlet.
+You just have to import `io.prometheus*` packages and simple use the regular Prometheus code:
+
+```
+class YourClass {
+  static final Gauge inprogressRequests = Gauge.build()
+     .name("inprogress_requests").help("Inprogress requests.").register();
+
+  void processRequest() {
+    inprogressRequests.inc();
+    // Your code here.
+    inprogressRequests.dec();
+  }
+}
+```
+
+Don't forget to import `io.prometheus*` packages in your bundle `MANIFEST.MF`:
+
+```
+Import-Package: io.prometheus.client;version="[0.8,1)"
+```
+
+That's the only thing you need: your metrics will be available on the Decanter Prometheus servlet (again on `http://localhost:8181/decanter/prometheus` by default).

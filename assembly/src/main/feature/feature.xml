@@ -395,6 +395,13 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.websocket-servlet/${project.version}</bundle>
     </feature>
 
+    <feature name="decanter-appender-prometheus" version="${project.Version}" description="Karaf Decanter Prometheus Servlet Appender">
+        <feature>decanter-common</feature>
+        <feature>http</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.prometheus.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.prometheus/${project.version}/cfg</configfile>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanteR.appender.prometheus/${project.version}</bundle>
+    </feature>
+
     <feature name="decanter-alerting-core" version="${project.version}" description="Karaf Decanter Alerting core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.service/${project.version}</bundle>
