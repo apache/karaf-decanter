@@ -52,10 +52,10 @@ public class DecanterTraceEventHandlerTest {
             String jsonString = marshaller.marshal(event);
             JsonReader jsonReader = Json.createReader(new StringReader(jsonString));
             JsonObject rootObject = jsonReader.readObject();
+            System.out.println(jsonString);
             Assert.assertEquals("InOnly", rootObject.getString("exchangePattern"));
             Assert.assertEquals("camelTracer", rootObject.getString("type"));
             Assert.assertEquals("test-route", rootObject.getString("routeId"));
-            Assert.assertEquals("log:foo", rootObject.getString("to2_label"));
             Assert.assertEquals("test-context", rootObject.getString("camelContextName"));
             JsonObject headersObject = rootObject.getJsonObject("inHeaders");
             Assert.assertEquals("test", headersObject.getString("header"));
