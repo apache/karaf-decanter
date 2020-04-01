@@ -17,6 +17,99 @@
     under the License.
 -->
 
+## Apache Karaf Decanter 2.3.0
+
+### Overview
+
+Apache Karaf Decanter 2.3.0 is a major release on the 2.x series. It provides bug fixes, improvements and new features, especially:
+
+* Complete new alerting service with powerful new features
+* New Prometheus appender
+* Camel MessageHistory support
+* Velocity template support in email alerter allowing you to define your email sent by the alerter
+* and much more !
+
+Take a look on ChangeLog for details.
+
+### ChangeLog
+
+#### Bug
+    * [KARAF-6227] - Unresolvable dependency for decanter-appender-influxdb 
+    * [KARAF-6240] - Decanter regex parser throw an exception at activate before he got the concrete configuration
+    * [KARAF-6249] - Avoid NullPointerException in the CsvMarshaller
+    * [KARAF-6269] - decanter : appender-jms / collector-jms bundles not started correctly ( hung in waiting state)
+    * [KARAF-6284] - elasticsearch feature missing some import packages
+    * [KARAF-6285] - Elasticsearch feature throws ClassCastException: org.ops4j.pax.logging.log4jv2.Log4jv2LoggerContext cannot be cast to org.apache.logging.log4j.core.LoggerContext
+    * [KARAF-6292] - Default collector-rest topic
+    * [KARAF-6427] - Decanter does not build with OpenJDK
+    * [KARAF-6450] - Upgrade to Jackson 2.9.10
+    * [KARAF-6540] - MongoDB Appender can't be installed due to missing import
+    * [KARAF-6629] - Memory leak in elasticsearch rest appender
+    * [KARAF-6631] - Decanter SoapCollectorTest testWithValidRequest is flacky
+
+#### New Feature
+    * [KARAF-6121] - Add prometheus appender
+
+#### Improvement
+    * [KARAF-5741] - Improve Decanter alerting by supporting time series and multi-attributes
+    * [KARAF-5777] - Decanter Camel collector should use Message History to retrieve From/To Node
+    * [KARAF-5922] - Be able to personalize the email sent by the alerter
+    * [KARAF-6223] - Avoid blacklisting of the appenders
+    * [KARAF-6242] - Improve Split and Regex parser by casting data
+    * [KARAF-6318] - Be able to persist AlertStore data
+    * [KARAF-6342] - Log Appender is always adding location information causing an expensive new Throwable() to be called for every log
+    * [KARAF-6392] - Be able to define event topic prefix in the collector system
+    * [KARAF-6401] - Use JDK8 in Decanter
+    * [KARAF-6455] - Improve SOAP collector by adding request response time
+    * [KARAF-6475] - Use a thread pool executor in the collector system
+    * [KARAF-6539] - Use non typed index in elasticsearch appender
+    * [KARAF-6617] - camel collector utests are failing with JDK 11
+
+#### Test
+    * [KARAF-6533] - Add itest coverage in Decanter
+
+#### Wish
+    * [KARAF-6437] - Be able to use property/templating in email alerter
+
+#### Task
+    * [KARAF-6295] - Avoid confusion between rest collector and rest-servlet collector
+    * [KARAF-6541] - Remove deprecated elasticsearch appender and remove backend
+    * [KARAF-6620] - Remove the spring-boot-starter-decanter module
+
+#### Dependency upgrade
+    * [KARAF-6228] - Upgrade to Felix maven-bundle-plugin 4.2.0
+    * [KARAF-6246] - Upgrade to elasticsearch 6.6.2
+    * [KARAF-6255] - Upgrade to elasticsearch 7.6.1
+    * [KARAF-6375] - Upgrade to cassandra 3.11.4
+    * [KARAF-6478] - Upgrade to ActiveMQ 5.15.10
+    * [KARAF-6481] - Upgrade to json-api 1.1.4
+    * [KARAF-6482] - Upgrade to derby 10.14.2.0
+    * [KARAF-6483] - Upgrade to johnzon 1.2.3
+    * [KARAF-6484] - Upgrade to Karaf 4.2.8
+    * [KARAF-6485] - Upgrade to paho mqtt client 1.2.2
+    * [KARAF-6487] - Upgrade to Pax Logging 1.11.2
+    * [KARAF-6488] - Upgrade to kafka 2.4.1
+    * [KARAF-6489] - Upgrade to CXF 3.3.4 & Camel 2.24.2
+    * [KARAF-6490] - Upgrade to influxdb 2.17
+    * [KARAF-6491] - Upgrade to mongodb 3.12.2
+    * [KARAF-6492] - Upgrade to redisson 3.11.6
+    * [KARAF-6493] - Upgrade to jetty websocket 9.4.22.v20191022
+    * [KARAF-6494] - Upgrade to javax mail 1.6.2
+    * [KARAF-6496] - Upgrade to orientdb 3.0.26
+    * [KARAF-6622] - Upgrade to PAX Exam 4.13.2
+    * [KARAF-6630] - Upgrade to junit 4.13
+    * [KARAF-6635] - Upgrade to ActiveMQ 5.15.11
+    * [KARAF-6636] - Upgrade to dropwizard 4.1.5
+    * [KARAF-6637] - Upgrade to mockito 3.3.3
+    * [KARAF-6638] - Upgrade to CXF 3.3.5
+    * [KARAF-6641] - Upgrade to JNA 5.5.0
+    * [KARAF-6642] - Upgrade to orientdb-client 3.0.29
+    * [KARAF-6643] - Upgrade to redisson 3.12.3
+    * [KARAF-6644] - Upgrade to jetty websocket servlet 9.4.27.v20200227
+    * [KARAF-6657] - Upgrade to Camel 2.25.0
+    * [KARAF-6658] - Upgrade to ActiveMQ 5.15.12
+    * [KARAF-6659] - Upgrade to johnzon 1.2.4
+
 ## Apache Karaf Decanter 2.2.0
 
 ### Overview
