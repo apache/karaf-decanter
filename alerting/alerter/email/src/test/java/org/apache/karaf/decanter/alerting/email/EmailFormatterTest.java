@@ -40,16 +40,17 @@ public class EmailFormatterTest {
     @Test
     public void testSubjectDefaultTemplate() {
         String subject = formatter.formatSubject(null, createEvent());
-        Assert.assertEquals("[SEVERE] Alert on TestAttribute", subject.trim());
+        Assert.assertEquals("[SEVERE] Alert TestPattern", subject.trim());
 
         // test recovery path
         Map<String, Object> data = new HashMap<>();
         data.put("alertLevel", "CRITICAL");
         data.put("alertAttribute", "recovery");
         data.put("alertBackToNormal", true);
+        data.put("alertPattern", "message:*");
         Event event = new Event("foo", data);
         subject = formatter.formatSubject(null, event);
-        Assert.assertEquals("Alert on recovery is back to normal", subject.trim());
+        Assert.assertEquals("Alert on message:* is back to normal", subject.trim());
     }
 
     @Test
@@ -72,13 +73,13 @@ public class EmailFormatterTest {
     @Test
     public void testBodyDefaultTemplate() {
         String body = formatter.formatBody(null, createEvent());
-        Assert.assertTrue(body.contains("SEVERE alert: TestAttribute is out of the pattern TestPattern"));
+        System.out.println(body);
+        Assert.assertTrue(body.contains("SEVERE alert: condition TestPattern alert"));
         Assert.assertTrue(body.contains("other : test"));
         Assert.assertTrue(body.contains("alertPattern : TestPattern"));
         Assert.assertTrue(body.contains("event.topics : foo"));
         Assert.assertTrue(body.contains("foo : bar"));
         Assert.assertTrue(body.contains("alertLevel : SEVERE"));
-        Assert.assertTrue(body.contains("alertAttribute : TestAttribute"));
     }
 
     @Test

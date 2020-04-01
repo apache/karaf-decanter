@@ -61,7 +61,6 @@ public class CamelAlerter implements EventHandler {
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         Map<String, Object> headers = new HashMap<>();
         headers.put("alertLevel", event.getProperty("alertLevel"));
-        headers.put("alertAttribute", event.getProperty("alertAttribute"));
         headers.put("alertPattern", event.getProperty("alertPattern"));
         headers.put("alertBackToNormal", event.getProperty("alertBackToNormal"));
         producerTemplate.sendBodyAndHeaders(alertDestinationUri, data, headers);

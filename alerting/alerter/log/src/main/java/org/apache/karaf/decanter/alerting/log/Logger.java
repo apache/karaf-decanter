@@ -33,28 +33,44 @@ public class Logger implements EventHandler {
 
     @Override
     public void handleEvent(Event event) {
-        StringBuilder builder = new StringBuilder();
-        for (String innerKey : event.getPropertyNames()) {
-            String value = (event.getProperty(innerKey) != null) ? event.getProperty(innerKey).toString() : null;
-            builder.append(innerKey).append(":").append(value).append(" | ");
+        boolean backToNormal = false;
+        if (event.getProperty("alertBackToNormal") != null) {
+            backToNormal = (boolean) event.getProperty("alertBackToNormal");
         }
-        boolean backToNormal = (boolean) event.getProperty("alertBackToNormal");
         if (event.getProperty("alertLevel") != null && ((String) event.getProperty("alertLevel")).equalsIgnoreCase("error")) {
             if (backToNormal) {
-                LOGGER.info("DECANTER ALERT BACK TO NORMAL: {} was out of pattern {}", event.getProperty("alertAttribute"), event.getProperty("alertPattern"));
+                LOGGER.info("DECANTER ALERT BACK TO NORMAL: condition {} recover", event.getProperty("alertPattern"));
+                LOGGER.info(renderEvent(event));
             } else {
-                LOGGER.error("DECANTER ALERT: {} out of pattern {}", event.getProperty("alertAttribute"), event.getProperty("alertPattern"));
+                LOGGER.error("DECANTER ALERT: condition {}", event.getProperty("alertPattern"));
+                LOGGER.error(renderEvent(event));
             }
-            LOGGER.error("DECANTER ALERT: Details: {}", builder.toString());
-        }
-        if (event.getProperty("alertLevel") != null && ((String) event.getProperty("alertLevel")).equalsIgnoreCase("warn")) {
+        } else if (event.getProperty("alertLevel") != null && ((String) event.getProperty("alertLevel")).equalsIgnoreCase("warn")) {
             if (backToNormal) {
-                LOGGER.info("DECANTER ALERT BACK TO NORMAL: {} was out of pattern {}", event.getProperty("alertAttribute"), event.getProperty("alertPattern"));
+                LOGGER.info("DECANTER ALERT BACK TO NORMAL: condition {} recover", event.getProperty("alertPattern"));
+                LOGGER.info(renderEvent(event));
             } else {
-                LOGGER.warn("DECANTER ALERT: {} out of pattern {}", event.getProperty("alertAttribute"), event.getProperty("alertPattern"));
+                LOGGER.warn("DECANTER ALERT: condition {}", event.getProperty("alertPattern"));
+                LOGGER.warn(renderEvent(event));
             }
-            LOGGER.warn("DECANTER ALERT: Details: {}", builder.toString());
+        } else {
+            if (backToNormal) {
+                LOGGER.info("DECANTER ALERT BACK TO NORMAL: condition {} recover", event.getProperty("alertPattern"));
+                LOGGER.info(renderEvent(event));
+            } else {
+                LOGGER.info("DECANTER ALERT ({}): condition {}", event.getProperty("alertLevel"), event.getProperty("alertPattern"));
+                LOGGER.info(renderEvent(event));
+            }
         }
+    }
+
+    private String renderEvent(Event event) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("\n");
+        for (String property : event.getPropertyNames()) {
+            builder.append(property).append(":").append(event.getProperty(property)).append("\n");
+        }
+        return builder.toString();
     }
 
 }

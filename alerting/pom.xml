@@ -34,9 +34,7 @@
     <name>Apache Karaf :: Decanter :: Alerting</name>
 
     <modules>
-        <module>checker</module>
-        <module>command</module>
-        <module>management</module>
+        <module>service</module>
         <module>alerter</module>
     </modules>
 

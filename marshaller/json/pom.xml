@@ -45,6 +45,7 @@
         <dependency>
             <groupId>org.apache.johnzon</groupId>
             <artifactId>johnzon-mapper</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
