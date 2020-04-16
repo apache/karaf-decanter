@@ -399,7 +399,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-common</feature>
         <feature>http</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.prometheus.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.prometheus/${project.version}/cfg</configfile>
-        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanteR.appender.prometheus/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.prometheus/${project.version}</bundle>
     </feature>
 
     <feature name="decanter-alerting-core" version="${project.version}" description="Karaf Decanter Alerting core">
