@@ -36,6 +36,7 @@
     <modules>
         <module>utils</module>
         <module>camel</module>
+        <module>configadmin</module>
         <module>dropwizard</module>
         <module>eventadmin</module>
         <module>file</module>

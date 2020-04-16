@@ -826,7 +826,7 @@ send to the Decanter dispatcher.
 
 The Decanter JDBC collector periodically executes a query on a database and sends the query result to the dispatcher.
 
-The `decanter-collector-jdbc` installs the JDBC collector:
+The `decanter-collector-jdbc` feature installs the JDBC collector:
 
 ----
 karaf@root()> feature:install decanter-collector-jdbc
@@ -853,6 +853,16 @@ This configuration file allows you to configure the datasource to use and the SQ
 * the `query` property contains the SQL query to perform on the database and retrieve data.
 
 This collector is periodically executed by the Karaf scheduler.
+
+==== ConfigAdmin
+
+The Decanter ConfigAdmin collector listens for any configuration change and send the updated configuration to the dispatcher.
+
+The `decanter-collector-configadmin` feature installs the ConfigAdmin collector:
+
+----
+karaf@root()> feature:install decanter-collector-configadmin
+----
 
 ==== Customizing properties in collectors
 

@@ -46,6 +46,11 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <bundle>mvn:org.apache.karaf.decanter.parser/org.apache.karaf.decanter.parser.regex/${project.version}</bundle>
     </feature>
 
+    <feature name="decanter-collector-configadmin" version="${project.version}" description="Karaf Decanter ConfigAdmin Collector">
+        <feature>decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.configadmin/${project.version}</bundle>
+    </feature>
+
     <feature name="decanter-collector-dropwizard" version="${project.version}" description="Karaf Decanter Dropwizard Metrics Collector">
         <feature>decanter-common</feature>
         <feature>scheduler</feature>
