@@ -18,13 +18,7 @@
 -->
 <features name="karaf-decanter-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
 
-    <feature name="decanter" version="${project.version}" description="Meta feature installing elasticsearch, kibana, jmx collector, log collector Decanter features">
-        <feature version="${elasticsearch22.version}">elasticsearch</feature>
-        <feature version="${kibana4.version}">kibana</feature>
-        <feature version="${project.version}">decanter-appender-elasticsearch</feature>
-        <feature version="${project.version}">decanter-collector-log</feature>
-        <feature version="${project.version}">decanter-collector-jmx</feature>
-    </feature>
+    <repository>mvn:org.apache.camel.karaf/apache-camel/${camel.version}/xml/features</repository>
 
     <feature name="decanter-common" version="${project.version}" description="Karaf Decanter API">
         <config name="org.apache.felix.eventadmin.impl.EventAdmin" append="true">
@@ -49,7 +43,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     <feature name="decanter-collector-dropwizard" version="${project.version}" description="Karaf Decanter Dropwizard Metrics Collector">
         <feature>decanter-common</feature>
         <feature>scheduler</feature>
-        <bundle dependency="true">mvn:io.dropwizard.metrics/metrics-core/4.0.0</bundle>
+        <bundle dependency="true">mvn:io.dropwizard.metrics/metrics-core/4.1.5</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.dropwizard/${project.version}</bundle>
     </feature>
 
@@ -98,6 +92,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-collector-camel" version="${project.version}" description="Karaf Decanter Camel Collector">
         <feature>decanter-common</feature>
+        <feature>camel-core</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.camel/${project.version}</bundle>
     </feature>
     
@@ -193,6 +188,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     <feature name="decanter-collector-jdbc-core" version="${project.version}" description="Karaf Decanter JDBC Collector core">
         <feature>decanter-common</feature>
         <feature>scheduler</feature>
+        <feature>jdbc</feature>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jdbc/${project.version}</bundle>
     </feature>
 
@@ -231,6 +227,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-appender-jdbc-core" version="${project.version}" description="Karaf Decanter JDBC Appender core">
         <feature>decanter-common</feature>
+        <feature>jdbc</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.jdbc/${project.version}</bundle>
     </feature>
 
@@ -252,6 +249,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-appender-camel-core" version="${project.version}" description="Karaf Decanter Camel Appender core">
         <feature>decanter-common</feature>
+        <feature>camel-core</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.camel/${project.version}</bundle>
     </feature>
     
@@ -373,7 +371,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-appender-dropwizard" version="${project.version}" description="Karaf Decanter Dropwizard Metrics Appender">
         <feature>decanter-common</feature>
-        <bundle dependency="true">mvn:io.dropwizard.metrics/metrics-core/4.0.0</bundle>
+        <bundle dependency="true">mvn:io.dropwizard.metrics/metrics-core/4.1.5</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.dropwizard/${project.version}</bundle>
     </feature>
 
@@ -430,6 +428,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-alerting-camel-core" version="${project.version}" description="Karaf Decanter alerting Camel alerter core">
         <feature version="${project.version}">decanter-alerting</feature>
+        <feature>camel-core</feature>
         <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.camel/${project.version}</bundle>
     </feature>
 
