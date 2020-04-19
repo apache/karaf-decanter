@@ -60,6 +60,12 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>
                             !io.netty*,
+                            !com.github.luben.zstd,
+                            !com.mongodb.crypt.capi,
+                            !javax.annotation,
+                            !javax.annotation.meta,
+                            !jnr.unixsocket,
+                            !org.xerial.snappy,
                             org.slf4j;resolution:=optional,
                             org.slf4j.impl;resolution:=optional,
                             javax.crypto*;resolution:=optional,
@@ -72,8 +78,14 @@
                             org.apache.karaf.decanter.appender.mongodb,
                             org.apache.karaf.decanter.appender.utils,
                             com.mongodb*,
+                            com.mongodb.crypt.capi,
                             org.bson*,
-                            io.netty*
+                            io.netty*,
+                            com.github.luben.zstd,
+                            javax.annotation,
+                            javax.annotation.meta,
+                            jnr.unixsocket,
+                            org.xerial.snappy
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                     </instructions>
