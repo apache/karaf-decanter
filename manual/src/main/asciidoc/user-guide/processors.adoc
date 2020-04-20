@@ -1,0 +1,35 @@
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+=== Processors
+
+Decanter Processors are optional. They receive data from the collectors, apply a processing logic on the received event, and send a new event to the appenders.
+
+The processors are listening for incoming events on `decanter/collect/*` dispatcher topics and send processed events to `decanter/process/*` dispatcher topics.
+By default, the appenders are listening on `decanter/collect/*` topics. If you want to append processed events, you have to configure the appenders
+to listen on `decanter/process/*` topics. To do that, you just have to change appender configuration with:
+
+----
+event.topics=decanter/process/*
+----
+
+It's possible to "chain" processors thanks to the topics.
+For instance, you can have the first processor listening on `decanter/collect/*` topic (containing events coming from the collectors), and
+sending processed events to `decanter/process/first`. Then, a second processor can listen on `decanter/process/first` topic and send processed
+data to `decanter/process/second`. Finally, at the end of the chain, you have to configure the appenders to listen on
+`decanter/process/second`.
+
+==== Pass Through
+
+This processor doesn't implement any concrete logic. It's for the example how to implement a processor.
