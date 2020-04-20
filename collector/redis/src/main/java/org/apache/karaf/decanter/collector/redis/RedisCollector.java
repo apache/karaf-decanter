@@ -14,46 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.appender.redis;
+package org.apache.karaf.decanter.collector.redis;
 
-import org.apache.karaf.decanter.appender.utils.EventFilter;
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
-import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
+import org.osgi.service.event.EventAdmin;
 import org.redisson.Redisson;
+import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Redis appender
- */
 @Component(
-        configurationPid = "org.apache.karaf.decanter.appender.redis",
-        service = EventHandler.class,
-        property = {EventConstants.EVENT_TOPIC + "=decanter/collect/*" }
+        name = "org.apache.karaf.decanter.collector.redis",
+        immediate = true,
+        property = { "decanter.collector.name=redis",
+                "scheduler.period:Long=60",
+                "scheduler.concurrent:Boolean=false",
+                "scheduler.name=decanter-collector-redis"}
 )
-public class RedisAppender implements EventHandler {
+public class RedisCollector implements Runnable {
 
-    public static final String ADDRESS_PROPERTY = "address";
-    public static final String MODE_PROPERTY = "mode";
-    public static final String MAP_PROPERTY = "map";
-    public static final String MASTER_ADDRESS_PROPERTY = "masterAddress";
-    public static final String MASTER_NAME_PROPERTY = "masterName";
-    public static final String SCAN_INTERVAL_PROPERTY = "scanInterval";
+    private final static Logger LOGGER = LoggerFactory.getLogger(RedisCollector.class);
+
+    @Reference
+    private EventAdmin dispatcher;
 
     public static final String ADDRESS_DEFAULT = "localhost:6379";
     public static final String MODE_DEFAULT = "Single";
-    public static final String MAP_DEFAULT = "Decanter";
-    public static final String MASTER_ADDRESS_DEFAULT = null;
-    public static final String MASTER_NAME_DEFAULT = null;
-    public static final String SCAN_INTERVAL_DEFAULT = "2000";
 
     private RedissonClient redissonClient;
 
@@ -63,11 +61,11 @@ public class RedisAppender implements EventHandler {
     public void activate(ComponentContext componentContext) {
         config = componentContext.getProperties();
 
-        String address = getValue(config, ADDRESS_PROPERTY, ADDRESS_DEFAULT);
-        String mode = getValue(config, MODE_PROPERTY, MODE_DEFAULT);
-        String masterAddress = getValue(config, MASTER_ADDRESS_PROPERTY, MASTER_ADDRESS_DEFAULT);
-        String masterName = getValue(config, MASTER_NAME_PROPERTY, MASTER_NAME_DEFAULT);
-        int scanInterval = Integer.parseInt(getValue(config, SCAN_INTERVAL_PROPERTY, SCAN_INTERVAL_DEFAULT));
+        String address = (config.get("address") != null) ? config.get("address").toString() : ADDRESS_DEFAULT;
+        String mode = (config.get("map") != null) ? config.get("map").toString() : MODE_DEFAULT;
+        String masterAddress = (config.get("masterAddress") != null) ? config.get("masterAddress").toString() : null;
+        String masterName = (config.get("masterName") != null) ? config.get("masterName").toString() : null;
+        int scanInterval = (config.get("scanInterval") != null) ? Integer.parseInt(config.get("scanInterval").toString()) : 2000;
 
         Config redissonConfig = new Config();
         if (mode.equalsIgnoreCase("Single")) {
@@ -90,17 +88,21 @@ public class RedisAppender implements EventHandler {
     }
 
     @Override
-    public void handleEvent(Event event) {
-        if (EventFilter.match(event, config)) {
-            Map<String, Object> redisMap = redissonClient.getMap(getValue(config, MAP_PROPERTY, MAP_DEFAULT));
-            for (String name : event.getPropertyNames()) {
-                redisMap.put(name, event.getProperty(name));
-            }
+    public void run() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("type", "redis");
+        String map = (config.get("map") != null) ? config.get("map").toString() : "Decanter";
+        String keyPattern = (config.get("keyPattern") != null) ? config.get("keyPattern").toString() : "*";
+        RMap rmap = redissonClient.getMap(map);
+        for (Object key : rmap.keySet(keyPattern)) {
+            data.put(key.toString(), rmap.get(key));
         }
-    }
-
-    private String getValue(Dictionary<String, Object> properties, String key, String defaultValue) {
-        return (properties.get(key) != null) ? (String) properties.get(key) : defaultValue;
+        try {
+            PropertiesPreparator.prepare(data, config);
+        } catch (Exception e) {
+            LOGGER.warn("Can't prepare data", e);
+        }
+        dispatcher.postEvent(new Event("decanter/collect/redis", data));
     }
 
 }

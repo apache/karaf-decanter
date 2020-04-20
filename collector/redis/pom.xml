@@ -23,15 +23,15 @@
 
     <parent>
         <groupId>org.apache.karaf.decanter</groupId>
-        <artifactId>appender</artifactId>
+        <artifactId>collector</artifactId>
         <version>2.4.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.apache.karaf.decanter.appender</groupId>
-    <artifactId>org.apache.karaf.decanter.appender.redis</artifactId>
+    <groupId>org.apache.karaf.decanter.collector</groupId>
+    <artifactId>org.apache.karaf.decanter.collector.redis</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache Karaf :: Decanter :: Appender :: Redis</name>
+    <name>Apache Karaf :: Decanter :: Collector :: Redis</name>
 
     <dependencies>
         <dependency>
@@ -40,13 +40,33 @@
             <version>3.12.3</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.karaf.decanter.appender</groupId>
-            <artifactId>org.apache.karaf.decanter.appender.utils</artifactId>
+            <groupId>org.apache.karaf.decanter.collector</groupId>
+            <artifactId>org.apache.karaf.decanter.collector.utils</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>src/main/cfg/org.apache.karaf.decanter.collector.redis.cfg</file>
+                                    <type>cfg</type>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -55,8 +75,10 @@
                 <configuration>
                     <obrRepository>NONE</obrRepository>
                     <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>!*</Export-Package>
                         <Import-Package>
+                            com.esotericsoftware.kryo*;resolution:=optional,
                             !com.github.benmanes.caffeine.cache,
                             !io.micrometer.core*,
                             !io.netty*,
@@ -101,32 +123,11 @@
                             net.bytebuddy*,
                             org.xerial.snappy*,
                             reactor*,
-                            org.apache.karaf.decanter.appender.utils,
-                            org.apache.karaf.decanter.appender.redis
+                            org.apache.karaf.decanter.collector.redis,
+                            org.apache.karaf.decanter.collector.utils
                         </Private-Package>
-                        <_dsannotations>*</_dsannotations>
                     </instructions>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>src/main/cfg/org.apache.karaf.decanter.appender.redis.cfg</file>
-                                    <type>cfg</type>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
