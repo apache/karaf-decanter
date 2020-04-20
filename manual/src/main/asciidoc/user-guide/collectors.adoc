@@ -926,6 +926,24 @@ The `decanter-collector-configadmin` feature installs the ConfigAdmin collector:
 karaf@root()> feature:install decanter-collector-configadmin
 ----
 
+==== Prometheus
+
+The Decanter Prometheus collectors is able to periodically (scheduled collector) read Prometheus servlet output to create events sent in Decanter.
+
+The `decanter-collector-prometheus` feature installs the Prometheus collector:
+
+----
+karaf@root()> feature:install decanter-collector-prometheus
+----
+
+The feature also installs the `etc/org.apache.karaf.decanter.collector.prometheus.cfg` configuration file containing:
+
+----
+prometheus.url=http://host/prometheus
+----
+
+The `prometheus.url` property is mandatory and define the location of the Prometheus export servlet (that could be provided by the Decanter Prometheus appender for instance).
+
 ==== Customizing properties in collectors
 
 You can add, rename or remove properties collected by the collectors before sending it to the dispatcher.
