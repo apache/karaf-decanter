@@ -33,3 +33,47 @@ data to `decanter/process/second`. Finally, at the end of the chain, you have to
 ==== Pass Through
 
 This processor doesn't implement any concrete logic. It's for the example how to implement a processor.
+
+You can install this processor using the `decanter-processor-passthrough` feature:
+
+----
+karaf@root()> feature:install decanter-processor-passthrough
+----
+
+==== Aggregate
+
+This processor "merges" several incoming events in a single one that is sent periodically.
+
+You can install this processor using the `decanter-processor-aggregate` feature:
+
+----
+karaf@root()> feature:install decanter-processor-aggregate
+----
+
+By default, the "merged" event is sent every minute. You can change this using the `period` configuration.
+
+You can provisiong `etc/org.apache.karaf.decanter.processor.aggregate.cfg` configuration file with:
+
+----
+period=120 # this is the period in seconds
+target.topics=decanter/process/aggregate # that's the default target topic
+----
+
+You can also decide if a known property is overwritten in the aggregator or appended.
+
+By default, properties are not overwritten, meaning that it's prefixed by the event index in the aggregator:
+
+----
+0.foo=first
+0.other=bar
+1.foo=second
+1.other=bar
+----
+
+In the processor `etc/org.apache.karaf.decanter.processor.aggregate.cfg` configuration file, you can enable `overwrite`:
+
+----
+overwrite=true
+----
+
+Then, if a property already exist in the aggregator, its value will be overwritten by the new event value received in the aggregator.
