@@ -54,6 +54,7 @@
     <modules>
         <module>api</module>
         <module>collector</module>
+        <module>processor</module>
         <module>appender</module>
         <module>marshaller</module>
         <module>parser</module>

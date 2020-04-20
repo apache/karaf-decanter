@@ -34,7 +34,7 @@ import java.util.Map;
 @Component(
         name = "org.apache.karaf.decanter.appender.prometheus",
         immediate = true,
-        property= EventConstants.EVENT_TOPIC + "=decanter/collect/*"
+        property = EventConstants.EVENT_TOPIC + "=decanter/collect/*"
 )
 public class PrometheusServlet implements EventHandler {
 

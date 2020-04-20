@@ -34,6 +34,8 @@ include::user-guide/appenders.adoc[]
 
 include::user-guide/alerting.adoc[]
 
+include::user-guide/processors.adoc[]
+
 == Developer Guide
 
 include::dev-guide/architecture.adoc[]
@@ -43,3 +45,5 @@ include::dev-guide/custom-collector.adoc[]
 include::dev-guide/custom-appender.adoc[]
 
 include::dev-guide/custom-alerter.adoc[]
+
+include::dev-guide/custom-processor.adoc[]

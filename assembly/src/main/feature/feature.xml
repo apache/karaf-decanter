@@ -16,7 +16,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<features name="karaf-decanter-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
+<features name="karaf-decanter-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
 
     <repository>mvn:org.apache.camel.karaf/apache-camel/${camel.version}/xml/features</repository>
 
@@ -410,6 +410,11 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>http</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.prometheus.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.prometheus/${project.version}/cfg</configfile>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.prometheus/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-processor-passthrough" version="${project.version}" description="Karaf Decanter Pass Through Processor">
+        <feature>decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.processor/org.apache.karaf.decanter.processor.passthrough/${project.version}</bundle>
     </feature>
 
     <feature name="decanter-alerting-core" version="${project.version}" description="Karaf Decanter Alerting core">
