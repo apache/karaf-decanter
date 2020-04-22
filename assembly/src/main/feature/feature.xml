@@ -209,6 +209,17 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-collector-jdbc-core</feature>
     </feature>
 
+    <feature name="decanter-collector-prometheus-core" version="${project.version}" description="Karaf Decanter Prometheus Collector core">
+        <feature>decanter-common</feature>
+        <feature>scheduler</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.prometheus/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-collector-prometheus" version="${project.version}" description="Karaf Decanter Prometheus Collector">
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.prometheus.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.prometheus/${project.version}/cfg</configfile>
+        <feature>decanter-collector-prometheus-core</feature>
+    </feature>
+
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature>decanter-common</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.log.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}/cfg</configfile>
