@@ -220,12 +220,25 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-collector-prometheus-core</feature>
     </feature>
 
+    <feature name="decanter-collector-redis-core" version="${project.version}" description="Karaf Decanter Redis Collector core">
+        <feature>decanter-common</feature>
+        <feature>scheduler</feature>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.10.2</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.10.2</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.10.2</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.redis/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-collector-redis" version="${project.version}" description="Karaf Decanter Redis Collector">
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.redis.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.redis/${project.version}/cfg</configfile>
+        <feature>decanter-collector-redis-core</feature>
+    </feature>
+
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature>decanter-common</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.log.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}/cfg</configfile>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}</bundle>
     </feature>
-
 
     <feature name="decanter-appender-elasticsearch-core" version="${project.version}" description="Karaf Decanter Elasticsearch Rest Appender core">
         <feature>decanter-common</feature>
@@ -343,6 +356,9 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-appender-redis-core" version="${project.version}" description="Karaf Decanter Redis Appender core">
         <feature>decanter-common</feature>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.10.2</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.10.2</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.10.2</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.redis/${project.version}</bundle>
     </feature>
     

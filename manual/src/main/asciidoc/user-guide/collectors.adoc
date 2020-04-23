@@ -928,7 +928,7 @@ karaf@root()> feature:install decanter-collector-configadmin
 
 ==== Prometheus
 
-The Decanter Prometheus collectors is able to periodically (scheduled collector) read Prometheus servlet output to create events sent in Decanter.
+The Decanter Prometheus collector is able to periodically (scheduled collector) read Prometheus servlet output to create events sent in Decanter.
 
 The `decanter-collector-prometheus` feature installs the Prometheus collector:
 
@@ -943,6 +943,61 @@ prometheus.url=http://host/prometheus
 ----
 
 The `prometheus.url` property is mandatory and define the location of the Prometheus export servlet (that could be provided by the Decanter Prometheus appender for instance).
+
+==== Redis
+
+The Decanter Redis collector is able to periodically (scheduled collector) read Redis Map to get key/value pairs.
+You can filter the keys you want thanks to key pattern.
+
+The `decanter-collector-redis` feature installs the Redis collector:
+
+----
+karaf@root()> feature:install decanter-collector-redis
+----
+
+The feature also installs the `etc/org.apache.karaf.decanter.collector.redis.cfg` configuration file containing:
+
+----
+address=localhost:6379
+
+#
+# Define the connection mode.
+# Possible modes: Single (default), Master_Slave, Sentinel, Cluster
+#
+mode=Single
+
+#
+# Name of the Redis map
+# Default is Decanter
+#
+map=Decanter
+
+#
+# For Master_Slave mode, we define the location of the master
+# Default is localhost:6379
+#
+#masterAddress=localhost:6379
+
+#
+# For Sentinel model, define the name of the master
+# Default is myMaster
+#
+#masterName=myMaster
+
+#
+# For Cluster mode, define the scan interval of the nodes in the cluster
+# Default value is 2000 (2 seconds).
+#
+#scanInterval=2000
+
+#
+# Key pattern to looking for.
+# Default is *
+#
+#keyPattern=*
+----
+
+You can configure the Redis connection (depending of the topology) and the key pattern in this configuration file.
 
 ==== Customizing properties in collectors
 

@@ -48,6 +48,7 @@
         <module>mqtt</module>
         <module>oshi</module>
         <module>process</module>
+        <module>redis</module>
         <module>rest</module>
         <module>rest-servlet</module>
         <module>soap</module>
