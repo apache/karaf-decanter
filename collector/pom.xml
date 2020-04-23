@@ -38,6 +38,7 @@
         <module>camel</module>
         <module>configadmin</module>
         <module>dropwizard</module>
+        <module>elasticsearch</module>
         <module>eventadmin</module>
         <module>file</module>
         <module>jms</module>

@@ -999,6 +999,50 @@ map=Decanter
 
 You can configure the Redis connection (depending of the topology) and the key pattern in this configuration file.
 
+==== Elasticsearch
+
+The Decanter Elasticsearch collector retrieves documents from Elasticsearch periodically (scheduled collector).
+By default, it harvests all documents in the given index, but you can also specify a query.
+
+The `decanter-collector-elasticsearch` feature installs the Elasticsearch collector:
+
+----
+karaf@root()> feature:install decanter-collector-elasticsearch
+----
+
+The feature also install `etc/org.apache.karaf.decanter.collector.elasticsearch.cfg` configuration file containing:
+
+----
+# HTTP address of the elasticsearch nodes (separated with comma)
+addresses=http://localhost:9200
+
+# Basic username and password authentication (no authentication by default)
+#username=user
+#password=password
+
+# Name of the index to request (decanter by default)
+#index=decanter
+
+# Query to request document (match all by default)
+#query=
+
+# Starting point for the document query (no from by default)
+#from=
+
+# Max number of documents retrieved (no max by default)
+#max=
+
+# Search timeout, in seconds (no timeout by default)
+#timeout=
+----
+
+* `addresses` property is the location of the Elasticsearch instances. Default is `http://localhost:9200`.
+* `username` and `password` properties are used for authentication. They are `null` (no authentication) by default.
+* `index` property is the Elasticsearch index where to get documents. It's `decanter` by default.
+* `query` property is a search query to use. Default is `null` meaning all documents in the index are harvested.
+* `from` and `max` properties are used to "square" the query. They are `null` by default.
+* `timeout` property limits the query execution. There's no timeout by default.
+
 ==== Customizing properties in collectors
 
 You can add, rename or remove properties collected by the collectors before sending it to the dispatcher.

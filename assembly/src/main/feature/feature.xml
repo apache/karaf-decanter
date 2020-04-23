@@ -234,6 +234,17 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-collector-redis-core</feature>
     </feature>
 
+    <feature name="decanter-collector-elasticsearch-core" version="${project.version}" description="Karaf Decanter Elasticsearch Collector core">
+        <feature>decanter-common</feature>
+        <feature>scheduler</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.elasticsearch/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-collector-elasticsearch" version="${project.version}" description="Karaf Decanter Elasticsearch Collector">
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.elasticsearch.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.elasticsearch/${project.version}/cfg</configfile>
+        <feature>decanter-collector-elasticsearch-core</feature>
+    </feature>
+
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature>decanter-common</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.log.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}/cfg</configfile>
