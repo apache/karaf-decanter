@@ -17,6 +17,39 @@
     under the License.
 -->
 
+## Apache Karaf Decanter 2.4.0
+
+### Overview
+
+Apache Karaf Decanter 2.4.0 is a maor release on the 2.x series. It provides a fix on the prometheus appender feature and new important
+features like:
+
+* New processing layer with aggregate processor
+* New Elasticsearch collector
+* New Redis collector
+* New Prometheus collector
+* New oshi collector
+* New ConfigAdmin collector
+
+Take a look on ChangeLog for details.
+
+### ChangeLog
+
+#### New Feature
+    * [KARAF-6646] - Create Elasticsearch collector
+    * [KARAF-6647] - Create redis collector
+    * [KARAF-6656] - Add prometheus collector
+    * [KARAF-6671] - Add oshi collector
+    * [KARAF-6673] - Add a aggregator processor
+    * [KARAF-6679] - Add ConfigAdmin collector
+
+#### Improvement
+    * [KARAF-6678] - Add feature verify on Decanter
+
+#### Dependency upgrade
+    * [KARAF-5844] - Add processors
+    * [KARAF-6694] - Upgrade to elasticsearch 7.6.2
+
 ## Apache Karaf Decanter 2.3.0
 
 ### Overview
