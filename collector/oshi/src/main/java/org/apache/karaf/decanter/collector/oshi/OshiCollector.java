@@ -363,7 +363,7 @@ public class OshiCollector implements Runnable {
 
             PropertiesPreparator.prepare(data, properties);
 
-            dispatcher.postEvent(new Event("decanter/collect/ohsi", data));
+            dispatcher.postEvent(new Event("decanter/collect/oshi", data));
         } catch (Exception e) {
             LOGGER.warn("Can't get oshi system metrics", e);
         }
