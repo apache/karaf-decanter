@@ -65,7 +65,7 @@
                             !org.apache.kafka*,
                             !com.fasterxml.jackson*,
                             !net.jpountz*,
-                            com.ibm.security.krb5.internal;resolution:=optional,
+                            com.ibm.security.krb5*;resolution:=optional,
                             sun.security.krb5;resolution:=optional,
                             *
                         </Import-Package>
