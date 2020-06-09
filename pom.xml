@@ -47,7 +47,7 @@
         <kibana.version>3.1.1</kibana.version>
         <kibana4.version>4.1.2</kibana4.version>
         <kibana6.version>6.1.1</kibana6.version>
-        <paho.version>1.2.2</paho.version>
+        <paho.version>1.2.4</paho.version>
         <slf4j.version>1.7.7</slf4j.version>
     </properties>
 
