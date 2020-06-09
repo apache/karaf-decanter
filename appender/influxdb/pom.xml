@@ -50,7 +50,7 @@
         <dependency>
             <groupId>org.influxdb</groupId>
             <artifactId>influxdb-java</artifactId>
-            <version>2.17</version>
+            <version>2.19</version>
         </dependency>
     </dependencies>
 
@@ -81,19 +81,23 @@
                             !okhttp3,
                             !okhttp3.internal,
                             !okhttp3.internal.annotations,
+                            !okhttp3.internal.authenticator,
                             !okhttp3.internal.cache,
+                            !okhttp3.internal.concurrent,
                             !okhttp3.internal.connection,
                             !okhttp3.internal.http,
                             !okhttp3.intenral.http1,
                             !okhttp3.internal.http2,
                             !okhttp3.internal.io,
                             !okhttp3.internal.platform,
+                            !okhttp3.internal.platform.android,
                             !okhttp3.internal.publicsuffix,
                             !okhttp3.internal.proxy,
                             !okhttp3.internal.tls,
                             !okhttp3.internal.ws,
                             !okhttp3.logging,
                             !okio,
+                            !okio.internal,
                             !org.conscrypt,
                             !org.msgpack.core,
                             !org.msgpack.core.buffer,
@@ -106,6 +110,8 @@
                             org.apache.harmony*;resolution:=optional,
                             kotlin*;resolution:=optional,
                             javax.annotation.meta;resolution:=optional,
+                            org.bouncycastle.jsse*;resolution:=optional,
+                            org.openjsse*;resolution:=optional,
                             *
                         </Import-Package>
                         <Private-Package>
@@ -125,19 +131,23 @@
                             okhttp3,
                             okhttp3.internal,
                             okhttp3.internal.annotations,
+                            okhttp3.internal.authenticator,
                             okhttp3.internal.cache,
+                            okhttp3.internal.concurrent,
                             okhttp3.internal.connection,
                             okhttp3.internal.http,
                             okhttp3.internal.http1,
                             okhttp3.internal.http2,
                             okhttp3.internal.io,
                             okhttp3.internal.platform,
+                            okhttp3.internal.platform.android,
                             okhttp3.internal.publicsuffix,
                             okhttp3.internal.proxy,
                             okhttp3.internal.tls,
                             okhttp3.internal.ws,
                             okhttp3.logging,
                             okio,
+                            okio.internal,
                             org.conscrypt,
                             org.msgpack.core,
                             org.msgpack.core.buffer,
