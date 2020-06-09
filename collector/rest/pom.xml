@@ -34,7 +34,7 @@
     <name>Apache Karaf :: Decanter :: Collector :: REST</name>
 
     <properties>
-        <cxf.version>3.3.5</cxf.version>
+        <cxf.version>3.3.6</cxf.version>
     </properties>
 
     <dependencies>
