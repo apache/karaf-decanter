@@ -39,7 +39,7 @@
         <baseline.skip>true</baseline.skip>
         <activemq.version>5.15.12</activemq.version>
         <camel.version>2.25.0</camel.version>
-        <cassandra.driver.version>4.1.0</cassandra.driver.version>
+        <cassandra.driver.version>4.6.1</cassandra.driver.version>
         <glassfish-json.version>1.1.4</glassfish-json.version>
         <json-api.version>1.1.4</json-api.version>
         <kafka.version>2.4.1</kafka.version>

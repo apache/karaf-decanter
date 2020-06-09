@@ -339,13 +339,13 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     <feature name="decanter-appender-cassandra-core" version="${project.version}" description="Karaf Decanter Cassandra Appender core">
         <feature>decanter-common</feature>
         <bundle dependency="true">mvn:com.google.guava/guava/25.1-jre</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-handler/4.1.34.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-transport-native-epoll/4.1.34.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-buffer/4.1.34.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-common/4.1.34.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-transport/4.1.34.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-codec/4.1.34.Final</bundle>
-        <bundle dependency="true">mvn:io.netty/netty-resolver/4.1.34.Final</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-handler/4.1.45.Final</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-transport-native-epoll/4.1.45.Final</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-buffer/4.1.45.Final</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-common/4.1.45.Final</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-transport/4.1.45.Final</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-codec/4.1.45.Final</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-resolver/4.1.45.Final</bundle>
         <bundle dependency="true">mvn:io.dropwizard.metrics/metrics-core/4.0.5</bundle>
         <bundle dependency="true">mvn:io.dropwizard.metrics/metrics-json/4.0.5</bundle>
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.9.8</bundle>
@@ -354,7 +354,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <bundle dependency="true">mvn:com.datastax.oss/java-driver-core-shaded/${cassandra.driver.version}</bundle>
         <bundle dependency="true">mvn:com.datastax.oss/java-driver-query-builder/${cassandra.driver.version}</bundle>
         <bundle dependency="true">mvn:com.datastax.oss/java-driver-shaded-guava/25.1-jre</bundle>
-        <bundle dependency="true">mvn:com.datastax.oss/native-protocol/1.4.5</bundle>
+        <bundle dependency="true">mvn:com.datastax.oss/native-protocol/1.4.10</bundle>
         <bundle dependency="true">mvn:com.typesafe/config/1.3.3</bundle>
         <bundle dependency="true">mvn:org.hdrhistogram/HdrHistogram/2.1.11</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.cassandra/${project.version}</bundle>
