@@ -57,7 +57,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.11</artifactId>
+            <artifactId>kafka_2.12</artifactId>
             <version>${kafka.version}</version>
             <scope>test</scope>
         </dependency>
@@ -79,7 +79,7 @@
                             !org.apache.kafka*,
                             !com.fasterxml.jackson*,
                             !net.jpountz*,
-                            com.ibm.security.krb5.internal;resolution:=optional,
+                            com.ibm.security.krb5*;resolution:=optional,
                             sun.security.krb5;resolution:=optional,
                             *
                         </Import-Package>
