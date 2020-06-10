@@ -534,10 +534,21 @@ containing:
 
 # Port number where to send the collected data
 #port=34343
+
+# If connected is true, the socket connection is created when the appender starts and
+# collected data are "streamed" to the socket.
+# If connected is false (default), a new socket connection is created for each data
+# to send to the socket.
+#connected=false
+
+# Marshaller to use
+marshaller.target=(dataFormat=json)
 ----
 
 * the `host` property contains the hostname or IP address of the remote network socket collector
 * the `port` property contains the port number of the remote network socket collector
+* the `connected` property defines if the socket connection is created when the appender starts, or for each data event.
+* the `marshaller.target` property defines the data format to use.
 
 ==== OrientDB
 
