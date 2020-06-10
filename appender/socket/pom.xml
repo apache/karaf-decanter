@@ -42,6 +42,13 @@
             <groupId>org.apache.karaf.decanter.appender</groupId>
             <artifactId>org.apache.karaf.decanter.appender.utils</artifactId>
         </dependency>
+
+        <!-- test -->
+        <dependency>
+            <groupId>org.apache.karaf.decanter.marshaller</groupId>
+            <artifactId>org.apache.karaf.decanter.marshaller.csv</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

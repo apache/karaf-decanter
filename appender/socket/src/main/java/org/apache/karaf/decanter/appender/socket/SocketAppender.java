@@ -26,6 +26,7 @@ import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.XmlType;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Dictionary;
@@ -40,9 +41,11 @@ public class SocketAppender implements EventHandler {
 
     public static final String HOST_PROPERTY = "host";
     public static final String PORT_PROPERTY = "port";
+    public static final String CONNECTED_PROPERTY = "connected";
 
     public static final String HOST_DEFAULT = "localhost";
     public static final String PORT_DEFAULT = "34343";
+    public static final String CONNECTED_DEFAULT = "false";
 
     @Reference
     public Marshaller marshaller;
@@ -51,37 +54,76 @@ public class SocketAppender implements EventHandler {
 
     private Dictionary<String, Object> config;
 
+    private Socket socket;
+    private PrintWriter writer;
+
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
-        this.config = componentContext.getProperties();
+        activate(componentContext.getProperties());
+    }
+
+    public void activate(Dictionary<String, Object> config) throws Exception {
+        this.config = config;
+        boolean connected = Boolean.parseBoolean(getValue(config, CONNECTED_PROPERTY, CONNECTED_DEFAULT));
+        if (connected) {
+            try {
+                initConnection();
+            } catch (Exception e) {
+                LOGGER.error("Can't create socket", e);
+                throw e;
+            }
+        }
+    }
+
+    @Deactivate
+    public void deactivate() {
+        closeConnection();
+    }
+
+    private void initConnection() throws Exception {
+        socket = new Socket(
+                getValue(config, HOST_PROPERTY, HOST_DEFAULT),
+                Integer.parseInt(getValue(config, PORT_PROPERTY, PORT_DEFAULT)));
+        writer = new PrintWriter(socket.getOutputStream(), true);
+    }
+
+    private void closeConnection() {
+        if (writer != null) {
+            try {
+                writer.close();
+            } catch (Exception e) {
+                // nothing to do
+            }
+        }
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (Exception e) {
+                // nothing to do
+            }
+        }
     }
 
     @Override
     public void handleEvent(Event event) {
         if (EventFilter.match(event, config)) {
-            Socket socket = null;
-            PrintWriter writer = null;
+            String data = marshaller.marshal(event);
+
+            boolean connected = Boolean.parseBoolean(getValue(config, CONNECTED_PROPERTY, CONNECTED_DEFAULT));
+
             try {
-                socket = new Socket(
-                        getValue(config, HOST_PROPERTY, HOST_DEFAULT),
-                        Integer.parseInt(getValue(config, PORT_PROPERTY, PORT_DEFAULT)));
-                String data = marshaller.marshal(event);
-                writer = new PrintWriter(socket.getOutputStream(), true);
+
+                if (!connected && socket == null) {
+                    initConnection();
+                }
+
                 writer.println(data);
+
+                if (!connected) {
+                    closeConnection();
+                }
             } catch (Exception e) {
                 LOGGER.warn("Error sending data on the socket", e);
-            } finally {
-                if (writer != null) {
-                    writer.flush();
-                    writer.close();
-                }
-                if (socket != null) {
-                    try {
-                        socket.close();
-                    } catch (Exception e) {
-                        // nothing to do
-                    }
-                }
             }
         }
     }
