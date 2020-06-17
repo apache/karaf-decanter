@@ -42,6 +42,18 @@
             <groupId>org.apache.karaf.decanter.collector</groupId>
             <artifactId>org.apache.karaf.decanter.collector.utils</artifactId>
         </dependency>
+
+        <!-- test -->
+        <dependency>
+            <groupId>org.apache.karaf.decanter.marshaller</groupId>
+            <artifactId>org.apache.karaf.decanter.marshaller.json</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-mapper</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
