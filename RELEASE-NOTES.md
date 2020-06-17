@@ -17,11 +17,63 @@
     under the License.
 -->
 
+## Apache Karaf Decanter 2.5.0
+
+### Overview
+
+Apache Karaf Decanter 2.5.0 is a major release on the 2.x series. It provides dependency updates and improvements especially:
+
+* extended REST support in REST collector and appender (REST verbs, basic authentication, custom headers, ...)
+* "connected" mode on the socket collector
+* streaming mode on the socket appender
+* new Pax Web Jetty handler collector
+
+Take a look on ChangeLog for details.
+
+### ChangeLog
+
+#### Bug
+    * [KARAF-6735] - Typo mistake in oshi collector topic
+
+#### New Feature
+    * [KARAF-5691] - Add Pax Web Jetty Handler Collector
+
+#### Improvement
+    * [KARAF-5910] - Improve REST collectors and appender with basic auth and extended user configuration
+    * [KARAF-6699] - Improve socket appender to deal with "connect" mode
+    * [KARAF-6765] - Add "streaming" mode for Socket Collector
+
+#### Dependency upgrade
+    * [KARAF-6712] - Upgrade to Apache pom parent 23
+    * [KARAF-6719] - Upgrade to jackson 2.10.4
+    * [KARAF-6739] - Upgrade to johnzon 1.2.7
+    * [KARAF-6740] - Upgrade to paho mqtt client 1.2.4
+    * [KARAF-6742] - Upgrade to dropwizard 4.1.9
+    * [KARAF-6743] - Upgrade to elasticsearch 7.7.1
+    * [KARAF-6744] - Upgrade to commons-io 2.7
+    * [KARAF-6745] - Upgrade to kafka 2.5.0
+    * [KARAF-6746] - Upgrade to oshi 5.1.2
+    * [KARAF-6747] - Upgrade to redisson 3.13.0
+    * [KARAF-6748] - Upgrade to CXF 3.3.6
+    * [KARAF-6749] - Upgrade to Cassandra java driver 4.6.1
+    * [KARAF-6750] - Upgrade to influxdb 2.19
+    * [KARAF-6751] - Upgrade to orientdb 3.1.0
+    * [KARAF-6752] - Upgrade to mongodb java driver 3.12.5
+    * [KARAF-6753] - Upgrade to prometheus 0.9.0
+    * [KARAF-6754] - Upgrade to jetty websocket 9.4.29.v20200521
+    * [KARAF-6755] - Upgrade to lucene 8.5.1
+    * [KARAF-6756] - Upgrade to maven-gpg-plugin 1.6
+    * [KARAF-6757] - Upgrade to maven-javadoc-plugin 3.2.0
+    * [KARAF-6758] - Upgrade to maven-resources-plugin 3.1.0
+    * [KARAF-6759] - Upgrade to build-helper-maven-plugin 3.1.0
+    * [KARAF-6760] - Upgrade to maven-antrun-plugin 3.0.0
+
+
 ## Apache Karaf Decanter 2.4.0
 
 ### Overview
 
-Apache Karaf Decanter 2.4.0 is a maor release on the 2.x series. It provides a fix on the prometheus appender feature and new important
+Apache Karaf Decanter 2.4.0 is a major release on the 2.x series. It provides a fix on the prometheus appender feature and new important
 features like:
 
 * New processing layer with aggregate processor
