@@ -14,41 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.karaf.decanter.collector.rest;
+package org.apache.karaf.decanter.appender.rest;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("/")
 public class TestService {
 
-    @GET
-    @Path("/echo")
-    public String echo() {
-        return "hello world";
-    }
+    public List<String> postMessages = new ArrayList<>();
+    public List<String> putMessages = new ArrayList<>();
 
     @POST
-    @Path("/submit")
-    public String submitPost(String foo) {
-        return "hello post " + foo;
+    @Consumes("application/json")
+    @Path("/echo")
+    public String echoPost(String message) {
+        postMessages.add(message);
+        return message;
     }
 
     @PUT
-    @Path("/submit")
-    public String submitPut(String foo) {
-        return "hello put " + foo;
-    }
-
-    @DELETE
-    @Path("/delete")
-    public String delete() {
-        return "deleted";
-    }
-
-    @POST
-    @Path("/header")
-    public String headerPost(@HeaderParam("foo") String foo) {
-        return "hello header " + foo;
+    @Consumes("application/json")
+    @Path("/echo")
+    public String echoPut(String message) {
+        putMessages.add(message);
+        return message;
     }
 
 }

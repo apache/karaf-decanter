@@ -16,13 +16,13 @@
  */
 package org.apache.karaf.decanter.collector.rest;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
 import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
@@ -60,6 +60,10 @@ public class RestCollector implements Runnable {
     private URL url;
     private String[] paths;
     private String topic;
+    private String requestMethod;
+    private String request;
+    private String user;
+    private String password;
     private Dictionary<String, Object> config;
 
     @Activate
@@ -72,6 +76,10 @@ public class RestCollector implements Runnable {
         this.url = new URL(getProperty(config, "url", "http://localhost:8181"));
         this.paths = getProperty(config, "paths", "").split(",");
         this.topic = getProperty(config, "topic", "decanter/collect/rest");
+        this.requestMethod = getProperty(config, "request.method", "GET");
+        this.user = getProperty(config, "user", null);
+        this.password = getProperty(config, "password", null);
+        this.request = getProperty(config, "request", null);
     }
     
     private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
@@ -94,18 +102,32 @@ public class RestCollector implements Runnable {
             Map<String, Object> data = new HashMap<>();
             try {
                 connection = (HttpURLConnection) urlWithPath.openConnection();
+                if (user != null) {
+                    String authentication = user + ":" + password;
+                    byte[] encodedAuthentication = Base64.getEncoder().encode(authentication.getBytes(StandardCharsets.UTF_8));
+                    String authenticationHeader = "Basic " + new String(encodedAuthentication);
+                    connection.setRequestProperty("Authorization", authenticationHeader);
+                }
+                connection.setRequestMethod(requestMethod);
+                if ((requestMethod.equalsIgnoreCase("POST") || requestMethod.equalsIgnoreCase("PUT")) && request != null) {
+                    connection.setDoInput(true);
+                    connection.setDoOutput(true);
+                    try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()))) {
+                        writer.write(request);
+                    }
+                }
+                Enumeration<String> keys = config.keys();
+                while (keys.hasMoreElements()) {
+                    String key = keys.nextElement();
+                    if (key.startsWith("header.")) {
+                        connection.setRequestProperty(key.substring("header.".length()), (String) config.get(key));
+                    }
+                }
                 data.putAll(unmarshaller.unmarshal(connection.getInputStream()));
                 data.put("http.response.code", connection.getResponseCode());
                 data.put("http.response.message", connection.getResponseMessage());
                 data.put("type", "rest");
                 data.put("url", urlWithPath);
-
-                // custom fields
-                Enumeration<String> keys = config.keys();
-                while (keys.hasMoreElements()) {
-                    String key = keys.nextElement();
-                    data.put(key, config.get(key));
-                }
 
                 PropertiesPreparator.prepare(data, config);
 

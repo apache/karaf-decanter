@@ -26,15 +26,34 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.osgi.service.event.Event;
 
 public class RestAppenderTest {
     
     private static final int NUM_MESSAGES = 100000;
+
+    private Server cxfServer;
+    private TestService testService;
+
+    @Before
+    public void setup() throws Exception {
+        JAXRSServerFactoryBean jaxrsServerFactoryBean = new JAXRSServerFactoryBean();
+        testService = new TestService();
+        jaxrsServerFactoryBean.setAddress("http://localhost:9091/test");
+        jaxrsServerFactoryBean.setServiceBean(testService);
+        cxfServer = jaxrsServerFactoryBean.create();
+        cxfServer.start();
+    }
+
+    @After
+    public void teardown() throws Exception {
+        cxfServer.stop();
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void testEmptyURI() throws URISyntaxException {
@@ -42,56 +61,42 @@ public class RestAppenderTest {
         Dictionary<String, Object> config = new Hashtable<>();
         appender.activate(config);
     }
-    
-    @Ignore
-    @Test
-    public void testSend() throws URISyntaxException, InterruptedException {
-        RestAppender appender = createAppender();
-        sendMessage(appender);
-    }
 
-    @Ignore
     @Test
-    public void testPerformance() throws URISyntaxException, InterruptedException {
-        RestAppender appender = createAppender();
-        sendMessages(appender);
-        long start = System.currentTimeMillis();
-        sendMessages(appender);
-        long end = System.currentTimeMillis();
-        System.out.println(NUM_MESSAGES * 1000 / (end-start));
-    }
-
-    private RestAppender createAppender() throws URISyntaxException {
+    public void testPost() throws URISyntaxException {
         RestAppender appender = new RestAppender();
-        Marshaller marshaller = new JsonMarshaller();
-        appender.marshaller = marshaller;
         Dictionary<String, Object> config = new Hashtable<>();
-        config.put("uri", "http://localhost:8181/decanter/collect");
+        config.put("uri", "http://localhost:9091/test/echo");
+        appender.marshaller = new JsonMarshaller();
         appender.activate(config);
-        return appender;
-    }
 
-    private void sendMessages(final RestAppender appender) throws InterruptedException {
-        ExecutorService executor = Executors.newFixedThreadPool(20);
-        for (int c=0; c<NUM_MESSAGES; c++) {
-            executor.submit(new Callable<Void>() {
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("foo", "bar");
+        Event event = new Event("post", data);
 
-                @Override
-                public Void call() throws Exception {
-                    sendMessage(appender);
-                    return null;
-                }
-            });
-            
-        }
-        executor.shutdown();
-        executor.awaitTermination(100, TimeUnit.SECONDS);
-    }
-
-    private void sendMessage(RestAppender appender) {
-        Map<String, Object> props = new HashMap<>();
-        props.put("key1", "value1");
-        Event event = new Event("decanter/collect", props);
         appender.handleEvent(event);
+
+        Assert.assertEquals(1, testService.postMessages.size());
+        Assert.assertTrue(testService.postMessages.get(0).contains("\"foo\":\"bar\""));
     }
+
+    @Test
+    public void testPut() throws URISyntaxException {
+        RestAppender appender = new RestAppender();
+        Dictionary<String, Object> config= new Hashtable<>();
+        config.put("uri", "http://localhost:9091/test/echo");
+        config.put("request.method", "PUT");
+        appender.marshaller = new JsonMarshaller();
+        appender.activate(config);
+
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("foo", "bar");
+        Event event = new Event("put", data);
+
+        appender.handleEvent(event);
+
+        Assert.assertEquals(1, testService.putMessages.size());
+        Assert.assertTrue(testService.putMessages.get(0).contains("\"foo\":\"bar\""));
+    }
+
 }

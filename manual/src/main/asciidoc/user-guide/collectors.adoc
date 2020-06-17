@@ -844,6 +844,37 @@ The `decanter-collector-rest-servlet` feature installs the collector:
 karaf@root()> feature:install decanter-collector-rest-servlet
 ----
 
+==== REST
+
+The Decanter REST collector periodically requests a REST service and returns the result (with all HTTP details).
+
+The `decanter-collector-rest` feature installs the collector:
+
+----
+karaf@root()> feature:install decanter-collector-rest
+----
+
+This feature also installs `etc/org.apache.karaf.decanter.collector.rest.cfg` configuration file where you can setup the REST service request:
+
+----
+#
+# Decanter REST collector
+#
+
+url=http://localhost:8080
+paths=metrics
+
+#request.method=GET (possible values are GET, POST, PUT, DELETE, default is GET)
+#request=foo (request payload)
+#header.foo=bar (header passed, prefixed with header.)
+#user=user (used for basic authentication)
+#password=password (used for basic authentication)
+#topic=decanter/collector/rest (Decanter dispatcher topic name to use)
+
+# Unmarshaller to use
+unmarshaller.target=(dataFormat=json)
+----
+
 ==== SOAP
 
 The Decanter SOAP collector periodically requests a SOAP service and returns the result (the SOAP Response, or error details if it failed).

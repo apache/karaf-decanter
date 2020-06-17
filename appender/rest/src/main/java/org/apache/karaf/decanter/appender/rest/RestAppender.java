@@ -16,12 +16,16 @@
  */
 package org.apache.karaf.decanter.appender.rest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Dictionary;
+import java.util.Enumeration;
 
 import org.apache.karaf.decanter.api.marshaller.Marshaller;
 import org.apache.karaf.decanter.appender.utils.EventFilter;
@@ -84,12 +88,38 @@ public class RestAppender implements EventHandler {
                 HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
                 connection.setDoOutput(true);
                 connection.setInstanceFollowRedirects(false);
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("charset", "utf-8");
-                OutputStream out = connection.getOutputStream();
-                marshaller.marshal(event, out);
-                out.close();
+                String user = config.get("user") != null ? (String) config.get("user") : null;
+                String password = config.get("password") != null ? (String) config.get("password") : null;
+                if (user != null) {
+                    String authentication = user + ":" + password;
+                    byte[] encodedAuthentication = Base64.getEncoder().encode(authentication.getBytes(StandardCharsets.UTF_8));
+                    String authenticationHeader = "Basic " + new String(encodedAuthentication);
+                    connection.setRequestProperty("Authorization", authenticationHeader);
+                }
+                String requestMethod = config.get("request.method") != null ? (String) config.get("request.method") : "POST";
+                connection.setRequestMethod(requestMethod);
+                String contentType = config.get("content.type") != null ? (String) config.get("content.type") : "application/json";
+                connection.setRequestProperty("Content-Type",  contentType);
+                String charset = config.get("charset") != null ? (String) config.get("charset") : "utf-8";
+                connection.setRequestProperty("charset", charset);
+                Enumeration<String> keys = config.keys();
+                while (keys.hasMoreElements()) {
+                    String key = keys.nextElement();
+                    if (key.startsWith("header.")) {
+                        connection.setRequestProperty(key.substring("header.".length()), (String) config.get(key));
+                    }
+                }
+                String payloadHeader = config.get("payload.header") != null ? (String) config.get("payload.header") : null;
+                if (payloadHeader != null) {
+                    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                        marshaller.marshal(event, out);
+                        connection.setRequestProperty(payloadHeader, out.toString());
+                    }
+                } else {
+                    try (OutputStream out = connection.getOutputStream()) {
+                        marshaller.marshal(event, out);
+                    }
+                }
                 InputStream is = connection.getInputStream();
                 is.read();
                 is.close();
