@@ -1043,6 +1043,18 @@ addresses=http://localhost:9200
 * `from` and `max` properties are used to "square" the query. They are `null` by default.
 * `timeout` property limits the query execution. There's no timeout by default.
 
+==== Pax Web Jetty Handler
+
+Pax Web Jetty Handler collector "intercepts" all HTTP exchanges with the Pax Web Jetty container running in Apache Karaf.
+
+The `decanter-collector-jetty` feature installs the Pax Web Jetty container:
+
+```
+karaf@root()> feature:install decanter-collector-jetty
+```
+
+The collector automatically registers in the Pax Web Jetty container and then all HTTP requests/responses data will be sent to the appenders.
+
 ==== Customizing properties in collectors
 
 You can add, rename or remove properties collected by the collectors before sending it to the dispatcher.

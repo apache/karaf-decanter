@@ -41,6 +41,7 @@
         <module>elasticsearch</module>
         <module>eventadmin</module>
         <module>file</module>
+        <module>jetty</module>
         <module>jms</module>
         <module>jmx</module>
         <module>kafka</module>
