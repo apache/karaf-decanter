@@ -80,4 +80,79 @@ public class RestCollectorTest {
         Assert.assertEquals("hello world\n", event.getProperty("payload"));
     }
 
+    @Test
+    public void testPost() throws Exception {
+        EventAdminMock eventAdminMock = new EventAdminMock();
+        RestCollector collector = new RestCollector();
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put("request.method", "POST");
+        config.put("request", "test");
+        config.put("url", "http://localhost:9090/test/submit");
+        collector.unmarshaller = new RawUnmarshaller();
+        collector.dispatcher = eventAdminMock;
+        collector.activate(config);
+        collector.run();
+
+        Assert.assertEquals(1, eventAdminMock.postedEvents.size());
+        Event event = eventAdminMock.postedEvents.get(0);
+        Assert.assertEquals(200, event.getProperty("http.response.code"));
+        Assert.assertEquals("hello post test\n", event.getProperty("payload"));
+    }
+
+    @Test
+    public void testPut() throws Exception {
+        EventAdminMock eventAdminMock = new EventAdminMock();
+        RestCollector collector = new RestCollector();
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put("request.method", "PUT");
+        config.put("request", "test");
+        config.put("url", "http://localhost:9090/test/submit");
+        collector.unmarshaller = new RawUnmarshaller();
+        collector.dispatcher = eventAdminMock;
+        collector.activate(config);
+        collector.run();
+
+        Assert.assertEquals(1, eventAdminMock.postedEvents.size());
+        Event event = eventAdminMock.postedEvents.get(0);
+        Assert.assertEquals(200, event.getProperty("http.response.code"));
+        Assert.assertEquals("hello put test\n", event.getProperty("payload"));
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        EventAdminMock eventAdminMock = new EventAdminMock();
+        RestCollector collector = new RestCollector();
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put("request.method", "DELETE");
+        config.put("url", "http://localhost:9090/test/delete");
+        collector.unmarshaller = new RawUnmarshaller();
+        collector.dispatcher = eventAdminMock;
+        collector.activate(config);
+        collector.run();
+
+        Assert.assertEquals(1, eventAdminMock.postedEvents.size());
+        Event event = eventAdminMock.postedEvents.get(0);
+        Assert.assertEquals(200, event.getProperty("http.response.code"));
+        Assert.assertEquals("deleted\n", event.getProperty("payload"));
+    }
+
+    @Test
+    public void testHeader() throws Exception {
+        EventAdminMock eventAdminMock = new EventAdminMock();
+        RestCollector collector = new RestCollector();
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put("request.method", "POST");
+        config.put("header.foo", "test");
+        config.put("url", "http://localhost:9090/test/header");
+        collector.unmarshaller = new RawUnmarshaller();
+        collector.dispatcher = eventAdminMock;
+        collector.activate(config);
+        collector.run();
+
+        Assert.assertEquals(1, eventAdminMock.postedEvents.size());
+        Event event = eventAdminMock.postedEvents.get(0);
+        Assert.assertEquals(200, event.getProperty("http.response.code"));
+        Assert.assertEquals("hello header test\n", event.getProperty("payload"));
+    }
+
 }

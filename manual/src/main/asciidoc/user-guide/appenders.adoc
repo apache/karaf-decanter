@@ -682,8 +682,6 @@ You can install a test database with Docker for dev:
 docker run -d --name timescaledb -p 5432:5432 -e POSTGRES_PASSWORD=decanter -e POSTGRES_USER=decanter -e POSTGRES_DATABASE=decanter timescale/timescaledb
 ```
 
-===== TimescaleDB appender
-
 The `decanter-appender-timescaledb` feature installs the TimescaleDB appender.
 
 As TimescaleDB is a PostgreSQL database extension, the *timescaledb* feature will install all required features to configure
@@ -718,7 +716,7 @@ The table is simple and contains just two column:
 ** `content` as TEXT
 * `marshaller.target` is the marshaller used to serialize data into the table.
 
-===== WebSocket Servlet
+==== WebSocket Servlet
 
 The `decanter-appender-websocket-servlet` feature exposes a websocket on which clients can register. Then, Decanter will send the collected data to the connected clients.
 
@@ -753,7 +751,7 @@ curl --include \
      http://localhost:8181/decanter-websocket
 ```
 
-===== Prometheus
+==== Prometheus
 
 The `decanter-appender-prometheus` feature collects and exposes metrics on prometheus:
 
@@ -823,3 +821,42 @@ Import-Package: io.prometheus.client;version="[0.8,1)"
 ```
 
 That's the only thing you need: your metrics will be available on the Decanter Prometheus servlet (again on `http://localhost:8181/decanter/prometheus` by default).
+
+==== Rest
+
+Decanter Rest appender send collected data to a remote REST service.
+
+The `decanter-appender-rest` feature installs the Rest appender:
+
+----
+karaf@root()> feature:install decanter-appender-rest
+----
+
+The feature also installs `etc/org.apache.karaf.decanter.appender.rest.cfg` configuration file:
+
+----
+###############################
+# Decanter Appender REST Configuration
+###############################
+
+# Mandatory URI where the REST appender connects to
+uri=
+
+#request.method=POST (the REST verb)
+#user= (for basic authentication)
+#password= (for basic authentication)
+#content.type=application/json (the message content type sent)
+#charset=utf-8 (the message charset)
+#header.foo= (HTTP header prefixed with header.)
+#payload.header= (if set the Decanter collected data is sent as HTTP header instead of body)
+
+# Marshaller to use (json is recommended)
+marshaller.target=(dataFormat=json)
+----
+
+* `uri` is mandatory and contains the location of the Rest service to call
+* `user` and `password` are used if the Rest service uses basic authentication
+* `content.type` is the message type sent to the Rest service (default is `application/json`)
+* `charset` is the message encoding (default is `utf-8`)
+* `header.` allows you to add any custom HTTP headers (parameters) to the request (prefixed by `header.`)
+* `payload.header` allows you to use a HTTP header to send the collected data instead of directly the "body".
