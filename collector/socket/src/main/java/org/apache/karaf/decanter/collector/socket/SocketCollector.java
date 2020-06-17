@@ -71,7 +71,11 @@ public class SocketCollector implements Closeable, Runnable {
 
     @Activate
     public void activate(ComponentContext context) throws IOException {
-        this.properties = context.getProperties();
+        activate(context.getProperties());
+    }
+
+    public void activate(Dictionary<String, Object> properties) throws IOException {
+        this.properties = properties;
         int port = Integer.parseInt(getProperty(this.properties, "port", "34343"));
         int workers = Integer.parseInt(getProperty(this.properties, "workers", "10"));
 
@@ -80,9 +84,9 @@ public class SocketCollector implements Closeable, Runnable {
         if (this.protocol == null) {
             this.protocol = Protocol.TCP;
         }
-        
+
         eventAdminTopic = getProperty(this.properties, EventConstants.EVENT_TOPIC, "decanter/collect/socket");
-        
+
         switch (protocol) {
             case TCP:
                 this.serverSocket = new ServerSocket(port);
@@ -91,7 +95,7 @@ public class SocketCollector implements Closeable, Runnable {
                 this.datagramSocket = new DatagramSocket(port);
                 break;
         }
-        
+
         // adding 1 for serverSocket handling
         this.executor = Executors.newFixedThreadPool(workers + 1);
         this.executor.execute(this);
@@ -162,32 +166,21 @@ public class SocketCollector implements Closeable, Runnable {
         }
 
         public void run() {
-            try (BufferedInputStream bis = new BufferedInputStream(clientSocket.getInputStream())) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("type", "socket");
-                try {
-                    data.putAll(unmarshaller.unmarshal(bis));
-                } catch (Exception e) {
-                    // nothing to do
-                }
-
-                try {
-                    PropertiesPreparator.prepare(data, properties);
-                } catch (Exception e) {
-                    LOGGER.warn("Can't prepare data for the dispatcher", e);
-                }
-
-                Event event = new Event(eventAdminTopic, data);
-                dispatcher.postEvent(event);
-            } catch (EOFException e) {
-                LOGGER.warn("Client closed the connection", e);
-            } catch (IOException e) {
-                LOGGER.warn("Exception receiving data", e);
-            }
             try {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("type", "socket");
+                        data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(line.getBytes())));
+                        PropertiesPreparator.prepare(data, properties);
+                        Event event = new Event(eventAdminTopic, data);
+                        dispatcher.postEvent(event);
+                    }
+                }
                 clientSocket.close();
-            } catch (IOException e) {
-                LOGGER.info("Error closing socket", e);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
