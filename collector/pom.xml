@@ -49,7 +49,6 @@
         <module>log4j-socket</module>
         <module>mqtt</module>
         <module>oshi</module>
-        <!-- <module>process</module> -->
         <module>redis</module>
         <module>rest</module>
         <module>rest-servlet</module>

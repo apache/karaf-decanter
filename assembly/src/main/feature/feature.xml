@@ -178,18 +178,6 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.socket/${project.version}</bundle>
     </feature>
     
-    <feature name="decanter-collector-process-core" version="${project.version}" description="Karaf Decanter JMX Process Collector core">
-        <feature>decanter-common</feature>
-        <feature>scheduler</feature>
-        <bundle>mvn:org.apache.karaf.decanter/tools-jar-wrapper/${project.version}</bundle>
-        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.process/${project.version}</bundle>
-    </feature>
-    
-    <feature name="decanter-collector-process" version="${project.version}" description="Karaf Decanter JMX Process Collector">
-        <configfile finalname="/etc/org.apache.karaf.decanter.collector.process-jmx.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.process/${project.version}/cfg/process</configfile>
-        <feature>decanter-collector-process-core</feature>
-    </feature>
-
     <feature name="decanter-collector-mqtt" version="${project.version}" description="Karaf Decanter MQTT Collector">
         <feature>decanter-common</feature>
         <bundle dependency="true">mvn:org.eclipse.paho/org.eclipse.paho.client.mqttv3/${paho.version}</bundle>
