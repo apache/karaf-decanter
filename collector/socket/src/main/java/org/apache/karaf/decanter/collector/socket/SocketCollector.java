@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
 import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
@@ -60,6 +61,7 @@ public class SocketCollector implements Closeable, Runnable {
     private ExecutorService executor;
     private Dictionary<String, Object> properties;
     private String eventAdminTopic;
+    private long maxRequestSize = 100000;
     
     @Reference
     public Unmarshaller unmarshaller;
@@ -96,6 +98,10 @@ public class SocketCollector implements Closeable, Runnable {
                 break;
         }
 
+        if (this.properties.get("max.request.size") != null) {
+            maxRequestSize = Long.parseLong((String)this.properties.get("max.request.size"));
+        }
+
         // adding 1 for serverSocket handling
         this.executor = Executors.newFixedThreadPool(workers + 1);
         this.executor.execute(this);
@@ -114,7 +120,7 @@ public class SocketCollector implements Closeable, Runnable {
                     case TCP:
                         Socket socket = serverSocket.accept();
                         LOGGER.debug("Connected to TCP client at {}", socket.getInetAddress());
-                        this.executor.execute(new SocketRunnable(socket));
+                        this.executor.execute(new SocketRunnable(socket, maxRequestSize));
                         break;
                         
                     case UDP:
@@ -160,14 +166,17 @@ public class SocketCollector implements Closeable, Runnable {
     private class SocketRunnable implements Runnable {
 
         private Socket clientSocket;
+        private final long maxRequestSize;
 
-        public SocketRunnable(Socket clientSocket) {
+        public SocketRunnable(Socket clientSocket, long maxRequestSize) {
             this.clientSocket = clientSocket;
+            this.maxRequestSize = maxRequestSize;
         }
 
         public void run() {
             try {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+                try (BoundedInputStream boundedInputStream = new BoundedInputStream(clientSocket.getInputStream(), maxRequestSize);
+                     BufferedReader reader = new BufferedReader(new InputStreamReader(boundedInputStream))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
                         Map<String, Object> data = new HashMap<>();

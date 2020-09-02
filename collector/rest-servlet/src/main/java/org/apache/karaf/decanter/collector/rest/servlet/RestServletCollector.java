@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.karaf.decanter.api.marshaller.Unmarshaller;
 import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
 import org.osgi.service.component.ComponentContext;
@@ -62,6 +63,7 @@ public class RestServletCollector extends HttpServlet {
 
     private String baseTopic;
     private Dictionary<String, Object> properties;
+    private long maxRequestSize = 100000;
 
     @SuppressWarnings("unchecked")
     @Activate
@@ -69,6 +71,9 @@ public class RestServletCollector extends HttpServlet {
         Dictionary<String, Object> props = context.getProperties();
         this.baseTopic = getProperty(props, "topic", "decanter/collect/rest-servlet");
         this.properties = props;
+        if (this.properties.get("max.request.size") != null) {
+            maxRequestSize = Long.parseLong((String)this.properties.get("max.request.size"));
+        }
     }
 
     private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
@@ -81,7 +86,8 @@ public class RestServletCollector extends HttpServlet {
         LOGGER.debug("Karaf Decanter REST Servlet Collector request received from {}", req.getRequestURI());
         try {
             StringBuilder builder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()))) {
+            try (BoundedInputStream boundedInputStream = new BoundedInputStream(req.getInputStream(), maxRequestSize);
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(boundedInputStream))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     builder.append(line);
