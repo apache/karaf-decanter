@@ -122,12 +122,12 @@ public class SocketCollectorTest {
         public List<Event> sentEvents = new ArrayList<>();
 
         @Override
-        public void postEvent(Event event) {
+        synchronized public void postEvent(Event event) {
             postedEvents.add(event);
         }
 
         @Override
-        public void sendEvent(Event event) {
+        synchronized public void sendEvent(Event event) {
             sentEvents.add(event);
         }
 
