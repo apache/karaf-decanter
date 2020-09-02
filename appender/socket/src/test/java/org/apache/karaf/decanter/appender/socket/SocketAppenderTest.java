@@ -50,15 +50,17 @@ public class SocketAppenderTest {
             public void run() {
                 try {
                     ServerSocket server = new ServerSocket(44445);
-                    while (true) {
-                        Socket socket = server.accept();
-                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-                            String line;
-                            while ((line = reader.readLine()) != null) {
-                                received.add(line);
+                    while (received.size() < 1) {
+                        try (Socket socket = server.accept()) {
+                            try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+                                String line;
+                                while ((line = reader.readLine()) != null) {
+                                    received.add(line);
+                                }
                             }
                         }
                     }
+                    server.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -79,7 +81,7 @@ public class SocketAppenderTest {
         Assert.assertEquals(1, received.size());
         Assert.assertEquals("type=test,first=1,event.topics=test", received.get(0));
 
-        serverThread.interrupt();
+        appender.deactivate();
     }
 
     @Test
@@ -98,50 +100,7 @@ public class SocketAppenderTest {
             // expected
         }
 
-        // no exception there as the socket is bound when sending message
-
-        final List<String> received = new ArrayList<>();
-
-        Runnable server = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ServerSocket server = new ServerSocket(44444);
-                    while (true) {
-                        Socket socket = server.accept();
-                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-                            String line;
-                            while ((line = reader.readLine()) != null) {
-                                received.add(line);
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread serverThread = new Thread(server);
-        serverThread.start();
-
-        // gives time to server thread to start
-        Thread.sleep(500);
-
-        appender.activate(config);
-
-        Map<String, String> data = new HashMap<>();
-        data.put("type", "test");
-        data.put("first", "1");
-        appender.handleEvent(new Event("test", data));
-
-        while (received.size() != 1) {
-            Thread.sleep(200);
-        }
-
-        Assert.assertEquals(1, received.size());
-        Assert.assertEquals("type=test,first=1,event.topics=test", received.get(0));
-
-        serverThread.interrupt();
+        appender.deactivate();
     }
 
 }
