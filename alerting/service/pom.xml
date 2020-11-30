@@ -33,6 +33,10 @@
     <packaging>bundle</packaging>
     <name>Apache Karaf :: Decanter :: Alerting :: Service</name>
 
+    <properties>
+        <lucene.version>8.7.0</lucene.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -42,22 +46,22 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>8.5.1</version>
+            <version>${lucene.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>8.5.1</version>
+            <version>${lucene.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
-            <version>8.5.1</version>
+            <version>${lucene.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-codecs</artifactId>
-            <version>8.5.1</version>
+            <version>${lucene.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.json</groupId>
