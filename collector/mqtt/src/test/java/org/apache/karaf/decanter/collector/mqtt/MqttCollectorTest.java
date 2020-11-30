@@ -52,7 +52,7 @@ public class MqttCollectorTest {
         broker.start();
     }
 
-    @Test
+    @Test(timeout = 120000)
     public void sendDecanterMessage() throws Exception {
         DispatcherMock dispatcherMock = new DispatcherMock();
         ComponentContext componentContext = new ComponentContextMock();
@@ -72,7 +72,9 @@ public class MqttCollectorTest {
         mqttClient.publish("decanter", message);
         mqttClient.disconnect();
 
-        Thread.sleep(200L);
+        while (dispatcherMock.getPostEvents().size() != 1) {
+            Thread.sleep(100);
+        }
 
         Assert.assertEquals(1, dispatcherMock.getPostEvents().size());
         Event event = dispatcherMock.getPostEvents().get(0);
