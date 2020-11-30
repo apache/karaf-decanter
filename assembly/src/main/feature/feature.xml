@@ -397,6 +397,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     <feature name="decanter-appender-orientdb-core" version="${project.version}" description="Karaf Decanter OrientDB Appender core">
         <feature>decanter-common</feature>
         <feature>http</feature>
+        <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.orientdb/${project.version}</bundle>
     </feature>
 
