@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson</artifactId>
-            <version>3.13.0</version>
+            <version>3.14.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter.collector</groupId>
@@ -123,6 +123,7 @@
                             net.bytebuddy*,
                             org.xerial.snappy*,
                             reactor*,
+                            jodd.*,
                             org.apache.karaf.decanter.collector.redis,
                             org.apache.karaf.decanter.collector.utils
                         </Private-Package>
