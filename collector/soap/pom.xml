@@ -34,7 +34,7 @@
     <name>Apache Karaf :: Decanter :: Collector :: SOAP</name>
 
     <properties>
-        <cxf.version>3.3.6</cxf.version>
+        <cxf.version>3.4.1</cxf.version>
     </properties>
 
     <dependencies>
