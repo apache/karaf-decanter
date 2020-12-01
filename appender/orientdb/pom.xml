@@ -45,7 +45,7 @@
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orientdb-client</artifactId>
-            <version>3.1.0</version>
+            <version>3.1.5</version>
         </dependency>
 
         <!-- test -->
@@ -90,6 +90,7 @@
                             com.kenai.jffi,
                             jnr*,
                             com.orientechnologies*,
+                            com.ibm.icu*,
                             com.googlecode.concurrentlinkedhashmap,
                             net.jpountz.lz4,
                             net.jpountz.util,
