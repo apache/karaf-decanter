@@ -462,6 +462,16 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-processor-aggregate-core</feature>
     </feature>
 
+    <feature name="decanter-processor-groupby-core" version="${project.version}" description="Karaf Decanter GroupBy Processor core">
+        <feature>decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.processor/org.apache.karaf.decanter.processor.groupby/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-processor-groupby" version="${project.version}" description="Karaf Decanter GroupBy Processor">
+        <configfile finalname="/etc/org.apache.karaf.decanter.processor.groupby.cfg">mvn:org.apache.karaf.decanter.processor/org.apache.karaf.decanter.processor.groupby/${project.version}/cfg</configfile>
+        <feature>decanter-processor-groupby-core</feature>
+    </feature>
+
     <feature name="decanter-alerting-core" version="${project.version}" description="Karaf Decanter Alerting core">
         <feature>decanter-common</feature>
         <bundle>mvn:org.apache.karaf.decanter.alerting/org.apache.karaf.decanter.alerting.service/${project.version}</bundle>
