@@ -1086,6 +1086,70 @@ karaf@root()> feature:install decanter-collector-jetty
 
 The collector automatically registers in the Pax Web Jetty container and then all HTTP requests/responses data will be sent to the appenders.
 
+==== SNMP
+
+Decanter SNMP Collector allows you to trap or poll metrics from SNMP.
+
+The `decanter-collector-snmp` feature installs the SNMP collector:
+
+----
+karaf@root()> feature:install decanter-collector-snmp
+----
+
+Actually, this collector provides two kind of collectors: poller or trap.
+
+===== Trap
+
+If you want to use SNMP trap, you have to create `etc/org.apache.karaf.decanter.collector.snmp.trap.cfg` configuration file containing:
+
+----
+address=127.0.0.1:161
+protocol=tcp
+----
+
+* `address` is the listening SNMP trap address
+* `protocol` is the transport protocol (TCP or UDP).
+
+===== Poll
+
+If you want to use SNMP poller (periodically getting SNMP metrics), you have to create `etc/org.apache.karaf.decanter.collector.snmp.poll.cfg` configuration file containing:
+
+----
+address=127.0.0.1:161
+protocol=tcp
+retries=2
+timeout=1500
+treelist=false
+oids=first,second
+snmp.version=3
+security.level=3
+security.name=security
+authentication.protocol=MD5
+authentication.passphrase=pass
+privacy.protocol=DES
+privacy.passphrase=pass
+#snmp.context.engine.id=foo
+#snmp.context.name=foo
+snmp.community=public
+----
+
+* `address` is the SNMP service address
+* `protocol` is the transport protocol (tcp or udp)
+* `retries` is the number of attempts
+* `timeout` is the SNMP request timeout (in ms)
+* `treelist` is true to request SNMP tree, false else
+* `oids` is the list of SNMP OIDs to request
+* `snmp.version` is the SNMP version to use (3 by default)
+* `security.level` is the level of security expected by the SNMP version (3 == AUTH_PRIV by default)
+* `security.name` is the security name alias
+* `authentication.protocol` is the password protocol (MD5 or SHA1)
+* `authentication.passphrase` is the password/passphrase to use
+* `privacy.protocol` is DES, TRIDES, AES128, AES192, AES256
+* `private.passphrase` is the password/passphrase to use
+* `snmp.context.engine.id` is optional
+* `snmp.context.name` is optional
+* `snmp.community` is the community to use, `public` by default
+
 ==== Customizing properties in collectors
 
 You can add, rename or remove properties collected by the collectors before sending it to the dispatcher.

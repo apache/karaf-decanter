@@ -241,6 +241,11 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.jetty/${project.version}</bundle>
     </feature>
 
+    <feature name="decanter-collector-snmp" version="${project.version}" description="Karaf Decanter SNMP Collector">
+        <feature>decanter-common</feature>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.snmp/${project.version}</bundle>
+    </feature>
+
     <feature name="decanter-appender-log" version="${project.version}" description="Karaf Decanter Log Appender">
         <feature>decanter-common</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.log.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.log/${project.version}/cfg</configfile>
