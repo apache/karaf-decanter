@@ -64,7 +64,7 @@ public class JmsAppenderTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void test() throws Exception {
         // install jms
         System.out.println(executeCommand("feature:install jms", new RolePrincipal("admin")));
@@ -82,6 +82,8 @@ public class JmsAppenderTest extends KarafTestSupport {
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-appender-jms", new RolePrincipal("admin")));
 
+        Thread.sleep(2000);
+
         // send event
         EventAdmin eventAdmin = getOsgiService(EventAdmin.class);
         HashMap<String, String> data = new HashMap<>();
@@ -89,12 +91,18 @@ public class JmsAppenderTest extends KarafTestSupport {
         Event event = new Event("decanter/collect/test", data);
         eventAdmin.sendEvent(event);
 
+        Thread.sleep(2000);
+
         // browse
         String browse = executeCommand("jms:browse jms/decanter decanter");
 
         System.out.println(browse);
 
-        Assert.assertTrue(browse.contains("\"foo\":\"bar\""));
+        if (browse.contains("foo=bar")) {
+            Assert.assertTrue(browse.contains("foo=bar"));
+        } else {
+            Assert.assertTrue(browse.contains("\"foo\":\"bar\""));
+        }
     }
 
 }

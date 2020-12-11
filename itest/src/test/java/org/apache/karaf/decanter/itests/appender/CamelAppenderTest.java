@@ -56,7 +56,9 @@ public class CamelAppenderTest extends KarafTestSupport {
     @Test
     public void test() throws Exception {
         final List<Exchange> exchanges = new ArrayList<>();
+
         // create route
+        System.out.println("Creating Camel consumer route ...");
         RouteBuilder routeBuilder = new RouteBuilder() {
             @Override
             public void configure() throws Exception {
@@ -73,24 +75,42 @@ public class CamelAppenderTest extends KarafTestSupport {
         camelContext.addRoutes(routeBuilder);
         camelContext.start();
 
-        Thread.sleep(1000);
+        while (!camelContext.isStarted()) {
+            Thread.sleep(200);
+        }
 
         // install decanter
+        System.out.println("Installing Decanter Appender Camel ...");
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-appender-camel", new RolePrincipal("admin")));
 
-        Thread.sleep(2000);
+        String configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.appender.camel)'");
+        while (!configList.contains("service.pid")) {
+            Thread.sleep(500);
+            configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.appender.camel)'");
+        }
 
         // send event
+        System.out.println("Sending event ...");
         EventAdmin eventAdmin = getOsgiService(EventAdmin.class);
         HashMap<String, String> data = new HashMap<>();
         data.put("foo", "bar");
         Event event = new Event("decanter/collect/test", data);
         eventAdmin.sendEvent(event);
 
+        System.out.println("Waiting event ...");
+        while (exchanges.size() < 1) {
+            Thread.sleep(200);
+        }
+
         Assert.assertEquals(1, exchanges.size());
 
         HashMap<String, Object> received = exchanges.get(0).getIn().getBody(HashMap.class);
+
+        for (String key : received.keySet()) {
+            System.out.println(key + " = " + received.get(key));
+        }
+
         Assert.assertEquals("decanter/collect/test", received.get("event.topics"));
         Assert.assertEquals("bar", received.get("foo"));
     }

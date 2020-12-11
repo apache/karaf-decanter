@@ -28,6 +28,7 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+import org.osgi.framework.Bundle;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.http.HttpService;
@@ -65,7 +66,7 @@ public class RestAppenderTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void test() throws Exception {
         List<String> calls = new ArrayList<>();
         // register servlet
@@ -88,7 +89,13 @@ public class RestAppenderTest extends KarafTestSupport {
             }
         }, null, null);
 
-        System.out.println(executeCommand("http:list"));
+        System.out.println("Waiting testing REST service ...");
+        String httpList = executeCommand("http:list");
+        while (!httpList.contains("Deployed")) {
+            Thread.sleep(200);
+            httpList = executeCommand("http:list");
+        }
+        System.out.println(httpList);
 
         // configure appender
         File file = new File(System.getProperty("karaf.etc"), "org.apache.karaf.decanter.appender.rest.cfg");
@@ -96,6 +103,14 @@ public class RestAppenderTest extends KarafTestSupport {
             writer.write("uri=http://localhost:" + getHttpPort() + "/test\n");
             writer.write("marshaller.target=(dataFormat=json)");
         }
+
+        System.out.println("Waiting org.apache.karaf.decanter.appender.rest configuration ...");
+        String configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.appender.rest)'");
+        while (!configList.contains("service.pid")) {
+            Thread.sleep(500);
+            configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.appender.rest)'");
+        }
+        System.out.println(configList);
 
         // install decanter
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
@@ -109,6 +124,10 @@ public class RestAppenderTest extends KarafTestSupport {
         data.put("foo", "bar");
         Event event = new Event("decanter/collect/test", data);
         eventAdmin.sendEvent(event);
+
+        while (calls.size() != 1) {
+            Thread.sleep(200);
+        }
 
         Assert.assertEquals(1, calls.size());
 

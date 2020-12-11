@@ -31,8 +31,10 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -51,13 +53,22 @@ public class SocketCollectorTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void test() throws Exception {
         // install decanter
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-collector-socket", new RolePrincipal("admin")));
 
-        Thread.sleep(2000);
+        System.out.println("Waiting Decanter Collector socket ...");
+        while (true) {
+            try {
+                Thread.sleep(200);
+                Socket socket = new Socket(InetAddress.getLocalHost(), 34343);
+                break;
+            } catch (IOException ioException) {
+                // no-op
+            }
+        }
 
         // create event handler
         List<Event> received = new ArrayList();
@@ -79,6 +90,17 @@ public class SocketCollectorTest extends KarafTestSupport {
         while (received.size() == 0) {
             Thread.sleep(500);
         }
+
+        System.out.println("");
+
+        for (int i = 0; i < received.size(); i++) {
+            for (String property : received.get(i).getPropertyNames()) {
+                System.out.println(property + " = " + received.get(i).getProperty(property));
+            }
+            System.out.println("========");
+        }
+
+        System.out.println("");
 
         Assert.assertEquals(1, received.size());
 

@@ -51,11 +51,12 @@ public class SocketAppenderTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void test() throws Exception {
         List<String> received = new ArrayList<>();
 
         // create server socket
+        System.out.println("Starting test socket listener ...");
         ServerSocket serverSocket = new ServerSocket(34343);
         Runnable runnable = new Runnable() {
             @Override
@@ -79,17 +80,32 @@ public class SocketAppenderTest extends KarafTestSupport {
         thread.start();
 
         // install decanter
+        System.out.println("Installing Decanter Socket Appender ...");
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-appender-socket", new RolePrincipal("admin")));
 
-        Thread.sleep(2000);
+        System.out.println("Waiting org.apache.karaf.decanter.appender.socket configuration");
+        String configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.appender.socket)'");
+        while (!configList.contains("service.pid")) {
+            Thread.sleep(500);
+            configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.appender.socket)'");
+        }
+        System.out.println(configList);
 
         // send event
+        System.out.println("Sending Decanter test event");
         EventAdmin eventAdmin = getOsgiService(EventAdmin.class);
         HashMap<String, String> data = new HashMap<>();
         data.put("foo", "bar");
         Event event = new Event("decanter/collect/test", data);
         eventAdmin.sendEvent(event);
+
+        System.out.println("Waiting events ...");
+        while (received.size() != 1) {
+            Thread.sleep(200);
+        }
+
+        System.out.println(received.get(0));
 
         Assert.assertEquals(1, received.size());
 

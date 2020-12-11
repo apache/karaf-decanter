@@ -27,6 +27,10 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+import org.osgi.framework.Bundle;
+import org.osgi.service.component.runtime.ServiceComponentRuntime;
+import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
+import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 
@@ -48,11 +52,13 @@ public class FileAppenderTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void test() throws Exception {
         // install decanter
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-appender-file", new RolePrincipal("admin")));
+
+        Thread.sleep(2000);
 
         // send event
         EventAdmin eventAdmin = getOsgiService(EventAdmin.class);
@@ -61,6 +67,8 @@ public class FileAppenderTest extends KarafTestSupport {
         Event event = new Event("decanter/collect/test", data);
         eventAdmin.sendEvent(event);
 
+        Thread.sleep(2000);
+
         // read file
         File file = new File(System.getProperty("karaf.data"), "decanter");
         StringBuilder builder = new StringBuilder();
@@ -68,7 +76,13 @@ public class FileAppenderTest extends KarafTestSupport {
             builder.append(reader.readLine()).append("\n");
         }
 
-        Assert.assertTrue(builder.toString().contains("foo=bar"));
+        System.out.println(builder.toString());
+
+        if (builder.toString().contains("foo=bar")) {
+            Assert.assertTrue(builder.toString().contains("foo=bar"));
+        } else {
+            Assert.assertTrue(builder.toString().contains("\"foo\":\"bar\""));
+        }
     }
 
 }

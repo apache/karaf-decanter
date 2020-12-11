@@ -29,6 +29,7 @@ import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.http.HttpService;
@@ -39,10 +40,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -50,10 +52,10 @@ import java.util.stream.Stream;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class SoapCollectorTest extends KarafTestSupport {
+public class JettyCollectorTest extends KarafTestSupport {
 
     @Inject
-    private HttpService httpService;
+    HttpService httpService;
 
     @Configuration
     public Option[] config() {
@@ -65,26 +67,32 @@ public class SoapCollectorTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test(timeout = 120000)
+    @Test(timeout = 60000)
     public void test() throws Exception {
+        System.out.println("Registering test servlet ...");
         httpService.registerServlet("/test", new HttpServlet() {
             @Override
-            protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                try (PrintWriter writer = new PrintWriter(resp.getWriter())) {
-                    writer.write("<soap:mock>test</soap:mock>");
+            public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(response.getOutputStream()))) {
+                    writer.write("{\"test\":\"test\"}");
+                    writer.flush();
                 }
-                resp.setHeader("Content-Type", "application/xml");
-                resp.setStatus(200);
             }
         }, null, null);
         String httpList = executeCommand("http:list");
         while (!httpList.contains("Deployed")) {
-            Thread.sleep(500);
+            Thread.sleep(200);
             httpList = executeCommand("http:list");
         }
-        Assert.assertTrue(httpList.contains("/test"));
+        System.out.println(httpList);
 
-        // create event handler
+        System.out.println("Installing Decanter Jetty Collector ...");
+        System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version"), new RolePrincipal("admin")));
+        System.out.println(executeCommand("feature:install decanter-collector-jetty", new RolePrincipal("admin")));
+
+        getOsgiService("org.eclipse.jetty.server.Handler");
+
+        System.out.println("Registering event handler ...");
         List<Event> received = new ArrayList();
         EventHandler eventHandler = new EventHandler() {
             @Override
@@ -96,23 +104,21 @@ public class SoapCollectorTest extends KarafTestSupport {
         serviceProperties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
         bundleContext.registerService(EventHandler.class, eventHandler, serviceProperties);
 
-        // configure soap collector
-        File file = new File(System.getProperty("karaf.etc"), "org.apache.karaf.decanter.collector.soap-1.cfg");
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write("url=http://localhost:" + getHttpPort() + "/test\n");
-            writer.write("soap.request=test");
+        System.out.println("Calling servlet ...");
+        // send data to rest servlet collector
+        URL url = new URL("http://localhost:" + getHttpPort() + "/test");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Content-Type", "application/json");
+        Assert.assertEquals(200, connection.getResponseCode());
+        System.out.println(connection.getResponseMessage());
+
+        System.out.println("Waiting events ...");
+        while (received.size() < 1) {
+            Thread.sleep(200);
         }
 
-        // install decanter
-        System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
-        System.out.println(executeCommand("feature:install decanter-collector-soap", new RolePrincipal("admin")));
-
-        System.out.println("Waiting scheduler ...");
-        while (received.size() == 0) {
-            Thread.sleep(500);
-        }
-
-        System.out.println("");
+        Assert.assertEquals(1, received.size());
 
         for (int i = 0; i < received.size(); i++) {
             for (String property : received.get(i).getPropertyNames()) {
@@ -121,18 +127,11 @@ public class SoapCollectorTest extends KarafTestSupport {
             System.out.println("========");
         }
 
-        System.out.println("");
-
-        Assert.assertEquals(1, received.size());
-
-        Assert.assertEquals("decanter/collect/soap", received.get(0).getTopic());
-        Assert.assertEquals("OK", received.get(0).getProperty("http.response.message"));
-        Assert.assertTrue(((String) received.get(0).getProperty("soap.response")).contains("<soap:mock>test</soap:mock>"));
-        Assert.assertEquals("test", received.get(0).getProperty("soap.request"));
-        Assert.assertEquals("soap", received.get(0).getProperty("type"));
-        Assert.assertEquals(200, received.get(0).getProperty("http.response.code"));
-        Assert.assertEquals("root", received.get(0).getProperty("karafName"));
-        Assert.assertNotNull(received.get(0).getProperty("http.response.time"));
+        Assert.assertEquals("decanter/collect/jetty", received.get(0).getProperty("event.topics"));
+        Assert.assertEquals("GET", received.get(0).getProperty("request.method"));
+        Assert.assertEquals("/test", received.get(0).getProperty("request.pathInfo"));
+        Assert.assertEquals("/test", received.get(0).getProperty("request.requestURI"));
+        Assert.assertEquals(200, received.get(0).getProperty("response.status"));
     }
 
 }

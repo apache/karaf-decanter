@@ -45,11 +45,13 @@ public class LogAppenderTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void test() throws Exception {
         // install decanter
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-appender-log", new RolePrincipal("admin")));
+
+        Thread.sleep(2000);
 
         // send event synchronously for test
         EventAdmin eventAdmin = getOsgiService(EventAdmin.class);
@@ -58,11 +60,20 @@ public class LogAppenderTest extends KarafTestSupport {
         Event event = new Event("decanter/collect/test", data);
         eventAdmin.sendEvent(event);
 
+        Thread.sleep(2000);
+
         // get log
         String log = executeCommand("log:display");
 
-        Assert.assertTrue(log.contains("foo=bar"));
-        Assert.assertTrue(log.contains("decanter/collect/test"));
+        System.out.println(log);
+
+        if (log.contains("foo=bar")) {
+            Assert.assertTrue(log.contains("foo=bar"));
+            Assert.assertTrue(log.contains("decanter/collect/test"));
+        } else {
+            Assert.assertTrue(log.contains("\"foo\":\"bar\""));
+            Assert.assertTrue(log.contains("decanter/collect/test"));
+        }
     }
 
 }

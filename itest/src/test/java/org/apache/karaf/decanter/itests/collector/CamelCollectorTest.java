@@ -103,14 +103,13 @@ public class CamelCollectorTest extends KarafTestSupport {
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         producerTemplate.sendBodyAndHeader("direct:test", "This is a test", "testHeader", "testValue");
 
-        // TODO two events ?
         Assert.assertEquals(2, received.size());
 
         Assert.assertEquals("decanter/collect/camel/tracer", received.get(0).getTopic());
         Assert.assertEquals("context-test", received.get(0).getProperty("camelContextName"));
         Assert.assertEquals("InOnly", received.get(0).getProperty("exchangePattern"));
         Assert.assertEquals("camelTracer", received.get(0).getProperty("type"));
-        Assert.assertEquals("log://foo", received.get(0).getProperty("toNode"));
+        Assert.assertEquals("log:foo", received.get(0).getProperty("to1.label"));
         Assert.assertEquals("route-test", received.get(0).getProperty("routeId"));
         Assert.assertEquals("direct://test", received.get(0).getProperty("fromEndpointUri"));
         Assert.assertEquals("root", received.get(0).getProperty("karafName"));
@@ -138,7 +137,7 @@ public class CamelCollectorTest extends KarafTestSupport {
 
         // create route with notifier
         EventAdmin eventAdmin = getOsgiService(EventAdmin.class);
-        DecanterEventNotifier notifier  = new DecanterEventNotifier();
+        DecanterEventNotifier notifier = new DecanterEventNotifier();
         notifier.setEventAdmin(eventAdmin);
 
         RouteBuilder builder = new RouteBuilder() {

@@ -35,6 +35,7 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,13 +55,11 @@ public class Log4jSocketCollectorTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void test() throws Exception {
         // install decanter
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-collector-log-socket", new RolePrincipal("admin")));
-
-        Thread.sleep(2000);
 
         // create event handler
         List<Event> received = new ArrayList();
@@ -75,7 +74,15 @@ public class Log4jSocketCollectorTest extends KarafTestSupport {
         bundleContext.registerService(EventHandler.class, eventHandler, serviceProperties);
 
         LoggingEvent loggingEvent = new LoggingEvent("test", Category.getInstance("logger"), System.currentTimeMillis(), Level.toLevel("INFO"), "Test", "thread", null, "test", null, new HashMap());
-        Socket socket = new Socket("localhost", 4560);
+        Socket socket = null;
+        while (socket == null) {
+            Thread.sleep(100);
+            try {
+                socket = new Socket("localhost", 4560);
+            } catch (ConnectException connectException) {
+                // wait
+            }
+        }
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream())) {
             objectOutputStream.writeObject(loggingEvent);
         }
@@ -83,6 +90,17 @@ public class Log4jSocketCollectorTest extends KarafTestSupport {
         while (received.size() == 0) {
             Thread.sleep(500);
         }
+
+        System.out.println("");
+
+        for (int i = 0; i < received.size(); i++) {
+            for (String property : received.get(i).getPropertyNames()) {
+                System.out.println(property + " = " + received.get(i).getProperty(property));
+            }
+            System.out.println("========");
+        }
+
+        System.out.println("");
 
         Assert.assertEquals(1, received.size());
 
