@@ -398,6 +398,11 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-common</feature>
         <feature>http</feature>
         <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
+        <bundle dependency="true">mvn:org.ow2.asm/asm/7.3.1</bundle>
+        <bundle dependency="true">mvn:org.ow2.asm/asm-util/7.3.1</bundle>
+        <bundle dependency="true">mvn:org.ow2.asm/asm-tree/7.3.1</bundle>
+        <bundle dependency="true">mvn:org.ow2.asm/asm-analysis/7.3.1</bundle>
+        <bundle dependency="true">mvn:org.ow2.asm/asm-commons/7.3.1</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.orientdb/${project.version}</bundle>
     </feature>
 
