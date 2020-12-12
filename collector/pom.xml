@@ -54,6 +54,7 @@
         <module>rest-servlet</module>
         <module>soap</module>
         <module>system</module>
+        <module>snmp</module>
         <module>socket</module>
         <module>prometheus</module>
         <module>jdbc</module>
