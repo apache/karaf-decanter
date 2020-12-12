@@ -36,6 +36,7 @@
     <modules>
         <module>passthrough</module>
         <module>aggregate</module>
+        <module>groupby</module>
     </modules>
 
 </project>

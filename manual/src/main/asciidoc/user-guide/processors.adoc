@@ -52,7 +52,7 @@ karaf@root()> feature:install decanter-processor-aggregate
 
 By default, the "merged" event is sent every minute. You can change this using the `period` configuration.
 
-You can provisiong `etc/org.apache.karaf.decanter.processor.aggregate.cfg` configuration file with:
+You can provision `etc/org.apache.karaf.decanter.processor.aggregate.cfg` configuration file with:
 
 ----
 period=120 # this is the period in seconds
@@ -77,3 +77,61 @@ overwrite=true
 ----
 
 Then, if a property already exist in the aggregator, its value will be overwritten by the new event value received in the aggregator.
+
+==== GroupBy
+
+This processor "groups" events containing same properties values during a period.
+
+For instance, you configure the GroupBy processor to group events using `foo` and `bar` properties. Then you receive
+the following three events:
+
+1. first event containing: `{ "foo":"foo","bar":"bar","first":"value1" }`
+2. second event containing: `{ "hello":"world","second":"value2" }`
+3. third event containing: `{ "foo":"foo","bar":"bar","third":"value3"}`
+
+The groupBy processor will create (and send) one event containing:
+
+* if you choose to "flatten" the properties, the event will contain: `{ "foo":"foo", "bar":"bar", "first":"value1","third":"value3" }`
+* if you chosse not to "flatten" the properties, the event will contain: `{ "events":[ { "foo":"foo","bar":"bar","first":"value1" }, { "foo":"foo","bar":"bar","third":"value3" } ] }`
+
+You can install this processor using the `decanter-processor-groupby` feature:
+
+----
+karaf@root()> feature:install decanter-processor-groupby
+----
+
+By default, the "merged" event is sent every minute. You can change this using the `period` configuration.
+
+The GroupBy processor is configured via `etc/org.apache.karaf.decanter.processor.groupby.cfg` configuration file:
+
+----
+#
+# Decanter GroupBy processor
+#
+
+#
+# Destination dispatcher topics where to send the aggregated events
+#
+#target.topics=decanter/process/groupby
+
+#
+# Aggregation period in seconds
+#
+#period=60
+
+#
+# List of grouping properties
+#
+#groupBy=first,second
+
+#
+# If true, grouped events properties are flatten (all properties in the event) aka Map<String,Object>
+# If false, grouped events properties are inner grouped map aka Map<int, Map<String,Object>>
+#
+#flatten=true
+----
+
+* The `target.topics` property defines the list of Decanter topics (separated by `,`) where the resulting events will be sent.
+* The `period` property defines the retention period to accumulate the incoming events
+* The `groupBy` property defines the property names (separated by `,`) as grouping term
+* The `flatten` property defines the way the resulting event will be created. If `true`, all events properties will be store directly (flat) in the resulting event. If `false`, the resulting event will contain an array of properties (from the original grouped events).
