@@ -52,7 +52,7 @@ public class LogCollectorTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void test() throws Exception {
         // install log collector
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
@@ -71,6 +71,21 @@ public class LogCollectorTest extends KarafTestSupport {
         bundleContext.registerService(EventHandler.class, eventHandler, serviceProperties);
 
         LOGGER.info("This is a test");
+
+        while (received.size() < 1) {
+            Thread.sleep(200);
+        }
+
+        System.out.println("");
+
+        for (int i = 0; i < received.size(); i++) {
+            for (String property : received.get(i).getPropertyNames()) {
+                System.out.println(property + " = " + received.get(i).getProperty(property));
+            }
+            System.out.println("========");
+        }
+
+        System.out.println("");
 
         Assert.assertEquals(1, received.size());
         Assert.assertEquals("decanter/collect/log/org_apache_karaf_decanter_itests_collector_LogCollectorTest", received.get(0).getTopic());

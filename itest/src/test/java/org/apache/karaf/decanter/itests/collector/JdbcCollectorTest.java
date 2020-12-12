@@ -61,7 +61,7 @@ public class JdbcCollectorTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 120000)
     public void test() throws Exception {
         // install database
         System.out.println(executeCommand("feature:install jdbc", new RolePrincipal("admin")));
@@ -88,7 +88,12 @@ public class JdbcCollectorTest extends KarafTestSupport {
         Thread.sleep(1000);
 
         // list scheduler jobs
-        System.out.println(executeCommand("scheduler:list"));
+        String schedulerList = executeCommand("scheduler:list");
+        while (!schedulerList.contains("decanter-collector-jdbc")) {
+            Thread.sleep(200);
+            schedulerList = executeCommand("scheduler:list");
+        }
+        System.out.println(schedulerList);
 
         // add a event handler
         List<Event> received = new ArrayList();
@@ -107,6 +112,17 @@ public class JdbcCollectorTest extends KarafTestSupport {
         while (received.size() == 0) {
             Thread.sleep(500);
         }
+
+        System.out.println("");
+
+        for (int i = 0; i < received.size(); i++) {
+            for (String property : received.get(i).getPropertyNames()) {
+                System.out.println(property + " = " + received.get(i).getProperty(property));
+            }
+            System.out.println("========");
+        }
+
+        System.out.println("");
 
         Assert.assertTrue(received.size() >= 1);
 

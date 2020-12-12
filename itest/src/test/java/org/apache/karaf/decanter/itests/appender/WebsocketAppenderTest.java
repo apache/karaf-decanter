@@ -65,9 +65,17 @@ public class WebsocketAppenderTest extends KarafTestSupport {
     @Test
     public void test() throws Exception {
         // install decanter
+        System.out.println("Installing Decanter WebSocket Appender ...");
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-appender-websocket-servlet", new RolePrincipal("admin")));
 
+        String configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.appender.websocket.servlet)'");
+        while (!configList.contains("service.pid")) {
+            Thread.sleep(500);
+            configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.appender.websocket.servlet)'");
+        }
+
+        System.out.println("Waiting websocket servlet deployed ...");
         String httpList = executeCommand("http:list");
         while (!httpList.contains("Deployed")) {
             Thread.sleep(500);
@@ -76,6 +84,7 @@ public class WebsocketAppenderTest extends KarafTestSupport {
         System.out.println(httpList);
 
         // websocket
+        System.out.println("Creating testing websocket client ...");
         WebSocketClient client = new WebSocketClient();
         DecanterSocket decanterSocket = new DecanterSocket();
         client.start();
@@ -91,6 +100,11 @@ public class WebsocketAppenderTest extends KarafTestSupport {
         eventAdmin.sendEvent(event);
 
         decanterSocket.awaitClose(20, TimeUnit.SECONDS);
+
+        System.out.println("Waiting event ...");
+        while (decanterSocket.messages.size() != 1) {
+            Thread.sleep(200);
+        }
 
         Assert.assertEquals(1, decanterSocket.messages.size());
 

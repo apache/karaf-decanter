@@ -65,8 +65,9 @@ public class RestCollectorTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 240000)
     public void test() throws Exception {
+        System.out.println("Deploying test servlet ...");
         // register servlet
         httpService.registerServlet("/test", new HttpServlet() {
             @Override
@@ -85,6 +86,7 @@ public class RestCollectorTest extends KarafTestSupport {
         }
         Assert.assertTrue(httpList.contains("/test"));
 
+        System.out.println("Adding test event handler ...");
         // create event handler
         List<Event> received = new ArrayList();
         EventHandler eventHandler = new EventHandler() {
@@ -98,12 +100,19 @@ public class RestCollectorTest extends KarafTestSupport {
         bundleContext.registerService(EventHandler.class, eventHandler, serviceProperties);
 
         // configure collector
+        System.out.println("Installing Decanter Collector Rest ...");
         File file = new File(System.getProperty("karaf.etc"), "org.apache.karaf.decanter.collector.rest-1.cfg");
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write("url=http://localhost:" + getHttpPort() + "\n");
             writer.write("paths=test\n");
             writer.write("unmarshaller.target=(dataFormat=json)");
         }
+        String configList = executeCommand("config:list '(service.factoryPid=org.apache.karaf.decanter.collector.rest)'");
+        while (!configList.contains("service.pid")) {
+            Thread.sleep(500);
+            configList = executeCommand("config:list '(service.factoryPid=org.apache.karaf.decanter.collector.rest)'");
+        }
+        System.out.println(configList);
 
         // install decanter
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
@@ -113,6 +122,17 @@ public class RestCollectorTest extends KarafTestSupport {
         while (received.size() == 0) {
             Thread.sleep(500);
         }
+
+        System.out.println("");
+
+        for (int i = 0; i < received.size(); i++) {
+            for (String property : received.get(i).getPropertyNames()) {
+                System.out.println(property + " = " + received.get(i).getProperty(property));
+            }
+            System.out.println("========");
+        }
+
+        System.out.println("");
 
         Assert.assertEquals(1, received.size());
 

@@ -16,6 +16,7 @@
  */
 package org.apache.karaf.decanter.itests.collector;
 
+import org.apache.karaf.features.FeaturesService;
 import org.apache.karaf.itests.KarafTestSupport;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
+import org.ops4j.pax.exam.karaf.options.KarafFeaturesOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.service.event.Event;
@@ -32,6 +34,7 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Stream;
@@ -59,11 +62,12 @@ public class JmsCollectorTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void test() throws Exception {
         // install activemq
-        featureService.installFeature("aries-blueprint");
-        featureService.installFeature("activemq-broker-noweb");
+        featureService.installFeature("shell-compat");
+        featureService.installFeature("activemq-broker-noweb", EnumSet.of(FeaturesService.Option.NoAutoRefreshBundles));
+        Thread.sleep(2000);
 
         // install jms
         featureService.installFeature("jms");
@@ -71,7 +75,12 @@ public class JmsCollectorTest extends KarafTestSupport {
 
         // create connection factory
         System.out.println(executeCommand("jms:create decanter"));
-        Thread.sleep(2000);
+        String jmsConnectionFactory = executeCommand("jms:connectionfactories");
+        while (!jmsConnectionFactory.contains("jms/decanter")) {
+            Thread.sleep(200);
+            jmsConnectionFactory = executeCommand("jms:connectionfactories");
+        }
+
         System.out.println(executeCommand("jms:connectionfactories"));
         System.out.println(executeCommand("jms:info jms/decanter"));
 
@@ -93,14 +102,29 @@ public class JmsCollectorTest extends KarafTestSupport {
         // send message to JMS queue
         System.out.println(executeCommand("jms:send jms/decanter decanter '{\"foo\":\"bar\"}'"));
 
-        while (received.size() == 0) {
-            Thread.sleep(500);
+        while (received.size() < 1) {
+            Thread.sleep(200);
         }
+
+        System.out.println("");
+
+        for (int i = 0; i < received.size(); i++) {
+            for (String property : received.get(i).getPropertyNames()) {
+                System.out.println(property + " = " + received.get(i).getProperty(property));
+            }
+            System.out.println("=========");
+        }
+
+        System.out.println("");
 
         Assert.assertEquals(1, received.size());
 
         Assert.assertEquals("decanter/collect/jms/decanter", received.get(0).getTopic());
-        Assert.assertEquals("bar", received.get(0).getProperty("foo"));
+        if (received.get(0).getProperty("payload") != null) {
+            Assert.assertTrue(((String) received.get(0).getProperty("payload")).contains("{\"foo\":\"bar\"}"));
+        } else {
+            Assert.assertEquals("bar", received.get(0).getProperty("foo"));
+        }
         Assert.assertEquals("jms", received.get(0).getProperty("type"));
         Assert.assertEquals("root", received.get(0).getProperty("karafName"));
     }

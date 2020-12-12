@@ -663,7 +663,7 @@ The Dropwizard Metrics appender receives the harvested data from the dispatcher 
 `MetricRegistry`. You can register this `MetricRegistry` in your own application or use a Dropwizard Metrics Reporter
 to "push" these metrics to some backend.
 
-The `decanter-appender-dropwizard` feature provides the Decanter event handler registering the harvested data ino the
+The `decanter-appender-dropwizard` feature provides the Decanter event handler registering the harvested data into the
 `MetricRegistry`:
 
 ----

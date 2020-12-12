@@ -59,7 +59,6 @@ public class MqttCollector {
     private String dispatcherTopic;
     private boolean consuming = false;
 
-
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
         properties = componentContext.getProperties();
@@ -78,8 +77,10 @@ public class MqttCollector {
         if (password != null) {
             options.setPassword(password.toCharArray());
         }
-        client.connect(options);
-        client.subscribe(topic);
+        options.setConnectionTimeout(60);
+        options.setAutomaticReconnect(true);
+        options.setKeepAliveInterval(10);
+        options.setExecutorServiceTimeout(30);
         client.setCallback(new MqttCallback() {
             @Override
             public void connectionLost(Throwable cause) {
@@ -113,12 +114,18 @@ public class MqttCollector {
                 // nothing to do
             }
         });
+        client.connect(options);
+        client.subscribe(topic);
     }
 
     @Deactivate
-    public void deactivate() throws Exception {
+    public void deactivate() {
         if (client != null) {
-            client.disconnect();
+            try {
+                client.disconnect();
+            } catch (Exception e) {
+                // no-op
+            }
         }
     }
 

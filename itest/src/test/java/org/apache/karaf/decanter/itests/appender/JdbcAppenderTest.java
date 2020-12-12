@@ -55,17 +55,24 @@ public class JdbcAppenderTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void test() throws Exception {
         // install database
         System.out.println(executeCommand("feature:install jdbc", new RolePrincipal("admin")));
         System.out.println(executeCommand("feature:install pax-jdbc-derby", new RolePrincipal("admin")));
 
-        System.out.println(executeCommand("jdbc:ds-list"));
+        String dsList = executeCommand("jdbc:ds-list");
+        while (!dsList.contains("jdbc/decanter")) {
+            Thread.sleep(200);
+            dsList = executeCommand("jdbc:ds-list");
+        }
+        System.out.println(dsList);
 
         // install decanter
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-appender-jdbc", new RolePrincipal("admin")));
+
+        Thread.sleep(2000);
 
         // send event
         EventAdmin eventAdmin = getOsgiService(EventAdmin.class);
@@ -74,15 +81,23 @@ public class JdbcAppenderTest extends KarafTestSupport {
         Event event = new Event("decanter/collect/test", data);
         eventAdmin.sendEvent(event);
 
+        Thread.sleep(2000);
+
         // check database content
         DataSource dataSource = getOsgiService(DataSource.class);
         try (Connection connection = dataSource.getConnection()) {
             try (Statement statement = connection.createStatement()) {
                 try (ResultSet resultSet = statement.executeQuery("select * from decanter")) {
                     resultSet.next();
-                    String json = resultSet.getString(2);
-                    Assert.assertTrue(json.contains("\"foo\":\"bar\""));
-                    Assert.assertTrue(json.contains("\"event_topics\":\"decanter/collect/test\""));
+                    String result = resultSet.getString(2);
+                    System.out.println(result);
+                    if (result.contains("foo=bar")) {
+                        Assert.assertTrue(result.contains("foo=bar"));
+                        Assert.assertTrue(result.contains("event.topics=decanter/collect/test"));
+                    } else {
+                        Assert.assertTrue(result.contains("\"foo\":\"bar\""));
+                        Assert.assertTrue(result.contains("\"event_topics\":\"decanter/collect/test\""));
+                    }
                 }
             }
         }

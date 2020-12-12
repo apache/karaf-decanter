@@ -53,16 +53,21 @@ public class FileCollectorTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test(timeout = 60000)
+    @Test(timeout = 30000)
     public void test() throws Exception {
         // install decanter
+        System.out.println("Installing Decanter Collector File ...");
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-collector-file", new RolePrincipal("admin")));
 
-        // wait for the factory
-        Thread.sleep(1000);
+        String configList = executeCommand("config:list '(service.factoryPid=org.apache.karaf.decanter.collector.file)'");
+        while (!configList.contains("service.pid")) {
+            Thread.sleep(500);
+            configList = executeCommand("config:list '(service.factoryPid=org.apache.karaf.decanter.collector.file)'");
+        }
 
         // add a event handler
+        System.out.println("Adding test event handler ...");
         List<Event> received = new ArrayList();
         EventHandler eventHandler = new EventHandler() {
             @Override
@@ -75,16 +80,28 @@ public class FileCollectorTest extends KarafTestSupport {
         bundleContext.registerService(EventHandler.class, eventHandler, serviceProperties);
 
         // append data in the file
+        System.out.println("Writing data in test.log file ...");
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File("test.log")))) {
             writer.write("This is a test\n");
             writer.write("Another test\n");
             writer.flush();
         }
 
-        System.out.println("Waiting message ...");
-        while (received.size() == 0) {
+        System.out.println("Waiting events ...");
+        while (received.size() < 2) {
             Thread.sleep(500);
         }
+
+        System.out.println("");
+
+        for (int i = 0; i < received.size(); i++) {
+            for (String property : received.get(i).getPropertyNames()) {
+                System.out.println(property + " = " + received.get(i).getProperty(property));
+            }
+            System.out.println("========");
+        }
+
+        System.out.println("");
 
         Assert.assertEquals(2, received.size());
 

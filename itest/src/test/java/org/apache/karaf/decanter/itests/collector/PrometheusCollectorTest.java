@@ -38,11 +38,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -50,7 +46,7 @@ import java.util.stream.Stream;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class SoapCollectorTest extends KarafTestSupport {
+public class PrometheusCollectorTest extends KarafTestSupport {
 
     @Inject
     private HttpService httpService;
@@ -67,23 +63,26 @@ public class SoapCollectorTest extends KarafTestSupport {
 
     @Test(timeout = 120000)
     public void test() throws Exception {
-        httpService.registerServlet("/test", new HttpServlet() {
+        System.out.println("Deploying Prometheus test servlet ...");
+        httpService.registerServlet("/prometheus", new HttpServlet() {
             @Override
-            protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                try (PrintWriter writer = new PrintWriter(resp.getWriter())) {
-                    writer.write("<soap:mock>test</soap:mock>");
+            public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(response.getOutputStream()))) {
+                    writer.write("# HELP Test Test\n");
+                    writer.write("# TYPE Test gauge\n");
+                    writer.write("Test 0.0");
+                    writer.flush();
                 }
-                resp.setHeader("Content-Type", "application/xml");
-                resp.setStatus(200);
             }
         }, null, null);
+
         String httpList = executeCommand("http:list");
         while (!httpList.contains("Deployed")) {
             Thread.sleep(500);
             httpList = executeCommand("http:list");
         }
-        Assert.assertTrue(httpList.contains("/test"));
 
+        System.out.println("Adding test event handler ...");
         // create event handler
         List<Event> received = new ArrayList();
         EventHandler eventHandler = new EventHandler() {
@@ -96,19 +95,22 @@ public class SoapCollectorTest extends KarafTestSupport {
         serviceProperties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
         bundleContext.registerService(EventHandler.class, eventHandler, serviceProperties);
 
-        // configure soap collector
-        File file = new File(System.getProperty("karaf.etc"), "org.apache.karaf.decanter.collector.soap-1.cfg");
+        System.out.println("Installing Decanter Collector Prometheus ...");
+        File file = new File(System.getProperty("karaf.etc"), "org.apache.karaf.decanter.collector.prometheus.cfg");
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write("url=http://localhost:" + getHttpPort() + "/test\n");
-            writer.write("soap.request=test");
+            writer.write("prometheus.url=http://localhost:" + getHttpPort() + "/prometheus");
+            writer.flush();
         }
+        String configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.collector.prometheus)'");
+        while (!configList.contains("service.pid")) {
+            Thread.sleep(500);
+            configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.collector.prometheus)'");
+        }
+        System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version"), new RolePrincipal("admin")));
+        System.out.println(executeCommand("feature:install decanter-collector-prometheus", new RolePrincipal("admin")));
 
-        // install decanter
-        System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
-        System.out.println(executeCommand("feature:install decanter-collector-soap", new RolePrincipal("admin")));
-
-        System.out.println("Waiting scheduler ...");
-        while (received.size() == 0) {
+        System.out.println("Waiting events ...");
+        while (received.size() < 1) {
             Thread.sleep(500);
         }
 
@@ -125,14 +127,9 @@ public class SoapCollectorTest extends KarafTestSupport {
 
         Assert.assertEquals(1, received.size());
 
-        Assert.assertEquals("decanter/collect/soap", received.get(0).getTopic());
-        Assert.assertEquals("OK", received.get(0).getProperty("http.response.message"));
-        Assert.assertTrue(((String) received.get(0).getProperty("soap.response")).contains("<soap:mock>test</soap:mock>"));
-        Assert.assertEquals("test", received.get(0).getProperty("soap.request"));
-        Assert.assertEquals("soap", received.get(0).getProperty("type"));
-        Assert.assertEquals(200, received.get(0).getProperty("http.response.code"));
-        Assert.assertEquals("root", received.get(0).getProperty("karafName"));
-        Assert.assertNotNull(received.get(0).getProperty("http.response.time"));
+        Assert.assertEquals(0.0, received.get(0).getProperty("Test"));
+        Assert.assertEquals("decanter/collect/prometheus", received.get(0).getProperty("event.topics"));
+        Assert.assertEquals("prometheus", received.get(0).getProperty("type"));
     }
 
 }
