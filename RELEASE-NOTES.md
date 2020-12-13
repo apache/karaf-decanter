@@ -17,6 +17,58 @@
     under the License.
 -->
 
+## Apache Karaf Decanter 2.6.0
+
+### Overview
+
+Apache Karaf Decanter 2.6.0 is a major release on the 2.x series. It provides dependency updates, fixes, improvements and new
+features, especially:
+
+* New SNMP collector
+* New Camel processor
+* New GroupBy processor
+* Improvements on REST and Socket collectors
+
+Take a look on ChangeLog for details.
+
+### ChangeLog
+
+#### Bug
+    * [KARAF-6834] - Extend pax-logging import version range in log collector
+    * [KARAF-6835] - Remove decanter process collector
+
+#### New Feature
+    * [KARAF-6706] - Add snmp collector
+    * [KARAF-6736] - Add camel processing
+    * [KARAF-6864] - Add a groupBy processor
+
+#### Improvement
+    * [KARAF-6837] - Place a bound on the data read in the rest servlet + socket collectors
+
+#### Dependency upgrade
+    * [KARAF-6806] - Upgrade to Jackson Databind 2.10.5
+    * [KARAF-6927] - Upgrade to commons-io 2.8.0
+    * [KARAF-6928] - Upgrade to junit 4.13.1
+    * [KARAF-6929] - Upgrade to ActiveMQ 5.15.13
+    * [KARAF-6930] - Upgrade to Karaf 4.2.10
+    * [KARAF-6931] - Upgrade to johnzon 1.2.8
+    * [KARAF-6932] - Upgrade to paho mqtt client 1.2.5
+    * [KARAF-6933] - Upgrade to camel 2.25.2
+    * [KARAF-6934] - Upgrade to dropwizard 4.1.16
+    * [KARAF-6935] - Upgrade to elasticsearch 7.10.0
+    * [KARAF-6936] - Upgrade to Jetty 9.4.35.v20201120
+    * [KARAF-6937] - Upgrade to mockito 3.6.28
+    * [KARAF-6938] - Upgrade to kafka 2.6.0
+    * [KARAF-6939] - Upgrade to Pax Logging 1.11.7
+    * [KARAF-6940] - Upgrade to oshi 5.3.6
+    * [KARAF-6941] - Upgrade to redisson 3.14.0
+    * [KARAF-6942] - Upgrade to CXF 3.4.1
+    * [KARAF-6943] - Upgrade to Cassandra java driver 4.9.0
+    * [KARAF-6944] - Upgrade to influxdb 2.20
+    * [KARAF-6945] - Upgrade to orientdb-client 3.1.5
+    * [KARAF-6946] - Upgrade to mongodb java driver 3.12.7
+    * [KARAF-6947] - Upgrade to lucene 8.7.0
+
 ## Apache Karaf Decanter 2.5.0
 
 ### Overview

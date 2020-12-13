@@ -34,6 +34,9 @@ It is very extensible, flexible, easy to install and use.
     to dispatch the collected data to the appenders.
 * **Appenders**: The appenders are responsible to send/store the collected data to target
     backend systems.
+* **Processor**: The processors can manipulate the internal Decanter events between the 
+    collectors and the appenders. Decanter provides ready to use processors (aggregate,
+    groupBy, camel, ...).
 * **Alerting**: the alerting layer provides a checker, responsible of testing values of
       harvested data (coming from the collectors) and send alerts when the data
       is not in the expected state.
@@ -52,24 +55,31 @@ using `feature:install` command.
 
 ## Features
 
-See user guide for the details of Decanter features:
+See user guide for the details of Decanter features.
 
 ### Collectors
 
 * `decanter-collector-camel`
+* `decanter-collector-configadmin
 * `decanter-collector-dropwizard`
 * `decanter-collector-eventadmin`
 * `decanter-collector-file`
 * `decanter-collector-jdbc`
+* `decanter-collector-jetty`
 * `decanter-collector-jms`
 * `decanter-collector-jmx`
 * `decanter-collector-kafka`
 * `decanter-collector-log`
 * `decanter-collector-log4j-socket`
 * `decanter-collector-mqtt`
+* `decanter-collector-oshi`
 * `decanter-collector-process`
+* `decanter-collector-prometheus`
+* `decanter-collector-redis`
 * `decanter-collector-rest`
 * `decanter-collector-rest-servlet`
+* `decanter-collector-snmp`
+* `decanter-collector-soap`
 * `decanter-collector-socket`
 * `decanter-collector-system`
 
@@ -78,11 +88,9 @@ See user guide for the details of Decanter features:
 * `decanter-appender-camel`
 * `decanter-appender-cassandra`
 * `decanter-appender-dropwizard`
-* `decanter-appender-elasticsearch-jest`
-* `decanter-appender-elasticsearch-native-1.x`
-* `decanter-appender-elasticsearch-native-2.x`
-* `decanter-appender-elasticsearch-rest`
+* `decanter-appender-elasticsearch`
 * `decanter-appender-file`
+* `decanter-appender-influxdb`
 * `decanter-appender-jdbc`
 * `decanter-appender-jms`
 * `decanter-appender-kafka`
@@ -90,31 +98,25 @@ See user guide for the details of Decanter features:
 * `decanter-appender-mongodb`
 * `decanter-appender-mqtt`
 * `decanter-appender-orientdb`
+* `decanter-appender-prometheus`
 * `decanter-appender-redis`
 * `decanter-appender-rest`
 * `decanter-appender-socket`
+* `decanter-appender-timescaledb`
+* `decanter-appender-websocket`
+
+### Processors
+
+* `decanter-processor-passthrough`
+* `decanter-processor-aggregate`
+* `decanter-processor-groupby`
+* `decanter-processor-camel`
 
 ### Alerters
 
 * `decanter-alerting-log`
 * `decanter-alerting-email`
 * `decanter-alerting-camel`
-
-### (Optional) Additional backend features
-
-WARNING: Since Apache Karaf Decanter 2.0.0, it's not recommended to use the embedded instances of these backends.
-We encourage users to install, setup and start backends for production system.
-
-* `elasticsearch 1.7.4`
-* `elasticsearch 2.2.0`
-* `elasticsearch 5.6.3`
-* `elasticsearch 6.2.4`
-* `elasticsearch-head 1.7.4`
-* `elasticsearch-head 2.2.0`
-* `kibana 3.1.1`
-* `kibana 4.1.2`
-* `kibana 6.1.1`
-* `orientdb 2.2.31`
 
 Thanks for using Apache Karaf Decanter !
 
