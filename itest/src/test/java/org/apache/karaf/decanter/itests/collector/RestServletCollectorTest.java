@@ -59,6 +59,12 @@ public class RestServletCollectorTest extends KarafTestSupport {
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-collector-rest-servlet", new RolePrincipal("admin")));
 
+        String configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.collector.rest.servlet)'");
+        while (!configList.contains("service.pid")) {
+            Thread.sleep(500);
+            configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.collector.rest.servlet)'");
+        }
+
         // create event handler
         List<Event> received = new ArrayList();
         EventHandler eventHandler = new EventHandler() {
