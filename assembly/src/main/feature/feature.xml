@@ -18,8 +18,6 @@
 -->
 <features name="karaf-decanter-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
 
-    <repository>mvn:org.apache.camel.karaf/apache-camel/${camel.version}/xml/features</repository>
-
     <feature name="decanter-common" version="${project.version}" description="Karaf Decanter API">
         <config name="org.apache.felix.eventadmin.impl.EventAdmin" append="true">
 org.apache.felix.eventadmin.ThreadPoolSize=40
@@ -299,6 +297,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-common</feature>
         <feature>camel-core</feature>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.camel/${project.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.camel/${project.version}</bundle>
     </feature>
     
     <feature name="decanter-appender-camel" version="${project.version}" description="Karaf Decanter Camel Appender">
@@ -480,6 +479,18 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     <feature name="decanter-processor-groupby" version="${project.version}" description="Karaf Decanter GroupBy Processor">
         <configfile finalname="/etc/org.apache.karaf.decanter.processor.groupby.cfg">mvn:org.apache.karaf.decanter.processor/org.apache.karaf.decanter.processor.groupby/${project.version}/cfg</configfile>
         <feature>decanter-processor-groupby-core</feature>
+    </feature>
+
+    <feature name="decanter-processor-camel-core" version="${project.version}" description="Karaf Decanter Camel Processor core">
+        <feature>decanter-common</feature>
+        <feature>camel-core</feature>
+        <bundle dependency="true">mvn:org.apache.camel/camel-core-osgi/${camel.version}</bundle>
+        <bundle>mvn:org.apache.karaf.decanter.processor/org.apache.karaf.decanter.processor.camel/${project.version}</bundle>
+    </feature>
+
+    <feature name="decanter-processor-camel" version="${project.version}" description="Karaf Decanter Camel Processor">
+        <configfile finalname="/etc/org.apache.karaf.decanter.processor.camel.cfg">mvn:org.apache.karaf.decanter.processor/org.apache.karaf.decanter.processor.camel/${project.version}/cfg</configfile>
+        <feature>decanter-processor-camel-core</feature>
     </feature>
 
     <feature name="decanter-alerting-core" version="${project.version}" description="Karaf Decanter Alerting core">

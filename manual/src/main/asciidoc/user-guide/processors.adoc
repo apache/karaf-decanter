@@ -107,11 +107,6 @@ The GroupBy processor is configured via `etc/org.apache.karaf.decanter.processor
 ----
 #
 # Decanter GroupBy processor
-#
-
-#
-# Destination dispatcher topics where to send the aggregated events
-#
 #target.topics=decanter/process/groupby
 
 #
@@ -135,3 +130,53 @@ The GroupBy processor is configured via `etc/org.apache.karaf.decanter.processor
 * The `period` property defines the retention period to accumulate the incoming events
 * The `groupBy` property defines the property names (separated by `,`) as grouping term
 * The `flatten` property defines the way the resulting event will be created. If `true`, all events properties will be store directly (flat) in the resulting event. If `false`, the resulting event will contain an array of properties (from the original grouped events).
+
+==== Apache Camel
+
+It's also possible you implement your own event processor using Apache Camel.
+
+Decanter Camel Processor delegates event processing to your Camel route. Your route just has to callback Decanter (on a dedicated Camel endpoint)
+to send the processed event back in the dispatcher.
+
+By default, Decanter Camel processor send the events to `direct-vm:decanter-delegate` endpoint, and
+expects the processed event back on `direct-vm:decanter-callback`.
+
+The Camel message body is `Map<String,Object>` (it's what Decanter is sending into your Camel route and expects on
+the callback endpoint).
+
+You can install the Camel processor with the `decanter-processor-camel` feature:
+
+----
+karaf@root()> feature:install decanter-processor-camel
+----
+
+This feature also installs `etc/org.apache.karaf.decanter.processor.camel.cfg` configuration file:
+
+----
+#
+# Decanter Camel processor
+#
+
+#
+# Destination dispatcher topics where to send the aggregated events
+#
+#target.topics=decanter/process/camel
+
+#
+# This is the Camel endpoint URI where Decanter is sending the events
+# (using event Map<String, Object> as body)
+#
+#delegate.uri=direct-vm:decanter-delegate
+
+#
+# This is the Camel endpoint URI where user Camel route should call to be "back" in Decanter
+# The user Camel route is supposed to do "to uri=[CALLBACK]" with a Map<String, Object> body
+# resulting of the route processing.
+# Decanter uses this body to send a new Event to the dispatcher target topics.
+#
+#callback.uri=direct-vm:decanter-callback
+----
+
+* the `target.topics` property is the list of Decanter dispatcher topics (separated by `,`) where the processor will "forward" the processed events.
+* the `delegate.uri` property is the Camel endpoint URI where Decanter Camel Processor will send events (as `Map<String,Object>`). It's basically the `from` endpoint of your route.
+* the `callback.uri` property is the Camel endpoint URI where Decanter Camel Processor is waiting from your processed events. Basically, it's where your route should send processed events (`to` of your route).
