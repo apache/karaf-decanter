@@ -55,6 +55,7 @@
                                 <linkcss>false</linkcss>
                                 <stylesheet>style/apache.css</stylesheet>
                                 <imagesdir>images</imagesdir>
+                                <project-version>${project.version}</project-version>
                             </attributes>
                         </configuration>
                     </execution>
