@@ -58,7 +58,7 @@ public class FileAppender implements EventHandler {
     public void open(Dictionary<String, Object> config) throws Exception {
         this.config = config;
 
-        String filename = (config.get(FILENAME_PROPERTY) != null) ? (String) config.get(FILENAME_PROPERTY) : System.getProperty("karaf.data") + File.separator + "decanter";
+        String filename = (config.get(FILENAME_PROPERTY) != null) ? (String) config.get(FILENAME_PROPERTY) : System.getProperty("karaf.data") + File.separator + "decanter" + File.separator + "appender.csv";
         boolean append = (config.get(APPEND_PROPERTY) != null) ? Boolean.parseBoolean((String) config.get(APPEND_PROPERTY)) : true;
 
         File file = new File(filename);
