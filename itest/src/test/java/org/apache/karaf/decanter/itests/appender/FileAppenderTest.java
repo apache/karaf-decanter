@@ -70,7 +70,7 @@ public class FileAppenderTest extends KarafTestSupport {
         Thread.sleep(2000);
 
         // read file
-        File file = new File(System.getProperty("karaf.data"), "decanter");
+        File file = new File(System.getProperty("karaf.data") + File.separator + "decanter", "appender.csv");
         StringBuilder builder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             builder.append(reader.readLine()).append("\n");

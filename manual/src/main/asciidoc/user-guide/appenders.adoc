@@ -53,8 +53,11 @@ The `decanter-appender-file` feature installs the file appender:
 karaf@root()> feature:install decanter-appender-file
 ----
 
-By default, the file appender stores the collected data in `${karaf.data}/decanter` file. You can change the file where to store the data
+By default, the file appender stores the collected data in `${karaf.data}/decanter/appender.csv` file. You can change the file where to store the data
 using the `filename` property in `etc/org.apache.karaf.decanter.appender.file.cfg` configuration file.
+
+NOTE: The default file changed from `${karaf.data}/decanter` to `${karaf.data}/decanter/appender.csv` in verson 2.7.0 due to a
+conflict with the Alerting Service.
 
 You can also change the marshaller to use. By default, the marshaller used is the CSV one. But you can switch to the JSON one
 using the `marshaller.target` property in `etc/org.apache.karaf.decanter.appender.file.cfg` configuration file.
