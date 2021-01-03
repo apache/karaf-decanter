@@ -17,6 +17,8 @@
 package org.apache.karaf.decanter.marshaller.json;
 
 import java.io.StringReader;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +36,10 @@ public class TestJsonMarshaller {
 
     private static final long EXPECTED_TIMESTAMP = 1454428780634L;
     private static final String EXPECTED_TOPIC = "testTopic";
+    private static final String DOT_KEY = "test.key";
+    private static final String DOT_VALUE = "test.value";
+    private static final String EXPECTED_DOT_KEY = "test.key";
+    private static final String EXPECTED_UNDERLINE_KEY = "test_key";
 
    @Test
    public void testMarshal() throws Exception {
@@ -50,6 +56,53 @@ public class TestJsonMarshaller {
        long ts = jsonO.getJsonNumber(EventConstants.TIMESTAMP).longValue();
        Assert.assertEquals("timestamp long", EXPECTED_TIMESTAMP, ts);
        Assert.assertEquals("Topic", EXPECTED_TOPIC, jsonO.getString(EventConstants.EVENT_TOPIC.replace('.', '_')));
+   }
+
+   @Test
+   public void testMarshalWithDot() throws Exception {
+       JsonMarshaller marshaller = new JsonMarshaller();
+
+       Dictionary<String, Object> config = new Hashtable<>();
+       config.put("replaceDotsByUnderscores", "false");
+       marshaller.activate(config);
+
+       Map<String, Object> map = new HashMap<>();
+       map.put(DOT_KEY, DOT_VALUE);
+       String jsonSt = marshaller.marshal(new Event(EXPECTED_TOPIC, map));
+       System.out.println(jsonSt);
+       JsonReader reader = Json.createReader(new StringReader(jsonSt));
+       JsonObject jsonO = reader.readObject();
+       Assert.assertEquals("Value", DOT_VALUE, jsonO.getString(EXPECTED_DOT_KEY));
+        try {
+           jsonO.getString(EXPECTED_UNDERLINE_KEY);
+	   Assert.fail("Key "+ EXPECTED_UNDERLINE_KEY + " exists");
+       } catch (NullPointerException e) {
+	   // This is expected
+       }
+   }
+
+
+   @Test
+   public void testMarshalWithUnderscore() throws Exception {
+       JsonMarshaller marshaller = new JsonMarshaller();
+
+       Dictionary<String, Object> config = new Hashtable<>();
+       config.put("replaceDotsByUnderscores", "true");
+       marshaller.activate(config);
+
+       Map<String, Object> map = new HashMap<>();
+       map.put(DOT_KEY, DOT_VALUE);
+       String jsonSt = marshaller.marshal(new Event(EXPECTED_TOPIC, map));
+       System.out.println(jsonSt);
+       JsonReader reader = Json.createReader(new StringReader(jsonSt));
+       JsonObject jsonO = reader.readObject();
+       Assert.assertEquals("Value", DOT_VALUE, jsonO.getString(EXPECTED_UNDERLINE_KEY));
+       try {
+           jsonO.getString(EXPECTED_DOT_KEY);
+	   Assert.fail("Key "+ EXPECTED_DOT_KEY + " exists");
+       } catch (NullPointerException e) {
+	   // This is expected
+       }
    }
 
    @Test

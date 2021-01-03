@@ -30,6 +30,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <bundle>mvn:org.apache.karaf.decanter/org.apache.karaf.decanter.api/${project.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.raw/${project.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.json/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.karaf.decanter.marshaller.json.cfg">mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.json/${project.version}/cfg</configfile>
         <bundle>mvn:org.apache.karaf.decanter.marshaller/org.apache.karaf.decanter.marshaller.csv/${project.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.parser/org.apache.karaf.decanter.parser.identity/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.karaf.decanter.parser.split.cfg">mvn:org.apache.karaf.decanter.parser/org.apache.karaf.decanter.parser.split/${project.version}/cfg</configfile>
