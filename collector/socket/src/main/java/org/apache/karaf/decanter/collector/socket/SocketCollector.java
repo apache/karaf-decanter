@@ -17,10 +17,7 @@
 package org.apache.karaf.decanter.collector.socket;
 
 import java.io.*;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,6 +76,7 @@ public class SocketCollector implements Closeable, Runnable {
     public void activate(Dictionary<String, Object> properties) throws IOException {
         this.properties = properties;
         int port = Integer.parseInt(getProperty(this.properties, "port", "34343"));
+        String host = getProperty(this.properties, "host", "0.0.0.0");
         int workers = Integer.parseInt(getProperty(this.properties, "workers", "10"));
 
         this.protocol = Protocol.valueOf(getProperty(this.properties, "protocol", "tcp").toUpperCase());
@@ -91,10 +89,10 @@ public class SocketCollector implements Closeable, Runnable {
 
         switch (protocol) {
             case TCP:
-                this.serverSocket = new ServerSocket(port);
+                this.serverSocket = new ServerSocket(port, 50, InetAddress.getByName(host));
                 break;
             case UDP:
-                this.datagramSocket = new DatagramSocket(port);
+                this.datagramSocket = new DatagramSocket(port, InetAddress.getByName(host));
                 break;
         }
 

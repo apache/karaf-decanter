@@ -669,6 +669,9 @@ This feature installs a default `etc/org.apache.karaf.decanter.collector.socket.
 # Port number on which to listen
 #port=34343
 
+# Binding address on which to listen
+#host=0.0.0.0
+
 # Number of worker threads to deal with
 #workers=10
 
@@ -681,6 +684,7 @@ unmarshaller.target=(dataFormat=json)
 ----
 
 * the `port` property contains the port number where the network socket collector is listening
+* the `host` property contains the host name/interface address where the network socket collector is listening
 * the `workers` property contains the number of worker threads the socket collector is using for the connection
 * the `protocol` property contains the protocol used by the collector for transferring data with the client
 * the `unmarshaller.target` property contains the unmarshaller used by the collector to transform the data
