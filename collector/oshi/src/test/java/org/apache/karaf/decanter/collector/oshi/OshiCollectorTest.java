@@ -48,7 +48,7 @@ public class OshiCollectorTest {
     }
 
    /**
-    * Verify the SYSTEM_CPU_LOAD_PROPERY is null on the initial collector run
+    * Verify the SYSTEM_CPU_LOAD_PROPERTY is null on the initial collector run
     * and not null on subsequent collector runs.
     */
    @Test
