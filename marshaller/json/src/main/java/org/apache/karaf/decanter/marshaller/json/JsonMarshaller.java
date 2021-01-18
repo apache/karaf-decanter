@@ -59,7 +59,10 @@ public class JsonMarshaller implements Marshaller {
 
     @Activate
     public void activate(ComponentContext componentContext) {
-        Dictionary<String, Object> config = componentContext.getProperties();
+	activate(componentContext.getProperties());
+    }
+
+    public void activate(Dictionary<String, Object> config) {
         replaceDotsByUnderscores = (config.get("replaceDotsByUnderscores") != null) ? 
             Boolean.valueOf((String) config.get("replaceDotsByUnderscores")) : true;
     }
