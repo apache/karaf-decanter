@@ -27,6 +27,8 @@ import java.util.List;
 
 public class OshiCollectorTest {
 
+    static final String SYSTEM_CPU_LOAD_PROPERTY = "processor.systemCpuLoadBetweenTicks";
+
     @Test
     public void test() throws Exception {
         DispatcherMock dispatcherMock = new DispatcherMock();
@@ -43,6 +45,29 @@ public class OshiCollectorTest {
         for (String property : event.getPropertyNames()) {
             System.out.println(property + ":" + event.getProperty(property));
         }
+    }
+
+   /**
+    * Verify the SYSTEM_CPU_LOAD_PROPERTY is null on the initial collector run
+    * and not null on subsequent collector runs.
+    */
+   @Test
+   public void testSystemCpuLoad() throws Exception {
+        DispatcherMock dispatcherMock = new DispatcherMock();
+
+        OshiCollector collector = new OshiCollector();
+        collector.setDispatcher(dispatcherMock);
+        collector.activate(new Hashtable<>());
+
+        collector.run();
+        collector.run();
+
+        Assert.assertEquals(2, dispatcherMock.postedEvents.size());
+        Event firstEvent = dispatcherMock.postedEvents.get(0);
+        Assert.assertNull("Initial systemCpuLoadBetweenTicks is null", firstEvent.getProperty(SYSTEM_CPU_LOAD_PROPERTY));
+        Event secondEvent = dispatcherMock.postedEvents.get(1);
+        Assert.assertNotNull("Second systemCpuLoadBetweenTicks is not null", secondEvent.getProperty(SYSTEM_CPU_LOAD_PROPERTY));
+        System.out.println(SYSTEM_CPU_LOAD_PROPERTY + ":" + secondEvent.getProperty(SYSTEM_CPU_LOAD_PROPERTY));
     }
 
     class DispatcherMock implements EventAdmin {

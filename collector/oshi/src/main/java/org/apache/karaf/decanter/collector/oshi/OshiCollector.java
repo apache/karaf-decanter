@@ -51,6 +51,8 @@ public class OshiCollector implements Runnable {
 
     private Dictionary<String, Object> properties;
 
+    long[] lastSystemCpuLoadTicks = null;
+
     @Activate
     public void activate(ComponentContext componentContext) {
         activate(componentContext.getProperties());
@@ -58,6 +60,7 @@ public class OshiCollector implements Runnable {
 
     public void activate(Dictionary<String, Object> properties) {
         this.properties = properties;
+        this.lastSystemCpuLoadTicks = null;
     }
 
     @Override
@@ -110,6 +113,8 @@ public class OshiCollector implements Runnable {
                 data.put("processor.interrupts", hardwareAbstractionLayer.getProcessor().getInterrupts());
                 data.put("processor.logicalProcessorCount", hardwareAbstractionLayer.getProcessor().getLogicalProcessorCount());
                 data.put("processor.maxFreq", hardwareAbstractionLayer.getProcessor().getMaxFreq());
+                data.put("processor.systemCpuLoadBetweenTicks", lastSystemCpuLoadTicks != null ? hardwareAbstractionLayer.getProcessor().getSystemCpuLoadBetweenTicks(lastSystemCpuLoadTicks) : null);
+                lastSystemCpuLoadTicks = hardwareAbstractionLayer.getProcessor().getSystemCpuLoadTicks();
                 boolean processorsLogical = properties.get("processors.logical") != null ? Boolean.parseBoolean(properties.get("processors.logical").toString()) : true;
                 if (processorsLogical) {
                     int i = 0;
