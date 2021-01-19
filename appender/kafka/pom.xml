@@ -47,6 +47,11 @@
             <artifactId>kafka-clients</artifactId>
             <version>${kafka.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.10.2</version>
+        </dependency>
 
         <!-- test -->
         <dependency>
@@ -77,8 +82,9 @@
                         <Export-Package>!*</Export-Package>
                         <Import-Package>
                             !org.apache.kafka*,
-                            !com.fasterxml.jackson*,
                             !net.jpountz*,
+                            !com.fasterxml.jackson*,
+                            !kafka,
                             com.ibm.security.krb5*;resolution:=optional,
                             sun.security.krb5;resolution:=optional,
                             *
@@ -87,8 +93,9 @@
                             org.apache.karaf.decanter.appender.kafka,
                             org.apache.karaf.decanter.appender.utils,
                             org.apache.kafka*,
+                            net.jpountz*,
                             com.fasterxml.jackson*,
-                            net.jpountz*
+                            kafka
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                     </instructions>
