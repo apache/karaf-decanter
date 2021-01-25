@@ -863,3 +863,38 @@ marshaller.target=(dataFormat=json)
 * `charset` is the message encoding (default is `utf-8`)
 * `header.` allows you to add any custom HTTP headers (parameters) to the request (prefixed by `header.`)
 * `payload.header` allows you to use a HTTP header to send the collected data instead of directly the "body".
+
+==== HDFS
+
+Decanter HDFS appender stores collected data into a HDFS file.
+
+The `decanter-appender-hdfs` feature installs the HDFS appender:
+
+```
+karaf@root()> feature:install decanter-appender-hdfs
+```
+
+The feature also installs `etc/org.apache.karaf.decanter.appender.hdfs.cfg` configuration file:
+
+----
+######################################
+# Decanter HDFS Appender Configuration
+######################################
+
+# Optional HDFS configuration
+#hdfs.configuration=
+
+# File mode (create or append)
+#hdfs.mode=create|append|overwrite
+
+# Path location
+#hdfs.path=
+
+# Marshaller
+marshaller.target=(dataFormat=csv)
+
+----
+
+* `hdfs.configuration` is the location of the hdfs configuration file (core or site)
+* `hdfs.mode` defines the way of populating the file on HDFS (creating a new one, appending to an existing one, overwriting an existing one)
+* `hdfs.path` defines the location and name of the file on HDFS

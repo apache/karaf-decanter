@@ -39,6 +39,7 @@
         <module>cassandra</module>
         <module>dropwizard</module>
         <module>elasticsearch</module>
+        <module>hdfs</module>
         <module>file</module>
         <module>influxdb</module>
         <module>jdbc</module>

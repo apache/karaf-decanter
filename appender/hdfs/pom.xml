@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!--
+
+        Licensed to the Apache Software Foundation (ASF) under one or more
+        contributor license agreements.  See the NOTICE file distributed with
+        this work for additional information regarding copyright ownership.
+        The ASF licenses this file to You under the Apache License, Version 2.0
+        (the "License"); you may not use this file except in compliance with
+        the License.  You may obtain a copy of the License at
+
+           http://www.apache.org/licenses/LICENSE-2.0
+
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
+    -->
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.apache.karaf.decanter</groupId>
+        <artifactId>appender</artifactId>
+        <version>2.7.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <groupId>org.apache.karaf.decanter.appender</groupId>
+    <artifactId>org.apache.karaf.decanter.appender.hdfs</artifactId>
+    <packaging>bundle</packaging>
+    <name>Apache Karaf :: Decanter :: Appender :: HDFS</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.decanter</groupId>
+            <artifactId>org.apache.karaf.decanter.api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.decanter.appender</groupId>
+            <artifactId>org.apache.karaf.decanter.appender.utils</artifactId>
+        </dependency>
+
+        <!-- test -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.decanter.marshaller</groupId>
+            <artifactId>org.apache.karaf.decanter.marshaller.csv</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <inherited>true</inherited>
+                <extensions>true</extensions>
+                <configuration>
+                    <obrRepository>NONE</obrRepository>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Export-Package>!*</Export-Package>
+                        <Import-Package>
+                            !org.apache.hadoop*,
+                            !com.ctc.wstx*,
+                            !com.google.common*,
+                            !com.google.appengine*,
+                            !com.google.apphosting*,
+                            !com.google.errorprone*,
+                            !com.google.gson*,
+                            !com.google.inject*,
+                            !com.google.protobuf*,
+                            !com.google.re2j*,
+                            !com.google.thirdparty*,
+                            !com.ibm.security*,
+                            !com.jcraft.jsch,
+                            !com.nimbusds*,
+                            !com.google.crypto*,
+                            !okio*,
+                            !com.squareup.okhttp*,
+                            !jdiff,
+                            !net.jcip*,
+                            !net.minidev*,
+                            !org.apache.commons.codec*,
+                            !org.apache.commons.collections*,
+                            !org.apache.commons.configuration2*,
+                            !org.apache.commons.compress*,
+                            !org.apache.commons.beanutils*,
+                            !org.apache.commons.io*,
+                            !org.apache.commons.jexl2*,
+                            !org.apache.commons.jxpath*,
+                            !org.apache.commons.lang3*,
+                            !org.apache.commons.math3*,
+                            !org.apache.commons.net*,
+                            !org.apache.commons.text*,
+                            !org.apache.xml*,
+                            !org.apache.zookeeper*,
+                            !org.tukaani*,
+                            android*;resolution:=optional,
+                            com.android*;resolution:=optional,
+                            com.sun.javadoc;resolution:=optional,
+                            com.sun.jersey*;resolution:=optional,
+                            com.sun*;resolution:=optional,
+                            javax.annotation;resolution:=optional,
+                            javax.servlet*;resolution:=optional,
+                            javax.ws.rs*;resolution:=optional,
+                            org.apache.avro*;resolution:=optional,
+                            org.apache.commons.cli*;resolution:=optional,
+                            com.github.luben*;resolution:=optional,
+                            javax.mail*;resolution:=optional,
+                            org.apache.commons.vfs2*;resolution:=optional,
+                            org.apache.curator*;resolution:=optional,
+                            org.apache.harmony*;resolution:=optional,
+                            org.apache.htrace*;resolution:=optional,
+                            org.apache.http*;resolution:=optional,
+                            org.apache.kerby*;resolution:=optional,
+                            org.bouncycastle*;resolution:=optional,
+                            org.brotli*;resolution:=optional,
+                            org.checkerframework*;resolution:=optional,
+                            org.codehaus.jackson*;resolution:=optional,
+                            org.codehaus.jettison*;resolution:=optional,
+                            org.codehaus.stax2*;resolution:=optional,
+                            org.eclipse.jetty*;resolution:=optional,
+                            org.jline*;resolution:=optional,
+                            org.objectweb.asm*;resolution:=optional,
+                            org.relaxng*;resolution:=optional,
+                            org.slf4j*;resolution:=optional,
+                            org.springframework*;resolution:=optional,
+                            org.wildfly*;resolution:=optional,
+                            org.xbill*;resolution:=optional,
+                            sun*;resolution:=optional,
+                            com.fasterxml.jackson.jaxrs*;resolution:=optional,
+                            com.fasterxml.jackson.module.jaxb;resolution:=optional,
+                            *
+                        </Import-Package>
+                        <Private-Package>
+                            org.apache.karaf.decanter.appender.hdfs,
+                            org.apache.karaf.decanter.appender.utils,
+                            org.apache.hadoop*,
+                            com.ctc.wstx*,
+                            com.google.common*,
+                            com.google.appengine*,
+                            com.google.apphosting*,
+                            com.google.errorprone*,
+                            com.google.gson*,
+                            com.google.inject*,
+                            com.google.protobuf*,
+                            com.google.re2j*,
+                            com.google.thirdparty*,
+                            com.ibm.security*,
+                            com.jcraft.jsch,
+                            com.nimbusds*,
+                            com.google.crypto*,
+                            okio*,
+                            com.squareup.okhttp*,
+                            jdiff,
+                            net.jcip*,
+                            net.minidev*,
+                            org.apache.commons.codec*,
+                            org.apache.commons.collections*,
+                            org.apache.commons.configuration2*,
+                            org.apache.commons.compress*,
+                            org.apache.commons.beanutils*,
+                            org.apache.commons.io*,
+                            org.apache.commons.jexl2*,
+                            org.apache.commons.jxpath*,
+                            org.apache.commons.lang3*,
+                            org.apache.commons.math3*,
+                            org.apache.commons.net*,
+                            org.apache.commons.text*,
+                            org.apache.xml.resolver*,
+                            org.apache.zookeeper*,
+                            org.tukaani*
+                        </Private-Package>
+                        <_dsannotations>*</_dsannotations>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>src/main/cfg/org.apache.karaf.decanter.appender.hdfs.cfg</file>
+                                    <type>cfg</type>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
