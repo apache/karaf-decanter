@@ -49,6 +49,7 @@
         <module>log</module>
         <module>log4j-socket</module>
         <module>mqtt</module>
+        <module>openstack</module>
         <module>oshi</module>
         <module>redis</module>
         <module>rest</module>
