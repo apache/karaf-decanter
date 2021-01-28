@@ -64,6 +64,25 @@ public class RestCollectorTest {
     }
 
     @Test
+    public void testExceptionWrapping() throws Exception {
+        EventAdminMock eventAdminMock = new EventAdminMock();
+        RestCollector collector = new RestCollector();
+        Dictionary<String, Object> config = new Hashtable<>();
+        config.put("url", "http://foo.bar/foo");
+        config.put("exception.as.http.response", "true");
+        config.put("exception.http.response.code", "600");
+        collector.unmarshaller = new RawUnmarshaller();
+        collector.dispatcher = eventAdminMock;
+        collector.activate(config);
+        collector.run();
+
+        Assert.assertEquals(1, eventAdminMock.postedEvents.size());
+        Event event = eventAdminMock.postedEvents.get(0);
+        Assert.assertEquals(600, event.getProperty("http.response.code"));
+        Assert.assertEquals("java.net.UnknownHostException: foo.bar", event.getProperty("http.exception"));
+    }
+
+    @Test
     public void testGet() throws Exception {
         EventAdminMock eventAdminMock = new EventAdminMock();
         RestCollector collector = new RestCollector();
