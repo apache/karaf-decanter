@@ -64,6 +64,8 @@ public class RestCollector implements Runnable {
     private String request;
     private String user;
     private String password;
+    private boolean exceptionAsHttpResponse;
+    private Integer exceptionHttpResponseCode = null;
     private Dictionary<String, Object> config;
 
     @Activate
@@ -80,6 +82,10 @@ public class RestCollector implements Runnable {
         this.user = getProperty(config, "user", null);
         this.password = getProperty(config, "password", null);
         this.request = getProperty(config, "request", null);
+        this.exceptionAsHttpResponse = Boolean.parseBoolean(getProperty(config, "exception.as.http.response", "false"));
+        if (config.get("exception.http.response.code") != null) {
+            this.exceptionHttpResponseCode = Integer.parseInt((String) config.get("exception.http.response.code"));
+        }
     }
     
     private String getProperty(Dictionary<String, Object> properties, String key, String defaultValue) {
@@ -134,7 +140,24 @@ public class RestCollector implements Runnable {
                 data.put("service.hostName", url.getHost());
             } catch (Exception e) {
                 LOGGER.warn("Can't request REST service", e);
-                data.put("error", e.getClass().getName() + ": " + e.getMessage());
+                if (exceptionAsHttpResponse) {
+                    if (exceptionHttpResponseCode != null) {
+                        data.put("http.response.code", exceptionHttpResponseCode);
+                    } else {
+                        try {
+                            data.put("http.response.code", connection.getResponseCode());
+                        } catch (Exception ie) {
+                            // no-op
+                        }
+                    }
+                    data.put("http.exception", e.getClass().getName() + ": " + e.getMessage());
+                    data.put("type", "rest");
+                    data.put("url", urlWithPath);
+                } else {
+                    data.put("type", "rest");
+                    data.put("url", urlWithPath);
+                    data.put("error", e.getClass().getName() + ": " + e.getMessage());
+                }
             } finally {
                 if (connection != null) {
                     connection.disconnect();

@@ -875,9 +875,18 @@ paths=metrics
 #password=password (used for basic authentication)
 #topic=decanter/collector/rest (Decanter dispatcher topic name to use)
 
+# Possible to wrap exception as HTTP response, where you can define the HTTP response code
+# exception.as.http.response=true
+# exception.http.response.code=501
+
 # Unmarshaller to use
 unmarshaller.target=(dataFormat=json)
 ----
+
+The `exception.as.http.response` property allows you to "wrap" any connection exception as a HTTP message.
+If `true`, any exception is catched and we send kind of HTTP message in the Decanter dispatcher.
+
+It's also possible to define a HTTP response code (thanks to `exception.http.response.code` property) when an exception is catched.
 
 ==== SOAP
 
