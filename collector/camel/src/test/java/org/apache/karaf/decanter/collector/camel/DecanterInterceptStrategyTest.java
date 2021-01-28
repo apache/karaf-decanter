@@ -24,26 +24,24 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.LoggingLevel;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.processor.interceptor.TraceEventHandler;
-import org.apache.camel.processor.interceptor.Tracer;
+import org.apache.camel.spi.InterceptStrategy;
 import org.apache.karaf.decanter.marshaller.json.JsonMarshaller;
 import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.service.event.Event;
 
-public class DecanterTraceEventHandlerTest {
+public class DecanterInterceptStrategyTest {
 
     @Test
     public void testTracer() throws Exception {
         JsonMarshaller marshaller = new JsonMarshaller();
         MockEventAdmin eventAdmin = new MockEventAdmin();
-        DecanterTraceEventHandler handler = new DecanterTraceEventHandler();
-        handler.setEventAdmin(eventAdmin);
-        DefaultCamelContext camelContext = createCamelContext(handler);
+        DecanterInterceptStrategy tracer = new DecanterInterceptStrategy();
+        tracer.setDispatcher(eventAdmin);
+        DefaultCamelContext camelContext = createCamelContext(tracer);
 
         ProducerTemplate template = camelContext.createProducerTemplate();
         template.sendBodyAndHeader("direct:start", "TEST", "header", "test");
@@ -73,21 +71,20 @@ public class DecanterTraceEventHandlerTest {
     public void testTracerWithExtender() throws Exception {
         MockEventAdmin eventAdmin = new MockEventAdmin();
         TestExtender extender = new TestExtender();
-        DecanterTraceEventHandler handler = new DecanterTraceEventHandler();
-        handler.setExtender(extender);
-        handler.setEventAdmin(eventAdmin);
-        DefaultCamelContext camelContext = createCamelContext(handler);
+        DecanterInterceptStrategy tracer = new DecanterInterceptStrategy();
+        tracer.setExtender(extender);
+        tracer.setDispatcher(eventAdmin);
+        DefaultCamelContext camelContext = createCamelContext(tracer);
 
         ProducerTemplate template = camelContext.createProducerTemplate();
         template.sendBodyAndHeader("direct:start", "TEST", "header", "test");
 
-        Assert.assertEquals(2, eventAdmin.getPostEvents().size());
+        Assert.assertEquals(1, eventAdmin.getPostEvents().size());
 
         Assert.assertEquals("test", eventAdmin.getPostEvents().get(0).getProperty("extender-test"));
-        Assert.assertEquals("test", eventAdmin.getPostEvents().get(1).getProperty("extender-test"));
     }
 
-    private DefaultCamelContext createCamelContext(TraceEventHandler handler) throws Exception {
+    private DefaultCamelContext createCamelContext(InterceptStrategy tracer) throws Exception {
         RouteBuilder builder = new RouteBuilder() {
             @Override
             public void configure() throws Exception {
@@ -97,13 +94,7 @@ public class DecanterTraceEventHandlerTest {
         DefaultCamelContext camelContext = new DefaultCamelContext();
         camelContext.setName("test-context");
         camelContext.addRoutes(builder);
-        Tracer tracer = new Tracer();
-        tracer.setEnabled(true);
-        tracer.setTraceOutExchanges(true);
-        tracer.setLogLevel(LoggingLevel.OFF);
-        tracer.addTraceHandler(handler);
-        camelContext.setTracing(true);
-        camelContext.setDefaultTracer(tracer);
+        camelContext.addInterceptStrategy(tracer);
         camelContext.start();
         return camelContext;
     }

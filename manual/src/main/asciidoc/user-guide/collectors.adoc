@@ -467,19 +467,25 @@ Decanter provides a Camel Tracer Handler that you can set on a Camel Tracer. It 
 
 ===== Camel Tracer
 
-If you enable the tracer on a Camel route, all tracer events (exchanges on each step of the route) are sent to the
-appenders.
+Decanter Camel Tracer is actually an intercept strategy.
 
-The `decanter-collector-camel` feature provides the Camel Tracer Handler:
+It catches all exchanges in the route. If you enable the tracer on a Camel route, all events (exchanges on each step of the route) are sent to the dispatcher.
+
+The `decanter-collector-camel` feature provides the Decanter Camel intercept strategy:
 
 ----
 karaf@root()> feature:install decanter-collector-camel
 ----
 
-Now, you can use the Decanter Camel Tracer Handler in a tracer that you can use in routes.
+You just have to register Decanter intercept strategy in your Camel Context:
 
-For instance, the following route definition shows how to enable tracer on a route, and use the Decanter Tracer Handler
-in the Camel Tracer:
+----
+DecanterInterceptStrategy decanterCamelTracer = new DecanterInterceptStrategy();
+decanterCamelTracer.setDispatcher(eventAdmin);
+camelContext.addInterceptStrategy(decanterCamelTracer);
+----
+
+This is an example of a complete route with Decanter Camel intercept strategy:
 
 ----
 <?xml version="1.0" encoding="UTF-8"?>
@@ -487,18 +493,14 @@ in the Camel Tracer:
 
     <reference id="dispatcher" interface="org.osgi.service.event.EventAdmin"/>
 
-    <bean id="traceHandler" class="org.apache.karaf.decanter.collector.camel.DecanterTraceEventHandler">
+    <bean id="decanterInterceptor" class="org.apache.karaf.decanter.collector.camel.DecanterInterceptStrategy">
         <property name="dispatcher" ref="dispatcher"/>
     </bean>
 
-    <bean id="tracer" class="org.apache.camel.processor.interceptor.Tracer">
-        <property name="traceHandler" ref="traceHandler"/>
-        <property name="enabled" value="true"/>
-        <property name="traceOutExchanges" value="true"/>
-        <property name="logLevel" value="OFF"/>
-    </bean>
-
-    <camelContext trace="true" xmlns="http://camel.apache.org/schema/blueprint">
+    <camelContext xmlns="http://camel.apache.org/schema/blueprint">
+       <interceptStrategy>
+          <bean ref="decanterInterceptor"/>
+        </interceptStrategy>
         <route id="test">
             <from uri="timer:fire?period=10000"/>
             <setBody><constant>Hello World</constant></setBody>
@@ -519,7 +521,7 @@ public interface DecanterCamelEventExtender {
 }
 ----
 
-You can inject your extender using `setExtender(myExtender)` on the `DecanterTraceEventHandler`. Decanter will automatically
+You can inject your extender using `setExtender(myExtender)` on the `DecanterInterceptStrategy`. Decanter will automatically
 call your extender to populate extra properties.
 
 ===== Camel Event Notifier
