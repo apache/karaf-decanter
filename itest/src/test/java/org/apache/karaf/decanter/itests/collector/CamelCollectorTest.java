@@ -16,13 +16,11 @@
  */
 package org.apache.karaf.decanter.itests.collector;
 
-import org.apache.camel.LoggingLevel;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.processor.interceptor.Tracer;
 import org.apache.karaf.decanter.collector.camel.DecanterEventNotifier;
-import org.apache.karaf.decanter.collector.camel.DecanterTraceEventHandler;
+import org.apache.karaf.decanter.collector.camel.DecanterInterceptStrategy;
 import org.apache.karaf.itests.KarafTestSupport;
 import org.apache.karaf.jaas.boot.principal.RolePrincipal;
 import org.junit.Assert;
@@ -78,8 +76,8 @@ public class CamelCollectorTest extends KarafTestSupport {
 
         // create route with tracer
         EventAdmin eventAdmin = getOsgiService(EventAdmin.class);
-        DecanterTraceEventHandler handler = new DecanterTraceEventHandler();
-        handler.setEventAdmin(eventAdmin);
+        DecanterInterceptStrategy tracer = new DecanterInterceptStrategy();
+        tracer.setDispatcher(eventAdmin);
 
         RouteBuilder routeBuilder = new RouteBuilder() {
             @Override
@@ -90,20 +88,14 @@ public class CamelCollectorTest extends KarafTestSupport {
         DefaultCamelContext camelContext = new DefaultCamelContext();
         camelContext.setName("context-test");
         camelContext.addRoutes(routeBuilder);
-        Tracer tracer = new Tracer();
-        tracer.setEnabled(true);
-        tracer.setTraceOutExchanges(true);
-        tracer.setLogLevel(LoggingLevel.OFF);
-        tracer.addTraceHandler(handler);
-        camelContext.setTracing(true);
-        camelContext.setDefaultTracer(tracer);
+        camelContext.addInterceptStrategy(tracer);
         camelContext.start();
 
         // send a exchange into the route
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         producerTemplate.sendBodyAndHeader("direct:test", "This is a test", "testHeader", "testValue");
 
-        Assert.assertEquals(2, received.size());
+        Assert.assertEquals(1, received.size());
 
         Assert.assertEquals("decanter/collect/camel/tracer", received.get(0).getTopic());
         Assert.assertEquals("context-test", received.get(0).getProperty("camelContextName"));

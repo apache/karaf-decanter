@@ -21,7 +21,7 @@
 
     <reference id="dispatcher" interface="org.osgi.service.event.EventAdmin"/>
 
-    <bean id="traceHandler" class="org.apache.karaf.decanter.collector.camel.DecanterTraceEventHandler">
+    <bean id="traceHandler" class="org.apache.karaf.decanter.collector.camel.DecanterInterceptStrategy">
         <property name="dispatcher" ref="dispatcher"/>
     </bean>
 

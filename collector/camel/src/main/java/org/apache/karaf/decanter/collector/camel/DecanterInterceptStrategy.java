@@ -19,28 +19,42 @@ package org.apache.karaf.decanter.collector.camel;
 import java.net.InetAddress;
 import java.util.HashMap;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.model.ProcessorDefinition;
-import org.apache.camel.processor.interceptor.TraceEventHandler;
-import org.apache.camel.processor.interceptor.TraceInterceptor;
+import org.apache.camel.spi.InterceptStrategy;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 
-public class DecanterTraceEventHandler implements TraceEventHandler {
+public class DecanterInterceptStrategy implements InterceptStrategy {
 
-    private EventAdmin eventAdmin;
+    private EventAdmin dispatcher;
     private DefaultExchangeExtender dextender = new DefaultExchangeExtender();
     private DecanterCamelEventExtender extender;
 
     @Override
-    public void traceExchange(ProcessorDefinition<?> node, Processor target, TraceInterceptor traceInterceptor, Exchange exchange) throws Exception {
+    public Processor wrapProcessorInInterceptors(CamelContext context, ProcessorDefinition<?> definition, Processor target, Processor nextTarget) throws Exception {
+        Processor answer = new Processor() {
+            @Override
+            public void process(Exchange exchange) throws Exception {
+                send(exchange);
+                target.process(exchange);
+            }
+        };
+        return answer;
+    }
+
+    private void send(Exchange exchange) {
         HashMap<String, Object> data = new HashMap<>();
         data.put("type", "camelTracer");
         data.put("karafName", System.getProperty("karaf.name"));
-        data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
-        data.put("hostName", InetAddress.getLocalHost().getHostName());
-        data.put("nodeId", node.getId());
+        try {
+            data.put("hostAddress", InetAddress.getLocalHost().getHostAddress());
+            data.put("hostName", InetAddress.getLocalHost().getHostName());
+        } catch (Exception e) {
+            // no-op
+        }
         data.put("timestamp", System.currentTimeMillis());
         new DefaultExchangeExtender().extend(data, exchange);
         for (String property : exchange.getProperties().keySet()) {
@@ -58,30 +72,19 @@ public class DecanterTraceEventHandler implements TraceEventHandler {
             }
         }
         Event event = new Event("decanter/collect/camel/tracer", data);
-        eventAdmin.postEvent(event);
-    }
-
-    @Override
-    public Object traceExchangeIn(ProcessorDefinition<?> node, Processor target, TraceInterceptor traceInterceptor, Exchange exchange) throws Exception {
-        traceExchange(node, target, traceInterceptor, exchange);
-        return null;
-    }
-
-    @Override
-    public void traceExchangeOut(ProcessorDefinition<?> node, Processor target, TraceInterceptor traceInterceptor, Exchange exchange, Object traceState) throws Exception {
-        traceExchange(node, target, traceInterceptor, exchange);
+        dispatcher.postEvent(event);
     }
     
-    public EventAdmin getEventAdmin() {
-        return eventAdmin;
+    public EventAdmin getDispatcher() {
+        return dispatcher;
     }
 
     public void setExtender(DecanterCamelEventExtender extender) {
         this.extender = extender;
     }
 
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
+    public void setDispatcher(EventAdmin dispatcher) {
+        this.dispatcher = dispatcher;
     }
     
     public void setIncludeBody(boolean includeBody) {
