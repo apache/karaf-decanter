@@ -1154,6 +1154,39 @@ snmp.community=public
 * `snmp.context.name` is optional
 * `snmp.community` is the community to use, `public` by default
 
+==== Druid
+
+Karaf Decanter Druid collector schedules execution of queries on Apache Druid broker.
+
+It allows to easily create analytics on data and schedule execution with Decanter. Then, the query result is sent to the dispatcher.
+
+The `karaf-collector-druid` feature installs the Druid collector:
+
+----
+karaf@root()> feature:install decanter-collector-druid
+----
+
+The location of the Apache Druid broker and Druid queries to execute are configured in `etc/org.apache.karaf.decanter.collector.druid.cfg` configuration file:
+
+----
+#
+# Druid broker query API location
+#
+druid.broker.location=http://localhost:8888/druid/v2/sql/
+
+# Druid queries set, using syntax: query.id
+query.foo=select sum_operatingSystem_threadCount from decanter
+
+# Unmarshaller to use
+unmarshaller.target=(dataFormat=json)
+----
+
+The `druid.broker.location` is the URL of the Apache Druid broker.
+
+Then, we can add the Druid queries using the format `query.ID=QUERY`.
+
+Decanter Druid collector schedules the queries and send the results in the dispatcher.
+
 ==== Customizing properties in collectors
 
 You can add, rename or remove properties collected by the collectors before sending it to the dispatcher.
