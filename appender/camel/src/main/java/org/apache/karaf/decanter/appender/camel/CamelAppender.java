@@ -18,8 +18,14 @@ package org.apache.karaf.decanter.appender.camel;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.core.osgi.OsgiClassResolver;
+import org.apache.camel.core.osgi.OsgiDataFormatResolver;
+import org.apache.camel.core.osgi.OsgiDefaultCamelContext;
+import org.apache.camel.core.osgi.OsgiLanguageResolver;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.karaf.decanter.appender.utils.EventFilter;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -48,19 +54,28 @@ public class CamelAppender implements EventHandler {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CamelAppender.class);
 
-    @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext context) throws ConfigurationException {
-        open(context.getProperties());
+        open(context.getProperties(), context.getBundleContext());
     }
     
-    public void open(Dictionary<String, Object> config) throws ConfigurationException {
+    public void open(Dictionary<String, Object> config, BundleContext bundleContext) throws ConfigurationException {
         this.config = config;
         if (config.get(DESTINATION_URI_KEY) == null) {
             throw new ConfigurationException(DESTINATION_URI_KEY, DESTINATION_URI_KEY + " is not defined");
         }
         LOGGER.debug("Creating CamelContext, and use the {} URI", config.get(DESTINATION_URI_KEY));
-        this.camelContext = new DefaultCamelContext();
+        if (bundleContext == null) {
+            this.camelContext = new DefaultCamelContext();
+        } else {
+            OsgiDefaultCamelContext osgiCamelContext = new OsgiDefaultCamelContext(bundleContext);
+            osgiCamelContext.setName("decanter-appender-context");
+            osgiCamelContext.setClassResolver(new OsgiClassResolver(osgiCamelContext, bundleContext));
+            osgiCamelContext.setDataFormatResolver(new OsgiDataFormatResolver(bundleContext));
+            osgiCamelContext.setLanguageResolver(new OsgiLanguageResolver(bundleContext));
+            this.camelContext = osgiCamelContext;
+        }
+        this.camelContext.start();
     }
 
     @Override
