@@ -19,10 +19,8 @@ package org.apache.karaf.decanter.collector.camel;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.MessageHistory;
-import org.apache.camel.RouteNode;
-import org.apache.camel.util.MessageHelper;
+import org.apache.camel.*;
+import org.apache.camel.util.ObjectHelper;
 
 /**
  * Adds the default data from the Exchange to the data map
@@ -48,17 +46,17 @@ public class DefaultExchangeExtender implements DecanterCamelEventExtender {
             data.put("inHeaders", exchange.getIn().getHeaders());
         }
         if (includeBody) {
-            data.put("inBody", MessageHelper.extractBodyAsString(exchange.getIn()));
+            data.put("inBody", extractBodyAsString(exchange.getIn()));
         }
-        data.put("inBodyType", MessageHelper.getBodyTypeName(exchange.getIn()));
+        data.put("inBodyType", getBodyTypeName(exchange.getIn()));
         if (exchange.hasOut()) {
             if (includeHeaders) {
                 data.put("outHeaders", exchange.getOut().getHeaders());
             }
             if (includeBody) {
-                data.put("outBody", MessageHelper.extractBodyAsString(exchange.getOut()));
+                data.put("outBody", extractBodyAsString(exchange.getOut()));
             }
-            data.put("outBodyType", MessageHelper.getBodyTypeName(exchange.getOut()));
+            data.put("outBodyType", getBodyTypeName(exchange.getOut()));
         }
         data.put("causedByException", extractCausedByException(exchange));
     }
@@ -87,6 +85,42 @@ public class DefaultExchangeExtender implements DecanterCamelEventExtender {
             cause = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
         }
         return (cause != null) ? cause.toString() : null;
+    }
+
+    private static String extractBodyAsString(Message message) {
+        if (message == null) {
+            return null;
+        } else {
+            Object body = message.getBody();
+            if (body instanceof String) {
+                return (String)body;
+            } else {
+                StreamCache newBody = (StreamCache)message.getBody(StreamCache.class);
+                if (newBody != null) {
+                    message.setBody(newBody);
+                }
+
+                Object answer = message.getBody(String.class);
+                if (answer == null) {
+                    answer = message.getBody();
+                }
+
+                if (newBody != null) {
+                    newBody.reset();
+                }
+
+                return answer != null ? answer.toString() : null;
+            }
+        }
+    }
+
+    private static String getBodyTypeName(Message message) {
+        if (message == null) {
+            return null;
+        } else {
+            String answer = ObjectHelper.classCanonicalName(message.getBody());
+            return answer != null && answer.startsWith("java.lang.") ? answer.substring(10) : answer;
+        }
     }
 
     public void setIncludeBody(boolean includeBody) {

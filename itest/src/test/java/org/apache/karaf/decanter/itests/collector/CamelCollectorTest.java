@@ -18,6 +18,10 @@ package org.apache.karaf.decanter.itests.collector;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.core.osgi.OsgiClassResolver;
+import org.apache.camel.core.osgi.OsgiDataFormatResolver;
+import org.apache.camel.core.osgi.OsgiDefaultCamelContext;
+import org.apache.camel.core.osgi.OsgiLanguageResolver;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.karaf.decanter.collector.camel.DecanterEventNotifier;
 import org.apache.karaf.decanter.collector.camel.DecanterInterceptStrategy;
@@ -85,11 +89,14 @@ public class CamelCollectorTest extends KarafTestSupport {
                 from("direct:test").routeId("route-test").to("log:foo");
             }
         };
-        DefaultCamelContext camelContext = new DefaultCamelContext();
+        OsgiDefaultCamelContext camelContext = new OsgiDefaultCamelContext(bundleContext);
+        camelContext.setClassResolver(new OsgiClassResolver(camelContext, bundleContext));
+        camelContext.setDataFormatResolver(new OsgiDataFormatResolver(bundleContext));
+        camelContext.setLanguageResolver(new OsgiLanguageResolver(bundleContext));
         camelContext.setName("context-test");
-        camelContext.addRoutes(routeBuilder);
         camelContext.addInterceptStrategy(tracer);
         camelContext.start();
+        camelContext.addRoutes(routeBuilder);
 
         // send a exchange into the route
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
@@ -101,7 +108,6 @@ public class CamelCollectorTest extends KarafTestSupport {
         Assert.assertEquals("context-test", received.get(0).getProperty("camelContextName"));
         Assert.assertEquals("InOnly", received.get(0).getProperty("exchangePattern"));
         Assert.assertEquals("camelTracer", received.get(0).getProperty("type"));
-        Assert.assertEquals("log:foo", received.get(0).getProperty("to1.label"));
         Assert.assertEquals("route-test", received.get(0).getProperty("routeId"));
         Assert.assertEquals("direct://test", received.get(0).getProperty("fromEndpointUri"));
         Assert.assertEquals("root", received.get(0).getProperty("karafName"));
@@ -139,11 +145,14 @@ public class CamelCollectorTest extends KarafTestSupport {
             }
         };
 
-        DefaultCamelContext camelContext = new DefaultCamelContext();
+        OsgiDefaultCamelContext camelContext = new OsgiDefaultCamelContext(bundleContext);
+        camelContext.setClassResolver(new OsgiClassResolver(camelContext, bundleContext));
+        camelContext.setDataFormatResolver(new OsgiDataFormatResolver(bundleContext));
+        camelContext.setLanguageResolver(new OsgiLanguageResolver(bundleContext));
         camelContext.setName("context-test");
-        camelContext.addRoutes(builder);
         camelContext.getManagementStrategy().addEventNotifier(notifier);
         camelContext.start();
+        camelContext.addRoutes(builder);
 
         // send a exchange into the route
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
@@ -154,41 +163,36 @@ public class CamelCollectorTest extends KarafTestSupport {
         // camel context starting
         Assert.assertEquals("decanter/collect/camel/event", received.get(0).getTopic());
         Assert.assertEquals("root", received.get(0).getProperty("karafName"));
-        Assert.assertEquals("org.apache.camel.management.event.CamelContextStartingEvent", received.get(0).getProperty("eventType"));
+        Assert.assertEquals("org.apache.camel.impl.event.CamelContextStartingEvent", received.get(0).getProperty("eventType"));
         Assert.assertEquals("context-test", received.get(0).getProperty("camelContextName"));
         Assert.assertEquals("camelEvent", received.get(0).getProperty("type"));
 
         // add route
         Assert.assertEquals("decanter/collect/camel/event", received.get(1).getTopic());
         Assert.assertEquals("root", received.get(1).getProperty("karafName"));
-        Assert.assertEquals("org.apache.camel.management.event.RouteAddedEvent", received.get(1).getProperty("eventType"));
+        Assert.assertEquals("org.apache.camel.impl.event.CamelContextRoutesStartingEvent", received.get(1).getProperty("eventType"));
         Assert.assertEquals("context-test", received.get(1).getProperty("camelContextName"));
-        Assert.assertEquals("route-test", received.get(1).getProperty("routeId"));
         Assert.assertEquals("camelEvent", received.get(1).getProperty("type"));
 
         // route started
         Assert.assertEquals("decanter/collect/camel/event", received.get(2).getTopic());
         Assert.assertEquals("root", received.get(2).getProperty("karafName"));
-        Assert.assertEquals("org.apache.camel.management.event.RouteStartedEvent", received.get(2).getProperty("eventType"));
+        Assert.assertEquals("org.apache.camel.impl.event.CamelContextRoutesStartedEvent", received.get(2).getProperty("eventType"));
         Assert.assertEquals("context-test", received.get(2).getProperty("camelContextName"));
-        Assert.assertEquals("route-test", received.get(2).getProperty("routeId"));
         Assert.assertEquals("camelEvent", received.get(2).getProperty("type"));
 
         // camel context started
         Assert.assertEquals("decanter/collect/camel/event", received.get(3).getTopic());
         Assert.assertEquals("root", received.get(3).getProperty("karafName"));
-        Assert.assertEquals("org.apache.camel.management.event.CamelContextStartedEvent", received.get(3).getProperty("eventType"));
+        Assert.assertEquals("org.apache.camel.impl.event.CamelContextStartedEvent", received.get(3).getProperty("eventType"));
         Assert.assertEquals("context-test", received.get(3).getProperty("camelContextName"));
         Assert.assertEquals("camelEvent", received.get(3).getProperty("type"));
 
         // exchange sending
         Assert.assertEquals("decanter/collect/camel/event", received.get(4).getTopic());
         Assert.assertEquals("root", received.get(4).getProperty("karafName"));
-        Assert.assertEquals("org.apache.camel.management.event.ExchangeSendingEvent", received.get(4).getProperty("eventType"));
+        Assert.assertEquals("org.apache.camel.impl.event.RouteAddedEvent", received.get(4).getProperty("eventType"));
         Assert.assertEquals("context-test", received.get(4).getProperty("camelContextName"));
-        Assert.assertEquals("direct://test", received.get(4).getProperty("fromEndpointUri"));
-        Assert.assertEquals("This is a test", received.get(4).getProperty("inBody"));
-        Assert.assertEquals("String", received.get(4).getProperty("inBodyType"));
     }
 
 }

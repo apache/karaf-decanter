@@ -18,25 +18,16 @@ package org.apache.karaf.decanter.collector.camel;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
-import org.apache.camel.management.event.CamelContextResumeFailureEvent;
-import org.apache.camel.management.event.CamelContextStartupFailureEvent;
-import org.apache.camel.management.event.CamelContextStopFailureEvent;
-import org.apache.camel.management.event.ExchangeFailureHandledEvent;
-import org.apache.camel.management.event.ExchangeRedeliveryEvent;
-import org.apache.camel.management.event.ExchangeSendingEvent;
-import org.apache.camel.management.event.ExchangeSentEvent;
-import org.apache.camel.management.event.ServiceStartupFailureEvent;
-import org.apache.camel.management.event.ServiceStopFailureEvent;
+import org.apache.camel.spi.CamelEvent;
 
 public class CamelEventMapper {
     
-    public Map<String, Object> toMap(EventObject event) throws UnknownHostException {
+    public Map<String, Object> toMap(CamelEvent event) throws UnknownHostException {
         HashMap<String, Object> data = new HashMap<String, Object>();
         data.put("eventType", event.getClass().getName());
         data.put("type", "camelEvent");
@@ -46,59 +37,56 @@ public class CamelEventMapper {
         data.put("timestamp", System.currentTimeMillis());
         
         Object source = event.getSource();
-        if (event instanceof ExchangeSentEvent) {
-            ExchangeSentEvent sent = (ExchangeSentEvent) event;
+        if (event instanceof CamelEvent.ExchangeSentEvent) {
+            CamelEvent.ExchangeSentEvent sent = (CamelEvent.ExchangeSentEvent) event;
             data.put("sentToEndpointUri", sent.getEndpoint()
                     .getEndpointUri());
             data.put("sentTimeTaken", sent.getTimeTaken());
         }
-        if (event instanceof ExchangeSendingEvent) {
-            ExchangeSendingEvent sending = (ExchangeSendingEvent) event;
+        if (event instanceof CamelEvent.ExchangeSendingEvent) {
+            CamelEvent.ExchangeSendingEvent sending = (CamelEvent.ExchangeSendingEvent) event;
             data.put("sendingToEndpointUri", sending.getEndpoint().getEndpointUri());
         }
-        if (event instanceof ExchangeFailureHandledEvent) {
-            ExchangeFailureHandledEvent failHandled = (ExchangeFailureHandledEvent) event;
-            data.put("failureIsHandled", failHandled.isHandled());
+        if (event instanceof CamelEvent.ExchangeFailureHandledEvent) {
+            CamelEvent.ExchangeFailureHandledEvent failHandled = (CamelEvent.ExchangeFailureHandledEvent) event;
             data.put("failureIsDeadLetterChannel", failHandled.isDeadLetterChannel());
             data.put("failureHandler", failHandled.getFailureHandler() == null ? "null"
                             : failHandled.getFailureHandler().getClass().getName());
         }
-        if (event instanceof ExchangeRedeliveryEvent) {
-            ExchangeRedeliveryEvent redelivery = (ExchangeRedeliveryEvent) event;
+        if (event instanceof CamelEvent.ExchangeRedeliveryEvent) {
+            CamelEvent.ExchangeRedeliveryEvent redelivery = (CamelEvent.ExchangeRedeliveryEvent) event;
             data.put("redeliveryAttempt", redelivery.getAttempt());
         }
         if (source instanceof Route) {
             Route route = (Route)source;
             data.put("routeId", route.getId());
-            data.put("camelContextName", route.getRouteContext().getCamelContext().getName());
+            data.put("camelContextName", route.getCamelContext().getName());
         }
         if (source instanceof CamelContext) {
             CamelContext context = (CamelContext)source;
             data.put("camelContextName", context.getName());
         }
             
-        if (event instanceof ServiceStartupFailureEvent) {
-            ServiceStartupFailureEvent service = (ServiceStartupFailureEvent) event;
+        if (event instanceof CamelEvent.ServiceStartupFailureEvent) {
+            CamelEvent.ServiceStartupFailureEvent service = (CamelEvent.ServiceStartupFailureEvent) event;
             data.put("serviceName", service.getService().getClass().getName());
-            data.put("camelContextName", service.getContext().getName());
             data.put("cause", service.getCause().toString());
         }
-        if (event instanceof ServiceStopFailureEvent) {
-            ServiceStopFailureEvent service = (ServiceStopFailureEvent) event;
+        if (event instanceof CamelEvent.ServiceStopFailureEvent) {
+            CamelEvent.ServiceStopFailureEvent service = (CamelEvent.ServiceStopFailureEvent) event;
             data.put("serviceName", service.getService().getClass().getName());
-            data.put("camelContextName", service.getContext().getName());
             data.put("cause", service.getCause().toString());
         }
-        if (event instanceof CamelContextResumeFailureEvent) {
-            CamelContextResumeFailureEvent context = (CamelContextResumeFailureEvent) event;
+        if (event instanceof CamelEvent.CamelContextResumeFailureEvent) {
+            CamelEvent.CamelContextResumeFailureEvent context = (CamelEvent.CamelContextResumeFailureEvent) event;
             data.put("cause", context.getCause().toString());
         }
-        if (event instanceof CamelContextStartupFailureEvent) {
-            CamelContextStartupFailureEvent context = (CamelContextStartupFailureEvent) event;
+        if (event instanceof CamelEvent.CamelContextStartupFailureEvent) {
+            CamelEvent.CamelContextStartupFailureEvent context = (CamelEvent.CamelContextStartupFailureEvent) event;
             data.put("cause", context.getCause().toString());
         }
-        if (event instanceof CamelContextStopFailureEvent) {
-            CamelContextStartupFailureEvent context = (CamelContextStartupFailureEvent) event;
+        if (event instanceof CamelEvent.CamelContextStopFailureEvent) {
+            CamelEvent.CamelContextStartupFailureEvent context = (CamelEvent.CamelContextStartupFailureEvent) event;
             data.put("cause", context.getCause().toString());
         }
         return data;

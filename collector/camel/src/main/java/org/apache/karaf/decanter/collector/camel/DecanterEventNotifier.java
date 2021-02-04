@@ -16,20 +16,12 @@
  */
 package org.apache.karaf.decanter.collector.camel;
 
-import java.util.EventObject;
 import java.util.Map;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Route;
-import org.apache.camel.management.event.ExchangeCompletedEvent;
-import org.apache.camel.management.event.ExchangeCreatedEvent;
-import org.apache.camel.management.event.ExchangeFailureHandledEvent;
-import org.apache.camel.management.event.ExchangeRedeliveryEvent;
-import org.apache.camel.management.event.ExchangeSendingEvent;
-import org.apache.camel.management.event.ExchangeSentEvent;
-import org.apache.camel.management.event.ServiceStartupFailureEvent;
-import org.apache.camel.management.event.ServiceStopFailureEvent;
+import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.support.EventNotifierSupport;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -78,49 +70,48 @@ public class DecanterEventNotifier extends EventNotifierSupport {
         dextender.setIncludeProperties(includeProperties);
     }
     
-    private boolean isIgnored(EventObject event) {
+    private boolean isIgnored(CamelEvent event) {
         if (isIgnoredBySourceType(event)) {
             return true;
         }
         
-        if (event instanceof ExchangeSentEvent && isIgnoreExchangeSentEvents()) {
+        if (event instanceof CamelEvent.ExchangeSentEvent && isIgnoreExchangeSentEvents()) {
             return true;
         }
-        if (event instanceof ExchangeSendingEvent && isIgnoreExchangeSendingEvents()) {
+        if (event instanceof CamelEvent.ExchangeSendingEvent && isIgnoreExchangeSendingEvents()) {
             return true;
         }
-        if (event instanceof ExchangeFailureHandledEvent && isIgnoreExchangeFailedEvents()) {
+        if (event instanceof CamelEvent.ExchangeFailureHandledEvent && isIgnoreExchangeFailedEvents()) {
             return true;
         }
-        if (event instanceof ExchangeRedeliveryEvent && isIgnoreExchangeRedeliveryEvents()) {
+        if (event instanceof CamelEvent.ExchangeRedeliveryEvent && isIgnoreExchangeRedeliveryEvents()) {
             return true;
         }
-        if (event instanceof ExchangeCompletedEvent && isIgnoreExchangeCompletedEvent()) {
+        if (event instanceof CamelEvent.ExchangeCompletedEvent && isIgnoreExchangeCompletedEvent()) {
             return true;
         }
-        if (event instanceof ExchangeCreatedEvent && isIgnoreExchangeCreatedEvent()) {
+        if (event instanceof CamelEvent.ExchangeCreatedEvent && isIgnoreExchangeCreatedEvent()) {
             return true;
         }
             
-        if (event instanceof ServiceStartupFailureEvent && isIgnoreServiceEvents()) {
+        if (event instanceof CamelEvent.ServiceStartupFailureEvent && isIgnoreServiceEvents()) {
             return true;
         }
-        if (event instanceof ServiceStopFailureEvent && isIgnoreServiceEvents()) {
+        if (event instanceof CamelEvent.ServiceStopFailureEvent && isIgnoreServiceEvents()) {
             return true;
         }
         
         return false;
     }
 
-    private boolean isIgnoredBySourceType(EventObject event) {
+    private boolean isIgnoredBySourceType(CamelEvent event) {
         Object source = event.getSource();
         return (source instanceof Exchange && isIgnoreExchangeEvents()
             || source instanceof Route && isIgnoreRouteEvents()
             || source instanceof CamelContext && isIgnoreCamelContextEvents());
     }
 
-    @Override
-    public boolean isEnabled(EventObject eventObject) {
+    public boolean isEnabled(CamelEvent eventObject) {
         if (eventObject == null) {
             return false;
         }
@@ -141,26 +132,29 @@ public class DecanterEventNotifier extends EventNotifierSupport {
             return context.getName().matches(camelContextMatcher);
         } else if (source instanceof Route) {
             Route route = (Route)source;
-            boolean contextMatches = route.getRouteContext().getCamelContext().getName().matches(camelContextMatcher);
+            boolean contextMatches = route.getCamelContext().getName().matches(camelContextMatcher);
             return contextMatches && route.getId().matches(routeMatcher);
         } else {
             return false;
         }
     }
 
-    public void notify(EventObject event) throws Exception {
-        try {
-            Map<String, Object> eventMap = new CamelEventMapper().toMap(event);
-            Object source = event.getSource();
-            if (source instanceof Exchange) {
-                dextender.extend(eventMap, (Exchange)source);
-                if (extender != null) {
-                    extender.extend(eventMap, (Exchange)source);
+    @Override
+    public void notify(CamelEvent event) throws Exception {
+        if (isEnabled(event)) {
+            try {
+                Map<String, Object> eventMap = new CamelEventMapper().toMap(event);
+                Object source = event.getSource();
+                if (source instanceof Exchange) {
+                    dextender.extend(eventMap, (Exchange) source);
+                    if (extender != null) {
+                        extender.extend(eventMap, (Exchange) source);
+                    }
                 }
+                eventAdmin.postEvent(new Event("decanter/collect/camel/event", eventMap));
+            } catch (Exception ex) {
+                LOG.warn("Failed to handle event", ex);
             }
-            eventAdmin.postEvent(new Event("decanter/collect/camel/event", eventMap));
-        } catch (Exception ex) {
-            LOG.warn("Failed to handle event", ex);
         }
     }
 

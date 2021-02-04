@@ -496,7 +496,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     <feature name="decanter-processor-camel-core" version="${project.version}" description="Karaf Decanter Camel Processor core">
         <feature>decanter-common</feature>
         <feature>camel-core</feature>
-        <bundle dependency="true">mvn:org.apache.camel/camel-core-osgi/${camel.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.camel.karaf/camel-core-osgi/${camel.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.processor/org.apache.karaf.decanter.processor.camel/${project.version}</bundle>
     </feature>
 

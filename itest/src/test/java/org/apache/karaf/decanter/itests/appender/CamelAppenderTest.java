@@ -16,9 +16,14 @@
  */
 package org.apache.karaf.decanter.itests.appender;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.core.osgi.OsgiClassResolver;
+import org.apache.camel.core.osgi.OsgiDataFormatResolver;
+import org.apache.camel.core.osgi.OsgiDefaultCamelContext;
+import org.apache.camel.core.osgi.OsgiLanguageResolver;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.karaf.itests.KarafTestSupport;
 import org.apache.karaf.jaas.boot.principal.RolePrincipal;
@@ -31,11 +36,14 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -53,7 +61,7 @@ public class CamelAppenderTest extends KarafTestSupport {
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void test() throws Exception {
         final List<Exchange> exchanges = new ArrayList<>();
 
@@ -62,18 +70,25 @@ public class CamelAppenderTest extends KarafTestSupport {
         RouteBuilder routeBuilder = new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("direct-vm:decanter").process(new Processor() {
+                from("direct-vm:decanter").routeId("test").process(new Processor() {
                     @Override
                     public void process(Exchange exchange) throws Exception {
+                        System.out.println("Adding exchange");
                         exchanges.add(exchange);
                     }
                 });
             }
         };
-        DefaultCamelContext camelContext = new DefaultCamelContext();
+
+        BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
+        OsgiDefaultCamelContext camelContext = new OsgiDefaultCamelContext(bundleContext);
+        camelContext.setClassResolver(new OsgiClassResolver(camelContext, bundleContext));
+        camelContext.setDataFormatResolver(new OsgiDataFormatResolver(bundleContext));
+        camelContext.setLanguageResolver(new OsgiLanguageResolver(bundleContext));
         camelContext.setName("context-test");
-        camelContext.addRoutes(routeBuilder);
+        bundleContext.registerService(CamelContext.class, camelContext, null);
         camelContext.start();
+        camelContext.addRoutes(routeBuilder);
 
         while (!camelContext.isStarted()) {
             Thread.sleep(200);

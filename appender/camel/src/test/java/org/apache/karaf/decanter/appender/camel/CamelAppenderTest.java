@@ -62,7 +62,7 @@ public class CamelAppenderTest {
         CamelAppender appender = new CamelAppender();
         Hashtable<String, Object> config = new Hashtable<>();
         config.put(CamelAppender.DESTINATION_URI_KEY, "direct-vm:decanter");
-        appender.open(config);
+        appender.open(config, null);
 
         Map<String, Object> data = new HashMap<>();
         data.put(EventConstants.TIMESTAMP, TIMESTAMP);
@@ -87,7 +87,7 @@ public class CamelAppenderTest {
         config.put(CamelAppender.DESTINATION_URI_KEY, "direct-vm:decanter");
         config.put(EventFilter.PROPERTY_NAME_EXCLUDE_CONFIG, ".*refused.*");
         config.put(EventFilter.PROPERTY_VALUE_EXCLUDE_CONFIG, ".*refused.*");
-        appender.open(config);
+        appender.open(config, null);
 
         Map<String, Object> data = new HashMap<>();
         data.put(EventConstants.TIMESTAMP, TIMESTAMP);

@@ -19,6 +19,10 @@ package org.apache.karaf.decanter.itests.processor;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.core.osgi.OsgiClassResolver;
+import org.apache.camel.core.osgi.OsgiDataFormatResolver;
+import org.apache.camel.core.osgi.OsgiDefaultCamelContext;
+import org.apache.camel.core.osgi.OsgiLanguageResolver;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.karaf.itests.KarafTestSupport;
 import org.apache.karaf.jaas.boot.principal.RolePrincipal;
@@ -64,8 +68,12 @@ public class CamelProcessorTest extends KarafTestSupport {
         }
 
         System.out.println("Creating test Camel route ...");
-        DefaultCamelContext camelContext = new DefaultCamelContext();
+        OsgiDefaultCamelContext camelContext = new OsgiDefaultCamelContext(bundleContext);
+        camelContext.setClassResolver(new OsgiClassResolver(camelContext, bundleContext));
+        camelContext.setDataFormatResolver(new OsgiDataFormatResolver(bundleContext));
+        camelContext.setLanguageResolver(new OsgiLanguageResolver(bundleContext));
         camelContext.setName("decanter-test-context");
+        camelContext.start();
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
@@ -80,7 +88,6 @@ public class CamelProcessorTest extends KarafTestSupport {
                         }).to("direct-vm:decanter-callback");
             }
         });
-        camelContext.start();
         while (!camelContext.isStarted()) {
             Thread.sleep(200);
         }
