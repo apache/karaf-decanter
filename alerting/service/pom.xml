@@ -34,7 +34,7 @@
     <name>Apache Karaf :: Decanter :: Alerting :: Service</name>
 
     <properties>
-        <lucene.version>8.7.0</lucene.version>
+        <lucene.version>8.8.0</lucene.version>
     </properties>
 
     <dependencies>
