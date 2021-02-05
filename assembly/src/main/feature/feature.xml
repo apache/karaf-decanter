@@ -133,6 +133,13 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-collector-soap-core</feature>
     </feature>
 
+    <feature name="decanter-collector-openstack" version="${project.version}" description="Karaf Decanter Openstack collector">
+        <feature>decanter-common</feature>
+        <feature>scheduler</feature>
+        <configfile finalname="/etc/org.apache.karaf.decanter.collector.openstack.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.openstack/${project.version}/cfg</configfile>
+        <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.openstack/${project.version}</bundle>
+    </feature>
+
     <feature name="decanter-collector-oshi" version="${project.version}" description="Karaf Decanter oshi (system) collector">
         <feature>decanter-common</feature>
         <feature>scheduler</feature>

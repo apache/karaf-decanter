@@ -1198,6 +1198,46 @@ Then, we can add the Druid queries using the format `query.ID=QUERY`.
 
 Decanter Druid collector schedules the queries and send the results in the dispatcher.
 
+==== OpenStack
+
+Karaf Decanter OpenStack collector periodically request OpenStack API to get details about openstack ecosystem.
+
+The `karaf-collector-openstack` feature installs the OpenStack collector:
+
+----
+karaf@root()> feature:install decanter-collector-openstack
+----
+
+This feature also installs `etc/org.apache.karaf.decanter.collector.openstack.cfg` configuration file:
+
+----
+#
+# Decanter Openstack collector
+#
+# Openstack services API locations
+#
+
+#openstack.identity=http://localhost/identity
+#openstack.project=2c7be0bac05c4144a328d4ab3dfac379
+#openstack.username=admin
+#openstack.password=secret
+#openstack.domain=default
+
+#openstack.compute.enabled=true
+#openstack.compute=http://localhost/compute/v2.1
+#openstack.block.storage.enabled=true
+#openstack.block.storage=http://localhost/volume/v3
+#openstack.image.enabled=true
+#openstack.image=http://localhost/image
+#openstack.metric.enabled=true
+#openstack.metric=http://localhost/metric
+
+# Unmarshaller to use
+unmarshaller.target=(dataFormat=json)
+----
+
+You have to define the locations of the OpenStack APIs and if you enabled requesting the APIs or not.
+
 ==== Customizing properties in collectors
 
 You can add, rename or remove properties collected by the collectors before sending it to the dispatcher.
