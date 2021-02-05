@@ -42,7 +42,7 @@
         <cassandra.driver.version>4.9.0</cassandra.driver.version>
         <glassfish-json.version>1.1.4</glassfish-json.version>
         <json-api.version>1.1.4</json-api.version>
-        <kafka.version>2.6.0</kafka.version>
+        <kafka.version>2.7.0</kafka.version>
         <karaf.version>4.2.10</karaf.version>
         <kibana.version>3.1.1</kibana.version>
         <kibana4.version>4.1.2</kibana4.version>
