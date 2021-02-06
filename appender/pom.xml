@@ -45,6 +45,7 @@
         <module>jms</module>
         <module>kafka</module>
         <module>log</module>
+        <module>loki</module>
         <module>orientdb</module>
         <module>mongodb</module>
         <module>mqtt</module>

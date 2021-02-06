@@ -321,6 +321,44 @@ This file allows you to define how the messages are sent to the Kafka broker:
 
 It's also possible to enable SSL security (with Kafka 0.9.x) using the SSL properties.
 
+==== Loki
+
+Loki (https://grafana.com/oss/loki/) is a log aggregation system. The Decanter Loki appender is able to push collected data
+to Loki via the Push API.
+
+The Decanter Loki appender converts any kind of collected data (coming from the dispatcher) as a log string that can be stored in Loki.
+
+The `decanter-appender-loki` feature installs the Loki appender:
+
+----
+karaf@root()> feature:install decanter-appender-loki
+----
+
+This feature also adds `etc/org.apache.karaf.decanter.appender.loki.cfg` configuration file:
+
+----
+######################################
+# Decanter Loki Appender Configuration
+######################################
+
+# Loki push API location
+#loki.url=http://localhost:3100/loki/api/v1/push
+
+# Loki tenant
+#loki.tenant=my-tenant
+
+# Loki basic authentication
+#loki.username=
+#loki.password=
+
+# Marshaller
+#marshaller.target=(dataFormat=raw)
+----
+
+* `loki.url` is the location of the Loki push API
+* `loki.tenant` is optional and define the tenant used to push data
+* `loki.username` and `loki.password` are used for basic authentication
+
 ==== Redis
 
 The Decanter Redis appender sends the data (collected by the collectors) to a Redis broker.
