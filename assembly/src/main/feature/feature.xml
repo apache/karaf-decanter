@@ -386,7 +386,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-appender-hdfs" version="${project.version}" description="Karaf Decanter HDFS appender">
         <feature>decanter-common</feature>
-        <configfile finalname="/etc/org.apache.karaf.decanter.appender.hdfs.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.hdfs/${project.version}</configfile>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.hdfs.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.hdfs/${project.version}/cfg</configfile>
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.12.0</bundle>
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.12.0</bundle>
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.12.0</bundle>
@@ -395,7 +395,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-appender-s3" version="${project.version}" description="Karaf Decanter AWS S3 appender">
         <feature>decanter-common</feature>
-        <configfile finalname="/etc/org.apache.karaf.decanter.appender.s3.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.s3/${project.version}</configfile>
+        <configfile finalname="/etc/org.apache.karaf.decanter.appender.s3.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.s3/${project.version}/cfg</configfile>
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.12.0</bundle>
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.12.0</bundle>
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.12.0</bundle>
