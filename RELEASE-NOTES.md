@@ -17,6 +17,62 @@
     under the License.
 -->
 
+## Apache Karaf Decanter 2.7.0
+
+### Overview
+
+Apache Karaf Decanter 2.7.0 is a major release on the 2.x series. It provides dependecy updates, fixes, improvements and new features,
+especially:
+
+* refactoring of Camel Collector as interceptor strategy
+* improvements on the REST collector
+* new OpenStack collector
+* new Apache Druid collector
+* new Grafana Loki appender
+* new HDFS appender
+* new AWS S3 appender
+
+Take a look on ChangeLog for details.
+
+### ChangeLog
+
+#### Bug
+    * [KARAF-6982] - decanter-appender-file default file conflicts with decanter-alerting-service 
+    * [KARAF-7001] - Missing jackson packages in kafka collector/appender
+
+#### New Feature
+    * [KARAF-5971] - Add hdfs/s3 appender
+    * [KARAF-6990] - Add grafana loki appender
+    * [KARAF-7002] - Add Apache Druid collector
+    * [KARAF-7005] - Add openstack collector
+
+#### Improvement
+    * [KARAF-6983] - JSON Marshaller configuration property "replaceDotsByUnderscores" not in .cfg
+    * [KARAF-6984] - Incorrect example in Decanter Alerting Service configuration 
+    * [KARAF-6987] - Add bind address on socket collector
+    * [KARAF-7000] - Add System-Wide CPU Load to the oshi collector
+    * [KARAF-7003] - Manage connection exception on REST collector
+
+#### Task
+    * [KARAF-7007] - Refactore Camel Tracer as Camel intercept strategy
+
+#### Dependency upgrade
+    * [KARAF-6486] - Upgrade to Camel 3.7.1
+    * [KARAF-7014] - Upgrade to johnzon 1.2.10
+    * [KARAF-7015] - Upgrade to elasticsearch 7.10.2
+    * [KARAF-7016] - Upgrade to Jetty 9.4.36.v20210114
+    * [KARAF-7019] - Upgrade to Kafka 2.7.0
+    * [KARAF-7020] - Upgrade to oshi 5.4.1
+    * [KARAF-7021] - Upgrade to redisson 3.15.0
+    * [KARAF-7022] - Upgrade to CXF 3.4.2
+    * [KARAF-7025] - Upgrade to influxdb 2.21
+    * [KARAF-7026] - Upgrade to orientdb-client 3.1.7
+    * [KARAF-7027] - Upgrade to prometheus 0.10.0
+    * [KARAF-7028] - Upgrade to lucene 8.8.0
+
+#### Documentation
+    * [KARAF-6981] - Installation instruction referent to v2.0.0 instead of the current or a generic version
+
 ## Apache Karaf Decanter 2.6.0
 
 ### Overview
