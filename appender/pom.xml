@@ -52,6 +52,7 @@
         <module>prometheus</module>
         <module>redis</module>
         <module>rest</module>
+        <module>s3</module>
         <module>socket</module>
         <module>timescaledb</module>
         <module>websocket-servlet</module>

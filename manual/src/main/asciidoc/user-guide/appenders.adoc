@@ -898,3 +898,40 @@ marshaller.target=(dataFormat=csv)
 * `hdfs.configuration` is the location of the hdfs configuration file (core or site)
 * `hdfs.mode` defines the way of populating the file on HDFS (creating a new one, appending to an existing one, overwriting an existing one)
 * `hdfs.path` defines the location and name of the file on HDFS
+
+==== Amazon S3
+
+Decanter Amazon S3 appender stores collected data as objects in a S3 bucket.
+
+The `decanter-appender-s3` feature installs the S3 appender:
+
+----
+karaf@root()> feature:install decanter-appender-s3
+----
+
+The feature also installs `etc/org.apache.karaf.decanter.appender.hdfs.cfg` configuration file:
+
+----
+###############################
+# Decanter Appender S3 Configuration
+###############################
+
+# AWS credentials
+accessKeyId=
+secretKeyId=
+
+# AWS Region (optional)
+#region=
+
+# S3 bucket name
+bucket=
+
+
+# Marshaller to use
+marshaller.target=(dataFormat=json)
+----
+
+* `accessKeyId` property is required, containing your AWS access key
+* `secretKeyId` property is required, containing your AWS secret key
+* `region` property is optional and allows you to define the Amazon region to use
+* `bucket` property is required, containing the name of the S3 bucket where to add objects
