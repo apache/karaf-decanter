@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson</artifactId>
-            <version>3.15.0</version>
+            <version>3.16.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter.appender</groupId>
@@ -69,6 +69,8 @@
                             com.ning.compress*;resolution:=optional,
                             com.oracle.svm*;resolution:=optional,
                             com.esotericsoftware.kryo*;resolution:=optional,
+                            com.aayushatharva.brotli4j*;resolution:=optional,
+                            com.github.luben.zstd;resolution:=optional,
                             io.reactivex*;resolution:=optional,
                             javax.cache*;resolution:=optional,
                             jodd.bean*;resolution:=optional,
