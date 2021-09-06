@@ -683,6 +683,9 @@ This feature installs a default `etc/org.apache.karaf.decanter.collector.socket.
 # Unmarshaller to use
 # Unmarshaller is identified by data format. The default is json, but you can use another unmarshaller
 unmarshaller.target=(dataFormat=json)
+
+# The maximum request size (in bytes). Set to -1 not to put any limit on the request size.
+max.request.size=100000
 ----
 
 * the `port` property contains the port number where the network socket collector is listening
@@ -691,6 +694,7 @@ unmarshaller.target=(dataFormat=json)
 * the `protocol` property contains the protocol used by the collector for transferring data with the client
 * the `unmarshaller.target` property contains the unmarshaller used by the collector to transform the data
 sent by the client.
+* the `max.request.size` is the size (in bytes) that the collector can accept. By default, it's bounded to prevent high memory consumption. You can use `-1` to disable any limit.
 
 ==== JMS
 
