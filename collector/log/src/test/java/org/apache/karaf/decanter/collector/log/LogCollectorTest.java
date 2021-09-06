@@ -34,11 +34,11 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 
-public class LogAppenderTest {
+public class LogCollectorTest {
 
     @Test
     public void testCleanLoggerName() {
-        LogAppender appender = new LogAppender();
+        LogCollector appender = new LogCollector();
         
         String loggerName = "wrong$Pattern%For&event!Name";
         String cleanedLoggerName = appender.cleanLoggerName(loggerName);
@@ -52,7 +52,7 @@ public class LogAppenderTest {
 
     @Test
     public void testIgnoredLoggerCategories() {
-        LogAppender appender = new LogAppender();
+        LogCollector appender = new LogCollector();
 
         ComponentContext componentContext = new ComponentContextMock();
         componentContext.getProperties().put("ignored.categories", "org.apache.karaf.decanter.collector.log.*,test,other");
@@ -70,7 +70,7 @@ public class LogAppenderTest {
 
     @Test
     public void testDisabledLocationCategories() {
-        LogAppender appender = new LogAppender();
+        LogCollector appender = new LogCollector();
 
         ComponentContext componentContext = new ComponentContextMock();
         componentContext.getProperties().put("location.disabled", "org.apache.karaf.decanter.collector.log.*,test,other");
@@ -88,7 +88,7 @@ public class LogAppenderTest {
 
     @Test
     public void testDisabledLocationCategoriesAllWildcard() {
-        LogAppender appender = new LogAppender();
+        LogCollector appender = new LogCollector();
 
         ComponentContext componentContext = new ComponentContextMock();
         componentContext.getProperties().put("location.disabled", ".*,test,other");

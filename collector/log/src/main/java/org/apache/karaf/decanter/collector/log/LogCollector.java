@@ -45,13 +45,13 @@ import org.slf4j.LoggerFactory;
               "name=log"},
     immediate = true
 )
-public class LogAppender implements PaxAppender {
+public class LogCollector implements PaxAppender {
 
     @Reference
     public EventAdmin dispatcher;
 
-    private static final String MDC_IN_LOG_APPENDER = "inLogAppender";
-    private final static Logger LOGGER = LoggerFactory.getLogger(LogAppender.class);
+    private static final String MDC_IN_LOG_COLLECTOR = "inLogCollector";
+    private final static Logger LOGGER = LoggerFactory.getLogger(LogCollector.class);
     private final static Pattern PATTERN = Pattern.compile("[^A-Za-z0-9]");
 
     private Dictionary<String, Object> properties;
@@ -72,16 +72,16 @@ public class LogAppender implements PaxAppender {
     
     public void doAppend(PaxLoggingEvent event) {
         try {
-            if (MDC.get(MDC_IN_LOG_APPENDER) != null) {
+            if (MDC.get(MDC_IN_LOG_COLLECTOR) != null) {
                 // Avoid recursion
                 return;
             }
-            MDC.put(MDC_IN_LOG_APPENDER, "true");
+            MDC.put(MDC_IN_LOG_COLLECTOR, "true");
             appendInternal(event);
         } catch (Exception e) {
             LOGGER.warn("Error while appending event", e);
         } finally {
-            MDC.remove(MDC_IN_LOG_APPENDER);
+            MDC.remove(MDC_IN_LOG_COLLECTOR);
         }
     }
 
@@ -90,8 +90,6 @@ public class LogAppender implements PaxAppender {
             LOGGER.debug("{} logger is ignored by the log collector", event.getLoggerName());
             return;
         }
-
-        LOGGER.debug("Publishing log event to the appenders ...");
 
         Map<String, Object> data = new HashMap<>();
         data.put("type", "log");
