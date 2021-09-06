@@ -79,7 +79,7 @@ pipeline {
         stage('Tests') {
             steps {
                 echo 'Running tests'
-                sh 'mvn -B -e test -Ptest'
+                sh 'mvn -B -fae -e test -Ptest'
             }
             post {
                 always {
