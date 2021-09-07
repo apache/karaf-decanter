@@ -45,7 +45,7 @@
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orientdb-client</artifactId>
-            <version>3.1.7</version>
+            <version>3.2.0</version>
         </dependency>
 
         <!-- test -->
@@ -79,14 +79,17 @@
                             !net.jpountz.lz4,
                             !net.jpountz.util,
                             !net.jpountz.xxhash,
+			    !org.eclipse.collections*,
                             com.sun.jna*;resolution:=optional,
                             jdk.nashorn*;resolution:=optional,
                             sun.nio*;resolution:=optional,
+			    org.graalvm.polyglot;resolution:=optional,
                             *
                         </Import-Package>
                         <Private-Package>
                             org.apache.karaf.decanter.appender.orientdb,
                             org.apache.karaf.decanter.appender.utils,
+			    org.eclipse.collections*,
                             com.kenai.jffi,
                             jnr*,
                             com.orientechnologies*,
