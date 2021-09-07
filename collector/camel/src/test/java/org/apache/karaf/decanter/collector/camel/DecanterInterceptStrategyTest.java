@@ -60,7 +60,6 @@ public class DecanterInterceptStrategyTest {
             Assert.assertEquals("direct://start", rootObject.getString("fromEndpointUri"));
             Assert.assertEquals("TEST", rootObject.getString("inBody"));
             JsonObject propertiesObject = rootObject.getJsonObject("properties");
-            Assert.assertEquals("log://foo", propertiesObject.getString("CamelToEndpoint"));
             Assert.assertEquals("String", rootObject.getString("inBodyType"));
             Assert.assertEquals("decanter/collect/camel/tracer", rootObject.getString("event_topics"));
             System.out.println(marshaller.marshal(event));
