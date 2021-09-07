@@ -68,9 +68,11 @@
                         <Export-Package>!*</Export-Package>
                         <Import-Package>
                             !org.apache.kafka*,
+                            !org.xerial.snappy*,
                             !com.fasterxml.jackson*,
                             !net.jpountz*,
                             !kafka;
+                            com.github.luben.zstd;resolution:=optional,
                             com.ibm.security.krb5*;resolution:=optional,
                             sun.security.krb5;resolution:=optional,
                             *
@@ -79,6 +81,7 @@
                             org.apache.karaf.decanter.collector.kafka,
                             org.apache.karaf.decanter.collector.utils,
                             org.apache.kafka*,
+                            org.xerial.snappy*,
                             com.fasterxml.jackson*,
                             net.jpountz*,
                             kafka
