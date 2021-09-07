@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
-            <version>3.3.0</version>
+            <version>3.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter</groupId>
@@ -94,6 +94,7 @@
                             !jdiff,
                             !net.jcip*,
                             !net.minidev*,
+                            !net.jpountz.lz4,
                             !org.apache.commons.codec*,
                             !org.apache.commons.collections*,
                             !org.apache.commons.configuration2*,
@@ -109,6 +110,7 @@
                             !org.apache.xml*,
                             !org.apache.zookeeper*,
                             !org.tukaani*,
+                            !org.xerial.snappy*,
                             android*;resolution:=optional,
                             com.android*;resolution:=optional,
                             com.sun.javadoc;resolution:=optional,
@@ -169,6 +171,7 @@
                             jdiff,
                             net.jcip*,
                             net.minidev*,
+                            net.jpountz.lz4,
                             org.apache.commons.codec*,
                             org.apache.commons.collections*,
                             org.apache.commons.configuration2*,
@@ -183,7 +186,8 @@
                             org.apache.commons.text*,
                             org.apache.xml.resolver*,
                             org.apache.zookeeper*,
-                            org.tukaani*
+                            org.tukaani*,
+                            org.xerial.snappy*
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                     </instructions>
