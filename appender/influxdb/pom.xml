@@ -103,12 +103,12 @@
                             !org.msgpack.core.buffer,
                             !org.msgpack.value,
                             !org.msgpack.value.impl,
+                            !kotlin*,
                             android*;resolution:=optional,
                             com.android*;resolution:=optional,
                             dalvik.system;resolution:=optional,
                             sun.security*;resolution:=optional,
                             org.apache.harmony*;resolution:=optional,
-                            kotlin*;resolution:=optional,
                             javax.annotation.meta;resolution:=optional,
                             org.bouncycastle.jsse*;resolution:=optional,
                             org.openjsse*;resolution:=optional,
@@ -152,7 +152,8 @@
                             org.msgpack.core,
                             org.msgpack.core.buffer,
                             org.msgpack.value,
-                            org.msgpack.value.impl
+                            org.msgpack.value.impl,
+                            kotlin*
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                     </instructions>
