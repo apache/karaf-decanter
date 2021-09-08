@@ -23,6 +23,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
 import javax.security.auth.Subject;
@@ -38,11 +39,11 @@ public class EventCollector implements EventHandler {
     @Reference
     public EventAdmin dispatcher;
 
-    private Dictionary<String, Object> properties;
+    private Dictionary<String, Object> config;
 
     @Activate
     public void activate(ComponentContext context) {
-        properties = context.getProperties();
+        config = context.getProperties();
     }
 
     @Override
@@ -68,7 +69,7 @@ public class EventCollector implements EventHandler {
         }
 
         try {
-            PropertiesPreparator.prepare(data, properties);
+            PropertiesPreparator.prepare(data, config);
         } catch (Exception e) {
             // nothing to do
         }

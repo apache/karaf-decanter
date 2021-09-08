@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,12 +138,12 @@ public class SocketCollector implements Closeable, Runnable {
             LOGGER.warn("Can't prepare data for the dispatcher", e);
         }
 
-        String topic = loggerName2Topic(loggingEvent.getLoggerName());
-        Event event = new Event(topic, data);
+        String topic = (properties.get(EventConstants.EVENT_TOPIC) != null) ? (String) properties.get(EventConstants.EVENT_TOPIC) : "decanter/collect/log/";
+        Event event = new Event(loggerName2Topic(topic, loggingEvent.getLoggerName()), data);
         dispatcher.postEvent(event);
     }
 
-    static String loggerName2Topic(String loggerName) {
+    static String loggerName2Topic(String topic, String loggerName) {
         StringBuilder out = new StringBuilder();
         for (int c = 0; c < loggerName.length(); c++) {
             Character ch = loggerName.charAt(c);
@@ -156,7 +157,7 @@ public class SocketCollector implements Closeable, Runnable {
         while (outSt.length() > 1 && outSt.endsWith("/")) {
             outSt = outSt.substring(0, outSt.length() - 1);
         }
-        return "decanter/collect/log/" + outSt.replace(".", "/");
+        return topic + outSt.replace(".", "/");
     }
 
     private void putLocation(Map<String, Object> data, LocationInfo loc) {

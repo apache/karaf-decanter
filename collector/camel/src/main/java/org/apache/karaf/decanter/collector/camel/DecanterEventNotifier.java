@@ -32,18 +32,27 @@ public class DecanterEventNotifier extends EventNotifierSupport {
 
     private static final Logger LOG = LoggerFactory.getLogger(DecanterEventNotifier.class.getName());
 
-    private EventAdmin eventAdmin;
+    private EventAdmin dispatcher;
+    private String topic = "decanter/collect/camel/event";
     private String camelContextMatcher = ".*";
     private String routeMatcher = ".*";
     private DefaultExchangeExtender dextender = new DefaultExchangeExtender();
     private DecanterCamelEventExtender extender;
 
-    public EventAdmin getEventAdmin() {
-        return eventAdmin;
+    public EventAdmin getDispatcher() {
+        return dispatcher;
     }
 
-    public void setEventAdmin(EventAdmin eventAdmin) {
-        this.eventAdmin = eventAdmin;
+    public void setDispatcher(EventAdmin dispatcher) {
+        this.dispatcher = dispatcher;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
 
     public void setCamelContextMatcher(String camelContextMatcher) {
@@ -151,7 +160,7 @@ public class DecanterEventNotifier extends EventNotifierSupport {
                         extender.extend(eventMap, (Exchange) source);
                     }
                 }
-                eventAdmin.postEvent(new Event("decanter/collect/camel/event", eventMap));
+                dispatcher.postEvent(new Event(topic, eventMap));
             } catch (Exception ex) {
                 LOG.warn("Failed to handle event", ex);
             }

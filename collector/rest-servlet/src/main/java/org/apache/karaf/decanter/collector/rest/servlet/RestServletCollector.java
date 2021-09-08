@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public class RestServletCollector extends HttpServlet {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(RestServletCollector.class);
 
-    private String baseTopic;
+    private String topic;
     private Dictionary<String, Object> properties;
     private long maxRequestSize = 100000;
 
@@ -69,7 +70,7 @@ public class RestServletCollector extends HttpServlet {
     @Activate
     public void activate(ComponentContext context) throws MalformedURLException {
         Dictionary<String, Object> props = context.getProperties();
-        this.baseTopic = getProperty(props, "topic", "decanter/collect/rest-servlet");
+        this.topic = getProperty(props, EventConstants.EVENT_TOPIC, "decanter/collect/rest-servlet");
         this.properties = props;
         if (this.properties.get("max.request.size") != null) {
             maxRequestSize = Long.parseLong((String)this.properties.get("max.request.size"));
@@ -101,7 +102,7 @@ public class RestServletCollector extends HttpServlet {
 
             PropertiesPreparator.prepare(data, properties);
 
-            Event event = new Event(baseTopic, data);
+            Event event = new Event(topic, data);
             dispatcher.postEvent(event);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             LOGGER.debug("Karaf Decanter REST Servlet Collector harvesting done");

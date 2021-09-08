@@ -19,13 +19,18 @@
 package org.apache.karaf.decanter.collector.dropwizard;
 
 import com.codahale.metrics.*;
+import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 
 import java.net.InetAddress;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +49,17 @@ public class DecanterReporterCollector implements Runnable {
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL)
     public MetricSet metricRegistry;
+
+    public Dictionary<String, Object> config;
+
+    @Activate
+    public void activate(ComponentContext componentContext) {
+        activate(componentContext.getProperties());
+    }
+
+    public void activate(Dictionary<String, Object> config) {
+        this.config = config;
+    }
 
     @Override
     public void run() {
@@ -95,7 +111,16 @@ public class DecanterReporterCollector implements Runnable {
                 data.put("Mean Rate", timer.getMeanRate());
                 populateSnapshot(timer.getSnapshot(), data);
             }
-            Event event = new Event("decanter/collect/dropwizard", data);
+
+            try {
+                PropertiesPreparator.prepare(data, config);
+            } catch (Exception e) {
+                // nothing to do
+            }
+
+            String topic = (config.get(EventConstants.EVENT_TOPIC) != null) ? (String) config.get(EventConstants.EVENT_TOPIC) : "decanter/collect/dropwizard";
+
+            Event event = new Event(topic, data);
             dispatcher.postEvent(event);
         }
     }

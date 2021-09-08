@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +78,7 @@ public class RestCollector implements Runnable {
         this.config = config;
         this.url = new URL(getProperty(config, "url", "http://localhost:8181"));
         this.paths = getProperty(config, "paths", "").split(",");
-        this.topic = getProperty(config, "topic", "decanter/collect/rest");
+        this.topic = getProperty(config, EventConstants.EVENT_TOPIC, "decanter/collect/rest");
         this.requestMethod = getProperty(config, "request.method", "GET");
         this.user = getProperty(config, "user", null);
         this.password = getProperty(config, "password", null);

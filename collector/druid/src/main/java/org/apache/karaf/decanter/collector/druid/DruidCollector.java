@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +81,7 @@ public class DruidCollector implements Runnable {
                     data.put("query", key.substring("query.".length()));
                     data.putAll(executeQuery(druidBroker, (String) config.get(key)));
                     PropertiesPreparator.prepare(data, config);
-                    String topic = (config.get("topic") != null) ? (String) config.get("topic") : "decanter/collect/druid";
+                    String topic = (config.get(EventConstants.EVENT_TOPIC) != null) ? (String) config.get(EventConstants.EVENT_TOPIC) : "decanter/collect/druid";
                     dispatcher.postEvent(new Event(topic, data));
                 } catch (Exception e) {
                     LOGGER.warn("Can't execute query {}", key.substring("query.".length()), e);

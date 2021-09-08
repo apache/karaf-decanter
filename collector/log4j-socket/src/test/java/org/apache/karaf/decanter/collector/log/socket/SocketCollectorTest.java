@@ -73,7 +73,7 @@ public class SocketCollectorTest {
 
     @Test
     public void testLoggerName2Topic() {
-        String topic = SocketCollector.loggerName2Topic("test.[Tomcat].[localhost].[/]");
+        String topic = SocketCollector.loggerName2Topic("decanter/collect/log/", "test.[Tomcat].[localhost].[/]");
         Assert.assertEquals("decanter/collect/log/test/Tomcat/localhost", topic);
     }
 

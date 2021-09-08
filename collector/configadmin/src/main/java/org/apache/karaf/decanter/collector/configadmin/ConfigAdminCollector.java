@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +50,7 @@ public class ConfigAdminCollector implements ConfigurationListener {
     @Reference
     private ConfigurationAdmin configurationAdmin;
 
-    private Dictionary<String, Object> properties;
+    private Dictionary<String, Object> config;
 
     @Activate
     public void activate(ComponentContext componentContext) {
@@ -57,7 +58,7 @@ public class ConfigAdminCollector implements ConfigurationListener {
     }
 
     public void activate(Dictionary<String, Object> properties) {
-        this.properties = properties;
+        this.config = properties;
     }
 
     @Override
@@ -94,12 +95,14 @@ public class ConfigAdminCollector implements ConfigurationListener {
         }
 
         try {
-            PropertiesPreparator.prepare(data, properties);
+            PropertiesPreparator.prepare(data, config);
         } catch (Exception e) {
             // nothing to do
         }
 
-        dispatcher.postEvent(new Event("decanter/collect/configadmin", data));
+        String topic = (config.get(EventConstants.EVENT_TOPIC) != null) ? (String) config.get(EventConstants.EVENT_TOPIC) : "decanter/collect/configadmin";
+
+        dispatcher.postEvent(new Event(topic, data));
     }
 
 }

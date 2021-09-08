@@ -23,6 +23,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +91,8 @@ public class PrometheusCollector implements Runnable {
                 }
             }
             PropertiesPreparator.prepare(data, properties);
-            dispatcher.postEvent(new Event("decanter/collect/prometheus", data));
+            String topic = (properties.get(EventConstants.EVENT_TOPIC) != null) ? (String) properties.get(EventConstants.EVENT_TOPIC) : "decanter/collect/prometheus";
+            dispatcher.postEvent(new Event(topic, data));
         } catch (Exception e) {
             LOGGER.warn("Can't get Prometheus metrics", e);
             e.printStackTrace();

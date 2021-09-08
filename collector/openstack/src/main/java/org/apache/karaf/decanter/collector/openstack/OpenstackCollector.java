@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,11 +82,7 @@ public class OpenstackCollector implements Runnable {
 
     public void activate(Dictionary<String, Object> config) throws Exception {
         this.config = config;
-        if (config.get("topic") != null) {
-            topic = (String) config.get("topic");
-        } else {
-            topic = "decanter/collect/openstack";
-        }
+        topic = (config.get(EventConstants.EVENT_TOPIC) != null) ? (String) config.get(EventConstants.EVENT_TOPIC) : "decanter/collect/openstack";
         if (config.get("openstack.identity") == null) {
             throw new IllegalStateException("openstack.identity is not configured");
         }

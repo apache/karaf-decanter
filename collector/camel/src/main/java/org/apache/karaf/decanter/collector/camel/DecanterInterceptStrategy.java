@@ -31,6 +31,7 @@ import org.osgi.service.event.EventAdmin;
 public class DecanterInterceptStrategy implements InterceptStrategy {
 
     private EventAdmin dispatcher;
+    private String topic = "decanter/collect/camel/tracer";
     private DefaultExchangeExtender dextender = new DefaultExchangeExtender();
     private DecanterCamelEventExtender extender;
 
@@ -72,7 +73,7 @@ public class DecanterInterceptStrategy implements InterceptStrategy {
                 data.put(header.substring("decanter.".length()), exchange.getIn().getHeader(header));
             }
         }
-        Event event = new Event("decanter/collect/camel/tracer", data);
+        Event event = new Event(topic, data);
         dispatcher.postEvent(event);
     }
     
@@ -86,6 +87,14 @@ public class DecanterInterceptStrategy implements InterceptStrategy {
 
     public void setDispatcher(EventAdmin dispatcher) {
         this.dispatcher = dispatcher;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
     
     public void setIncludeBody(boolean includeBody) {

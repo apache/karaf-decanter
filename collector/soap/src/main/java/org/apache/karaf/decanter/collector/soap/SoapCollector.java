@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,10 +71,7 @@ public class SoapCollector implements Runnable {
         if (config.get("url") == null) {
             throw new IllegalArgumentException("url property is mandatory");
         }
-        this.topic = "decanter/collect/soap";
-        if (config.get("topic") != null) {
-            this.topic = (String) config.get("topic");
-        }
+        topic = (config.get(EventConstants.EVENT_TOPIC) != null) ? (String) config.get(EventConstants.EVENT_TOPIC) : "decanter/collect/soap";
         url = new URL((String) config.get("url"));
         if (config.get("soap.request") == null) {
             throw new IllegalStateException("soap.request property is mandatory");

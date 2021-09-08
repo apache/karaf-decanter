@@ -21,6 +21,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.*;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snmp4j.*;
@@ -238,7 +239,8 @@ public class SnmpPoller implements ResponseListener, Runnable {
             data.put(variableBinding.getOid().toString(), variableBinding.getVariable().toString());
         }
         // send event
-        dispatcher.postEvent(new Event("decanter/collector/snmp", data));
+        String topic = (configuration.get(EventConstants.EVENT_TOPIC) != null) ? (String) configuration.get(EventConstants.EVENT_TOPIC) : "decanter/collector/snmp";
+        dispatcher.postEvent(new Event(topic, data));
     }
 
     private OctetString convertToOctetString(String value) {

@@ -62,7 +62,7 @@ public class TestJdbcCollector {
         collector.dataSource = dataSource;
         Dictionary<String, Object> config = new Hashtable<>();
         config.put("query", "select * from TEST");
-        collector.open(config);
+        collector.activate(config);
 
         List<Map<String, Object>> dataRows = collector.query();
         Assert.assertEquals(2, dataRows.size());
