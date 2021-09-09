@@ -193,7 +193,6 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
     <feature name="decanter-collector-socket" version="${project.version}" description="Karaf Decanter Network Socket Collector">
         <feature>decanter-common</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.socket.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.socket/${project.version}/cfg</configfile>
-        <bundle dependency="true">mvn:commons-io/commons-io/2.7</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.socket/${project.version}</bundle>
     </feature>
     
