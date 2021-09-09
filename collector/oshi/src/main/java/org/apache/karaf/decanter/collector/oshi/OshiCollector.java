@@ -23,6 +23,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
@@ -368,7 +369,9 @@ public class OshiCollector implements Runnable {
 
             PropertiesPreparator.prepare(data, properties);
 
-            dispatcher.postEvent(new Event("decanter/collect/oshi", data));
+            String topic = (properties.get(EventConstants.EVENT_TOPIC) != null) ? (String) properties.get(EventConstants.EVENT_TOPIC) : "decanter/collect/oshi";
+
+            dispatcher.postEvent(new Event(topic, data));
         } catch (Exception e) {
             LOGGER.warn("Can't get oshi system metrics", e);
         }

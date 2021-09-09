@@ -22,7 +22,6 @@ import org.apache.camel.core.osgi.OsgiClassResolver;
 import org.apache.camel.core.osgi.OsgiDataFormatResolver;
 import org.apache.camel.core.osgi.OsgiDefaultCamelContext;
 import org.apache.camel.core.osgi.OsgiLanguageResolver;
-import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.karaf.decanter.collector.camel.DecanterEventNotifier;
 import org.apache.karaf.decanter.collector.camel.DecanterInterceptStrategy;
 import org.apache.karaf.itests.KarafTestSupport;
@@ -136,7 +135,7 @@ public class CamelCollectorTest extends KarafTestSupport {
         // create route with notifier
         EventAdmin eventAdmin = getOsgiService(EventAdmin.class);
         DecanterEventNotifier notifier = new DecanterEventNotifier();
-        notifier.setEventAdmin(eventAdmin);
+        notifier.setDispatcher(eventAdmin);
 
         RouteBuilder builder = new RouteBuilder() {
             @Override

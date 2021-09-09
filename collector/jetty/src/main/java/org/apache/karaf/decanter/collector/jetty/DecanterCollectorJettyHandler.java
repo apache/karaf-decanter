@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -155,7 +156,8 @@ public class DecanterCollectorJettyHandler implements Handler {
         } catch (Exception e) {
             // nothing to do
         }
-        Event event = new Event("decanter/collect/jetty", data);
+        String topic = (properties.get(EventConstants.EVENT_TOPIC) != null) ? (String) properties.get(EventConstants.EVENT_TOPIC) : "decanter/collect/jetty";
+        Event event = new Event(topic, data);
         dispatcher.postEvent(event);
     }
 

@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,8 +117,8 @@ public class LogCollector implements PaxAppender {
         if (loggerName == null || loggerName.isEmpty()) {
             loggerName = "default";
         }
-        String topic = "decanter/collect/log/" + cleanLoggerName(loggerName);
-        this.dispatcher.postEvent(new Event(topic, data));
+        String topic = (properties.get(EventConstants.EVENT_TOPIC) != null) ? (String) properties.get(EventConstants.EVENT_TOPIC) : "decanter/collect/log/";
+        this.dispatcher.postEvent(new Event(topic + cleanLoggerName(loggerName), data));
     }
     
     /*

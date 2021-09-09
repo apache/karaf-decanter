@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,13 +150,15 @@ public class JmxCollector implements Runnable {
                 names.addAll(connection.queryNames(getObjectName(null), null));
             }
 
+            String topic = (properties.get(EventConstants.EVENT_TOPIC) != null) ? (String) properties.get(EventConstants.EVENT_TOPIC) : "decanter/collect/jmx/";
+
             for (ObjectName name : names) {
                 LOGGER.debug("Harvesting {}", name);
                 try {
                     Map<String, Object> data = harvester.harvestBean(name);
                     PropertiesPreparator.prepare(data, properties);
                     data.put("host", host);
-                    Event event = new Event("decanter/collect/jmx/" + this.type + "/" + getTopic(name), data);
+                    Event event = new Event(topic + this.type + "/" + getTopic(name), data);
                     LOGGER.debug("Posting for {}", name);
                     dispatcher.postEvent(event);
                 } catch (Exception e) {
@@ -174,7 +177,7 @@ public class JmxCollector implements Runnable {
                     Map<String, Object> data = harvester.executeOperation(operation, objectName, operationName, arguments, signatures);
                     PropertiesPreparator.prepare(data, properties);
                     data.put("host", host);
-                    Event event = new Event("decanter/collect/jmx/" + this.type + "/" + getTopic(objectName), data);
+                    Event event = new Event(topic + this.type + "/" + getTopic(objectName), data);
                     dispatcher.postEvent(event);
                 } else {
                     LOGGER.warn("{} is not well configured ({})", operation, raw);

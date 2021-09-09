@@ -20,7 +20,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.spi.CamelEvent;
 import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.service.event.Event;
@@ -33,7 +32,7 @@ public class DecanterEventNotifierTest {
     public void testEventNotifier() throws Exception {
         MockEventAdmin eventAdmin = new MockEventAdmin();
         DecanterEventNotifier notifier = new DecanterEventNotifier();
-        notifier.setEventAdmin(eventAdmin);
+        notifier.setDispatcher(eventAdmin);
 
         DefaultCamelContext camelContext = createCamelContext(notifier);
 
@@ -73,7 +72,7 @@ public class DecanterEventNotifierTest {
     public void testCamelContextFilter() throws Exception {
         MockEventAdmin eventAdmin = new MockEventAdmin();
         DecanterEventNotifier notifier = new DecanterEventNotifier();
-        notifier.setEventAdmin(eventAdmin);
+        notifier.setDispatcher(eventAdmin);
         notifier.setCamelContextMatcher("foo");
 
         DefaultCamelContext camelContext = createCamelContext(notifier);
@@ -88,7 +87,7 @@ public class DecanterEventNotifierTest {
     public void testRouteIdFilter() throws Exception {
         MockEventAdmin eventAdmin = new MockEventAdmin();
         DecanterEventNotifier notifier = new DecanterEventNotifier();
-        notifier.setEventAdmin(eventAdmin);
+        notifier.setDispatcher(eventAdmin);
         notifier.setCamelContextMatcher(".*");
         notifier.setRouteMatcher("foo");
 
@@ -104,7 +103,7 @@ public class DecanterEventNotifierTest {
     public void testIgnoredEvents() throws Exception {
         MockEventAdmin eventAdmin = new MockEventAdmin();
         DecanterEventNotifier notifier = new DecanterEventNotifier();
-        notifier.setEventAdmin(eventAdmin);
+        notifier.setDispatcher(eventAdmin);
         notifier.setIgnoreCamelContextEvents(true);
 
         DefaultCamelContext camelContext = createCamelContext(notifier);
@@ -121,7 +120,7 @@ public class DecanterEventNotifierTest {
         DecanterEventNotifier notifier = new DecanterEventNotifier();
         notifier.setIgnoreCamelContextEvents(true);
         notifier.setIgnoreRouteEvents(true);
-        notifier.setEventAdmin(eventAdmin);
+        notifier.setDispatcher(eventAdmin);
         notifier.setExtender(new TestExtender());
 
         DefaultCamelContext camelContext = createCamelContext(notifier);

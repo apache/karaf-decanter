@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,8 @@ public class DecanterTailerListener extends TailerListenerAdapter {
     private String path;
     private String regex;
     private Pattern compiledRegex;
+
+    private String topic;
     
     /**
      * additional properties provided by the user
@@ -88,6 +91,7 @@ public class DecanterTailerListener extends TailerListenerAdapter {
         if (regex != null) {
             compiledRegex  = Pattern.compile(regex);
         }
+        topic = (properties.get(EventConstants.EVENT_TOPIC) != null) ? (String) properties.get(EventConstants.EVENT_TOPIC) : "decanter/collect/file/";
     }
     
     @Deactivate
@@ -120,7 +124,7 @@ public class DecanterTailerListener extends TailerListenerAdapter {
             LOGGER.warn("Can't fully prepare data for the dispatcher", e);
         }
 
-        Event event = new Event("decanter/collect/file/" + type, data);
+        Event event = new Event(topic + type, data);
         dispatcher.postEvent(event);
     }
 

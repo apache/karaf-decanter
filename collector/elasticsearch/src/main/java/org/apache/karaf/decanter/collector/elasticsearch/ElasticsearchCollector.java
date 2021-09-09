@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,7 @@ public class ElasticsearchCollector implements Runnable {
     @Reference
     private EventAdmin dispatcher;
 
-    private Dictionary<String, Object> configuration;
+    private Dictionary<String, Object> config;
     private RestHighLevelClient restClient;
 
     @Activate
@@ -74,7 +75,7 @@ public class ElasticsearchCollector implements Runnable {
     }
 
     public void activate(Dictionary<String, Object> configuration) {
-        this.configuration = configuration;
+        this.config = configuration;
         String addressesString = (configuration.get("addresses") != null) ? configuration.get("addresses").toString() : "http://localhost:9200";
         String username = (configuration.get("username") != null) ? configuration.get("username").toString() : null;
         String password = (configuration.get("password") != null) ? configuration.get("password").toString() : null;
@@ -126,12 +127,12 @@ public class ElasticsearchCollector implements Runnable {
     public void run() {
         SearchRequest searchRequest = new SearchRequest();
 
-        String index = (configuration.get("index") != null) ? configuration.get("index").toString() : "decanter";
+        String index = (config.get("index") != null) ? config.get("index").toString() : "decanter";
         searchRequest.indices(index);
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
-        String query = (configuration.get("query") != null) ? configuration.get("query").toString() : null;
+        String query = (config.get("query") != null) ? config.get("query").toString() : null;
         QueryBuilder queryBuilder;
         if (query == null) {
             queryBuilder = QueryBuilders.matchAllQuery();
@@ -139,17 +140,17 @@ public class ElasticsearchCollector implements Runnable {
             queryBuilder = QueryBuilders.queryStringQuery(query);
         }
         searchSourceBuilder.query(queryBuilder);
-        String fromString = (configuration.get("from") != null) ? configuration.get("from").toString() : null;
+        String fromString = (config.get("from") != null) ? config.get("from").toString() : null;
         if (fromString != null) {
             int from = Integer.parseInt(fromString);
             searchSourceBuilder.from(from);
         }
-        String sizeString = (configuration.get("size") != null) ? configuration.get("size").toString() : null;
+        String sizeString = (config.get("size") != null) ? config.get("size").toString() : null;
         if (sizeString != null) {
             int size = Integer.parseInt(sizeString);
             searchSourceBuilder.size(size);
         }
-        String timeoutString = (configuration.get("timeout") != null) ? configuration.get("timeout").toString() : null;
+        String timeoutString = (config.get("timeout") != null) ? config.get("timeout").toString() : null;
         if (timeoutString != null) {
             int timeout = Integer.parseInt(timeoutString);
             searchSourceBuilder.timeout(new TimeValue(timeout, TimeUnit.SECONDS));
@@ -176,12 +177,14 @@ public class ElasticsearchCollector implements Runnable {
             LOGGER.error("Can't query elasticsearch", e);
         }
         try {
-            PropertiesPreparator.prepare(data, configuration);
+            PropertiesPreparator.prepare(data, config);
         } catch (Exception e) {
             LOGGER.warn("Can't prepare event", e);
         }
 
-        dispatcher.postEvent(new Event("decanter/collect/elasticsearch", data));
+        String topic = (config.get(EventConstants.EVENT_TOPIC) != null) ? (String) config.get(EventConstants.EVENT_TOPIC) : "decanter/collect/elasticsearch";
+
+        dispatcher.postEvent(new Event(topic, data));
     }
 
     /**

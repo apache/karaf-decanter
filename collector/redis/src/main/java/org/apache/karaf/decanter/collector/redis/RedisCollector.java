@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.redisson.Redisson;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
@@ -102,7 +103,8 @@ public class RedisCollector implements Runnable {
         } catch (Exception e) {
             LOGGER.warn("Can't prepare data", e);
         }
-        dispatcher.postEvent(new Event("decanter/collect/redis", data));
+        String topic = (config.get(EventConstants.EVENT_TOPIC) != null) ? (String) config.get(EventConstants.EVENT_TOPIC) : "decanter/collect/redis";
+        dispatcher.postEvent(new Event(topic, data));
     }
 
 }

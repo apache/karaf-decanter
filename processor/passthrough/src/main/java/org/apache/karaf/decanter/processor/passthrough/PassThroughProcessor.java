@@ -43,10 +43,7 @@ public class PassThroughProcessor implements EventHandler {
     @Activate
     public void activate(ComponentContext componentContext) {
         Dictionary<String, Object> properties = componentContext.getProperties();
-        String targetTopic = "decanter/process/passthrough";
-        if (properties.get("target.topics") != null) {
-            targetTopic = properties.get("target.topics").toString();
-        }
+        targetTopic = (properties.get("target.topics") != null) ? (String) properties.get("target.topics") : "decanter/process/passthrough";
         activate(targetTopic);
     }
 

@@ -57,7 +57,7 @@ public class SocketCollector implements Closeable, Runnable {
     private boolean open;
     private ExecutorService executor;
     private Dictionary<String, Object> properties;
-    private String eventAdminTopic;
+    private String topic;
     private long maxRequestSize = 100000;
     
     @Reference
@@ -85,7 +85,7 @@ public class SocketCollector implements Closeable, Runnable {
             this.protocol = Protocol.TCP;
         }
 
-        eventAdminTopic = getProperty(this.properties, EventConstants.EVENT_TOPIC, "decanter/collect/socket");
+        topic = getProperty(this.properties, EventConstants.EVENT_TOPIC, "decanter/collect/socket");
 
         switch (protocol) {
             case TCP:
@@ -181,7 +181,7 @@ public class SocketCollector implements Closeable, Runnable {
                         data.put("type", "socket");
                         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(line.getBytes())));
                         PropertiesPreparator.prepare(data, properties);
-                        Event event = new Event(eventAdminTopic, data);
+                        Event event = new Event(topic, data);
                         dispatcher.postEvent(event);
                     }
                 }
@@ -217,7 +217,7 @@ public class SocketCollector implements Closeable, Runnable {
                     LOGGER.warn("Can't prepare data for the dispatcher", e);
                 }
 
-                Event event = new Event(eventAdminTopic, data);
+                Event event = new Event(topic, data);
                 dispatcher.postEvent(event);
                 datagramSocket.send(packet);
             } catch (EOFException e) {

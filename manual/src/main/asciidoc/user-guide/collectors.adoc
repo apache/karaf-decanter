@@ -1242,6 +1242,18 @@ unmarshaller.target=(dataFormat=json)
 
 You have to define the locations of the OpenStack APIs and if you enabled requesting the APIs or not.
 
+==== Target dispatcher topics
+
+All collectors use a default Decanter dispatcher topic name. However, you can change the topic name with the one of your choice.
+
+For that, you have to set `event.topics` property in the collector configuration.
+
+For instance:
+
+----
+event.topics=my/topic/name
+----
+
 ==== Customizing properties in collectors
 
 You can add, rename or remove properties collected by the collectors before sending it to the dispatcher.

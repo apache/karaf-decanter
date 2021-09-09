@@ -58,7 +58,7 @@ public class JdbcCollector implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(JdbcCollector.class);
 
     private String query;
-    private String dispatcherTopic;
+    private String topic;
     private Dictionary<String, Object> properties;
     private Connection connection;
     private PreparedStatement preparedStatement;
@@ -66,15 +66,15 @@ public class JdbcCollector implements Runnable {
     @Activate
     public void activate(ComponentContext context) throws Exception {
         properties = context.getProperties();
-        open(properties);
+        activate(properties);
     }
 
-    public void open(Dictionary<String, Object> config)  throws Exception {
+    public void activate(Dictionary<String, Object> config)  throws Exception {
         query = getProperty(config, "query", null);
         if (query == null) {
             throw new IllegalStateException("Query is mandatory");
         }
-        dispatcherTopic = getProperty(config, EventConstants.EVENT_TOPIC, "decanter/collect/jdbc");
+        topic = getProperty(config, EventConstants.EVENT_TOPIC, "decanter/collect/jdbc");
 
         connection = dataSource.getConnection();
         preparedStatement = connection.prepareStatement(query);
@@ -101,7 +101,7 @@ public class JdbcCollector implements Runnable {
         List<Map<String, Object>> dataRows = query();
 
         for (Map<String, Object> data : dataRows) {
-            Event event = new Event(dispatcherTopic, data);
+            Event event = new Event(topic, data);
             dispatcher.postEvent(event);
         }
     }
