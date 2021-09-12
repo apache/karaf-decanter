@@ -28,6 +28,8 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.http.HttpService;
 
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,15 +43,18 @@ public class PrometheusServlet implements EventHandler {
     @Reference
     HttpService httpService;
 
-    private String alias = "/decanter/prometheus";
+    private Dictionary<String, Object> config;
+
+    private String alias;
+    private boolean filtered = false;
 
     private Map<String, Gauge> gauges = new HashMap<>();
 
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
-        if (componentContext.getProperties().get("alias") != null) {
-            alias = componentContext.getProperties().get("alias").toString();
-        }
+        config = componentContext.getProperties();
+        setFiltered();
+        alias = (config.get("alias") != null) ? (String) config.get("alias") : "/decanter/prometheus";
         httpService.registerServlet(alias, new MetricsServlet(), null, null);
     }
 
@@ -61,18 +66,49 @@ public class PrometheusServlet implements EventHandler {
     @Override
     public void handleEvent(Event event) {
         for (String property : event.getPropertyNames()) {
-            if (event.getProperty(property) instanceof Long || event.getProperty(property) instanceof Integer) {
-                String convertedProperty = property.replace(".", "_");
-                Gauge gauge = gauges.get(convertedProperty);
-                if (gauge == null) {
-                    gauge = Gauge.build().name(convertedProperty).help(property).register();
-                    gauges.put(convertedProperty, gauge);
+            if (!filtered || (filtered && config.get("prometheus.key." + property) != null)) {
+                if (event.getProperty(property) instanceof Map) {
+                    Map<String, Object> map = (Map) event.getProperty(property);
+                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+                        if (entry.getValue() instanceof Long || entry.getValue() instanceof Integer) {
+                            String convertedProperty = (property + "." + entry.getKey()).replace(".", "_");
+                            Gauge gauge = gauges.get(convertedProperty);
+                            if (gauge == null) {
+                                gauge = Gauge.build().name(convertedProperty).help(property + "." + entry.getKey()).register();
+                                gauges.put(convertedProperty, gauge);
+                            }
+                            if (entry.getValue() instanceof Long) {
+                                gauge.set((Long) entry.getValue());
+                            } else if (entry.getValue() instanceof Integer) {
+                                gauge.set((Integer) entry.getValue());
+                            }
+                        }
+                    }
                 }
-                if (event.getProperty(property) instanceof Long) {
-                    gauge.set((Long) event.getProperty(property));
-                } else if (event.getProperty(property) instanceof Integer) {
-                    gauge.set((Integer) event.getProperty(property));
+                if (event.getProperty(property) instanceof Long || event.getProperty(property) instanceof Integer) {
+                    String convertedProperty = property.replace(".", "_");
+                    Gauge gauge = gauges.get(convertedProperty);
+                    if (gauge == null) {
+                        gauge = Gauge.build().name(convertedProperty).help(property).register();
+                        gauges.put(convertedProperty, gauge);
+                    }
+                    if (event.getProperty(property) instanceof Long) {
+                        gauge.set((Long) event.getProperty(property));
+                    } else if (event.getProperty(property) instanceof Integer) {
+                        gauge.set((Integer) event.getProperty(property));
+                    }
                 }
+            }
+        }
+    }
+
+    private void setFiltered() {
+        Enumeration<String> keys = config.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            if (key.startsWith("prometheus.key")) {
+                filtered = true;
+                return;
             }
         }
     }
