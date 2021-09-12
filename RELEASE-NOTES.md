@@ -17,6 +17,50 @@
     under the License.
 -->
 
+## Apache Karaf Decanter 2.8.0
+
+### Overview
+
+Apache Karaf Decanter 2.8.0 is a major release on the 2.x series. It provides dependency updates, fixes and improvements, especially:
+
+* fix on InfluxDB appender startup
+* improved Prometheus appender
+* be able to define topic name in all collectors
+* and much more!
+
+### ChangeLog
+
+#### Bug
+    * [KARAF-7038] - Camel appender bundle is defined twice in the feature
+    * [KARAF-7127] - InfluxDB appender doesn't start correctly
+
+#### Improvement
+    * [KARAF-7154] - Improve prometheus appender with expected properties
+    * [KARAF-7169] - Rename LogAppender (PAX Logging) to LogCollector
+    * [KARAF-7170] - Be able to define topic name in all collectors
+    * [KARAF-7177] - Add warning log when socket collector BoundedInputStream is not large enough
+
+#### Dependency upgrade
+    * [KARAF-7069] - Upgrade to Velocity 2.3
+    * [KARAF-7078] - Upgrade to maven-bundle-plugin 5.1.2
+    * [KARAF-7199] - Upgrade to commons-io 2.11.0
+    * [KARAF-7200] - Upgrade to junit 4.13.2
+    * [KARAF-7201] - Upgrade to johnzon 1.2.14
+    * [KARAF-7202] - Upgrade to dropwizard 4.2.3
+    * [KARAF-7203] - Upgrade to Jetty 9.4.43.v20210629
+    * [KARAF-7204] - Upgrade to mockito 3.11.2
+    * [KARAF-7205] - Upgrade to oshi 5.8.2
+    * [KARAF-7206] - Upgrade to redisson 3.16.2
+    * [KARAF-7207] - Upgrade to CXF 3.4.4
+    * [KARAF-7209] - Upgrade to Camel 3.11.1
+    * [KARAF-7211] - Upgrade to hadoop-client 3.3.1
+    * [KARAF-7212] - Upgrade to kafka 2.8.0
+    * [KARAF-7213] - Upgrade to orientdb-client 3.2.0
+    * [KARAF-7214] - Upgrade to mongodb java driver 3.12.10
+    * [KARAF-7215] - Upgrade to prometheus 0.11.0
+    * [KARAF-7216] - Upgrade to lucene 8.9.0
+    * [KARAF-7245] - Upgrade to aws-java-sdk 1.12.62
+
 ## Apache Karaf Decanter 2.7.0
 
 ### Overview
