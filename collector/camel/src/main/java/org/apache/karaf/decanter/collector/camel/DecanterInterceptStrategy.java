@@ -109,4 +109,8 @@ public class DecanterInterceptStrategy implements InterceptStrategy {
         dextender.setIncludeProperties(includeProperties);
     }
 
+    public void setIncludeHistory(boolean includeHistory) {
+        dextender.setIncludeHistory(includeHistory);
+    }
+
 }

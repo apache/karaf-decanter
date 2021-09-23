@@ -16,11 +16,14 @@
  */
 package org.apache.karaf.decanter.collector.camel;
 
-import java.util.List;
-import java.util.Map;
 
 import org.apache.camel.*;
 import org.apache.camel.util.ObjectHelper;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Adds the default data from the Exchange to the data map
@@ -29,11 +32,14 @@ public class DefaultExchangeExtender implements DecanterCamelEventExtender {
     private boolean includeProperties = true;
     private boolean includeHeaders = true;
     private boolean includeBody = true;
+    private boolean includeHistory = true;
 
     @Override
     public void extend(Map<String, Object> data, Exchange exchange) {
         data.put("fromEndpointUri", exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : null);
-        setHistory(data, exchange);
+        if (includeHistory) {
+            setHistory(data, exchange);
+        }
         data.put("exchangeId", exchange.getExchangeId());
         data.put("routeId", exchange.getFromRouteId());
         data.put("camelContextName", exchange.getContext().getName());
@@ -67,15 +73,19 @@ public class DefaultExchangeExtender implements DecanterCamelEventExtender {
 
     private static void setHistory(Map<String, Object> data, Exchange exchange) {
         List<MessageHistory> messageHistory = exchange.getProperty(Exchange.MESSAGE_HISTORY, List.class);
-        if (messageHistory != null) {
+        if (messageHistory != null && !messageHistory.isEmpty()) {
+            ArrayList<Object> historyList = new ArrayList<Object>();
             for (MessageHistory history : messageHistory) {
-                String nodeId = history.getNode().getId();
-                data.put(nodeId + ".route", history.getRouteId());
-                data.put(nodeId + ".time", history.getTime());
-                data.put(nodeId + ".elapsed", history.getElapsed());
-                data.put(nodeId + ".label", history.getNode().getLabel());
-                data.put(nodeId + ".shortName", history.getNode().getShortName());
+                historyList.add(new HashMap<String, Object>() {{
+                    put("nodeId", history.getNode().getId());
+                    put("route", history.getRouteId());
+                    put("time", history.getTime());
+                    put("elapsed", history.getElapsed());
+                    put("label", history.getNode().getLabel());
+                    put("shortName", history.getNode().getShortName());
+                }});
             }
+            data.put("history", historyList);
         }
     }
 
@@ -133,5 +143,9 @@ public class DefaultExchangeExtender implements DecanterCamelEventExtender {
     
     public void setIncludeProperties(boolean includeProperties) {
         this.includeProperties = includeProperties;
+    }
+
+    public void setIncludeHistory(boolean includeHistory) {
+        this.includeHistory = includeHistory;
     }
 }
