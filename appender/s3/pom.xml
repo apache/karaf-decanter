@@ -101,7 +101,7 @@
                             !software.amazon*,
                             !org.apache.http*,
                             !org.joda*,
-                            8org.apache.commons.codec*,
+                            org.apache.commons.codec*,
                             com.sun*;resolution:=optional,
                             kotlin*;resolution:=optional,
                             org.bouncycastle*;resolution:=optional,
