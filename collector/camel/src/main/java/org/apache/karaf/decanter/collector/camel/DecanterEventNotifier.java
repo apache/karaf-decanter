@@ -78,6 +78,10 @@ public class DecanterEventNotifier extends EventNotifierSupport {
     public void setIncludeProperties(boolean includeProperties) {
         dextender.setIncludeProperties(includeProperties);
     }
+
+    public void setIncludeHistory(boolean includeHistory) {
+        dextender.setIncludeHistory(includeHistory);
+    }
     
     private boolean isIgnored(CamelEvent event) {
         if (isIgnoredBySourceType(event)) {
