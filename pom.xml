@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>23</version>
+        <version>24</version>
         <relativePath />
     </parent>
 
@@ -35,6 +35,8 @@
     <name>Apache Karaf :: Decanter</name>
 
     <properties>
+        <!-- for reproducible builds -->
+        <project.build.outputTimestamp>10</project.build.outputTimestamp>
         <baseline>1.0.0</baseline>
         <baseline.skip>true</baseline.skip>
         <activemq.version>5.15.13</activemq.version>
