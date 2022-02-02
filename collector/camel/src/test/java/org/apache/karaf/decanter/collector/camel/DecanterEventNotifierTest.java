@@ -39,32 +39,26 @@ public class DecanterEventNotifierTest {
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         producerTemplate.sendBodyAndHeader("direct:start", "TEST", "foo", "bar");
 
-        Assert.assertEquals(13, eventAdmin.getPostEvents().size());
+        Assert.assertEquals(15, eventAdmin.getPostEvents().size());
 
         Event camelContextStartingEvent = eventAdmin.getPostEvents().get(0);
         Assert.assertEquals("test-context", camelContextStartingEvent.getProperty("camelContextName"));
-        Assert.assertEquals(org.apache.camel.impl.event.CamelContextStartingEvent.class.getName(), camelContextStartingEvent.getProperty("eventType"));
+        Assert.assertEquals(org.apache.camel.impl.event.CamelContextInitializingEvent.class.getName(), camelContextStartingEvent.getProperty("eventType"));
         Assert.assertEquals("camelEvent", camelContextStartingEvent.getProperty("type"));
 
         Event routeAddedEvent = eventAdmin.getPostEvents().get(1);
         Assert.assertEquals("test-context", routeAddedEvent.getProperty("camelContextName"));
-        Assert.assertEquals(org.apache.camel.impl.event.CamelContextRoutesStartingEvent.class.getName(), routeAddedEvent.getProperty("eventType"));
+        Assert.assertEquals(org.apache.camel.impl.event.CamelContextInitializedEvent.class.getName(), routeAddedEvent.getProperty("eventType"));
         Assert.assertEquals("camelEvent", routeAddedEvent.getProperty("type"));
-
-        Event routeStartedEvent = eventAdmin.getPostEvents().get(2);
-        Assert.assertEquals("test-context", routeStartedEvent.getProperty("camelContextName"));
-        Assert.assertEquals("test-route", routeStartedEvent.getProperty("routeId"));
-        Assert.assertEquals(org.apache.camel.impl.event.RouteAddedEvent.class.getName(), routeStartedEvent.getProperty("eventType"));
-        Assert.assertEquals("camelEvent", routeStartedEvent.getProperty("type"));
 
         Event exchangeSendingEvent = eventAdmin.getPostEvents().get(4);
         Assert.assertEquals("test-context", exchangeSendingEvent.getProperty("camelContextName"));
-        Assert.assertEquals(org.apache.camel.impl.event.RouteStartedEvent.class.getName(), exchangeSendingEvent.getProperty("eventType"));
+        Assert.assertEquals(org.apache.camel.impl.event.RouteAddedEvent.class.getName(), exchangeSendingEvent.getProperty("eventType"));
         Assert.assertEquals("camelEvent", exchangeSendingEvent.getProperty("type"));
 
         Event exchangeCreatedEvent = eventAdmin.getPostEvents().get(5);
         Assert.assertEquals("test-context", exchangeCreatedEvent.getProperty("camelContextName"));
-        Assert.assertEquals(org.apache.camel.impl.event.CamelContextRoutesStartedEvent.class.getName(), exchangeCreatedEvent.getProperty("eventType"));
+        Assert.assertEquals(org.apache.camel.impl.event.RouteStartingEvent.class.getName(), exchangeCreatedEvent.getProperty("eventType"));
         Assert.assertEquals("camelEvent", exchangeCreatedEvent.getProperty("type"));
     }
 
@@ -96,7 +90,7 @@ public class DecanterEventNotifierTest {
         ProducerTemplate producerTemplate = camelContext.createProducerTemplate();
         producerTemplate.sendBodyAndHeader("direct:start", "TEST", "foo", "bar");
 
-        Assert.assertEquals(6, eventAdmin.getPostEvents().size());
+        Assert.assertEquals(8, eventAdmin.getPostEvents().size());
     }
 
     @Test
