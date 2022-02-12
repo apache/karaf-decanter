@@ -85,6 +85,7 @@
                             !org.xerial.snappy*,
                             !net.jpountz*,
                             !com.fasterxml.jackson*,
+                            !org.jose4j*,
                             !kafka,
                             com.github.luben.zstd;resolution:=optional,
                             com.ibm.security.krb5*;resolution:=optional,
@@ -98,6 +99,7 @@
                             org.xerial.snappy*,
                             net.jpountz*,
                             com.fasterxml.jackson*,
+                            org.jose4j*,
                             kafka
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
