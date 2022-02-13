@@ -56,7 +56,8 @@ public class LogCollector implements PaxAppender {
     private final static Pattern PATTERN = Pattern.compile("[^A-Za-z0-9]");
 
     private Dictionary<String, Object> properties;
-    protected String[] ignoredCategories;
+    protected String[] excludedCategories;
+    protected String[] includedCategories;
     protected String[] locationDisabledCategories;
 
     @SuppressWarnings("unchecked")
@@ -64,7 +65,13 @@ public class LogCollector implements PaxAppender {
     public void activate(ComponentContext context) {
         this.properties = context.getProperties();
         if (this.properties.get("ignored.categories") != null) {
-            ignoredCategories = ((String)this.properties.get("ignored.categories")).split(",");
+            excludedCategories = ((String)this.properties.get("ignored.categories")).split(",");
+        }
+        if (this.properties.get("excluded.categories") != null) {
+            excludedCategories = ((String)this.properties.get("excluded.categories")).split(",");
+        }
+        if (this.properties.get("included.categories") != null) {
+            includedCategories = ((String)this.properties.get("included.categories")).split(",");
         }
         if (this.properties.get("location.disabled") != null) {
             locationDisabledCategories = ((String) this.properties.get("location.disabled")).split(",");
@@ -86,8 +93,12 @@ public class LogCollector implements PaxAppender {
         }
     }
 
-    private void appendInternal(PaxLoggingEvent event) throws Exception {
-        if (isIgnored(event.getLoggerName(), ignoredCategories)) {
+    protected void appendInternal(PaxLoggingEvent event) throws Exception {
+        if (includedCategories != null && !filterCategory(event.getLoggerName(), includedCategories)) {
+            LOGGER.debug("{} logger is not in the included list", event.getLoggerName());
+            return;
+        }
+        if (filterCategory(event.getLoggerName(), excludedCategories)) {
             LOGGER.debug("{} logger is ignored by the log collector", event.getLoggerName());
             return;
         }
@@ -100,10 +111,10 @@ public class LogCollector implements PaxAppender {
         data.put("loggerName", event.getLoggerName());
         data.put("threadName", event.getThreadName());
         data.put("message", event.getMessage());
-        data.put("level", event.getLevel().toString());
+        data.put("level", (event.getLevel() != null) ? event.getLevel().toString() : "default");
         data.put("renderedMessage", event.getRenderedMessage());
         data.put("MDC", event.getProperties());
-        if (locationDisabledCategories == null || !isIgnored(event.getLoggerName(), locationDisabledCategories)) {
+        if (locationDisabledCategories == null || !filterCategory(event.getLoggerName(), locationDisabledCategories)) {
             putLocation(data, event.getLocationInformation());
         }
         String[] throwableAr = event.getThrowableStrRep();
@@ -135,10 +146,12 @@ public class LogCollector implements PaxAppender {
     }
 
     private void putLocation(Map<String, Object> data, PaxLocationInfo loc) {
-        data.put("loc.class", loc.getClassName());
-        data.put("loc.file", loc.getFileName());
-        data.put("loc.line", loc.getLineNumber());
-        data.put("loc.method", loc.getMethodName());
+        if (loc != null) {
+            data.put("loc.class", loc.getClassName());
+            data.put("loc.file", loc.getFileName());
+            data.put("loc.line", loc.getLineNumber());
+            data.put("loc.method", loc.getMethodName());
+        }
     }
 
     private Object join(String[] throwableAr) {
@@ -149,12 +162,12 @@ public class LogCollector implements PaxAppender {
         return builder.toString();
     }
 
-    protected boolean isIgnored(String loggerName, String[] ignoreList) {
+    protected boolean filterCategory(String loggerName, String[] filterCategories) {
         if (loggerName == null) {
             return true;
         }
-        if (ignoreList != null) {
-            for (String cat : ignoreList) {
+        if (filterCategories != null) {
+            for (String cat : filterCategories) {
                 if (loggerName.matches(cat)) {
                     return true;
                 }
