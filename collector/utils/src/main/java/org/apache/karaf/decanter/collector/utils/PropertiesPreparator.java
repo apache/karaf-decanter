@@ -61,31 +61,33 @@ public class PropertiesPreparator {
         data.put("hostName", hostName);
 
         // custom fields
-        Enumeration<String> keys = properties.keys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            if (key.startsWith(FIELDS_ADD)) {
-                if ("UUID".equals(properties.get(key).toString().trim())) {
-                    String uuid = UUID.randomUUID().toString();
-                    data.put(key.substring(FIELDS_ADD.length()), uuid);
-                } else if ("TIMESTAMP".equals(properties.get(key).toString().trim())) {
-                    Date date = new Date();
-                    data.put(key.substring(FIELDS_ADD.length()), tsFormat.format(date));
+        if (properties != null) {
+            Enumeration<String> keys = properties.keys();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                if (key.startsWith(FIELDS_ADD)) {
+                    if ("UUID".equals(properties.get(key).toString().trim())) {
+                        String uuid = UUID.randomUUID().toString();
+                        data.put(key.substring(FIELDS_ADD.length()), uuid);
+                    } else if ("TIMESTAMP".equals(properties.get(key).toString().trim())) {
+                        Date date = new Date();
+                        data.put(key.substring(FIELDS_ADD.length()), tsFormat.format(date));
+                    } else {
+                        data.put(key.substring(FIELDS_ADD.length()), properties.get(key));
+                    }
+                } else if (key.startsWith(FIELDS_RENAME)) {
+                    if (data.containsKey(key.substring(FIELDS_RENAME.length()))) {
+                        Object value = data.get(key.substring(FIELDS_RENAME.length()));
+                        data.remove(key.substring(FIELDS_RENAME.length()));
+                        data.put(properties.get(key).toString().trim(), value);
+                    }
+                } else if (key.startsWith(FIELDS_REMOVE)) {
+                    if (data.containsKey(key.substring(FIELDS_REMOVE.length()))) {
+                        data.remove(key.substring(FIELDS_REMOVE.length()));
+                    }
                 } else {
-                    data.put(key.substring(FIELDS_ADD.length()), properties.get(key));
+                    data.put(key, properties.get(key));
                 }
-            } else if (key.startsWith(FIELDS_RENAME)) {
-                if (data.containsKey(key.substring(FIELDS_RENAME.length()))) {
-                    Object value = data.get(key.substring(FIELDS_RENAME.length()));
-                    data.remove(key.substring(FIELDS_RENAME.length()));
-                    data.put(properties.get(key).toString().trim(), value);
-                }
-            } else if (key.startsWith(FIELDS_REMOVE)) {
-                if (data.containsKey(key.substring(FIELDS_REMOVE.length()))) {
-                    data.remove(key.substring(FIELDS_REMOVE.length()));
-                }
-            } else {
-                data.put(key, properties.get(key));
             }
         }
     }
