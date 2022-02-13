@@ -17,6 +17,48 @@
     under the License.
 -->
 
+## Apache Karaf Decanter 2.9.0
+
+### Overview
+
+Apache Karaf Decanter 2.9.0 is a major release on the 2.x series. It provides dependency updates, fixes and improvements, especially:
+
+* add a flag on log collector to include only some loggers
+* add a flag to enable camel history in the camel collector
+* bunch of dependency updates
+
+### ChangeLog
+
+#### New Feature
+    * [KARAF-7257] - Make the inclusion of camel history configurable
+
+#### Improvement
+    * [KARAF-7260] - Add a field to include only some categories in the collector log
+
+#### Dependency upgrade
+    * [KARAF-7268] - Upgrade to johnzon 1.2.16
+    * [KARAF-7328] - Upgrade to ActiveMQ 5.16.3
+    * [KARAF-7330] - Upgrade to karaf 4.2.15
+    * [KARAF-7332] - Upgrade to dropwizard 4.2.7
+    * [KARAF-7334] - Upgrade to jackson 2.13.1
+    * [KARAF-7335] - Upgrade to kafka 3.1.0
+    * [KARAF-7336] - Upgrade to oshi 6.1.0
+    * [KARAF-7337] - Upgrade to redisson 3.16.7
+    * [KARAF-7338] - Upgrade to CXF 3.5.0
+    * [KARAF-7339] - Upgrade to snmp4j 3.6.4
+    * [KARAF-7341] - Upgrade to influxdb 2.22
+    * [KARAF-7342] - Upgrade to orientdb-client 3.2.4
+    * [KARAF-7343] - Upgrade to prometheus 0.14.1
+    * [KARAF-7345] - Upgrade to Jetty 9.4.44.v20210927
+    * [KARAF-7346] - Upgrade to lucene 8.11.1
+    * [KARAF-7348] - Upgrade to build-helper-maven-plugin 3.3.0
+    * [KARAF-7349] - Upgrade to maven-resources-plugin 3.2.0
+    * [KARAF-7350] - Upgrade to maven-scm-publish-plugin 3.1.0
+    * [KARAF-7351] - Upgrade to asciidoctor-maven-plugin 2.2.1
+    * [KARAF-7352] - Upgrade to maven-bundle-plugin 5.1.4
+    * [KARAF-7357] - Upgrade to Apache POM 24
+    * [KARAF-7361] - Upgrade to Camel 3.14.1
+
 ## Apache Karaf Decanter 2.8.0
 
 ### Overview
