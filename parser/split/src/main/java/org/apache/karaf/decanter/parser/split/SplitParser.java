@@ -38,6 +38,7 @@ public class SplitParser implements Parser {
 
     private String separator;
     private String keys = null;
+    private Boolean useDefaultKey;
 
     @Activate
     public void activate(ComponentContext componentContext) {
@@ -47,11 +48,13 @@ public class SplitParser implements Parser {
     public void activate(Dictionary<String, Object> config) {
         this.separator = (config.get("separator") != null) ? (String) config.get("separator") : ",";
         this.keys = (config.get("keys") != null) ? (String) config.get("keys") : null;
+        this.useDefaultKey = (config.get("useDefaultKey") != null) ? (Boolean) config.get("useDefaultKey") : false;
     }
 
     @Override
     public Map<String, Object> parse(String key, String line) {
         Map<String, Object> map = new HashMap<>();
+        boolean isByPassed = false;
         if (line != null) {
             String[] valuesArray = line.split(separator);
             String[] keysArray;
@@ -59,10 +62,15 @@ public class SplitParser implements Parser {
             if (this.keys != null) {
                 keysArray = this.keys.split(",");
                 if (keysArray.length != valuesArray.length) {
-                    LOGGER.warn("keys count and values count don't match, using default keys ID");
-                    keysArray = new String[valuesArray.length];
-                    for (int i = 0; i < valuesArray.length; i++) {
-                        keysArray[i] = "key-" + i;
+                    if (useDefaultKey) {
+                        LOGGER.warn("keys count and values count don't match, using default key ID");
+                        keysArray = new String[valuesArray.length];
+                        for (int i = 0; i < valuesArray.length; i++) {
+                            keysArray[i] = "key-" + i;
+                        }
+                    } else {
+                        LOGGER.warn("keys count and values count don't match, bypassing default key ID");
+                        isByPassed = true;
                     }
                 }
             } else {
@@ -71,22 +79,25 @@ public class SplitParser implements Parser {
                     keysArray[i] = "key-" + i;
                 }
             }
-            for (int i = 0; i < valuesArray.length; i++) {
-                try {
-                    map.put(keysArray[i], Integer.parseInt(valuesArray[i]));
-                    continue;
-                } catch (Exception e) {
-                    // nothing to do
-                }
 
-                try {
-                    map.put(keysArray[i], Long.parseLong(valuesArray[i]));
-                    continue;
-                } catch (Exception e) {
-                    // nothing to do
+            if (!isByPassed) {
+                for (int i = 0; i < valuesArray.length; i++) {
+                    try {
+                        map.put(keysArray[i], Integer.parseInt(valuesArray[i]));
+                        continue;
+                    } catch (Exception e) {
+                        // nothing to do
+                    }
+
+                    try {
+                        map.put(keysArray[i], Long.parseLong(valuesArray[i]));
+                        continue;
+                    } catch (Exception e) {
+                        // nothing to do
+                    }
+                    // if not integer and long value
+                    map.put(keysArray[i], valuesArray[i]);
                 }
-                // if not integer and long value
-                map.put(keysArray[i], valuesArray[i]);
             }
         }
         return map;

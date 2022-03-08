@@ -185,6 +185,7 @@ For instance, you can have the following `etc/org.apache.karaf.decanter.parser.s
 ----
 separator=,
 keys=first,second,third,fourth
+useDefaultKey=false
 ----
 
 If the parser gets a line (collected by the file collector) like `this,is,a,test`, the line will be parsed as follows (the file collector will send the following data to the dispatcher):
@@ -196,7 +197,8 @@ third->a
 fourth->test
 ----
 
-If the `keys` configuration is not set, then `key-0`, `key-1`, etc will be used.
+If the `keys` configuration is not set and `useDefaultKey` is set to `true`, then `key-0`, `key-1`, etc will be used.
+When the `useDefaultKey` is set to `false` and the line doesn't match the `keys` configuration the data will not be sent.
 
 To use this parser in the file collector, you have to define it in the `parser.target` configuration (in `etc/org.apache.karaf.decanter.collector.file-XXXX.cfg`):
 
