@@ -58,6 +58,7 @@ public class RestServletCollectorTest extends KarafTestSupport {
         // install decanter
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version")));
         System.out.println(executeCommand("feature:install decanter-collector-rest-servlet", new RolePrincipal("admin")));
+        System.out.println(executeCommand("feature:install pax-web-karaf", new RolePrincipal("admin")));
 
         String configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.collector.rest.servlet)'");
         while (!configList.contains("service.pid")) {
@@ -77,10 +78,11 @@ public class RestServletCollectorTest extends KarafTestSupport {
         serviceProperties.put(EventConstants.EVENT_TOPIC, "decanter/collect/*");
         bundleContext.registerService(EventHandler.class, eventHandler, serviceProperties);
 
-        String httpList = executeCommand("http:list");
-        while (!httpList.contains("Deployed")) {
+        String httpList = executeCommand("web:servlet-list");
+        while (!httpList.contains("RestServletCollector")) {
             Thread.sleep(500);
-            httpList = executeCommand("http:list");
+            httpList = executeCommand("web:servlet-list");
+            System.out.println(httpList);
         }
 
         // send data to rest servlet collector

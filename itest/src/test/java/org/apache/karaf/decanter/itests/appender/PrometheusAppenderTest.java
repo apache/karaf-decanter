@@ -52,6 +52,8 @@ public class PrometheusAppenderTest extends KarafTestSupport {
     @Test(timeout = 60000)
     public void test() throws Exception {
         System.out.println("Installing Decanter Appender Prometheus ...");
+        System.out.println(executeCommand("feature:install http", new RolePrincipal("admin")));
+        System.out.println(executeCommand("feature:install pax-web-karaf", new RolePrincipal("admin")));
         System.out.println(executeCommand("feature:repo-add decanter " + System.getProperty("decanter.version"), new RolePrincipal("admin")));
         System.out.println(executeCommand("feature:install decanter-appender-prometheus", new RolePrincipal("admin")));
         String configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.appender.prometheus)'");
@@ -59,11 +61,12 @@ public class PrometheusAppenderTest extends KarafTestSupport {
             Thread.sleep(500);
             configList = executeCommand("config:list '(service.pid=org.apache.karaf.decanter.appender.prometheus)'");
         }
-        String httpList = executeCommand("http:list");
-        while (!httpList.contains("Deployed")) {
+        String httpList = executeCommand("web:servlet-list");
+        while (!httpList.contains("MetricsServlet")) {
             Thread.sleep(500);
-            httpList = executeCommand("http:list");
+            httpList = executeCommand("web:servlet-list");
         }
+        System.out.println(httpList);
 
         System.out.println("Sending test event ...");
         EventAdmin dispatcher = getOsgiService(EventAdmin.class);
