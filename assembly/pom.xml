@@ -94,7 +94,7 @@
                                 <descriptor>mvn:org.apache.camel.karaf/apache-camel/${camel.version}/xml/features</descriptor>
                             </descriptors>
                             <distribution>org.apache.karaf.features:framework</distribution>
-                            <javase>1.8</javase>
+                            <javase>11</javase>
                             <framework>
                                 <feature>framework</feature>
                             </framework>

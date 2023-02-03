@@ -60,7 +60,7 @@ public class RestCollectorTest extends KarafTestSupport {
         String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf");
         Option[] options = new Option[]{
                 KarafDistributionOption.editConfigurationFilePut("etc/system.properties", "decanter.version", System.getProperty("decanter.version")),
-                KarafDistributionOption.features("mvn:org.apache.karaf.features/standard/" + karafVersion + "/xml/features", "http")
+                KarafDistributionOption.features("mvn:org.apache.karaf.features/standard/" + karafVersion + "/xml/features", "http", "pax-web-karaf")
         };
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
@@ -79,10 +79,11 @@ public class RestCollectorTest extends KarafTestSupport {
             }
         }, null, null);
 
-        String httpList = executeCommand("http:list");
-        while (!httpList.contains("Deployed")) {
+        String httpList = executeCommand("web:servlet-list");
+        while (!httpList.contains("RestCollectorTest")) {
             Thread.sleep(200);
-            httpList = executeCommand("http:list");
+            httpList = executeCommand("web:servlet-list");
+            System.out.println(httpList);
         }
         Assert.assertTrue(httpList.contains("/test"));
 

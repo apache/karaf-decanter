@@ -64,7 +64,9 @@
                         <Import-Package>
                             org.osgi.service.component,
                             org.osgi.service.event,
-                            org.eclipse.jetty.websocket*;version="[8,11)",
+                            org.eclipse.jetty.websocket.api;version="[7,12)",
+                            org.eclipse.jetty.websocket.servlet;version="[7,12)",
+                            org.eclipse.jetty.websocket.server;version="[7,12)",
                             *
                         </Import-Package>
                         <Private-Package>

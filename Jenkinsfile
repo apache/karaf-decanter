@@ -36,12 +36,12 @@ pipeline {
     tools {
         // ... tell Jenkins what java version, maven version or other tools are required ...
         maven 'maven_3_latest'
-        jdk 'jdk_1.8_latest'
+        jdk 'jdk_11_latest'
     }
 
     options {
         // Configure an overall timeout for the build of one hour.
-        timeout(time: 1, unit: 'HOURS')
+        timeout(time: 2, unit: 'HOURS')
         // When we have test-fails e.g. we don't need to run the remaining steps
         skipStagesAfterUnstable()
         buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
