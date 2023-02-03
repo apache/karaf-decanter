@@ -39,7 +39,7 @@
         <project.build.outputTimestamp>10</project.build.outputTimestamp>
         <baseline>1.0.0</baseline>
         <baseline.skip>true</baseline.skip>
-        <activemq.version>5.16.3</activemq.version>
+        <activemq.version>5.17.3</activemq.version>
         <camel.version>3.14.1</camel.version>
         <cassandra.driver.version>4.9.0</cassandra.driver.version>
         <glassfish-json.version>1.1.4</glassfish-json.version>
