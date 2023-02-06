@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson</artifactId>
-            <version>3.16.7</version>
+            <version>3.19.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter.collector</groupId>
@@ -86,6 +86,7 @@
                             !net.bytebuddy*,
                             !org.xerial.snappy*,
                             !reactor*,
+														!org.objenesis*,
                             com.google.protobuf*;resolution:=optional,
                             com.jcraft.jzlib;resolution:=optional,
                             com.ning.compress*;resolution:=optional,
@@ -114,6 +115,9 @@
                             javax.annotation*;resolution:=optional,
                             kotlin*;resolution:=optional,
                             sun*;resolution:=optional,
+                            com.sun.jna;resolution:=optional,
+														COM.newmonics*;resolution:=optional,
+														android*;resolution:=optional,
                             *
                         </Import-Package>
                         <Private-Package>
@@ -126,6 +130,7 @@
                             org.xerial.snappy*,
                             reactor*,
                             jodd.*,
+														org.objenesis*,
                             org.apache.karaf.decanter.collector.redis,
                             org.apache.karaf.decanter.collector.utils
                         </Private-Package>
