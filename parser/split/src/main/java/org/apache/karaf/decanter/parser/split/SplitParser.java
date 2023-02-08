@@ -48,7 +48,7 @@ public class SplitParser implements Parser {
     public void activate(Dictionary<String, Object> config) {
         this.separator = (config.get("separator") != null) ? (String) config.get("separator") : ",";
         this.keys = (config.get("keys") != null) ? (String) config.get("keys") : null;
-        this.useDefaultKey = (config.get("useDefaultKey") != null) ? (Boolean) config.get("useDefaultKey") : false;
+        this.useDefaultKey = (config.get("useDefaultKey") != null) ? Boolean.parseBoolean((String) config.get("useDefaultKey")) : false;
     }
 
     @Override
