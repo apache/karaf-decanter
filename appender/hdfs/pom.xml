@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
-            <version>3.3.1</version>
+            <version>3.3.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter</groupId>
@@ -111,6 +111,7 @@
                             !org.apache.zookeeper*,
                             !org.tukaani*,
                             !org.xerial.snappy*,
+                            !okhttp3*,
                             android*;resolution:=optional,
                             com.android*;resolution:=optional,
                             com.sun.javadoc;resolution:=optional,
@@ -187,7 +188,8 @@
                             org.apache.xml.resolver*,
                             org.apache.zookeeper*,
                             org.tukaani*,
-                            org.xerial.snappy*
+                            org.xerial.snappy*,
+                            okhttp3*
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                     </instructions>
