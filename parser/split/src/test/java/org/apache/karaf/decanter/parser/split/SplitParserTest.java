@@ -64,7 +64,7 @@ public class SplitParserTest {
         Dictionary<String, Object> config = new Hashtable<>();
         config.put("separator", "\\s+");
         config.put("keys", "this,is");
-        config.put("useDefaultKey", true);
+        config.put("useDefaultKey", "true");
         splitParser.activate(config);
 
         Map<String, Object> result = splitParser.parse("line", TEST_LINE);
@@ -81,7 +81,7 @@ public class SplitParserTest {
         Dictionary<String, Object> config = new Hashtable<>();
         config.put("separator", "\\s+");
         config.put("keys", "this,is");
-        config.put("useDefaultKey", true);
+        config.put("useDefaultKey", "true");
         splitParser.activate(config);
 
         Map<String, Object> result = splitParser.parse("line", TEST_LINE);
