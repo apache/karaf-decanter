@@ -35,6 +35,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.event</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-core</artifactId>
             <version>${camel.version}</version>
