@@ -17,6 +17,47 @@
     under the License.
 -->
 
+## Apache Karaf Decanter 2.10.0
+
+### Overview
+
+Apache Karaf Decanter 2.10.0 is a major release on the 2.x series. It provids dependency updates, fixes and improvements:
+* improvements on the split parser
+* upgrade to OSGi R8 with atomic service bundles
+* a bunch of dependency updates
+
+### ChangeLog
+
+#### Bug
+    * [KARAF-7666] - Decanter split parser throws ClassCastException
+
+#### Improvement
+    * [KARAF-7403] - Add a config param to use default key id in the split parser
+    * [KARAF-7638] - remove non-reproducible timestamp
+
+#### Dependency upgrade
+    * [KARAF-7643] - Upgrade to Karaf 4.4.3
+    * [KARAF-7644] - Upgrade to ActiveMQ 5.17.3
+    * [KARAF-7645] - Upgrade to johnzon 1.2.19
+    * [KARAF-7646] - Upgrade to OSGi R8
+    * [KARAF-7647] - Upgrade to Camel 3.20.1
+    * [KARAF-7648] - Upgrade to dropwizard 4.2.15
+    * [KARAF-7649] - Upgrade to elasticsearch 8.6.1
+    * [KARAF-7650] - Upgrade to Jetty 9.4.50.v20221201
+    * [KARAF-7651] - Upgrade to mockito 5.1.1
+    * [KARAF-7652] - Upgrade to kafka 3.3.2
+    * [KARAF-7653] - Upgrade to oshi 6.4.0
+    * [KARAF-7654] - Upgrade to redisson 3.19.1
+    * [KARAF-7655] - Upgrade to CXF 3.5.5
+    * [KARAF-7656] - Upgrade to snmp4j 3.7.4
+    * [KARAF-7658] - Upgrade to hadoop-client 3.3.4
+    * [KARAF-7659] - Upgrade to influxdb-java 2.23
+    * [KARAF-7660] - Upgrade to orientdb-client 3.2.15
+    * [KARAF-7661] - Upgrade to mongo-java-driver 3.12.11
+    * [KARAF-7662] - Upgrade to prometheus 0.16.0
+    * [KARAF-7663] - Upgrade to aws-java-sdk 1.12.396
+    * [KARAF-7664] - Upgrade to lucene 9.5.0
+
 ## Apache Karaf Decanter 2.9.0
 
 ### Overview
