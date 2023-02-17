@@ -50,38 +50,13 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-client</artifactId>
-            <version>7.10.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-high-level-client</artifactId>
-            <version>7.10.2</version>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-java</artifactId>
+            <version>8.6.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter.collector</groupId>
             <artifactId>org.apache.karaf.decanter.collector.utils</artifactId>
-        </dependency>
-
-        <!-- test -->
-        <dependency>
-            <groupId>org.elasticsearch.test</groupId>
-            <artifactId>framework</artifactId>
-            <version>7.10.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch.plugin</groupId>
-            <artifactId>transport-netty4-client</artifactId>
-            <version>7.10.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.12.1</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -132,6 +107,10 @@
                             !org.locationtech*,
                             !org.tartarus.snowball*,
                             !org.yaml.snakeyaml*,
+                            !co.elastic.clients*,
+                            !jakarta.json*,
+                            !javax.annotation*,
+                            !org.glassfish.json*,
                             org.apache.log;resolution:=optional,
                             javax.servlet;resolution:=optional,
                             jdk.net;resolution:=optional,
@@ -158,7 +137,11 @@
                             org.locationtech*;-split-package:=merge-first,
                             org.tartarus.snowball*;-split-package:=merge-first,
                             org.yaml.snakeyaml*;-split-package:=merge-first,
-                            org.elasticsearch*;-split-package:=merge-first
+                            org.elasticsearch*;-split-package:=merge-first,
+                            co.elastic.clients*;-split-package:=merge-first,
+                            jakarta.json*;-split-package:=merge-first,
+                            javax.annotation*;-split-package:=merge-first,
+                            org.glassfish.json*;-split-package:=merge-first
                         </Private-Package>
                     </instructions>
                 </configuration>

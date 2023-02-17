@@ -16,6 +16,19 @@
  */
 package org.apache.karaf.decanter.collector.elasticsearch;
 
+import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBase;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.query_dsl.SimpleQueryStringQuery;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -23,19 +36,9 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.karaf.decanter.collector.utils.PropertiesPreparator;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -67,7 +70,7 @@ public class ElasticsearchCollector implements Runnable {
     private EventAdmin dispatcher;
 
     private Dictionary<String, Object> config;
-    private RestHighLevelClient restClient;
+    private RestClient restClient;
 
     @Activate
     public void activate(ComponentContext componentContext) {
@@ -111,7 +114,7 @@ public class ElasticsearchCollector implements Runnable {
             );
         }
 
-        restClient = new RestHighLevelClient(restClientBuilder);
+        restClient = restClientBuilder.build();
     }
 
     @Deactivate
@@ -125,54 +128,50 @@ public class ElasticsearchCollector implements Runnable {
 
     @Override
     public void run() {
-        SearchRequest searchRequest = new SearchRequest();
+        SearchRequest.Builder searchRequestBuilder = new SearchRequest.Builder();
 
         String index = (config.get("index") != null) ? config.get("index").toString() : "decanter";
-        searchRequest.indices(index);
-
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchRequestBuilder.index(index);
 
         String query = (config.get("query") != null) ? config.get("query").toString() : null;
-        QueryBuilder queryBuilder;
+        QueryBase queryBase;
+
         if (query == null) {
-            queryBuilder = QueryBuilders.matchAllQuery();
+            searchRequestBuilder.q(QueryBuilders.matchAll().build().toString());
         } else {
-            queryBuilder = QueryBuilders.queryStringQuery(query);
+            searchRequestBuilder.q(query);
         }
-        searchSourceBuilder.query(queryBuilder);
+
         String fromString = (config.get("from") != null) ? config.get("from").toString() : null;
         if (fromString != null) {
             int from = Integer.parseInt(fromString);
-            searchSourceBuilder.from(from);
+            searchRequestBuilder.from(from);
         }
         String sizeString = (config.get("size") != null) ? config.get("size").toString() : null;
         if (sizeString != null) {
             int size = Integer.parseInt(sizeString);
-            searchSourceBuilder.size(size);
+            searchRequestBuilder.size(size);
         }
         String timeoutString = (config.get("timeout") != null) ? config.get("timeout").toString() : null;
         if (timeoutString != null) {
-            int timeout = Integer.parseInt(timeoutString);
-            searchSourceBuilder.timeout(new TimeValue(timeout, TimeUnit.SECONDS));
+            searchRequestBuilder.timeout(timeoutString);
         }
-        searchRequest.source(searchSourceBuilder);
 
         Map<String, Object> data = new HashMap<>();
         data.put("type", "elasticsearch");
         try {
-            SearchResponse searchResponse = restClient.search(searchRequest, RequestOptions.DEFAULT);
-            RestStatus status = searchResponse.status();
-            TimeValue took = searchResponse.getTook();
-            Boolean terminatedEarly = searchResponse.isTerminatedEarly();
-            boolean timedOut = searchResponse.isTimedOut();
-            int totalShards = searchResponse.getTotalShards();
-            int successfulShards = searchResponse.getSuccessfulShards();
-            int failedShards = searchResponse.getFailedShards();
-            SearchHits hits = searchResponse.getHits();
-            for (SearchHit hit : hits) {
-                Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-                data.putAll(sourceAsMap);
-            }
+            ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+            new ElasticsearchAsyncClient(transport).search(searchRequestBuilder.build(), Map.class)
+                    .thenApply((response) -> {
+                        data.put("timeout", response.timedOut());
+                        data.put("totalShards", response.shards().total().intValue());
+                        data.put("successfulShards", response.shards().successful().intValue());
+                        data.put("failedShards", response.shards().failed().intValue());
+                        for (Hit hit : response.hits().hits()) {
+                            data.putAll(hit.fields());
+                        }
+                        return null;
+                    });
         } catch (Exception e) {
             LOGGER.error("Can't query elasticsearch", e);
         }
