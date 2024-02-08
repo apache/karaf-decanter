@@ -60,7 +60,7 @@ See user guide for the details of Decanter features.
 ### Collectors
 
 * `decanter-collector-camel`
-* `decanter-collector-configadmin
+* `decanter-collector-configadmin`
 * `decanter-collector-dropwizard`
 * `decanter-collector-eventadmin`
 * `decanter-collector-file`
