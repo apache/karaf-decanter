@@ -538,6 +538,7 @@
                                 <exclude>**/*.svg</exclude>
                                 <exclude>**/*.less</exclude>
                                 <exclude>**/build.txt</exclude>
+                                <exclude>**/sample.txt</exclude>
                                 <exclude>**/components/**/*</exclude>
                                 <exclude>**/bower_components/**/*</exclude>
                                 <exclude>**/resources/config</exclude>
