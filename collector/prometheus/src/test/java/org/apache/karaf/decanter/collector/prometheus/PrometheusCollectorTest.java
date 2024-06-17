@@ -38,11 +38,25 @@ public class PrometheusCollectorTest {
 
         prometheusCollector.run();
 
-        Assert.assertEquals(1, dispatcher.postedEvents.size());
+        Assert.assertEquals(5, dispatcher.postedEvents.size());
 
         Assert.assertEquals(0.0, dispatcher.postedEvents.get(0).getProperty("Test1"));
-        Assert.assertEquals(8.0, dispatcher.postedEvents.get(0).getProperty("Test2"));
         Assert.assertEquals("prometheus", dispatcher.postedEvents.get(0).getProperty("type"));
+
+        Assert.assertEquals(8.0, dispatcher.postedEvents.get(1).getProperty("Test2"));
+        Assert.assertEquals("prometheus", dispatcher.postedEvents.get(1).getProperty("type"));
+
+        Assert.assertEquals(1.0, dispatcher.postedEvents.get(2).getProperty("request_time_total_seconds"));
+        Assert.assertEquals("/send", dispatcher.postedEvents.get(2).getProperty("endpoint"));
+        Assert.assertEquals("prometheus", dispatcher.postedEvents.get(2).getProperty("type"));
+
+        Assert.assertEquals(2.2561752E7, dispatcher.postedEvents.get(3).getProperty("memoryPool_usage_bytes"));
+        Assert.assertEquals("Compressed Class Space", dispatcher.postedEvents.get(3).getProperty("name"));
+        Assert.assertEquals("prometheus", dispatcher.postedEvents.get(3).getProperty("type"));
+
+        Assert.assertEquals(1.2582912E7, dispatcher.postedEvents.get(4).getProperty("memoryPool_usage_bytes"));
+        Assert.assertEquals("G1 Eden Space", dispatcher.postedEvents.get(4).getProperty("name"));
+        Assert.assertEquals("prometheus", dispatcher.postedEvents.get(4).getProperty("type"));
     }
 
     class MockDispatcher implements EventAdmin {
