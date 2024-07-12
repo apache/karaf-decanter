@@ -81,11 +81,14 @@ public class EventCollector implements EventHandler {
     public Map<String, String> convertSubject(Subject subject) {
         Map<String, String> map = new HashMap<String, String>();
         Set<Principal> principals = subject.getPrincipals();
-        for (Principal principal : principals) {
-            if (map.get(principal.getClass().getSimpleName()) != null) {
-                map.put(principal.getClass().getSimpleName(), map.get(principal.getClass().getSimpleName()) + "," + principal.getName());
-            } else {
-                map.put(principal.getClass().getSimpleName(), principal.getName());
+        synchronized (principals) {
+            for (Principal principal : principals) {
+                if (map.get(principal.getClass().getSimpleName()) != null) {
+                    map.put(principal.getClass().getSimpleName(),
+                            map.get(principal.getClass().getSimpleName()) + "," + principal.getName());
+                } else {
+                    map.put(principal.getClass().getSimpleName(), principal.getName());
+                }
             }
         }
         return map;
