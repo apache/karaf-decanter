@@ -46,9 +46,6 @@
         <json-api.version>1.1.4</json-api.version>
         <kafka.version>3.3.2</kafka.version>
         <karaf.version>4.4.3</karaf.version>
-        <kibana.version>3.1.1</kibana.version>
-        <kibana4.version>4.1.2</kibana4.version>
-        <kibana6.version>6.1.1</kibana6.version>
         <paho.version>1.2.5</paho.version>
         <slf4j.version>1.7.7</slf4j.version>
     </properties>
