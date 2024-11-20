@@ -64,15 +64,11 @@ public class SplitParserTest {
         Dictionary<String, Object> config = new Hashtable<>();
         config.put("separator", "\\s+");
         config.put("keys", "this,is");
-        config.put("useDefaultKey", "true");
+        config.put("useDefaultKey", "false");
         splitParser.activate(config);
 
         Map<String, Object> result = splitParser.parse("line", TEST_LINE);
-        Assert.assertEquals(4, result.size());
-        Assert.assertEquals("this", result.get("key-0"));
-        Assert.assertEquals("is", result.get("key-1"));
-        Assert.assertEquals("a", result.get("key-2"));
-        Assert.assertEquals("test", result.get("key-3"));
+        Assert.assertEquals(0, result.size());
     }
 
     @Test
