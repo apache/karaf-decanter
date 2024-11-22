@@ -80,7 +80,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-collector-file" version="${project.version}" description="Karaf Decanter Log File Collector">
         <feature>decanter-common</feature>
-        <bundle dependency="true">mvn:commons-io/commons-io/2.7</bundle>
+        <bundle dependency="true">mvn:commons-io/commons-io/${commons-io.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.file/${project.version}</bundle>
     </feature>
 
@@ -186,7 +186,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-common</feature>
         <feature>http-whiteboard</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.collector.rest.servlet.cfg">mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest.servlet/${project.version}/cfg</configfile>
-        <bundle dependency="true">mvn:commons-io/commons-io/2.7</bundle>
+        <bundle dependency="true">mvn:commons-io/commons-io/${commons-io.version}</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.rest.servlet/${project.version}</bundle>
     </feature>
 
