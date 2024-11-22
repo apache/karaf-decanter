@@ -17,3 +17,7 @@
 
 notifications:
   pullrequests: commits@karaf.apache.org
+
+github:
+  dependabot_alerts: false
+  dependabot_updates: false
