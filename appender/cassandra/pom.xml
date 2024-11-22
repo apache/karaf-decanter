@@ -149,7 +149,7 @@
         <dependency>
 			<artifactId>guava</artifactId>
 			<groupId>com.google.guava</groupId>
-			<version>25.1-jre</version>
+			<version>32.0.0-jre</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
