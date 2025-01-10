@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.management.MBeanServerConnection;
@@ -85,6 +86,9 @@ public class JmxCollector implements Runnable {
         this.url = url;
         this.username = username;
         this.password = password;
+        // remove jmx connection credentials from properties to not expose them as collected data
+        if (Objects.nonNull(this.username)) this.properties.remove("username");
+        if (Objects.nonNull(this.password)) this.properties.remove("password");
         this.remoteProtocolPkgs = remoteProtocolPkgs;
 
         this.objectNames = new HashSet<> ();

@@ -83,4 +83,19 @@ public class TestMapAttribute {
         Assert.assertEquals("org.something.else:*", objectNames.get(2));
         Assert.assertEquals("whatever", objectNames.get(3));
     }
+
+    @Test
+    public void testJMXCredentialsCleanUp() {
+        ComponentContext ctx = Mockito.mock(ComponentContext.class);
+        Dictionary props = new Hashtable<>();
+        Mockito.when(ctx.getProperties()).thenReturn(props);
+
+        props.put("username", "okenobi");
+        props.put("password", "Th3fOrC$");
+
+        JmxCollector collector = new JmxCollector();
+        collector.activate(ctx);
+
+        Assert.assertTrue(props.isEmpty());
+    }
 }
