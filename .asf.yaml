@@ -15,9 +15,40 @@
 # limitations under the License.
 #
 
-notifications:
-  pullrequests: commits@karaf.apache.org
-
 github:
-  dependabot_alerts: false
-  dependabot_updates: false
+  description: "Apache Karaf Decanter, an observability framework powered by Apache Karaf"
+  homepage: https://karaf.apache.org
+  labels:
+    - apache
+    - karaf
+    - decanter
+    - monitoring
+    - observability
+
+  enabled_merge_buttons:
+    merge: false
+    rebase: false
+    squash: true
+
+  protected_branches:
+    main:
+      required_pull_request_reviews:
+        require_code_owner_reviews: false
+        required_approving_review_count: 1
+      required_linear_history: true
+      del_branch_on_merge: true
+      required_status_checks:
+        strict: false
+        contexts:
+          - build
+
+  features:
+    wiki: false
+    issues: true
+    projects: true
+
+notifications:
+  commits: commits@karaf.apache.org
+  issues: issues@karaf.apache.org
+  pullrequests: issues@karaf.apache.org
+  jira_options: link label
