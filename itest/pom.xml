@@ -246,4 +246,26 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>ci</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <!-- TODO these itests are problematic on CI, see https://github.com/apache/karaf-decanter/issues/369 -->
+                                <exclude>**/OshiCollectorTest.java</exclude>
+                                <exclude>**/Log4jSocketCollectorTest.java</exclude>
+                                <exclude>**/SocketCollectorTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
