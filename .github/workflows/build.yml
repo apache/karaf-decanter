@@ -39,6 +39,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
+          architecture: 'x64'
       - name: Building
         run: mvn -U -B -e clean install -DskipTests -Prat
       - name: Tests
