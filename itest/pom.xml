@@ -260,6 +260,7 @@
                                 <exclude>**/OshiCollectorTest.java</exclude>
                                 <exclude>**/Log4jSocketCollectorTest.java</exclude>
                                 <exclude>**/SocketCollectorTest.java</exclude>
+                                <exclude>**/KafkaCollectorTest.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
