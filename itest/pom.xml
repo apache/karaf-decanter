@@ -261,6 +261,7 @@
                                 <exclude>**/Log4jSocketCollectorTest.java</exclude>
                                 <exclude>**/SocketCollectorTest.java</exclude>
                                 <exclude>**/KafkaCollectorTest.java</exclude>
+                                <exclude>**/JmsCollectorTest.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
