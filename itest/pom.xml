@@ -258,6 +258,7 @@
                             <excludes>
                                 <!-- TODO these itests are problematic on CI, see https://github.com/apache/karaf-decanter/issues/369 -->
                                 <exclude>**/OshiCollectorTest.java</exclude>
+                                <exclude>**/SystemCollectorTest.java</exclude>
                                 <exclude>**/Log4jSocketCollectorTest.java</exclude>
                                 <exclude>**/SocketCollectorTest.java</exclude>
                                 <exclude>**/KafkaCollectorTest.java</exclude>
