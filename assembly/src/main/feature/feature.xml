@@ -392,7 +392,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-common</feature>
         <configfile finalname="/etc/org.apache.karaf.decanter.appender.s3.cfg">mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.s3/${project.version}/cfg</configfile>
         <feature>jackson</feature>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.13.1</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.18.2</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.s3/${project.version}</bundle>
     </feature>
 
