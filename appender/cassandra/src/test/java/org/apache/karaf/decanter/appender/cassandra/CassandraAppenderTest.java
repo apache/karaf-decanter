@@ -196,8 +196,6 @@ public class CassandraAppenderTest {
                         .withBoolean(DefaultDriverOption.RECONNECT_ON_INIT, true)
                         .withString(DefaultDriverOption.LOAD_BALANCING_POLICY, "")
                         .withString(DefaultDriverOption.LOAD_BALANCING_POLICY_CLASS, "DefaultLoadBalancingPolicy")
-                        .withString(DefaultDriverOption.RETRY_POLICY, "")
-                        .withString(DefaultDriverOption.RETRY_POLICY_CLASS, "DefaultRetryPolicy")
                         .withString(DefaultDriverOption.SPECULATIVE_EXECUTION_POLICY, "")
                         .withString(DefaultDriverOption.SPECULATIVE_EXECUTION_POLICY_CLASS, "NoSpeculativeExecutionPolicy")
                         .withString(DefaultDriverOption.ADDRESS_TRANSLATOR_CLASS, "PassThroughAddressTranslator")
