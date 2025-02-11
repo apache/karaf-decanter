@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
-            <version>3.3.4</version>
+            <version>3.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter</groupId>
@@ -132,12 +132,14 @@
                             !org.tukaani*,
                             !org.xerial.snappy*,
                             !okhttp3*,
+                            !org.yaml.snakeyaml*,
                             android*;resolution:=optional,
                             com.android*;resolution:=optional,
                             com.sun.javadoc;resolution:=optional,
                             com.sun.jersey*;resolution:=optional,
                             com.sun*;resolution:=optional,
                             javax.annotation;resolution:=optional,
+                            javax.annotation.meta;resolution:=optional,
                             javax.servlet*;resolution:=optional,
                             javax.ws.rs*;resolution:=optional,
                             org.apache.avro*;resolution:=optional,
@@ -209,7 +211,8 @@
                             org.apache.zookeeper*,
                             org.tukaani*,
                             org.xerial.snappy*,
-                            okhttp3*
+                            okhttp3*,
+                            org.yaml.snakeyaml*
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
                     </instructions>
