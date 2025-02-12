@@ -19,10 +19,8 @@ package org.apache.karaf.decanter.appender.kafka;
 import kafka.metrics.KafkaMetricsReporter;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;
-import org.apache.kafka.common.utils.SystemTime;
 import org.junit.rules.ExternalResource;
 import scala.Option;
-import scala.collection.mutable.Buffer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -71,7 +69,7 @@ public class EmbeddedKafkaBroker extends ExternalResource {
 
     private KafkaServer startBroker(Properties props) {
         List<KafkaMetricsReporter> kmrList = new ArrayList<>();
-        KafkaServer server = new KafkaServer(new KafkaConfig(props), new SystemTime(), Option.<String>empty(), true);
+        KafkaServer server = new KafkaServer(new KafkaConfig(props), new TestSystemTime(), Option.<String>empty(), true);
         server.startup();
         return server;
     }

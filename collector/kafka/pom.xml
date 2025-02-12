@@ -87,10 +87,12 @@
                             !com.fasterxml.jackson*,
                             !net.jpountz*,
                             !org.jose4j*,
-                            !kafka;
+                            !kafka,
+                            !com.google.common*,
                             com.github.luben.zstd;resolution:=optional,
                             com.ibm.security.krb5*;resolution:=optional,
                             sun.security.krb5;resolution:=optional,
+                            io.grpc*;resolution:=optional,
                             *
                         </Import-Package>
                         <Private-Package>
@@ -101,6 +103,7 @@
                             com.fasterxml.jackson*,
                             net.jpountz*,
                             org.jose4j*,
+                            com.google.common*,
                             kafka
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>
