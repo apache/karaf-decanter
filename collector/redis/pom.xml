@@ -101,7 +101,7 @@
                             !net.bytebuddy*,
                             !org.xerial.snappy*,
                             !reactor*,
-														!org.objenesis*,
+							!org.objenesis*,
                             com.google.protobuf*;resolution:=optional,
                             com.jcraft.jzlib;resolution:=optional,
                             com.ning.compress*;resolution:=optional,
@@ -131,8 +131,13 @@
                             kotlin*;resolution:=optional,
                             sun*;resolution:=optional,
                             com.sun.jna;resolution:=optional,
-														COM.newmonics*;resolution:=optional,
-														android*;resolution:=optional,
+							COM.newmonics*;resolution:=optional,
+                            android*;resolution:=optional,
+                            com.github.luben.zstd*;resolution:=optional,
+                            io.micrometer*;resolution:=optional,
+                            io.protostuff*;resolution:=optional,
+                            org.apache.commons.compress*;resolution:=optional,
+                            org.apache.fury*;resolution:=optional,
                             *
                         </Import-Package>
                         <Private-Package>
