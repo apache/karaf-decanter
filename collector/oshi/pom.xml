@@ -95,6 +95,7 @@
                         <Import-Package>
                             !oshi*,
                             !com.sun.jna*,
+                            io.github.pandalxb*;resolution:=optional,
                             *
                         </Import-Package>
                         <Private-Package>
