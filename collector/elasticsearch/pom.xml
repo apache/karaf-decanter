@@ -52,7 +52,7 @@
         <dependency>
             <groupId>co.elastic.clients</groupId>
             <artifactId>elasticsearch-java</artifactId>
-            <version>8.6.1</version>
+            <version>8.17.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter.collector</groupId>
@@ -111,6 +111,7 @@
                             !jakarta.json*,
                             !javax.annotation*,
                             !org.glassfish.json*,
+                            !io.opentelemetry*,
                             org.apache.log;resolution:=optional,
                             javax.servlet;resolution:=optional,
                             jdk.net;resolution:=optional,
@@ -141,7 +142,8 @@
                             co.elastic.clients*;-split-package:=merge-first,
                             jakarta.json*;-split-package:=merge-first,
                             javax.annotation*;-split-package:=merge-first,
-                            org.glassfish.json*;-split-package:=merge-first
+                            org.glassfish.json*;-split-package:=merge-first,
+                            io.opentelemetry*;-split-package:=merge-first
                         </Private-Package>
                     </instructions>
                 </configuration>

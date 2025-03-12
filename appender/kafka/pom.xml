@@ -65,14 +65,14 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.13.1</version>
+            <version>2.18.2</version>
         </dependency>
 
         <!-- test -->
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
-            <version>3.4.10</version>
+            <version>3.9.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -102,9 +102,11 @@
                             !com.fasterxml.jackson*,
                             !org.jose4j*,
                             !kafka,
+                            !com.google.common*,
                             com.github.luben.zstd;resolution:=optional,
                             com.ibm.security.krb5*;resolution:=optional,
                             sun.security.krb5;resolution:=optional,
+                            io.grpc*;resolution:=optional,
                             *
                         </Import-Package>
                         <Private-Package>
@@ -115,6 +117,7 @@
                             net.jpountz*,
                             com.fasterxml.jackson*,
                             org.jose4j*,
+                            com.google.common*,
                             kafka
                         </Private-Package>
                         <_dsannotations>*</_dsannotations>

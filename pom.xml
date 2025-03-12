@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>24</version>
+        <version>33</version>
         <relativePath />
     </parent>
 
@@ -35,19 +35,19 @@
     <name>Apache Karaf :: Decanter</name>
 
     <properties>
-        <!-- for reproducible builds -->
-        <project.build.outputTimestamp>10</project.build.outputTimestamp>
+        <maven.compiler.target>11</maven.compiler.target>
+
         <baseline>1.0.0</baseline>
         <baseline.skip>true</baseline.skip>
-        <activemq.version>5.17.3</activemq.version>
-        <camel.version>3.20.1</camel.version>
-        <cassandra.driver.version>4.9.0</cassandra.driver.version>
+        <activemq.version>5.19.0</activemq.version>
+        <camel.version>3.22.4</camel.version>
+        <cassandra.driver.version>4.17.0</cassandra.driver.version>
         <glassfish-json.version>1.1.4</glassfish-json.version>
         <json-api.version>1.1.4</json-api.version>
-        <kafka.version>3.3.2</kafka.version>
+        <kafka.version>3.9.0</kafka.version>
         <karaf.version>4.4.7</karaf.version>
         <paho.version>1.2.5</paho.version>
-        <slf4j.version>1.7.7</slf4j.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <commons-io.version>2.18.0</commons-io.version>
     </properties>
 
@@ -134,28 +134,7 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.3.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
                     <configuration>
                         <useReleaseProfile>false</useReleaseProfile>
                         <preparationGoals>clean install</preparationGoals>
@@ -165,19 +144,9 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.2.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
-                </plugin>
-                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.6.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -185,7 +154,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <id>copy-notice</id>
@@ -197,32 +165,6 @@
                             <target>
                                 <copy file="NOTICE" todir="target/maven-shared-archive-resources/META-INF" failonerror="false" overwrite="true" />
                             </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.9.0</version>
-                <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>1.7.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                        <configuration>
-                            <resourceBundles>
-                                <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
-                            </resourceBundles>
                         </configuration>
                     </execution>
                 </executions>
@@ -297,22 +239,22 @@
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.service.component</artifactId>
-                <version>1.4.0</version>
+                <version>1.5.1</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.service.component.annotations</artifactId>
-                <version>1.4.0</version>
+                <version>1.5.1</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.service.event</artifactId>
-                <version>1.4.0</version>
+                <version>1.4.1</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.service.cm</artifactId>
-                <version>1.6.0</version>
+                <version>1.6.1</version>
             </dependency>
 
             <!-- Karaf -->
@@ -376,7 +318,7 @@
             <dependency>
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-core</artifactId>
-                <version>1.2.19</version>
+                <version>1.2.21</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.derby</groupId>
@@ -514,7 +456,6 @@
                     <plugin>
                         <groupId>org.apache.rat</groupId>
                         <artifactId>apache-rat-plugin</artifactId>
-                        <version>0.13</version>
                         <executions>
                             <execution>
                                 <phase>verify</phase>
