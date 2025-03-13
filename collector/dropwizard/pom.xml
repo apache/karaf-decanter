@@ -71,13 +71,17 @@
                     <obrRepository>NONE</obrRepository>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Export-Package>!*</Export-Package>
                         <Import-Package>
                             !com.codahale.metrics,
                             *
                         </Import-Package>
                         <Private-Package>
+                            org.apache.karaf.decanter.collector.dropwizard,
+                            org.apache.karaf.decanter.collector.utils,
                             com.codahale.metrics
                         </Private-Package>
+                        <_dsannotations>*</_dsannotations>
                     </instructions>
                 </configuration>
             </plugin>
