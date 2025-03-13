@@ -226,6 +226,7 @@
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
                     <systemPropertyVariables>
+                        <org.ops4j.pax.logging.DefaultServiceLog.level>INFO</org.ops4j.pax.logging.DefaultServiceLog.level>
                         <activemq.version>${activemq.version}</activemq.version>
                         <camel.version>${camel.version}</camel.version>
                         <decanter.version>${project.version}</decanter.version>
