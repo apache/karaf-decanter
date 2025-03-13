@@ -70,7 +70,7 @@ public class PrometheusServlet implements EventHandler {
                 if (event.getProperty(property) instanceof Map) {
                     Map<String, Object> map = (Map) event.getProperty(property);
                     for (Map.Entry<String, Object> entry : map.entrySet()) {
-                        if (entry.getValue() instanceof Long || entry.getValue() instanceof Integer) {
+                        if (entry.getValue() instanceof Double || entry.getValue() instanceof Long || entry.getValue() instanceof Integer) {
                             String convertedProperty = (property + "." + entry.getKey()).replace(".", "_");
                             Gauge gauge = gauges.get(convertedProperty);
                             if (gauge == null) {
@@ -81,11 +81,13 @@ public class PrometheusServlet implements EventHandler {
                                 gauge.set((Long) entry.getValue());
                             } else if (entry.getValue() instanceof Integer) {
                                 gauge.set((Integer) entry.getValue());
+                            } else if (entry.getValue() instanceof Double) {
+                                gauge.set((Double) entry.getValue());
                             }
                         }
                     }
                 }
-                if (event.getProperty(property) instanceof Long || event.getProperty(property) instanceof Integer) {
+                if (event.getProperty(property) instanceof Double || event.getProperty(property) instanceof Long || event.getProperty(property) instanceof Integer) {
                     String convertedProperty = property.replace(".", "_");
                     Gauge gauge = gauges.get(convertedProperty);
                     if (gauge == null) {
@@ -96,6 +98,8 @@ public class PrometheusServlet implements EventHandler {
                         gauge.set((Long) event.getProperty(property));
                     } else if (event.getProperty(property) instanceof Integer) {
                         gauge.set((Integer) event.getProperty(property));
+                    } else if (event.getProperty(property) instanceof Double) {
+                        gauge.set((Double) event.getProperty(property));
                     }
                 }
             }
