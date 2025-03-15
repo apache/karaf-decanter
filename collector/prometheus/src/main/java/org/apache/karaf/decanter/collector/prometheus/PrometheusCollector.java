@@ -31,9 +31,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Component(
         name = "org.apache.karaf.decanter.collector.prometheus",
@@ -53,6 +55,7 @@ public class PrometheusCollector implements Runnable {
     private Dictionary<String, Object> properties;
 
     private URL prometheusURL;
+    private String type = "prometheus";
 
     @Activate
     public void activate(ComponentContext componentContext) throws Exception {
@@ -71,28 +74,38 @@ public class PrometheusCollector implements Runnable {
     public void run() {
         try {
             URLConnection connection = prometheusURL.openConnection();
-            Map<String, Object> data = new HashMap<>();
-            data.put("type", "prometheus");
+            String topic = (properties.get(EventConstants.EVENT_TOPIC) != null) ? (String) properties.get(EventConstants.EVENT_TOPIC) : "decanter/collect/prometheus";
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (line.matches("# TYPE .* gauge")) {
-                        line = reader.readLine();
-                        if (line == null) {
-                            break;
+                    if (!line.matches("# .*")) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("type", type);
+                        if (line.contains("{")) {
+                            final String name = line.substring(0, line.indexOf("{"));
+                            String[] labels = line.substring(line.indexOf("{")+1, line.indexOf("}")).split(",");
+                            Stream.of(labels).forEach(it -> {
+                                String labelName = it.substring(0, it.indexOf("=")).replace("\"", "");
+                                String labelValue = it.substring(it.indexOf("=")+1).replace("\"", "");
+                                data.put(labelName, labelValue);
+                            });
+
+                            String value = line.substring(line.indexOf("}")+2);
+                            Double parseValue = Double.parseDouble(value);
+                            data.put(name, parseValue);
+                        } else {
+                            String[] split = line.split(" ");
+                            if (split.length == 2) {
+                                String property = split[0];
+                                double value = Double.parseDouble(split[1]);
+                                data.put(property, value);
+                            }
                         }
-                        String[] split = line.split(" ");
-                        if (split.length == 2) {
-                            String property = split[0];
-                            double value = Double.parseDouble(split[1]);
-                            data.put(property, value);
-                        }
+                        PropertiesPreparator.prepare(data, properties);
+                        dispatcher.postEvent(new Event(topic, data));
                     }
                 }
             }
-            PropertiesPreparator.prepare(data, properties);
-            String topic = (properties.get(EventConstants.EVENT_TOPIC) != null) ? (String) properties.get(EventConstants.EVENT_TOPIC) : "decanter/collect/prometheus";
-            dispatcher.postEvent(new Event(topic, data));
         } catch (Exception e) {
             LOGGER.warn("Can't get Prometheus metrics", e);
             e.printStackTrace();
