@@ -93,7 +93,7 @@ public class TestMqttAppender  {
         String jsonSt = received.iterator().next().toString();
         JsonReader reader = Json.createReader(new StringReader(jsonSt));
         JsonObject jsonO = reader.readObject();
-        Assert.assertEquals("2016-02-02T15:59:40,634Z", jsonO.getString("@timestamp"));
+        Assert.assertEquals("2016-02-02T15:59:40.634", jsonO.getString("@timestamp"));
         Assert.assertEquals(TIMESTAMP, jsonO.getJsonNumber(EventConstants.TIMESTAMP).longValue());
         Assert.assertEquals("decanter", jsonO.getString(EventConstants.EVENT_TOPIC.replace('.', '_')));
         
