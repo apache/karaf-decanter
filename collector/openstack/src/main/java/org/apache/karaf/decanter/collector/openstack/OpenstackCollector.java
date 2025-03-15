@@ -317,6 +317,7 @@ public class OpenstackCollector implements Runnable {
                 if (!use.endsWith("}")) {
                     use = use + "}";
                 }
+                data.put("type", "openstack");
                 data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(use.getBytes())));
                 PropertiesPreparator.prepare(data, config);
                 dispatcher.postEvent(new Event(topic, data));
@@ -332,6 +333,7 @@ public class OpenstackCollector implements Runnable {
     protected void computeServers(String token, EventAdmin dispatcher) throws Exception {
         String response = request(compute + "/servers/detail", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -340,6 +342,7 @@ public class OpenstackCollector implements Runnable {
     protected void computeFlavors(String token, EventAdmin dispatcher) throws Exception {
         String response = request(compute + "/flavors/detail", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -348,6 +351,7 @@ public class OpenstackCollector implements Runnable {
     protected void computeOsKeypairs(String token, EventAdmin dispatcher) throws Exception {
         String response = request(compute + "/os-keypairs", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -356,6 +360,7 @@ public class OpenstackCollector implements Runnable {
     protected void computeLimits(String token, EventAdmin dispatcher) throws Exception {
         String response = request(compute + "/limits", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -364,6 +369,7 @@ public class OpenstackCollector implements Runnable {
     protected void computeOsAggregates(String token, EventAdmin dispatcher) throws Exception {
         String response = request(compute + "/os-aggregates", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -372,6 +378,7 @@ public class OpenstackCollector implements Runnable {
     protected void computeAvailabilityZones(String token, EventAdmin dispatcher) throws Exception {
         String response = request(compute + "/os-availability-zone/detail", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -380,6 +387,7 @@ public class OpenstackCollector implements Runnable {
     protected void computeOsHypervisors(String token, EventAdmin dispatcher) throws Exception {
         String response = request(compute + "/os-hypervisors/detail", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -388,6 +396,7 @@ public class OpenstackCollector implements Runnable {
     protected void computeOsInstanceUsageAuditLog(String token, EventAdmin dispatcher) throws Exception {
         String response = request(compute + "/os-instance_usage_audit_log", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -396,6 +405,7 @@ public class OpenstackCollector implements Runnable {
     protected void computeOsMigrations(String token, EventAdmin dispatcher) throws Exception {
         String response = request(compute + "/os-migrations", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -404,6 +414,7 @@ public class OpenstackCollector implements Runnable {
     protected void computeOsServerGroups(String token, EventAdmin dispatcher) throws Exception {
         String response = request(compute + "/os-server-groups", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -412,6 +423,7 @@ public class OpenstackCollector implements Runnable {
     protected void computeOsServices(String token, EventAdmin dispatcher) throws Exception {
         String response = request(compute + "/os-services", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -420,6 +432,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageVolumeTypes(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/types", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -428,6 +441,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageVolumesDetail(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/volumes/detail", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -436,6 +450,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageManageableVolumes(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/manageable_volumes/detail", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -444,6 +459,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageSnapshotsDetail(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/snapshots/detail", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -452,6 +468,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageVolumeTransfers(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/volume-transfers/detail", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -460,6 +477,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageAttachments(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/attachments/detail", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -468,6 +486,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageBackups(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/backups/detail", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -476,6 +495,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageOsServices(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/os-services", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -484,6 +504,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageGroups(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/groups", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -492,6 +513,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageGroupSnapshots(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/group_snapshots/detail", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -500,6 +522,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageGroupTypes(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/group_types", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -508,6 +531,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageOsHosts(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/os-hosts", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -516,6 +540,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageLimits(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/limits", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -524,6 +549,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageResourceFilters(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/resource_filters", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -532,6 +558,7 @@ public class OpenstackCollector implements Runnable {
     protected void blockStorageQosSpecs(String token, EventAdmin dispatcher) throws Exception {
         String response = request(blockStorage + "/" + project + "/qos-specs", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -540,6 +567,7 @@ public class OpenstackCollector implements Runnable {
     protected void images(String token, EventAdmin dispatcher) throws Exception {
         String response = request(image + "/v2/images", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -548,6 +576,7 @@ public class OpenstackCollector implements Runnable {
     protected void imageStore(String token, EventAdmin dispatcher) throws Exception {
         String response = request(image + "/v2/info/stores", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -556,6 +585,7 @@ public class OpenstackCollector implements Runnable {
     protected void imageTasks(String token, EventAdmin dispatcher) throws Exception {
         String response = request(image + "/v2/tasks", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
@@ -564,6 +594,7 @@ public class OpenstackCollector implements Runnable {
     protected void metric(String token, EventAdmin dispatcher) throws Exception {
         String response = request(metric + "/v1/metric", token);
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "openstack");
         data.putAll(unmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes())));
         PropertiesPreparator.prepare(data, config);
         dispatcher.postEvent(new Event(topic, data));
