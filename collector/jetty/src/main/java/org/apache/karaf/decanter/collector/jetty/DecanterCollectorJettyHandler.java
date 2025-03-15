@@ -110,6 +110,7 @@ public class DecanterCollectorJettyHandler implements Handler {
     @Override
     public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
         Map<String, Object> data = new HashMap<>();
+        data.put("type", "jetty");
         data.put("request.method", httpServletRequest.getMethod());
         data.put("request.requestURI", httpServletRequest.getRequestURI());
         try {

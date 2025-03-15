@@ -78,6 +78,7 @@ public class DruidCollector implements Runnable {
             if (key.startsWith("query.")) {
                 try {
                     Map<String, Object> data = new HashMap<>();
+                    data.put("type", "druid");
                     data.put("query", key.substring("query.".length()));
                     data.putAll(executeQuery(druidBroker, (String) config.get(key)));
                     PropertiesPreparator.prepare(data, config);
