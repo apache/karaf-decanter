@@ -71,6 +71,7 @@ public class PrometheusAppenderTest extends KarafTestSupport {
         System.out.println("Sending test event ...");
         EventAdmin dispatcher = getOsgiService(EventAdmin.class);
         HashMap<String, Object> data = new HashMap<>();
+        data.put("ObjectName", "test:TestMBean,name=foo");
         data.put("Test", 0);
         dispatcher.sendEvent(new Event("decanter/collect/test", data));
 
@@ -92,9 +93,9 @@ public class PrometheusAppenderTest extends KarafTestSupport {
             }
         }
 
-        System.out.println("");
+        System.out.println("-------");
         System.out.println(builder.toString());
-        System.out.println("");
+        System.out.println("-------");
 
         Assert.assertTrue(builder.toString().contains("Test 0.0"));
     }

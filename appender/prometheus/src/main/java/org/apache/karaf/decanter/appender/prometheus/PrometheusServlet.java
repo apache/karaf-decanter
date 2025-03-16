@@ -28,10 +28,7 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.http.HttpService;
 
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component(
         name = "org.apache.karaf.decanter.appender.prometheus",
@@ -63,6 +60,25 @@ public class PrometheusServlet implements EventHandler {
         httpService.unregister(alias);
     }
 
+    protected static String createUniqueGaugeName(Event event, String mapProperty, String keyProperty) {
+        String gauge = event.getTopic();
+        if (event.getProperty("ObjectName") != null) {
+            gauge = gauge + "." + event.getProperty("ObjectName").toString();
+        } else if (event.getProperty("uuid") != null) {
+            gauge = gauge + "." + event.getProperty("uuid").toString();
+        } else {
+            gauge = gauge + "." + UUID.randomUUID();
+        }
+        if (mapProperty != null) {
+            gauge = mapProperty + "." + gauge;
+        }
+        gauge = gauge + "." + keyProperty;
+        gauge = gauge.replace(".", "_").replace("-", "_")
+                .replace(":", "_").replace(",", "_")
+                .replace("=", "_").replace("/", "_");
+        return gauge;
+    }
+
     @Override
     public void handleEvent(Event event) {
         for (String property : event.getPropertyNames()) {
@@ -71,7 +87,7 @@ public class PrometheusServlet implements EventHandler {
                     Map<String, Object> map = (Map) event.getProperty(property);
                     for (Map.Entry<String, Object> entry : map.entrySet()) {
                         if (entry.getValue() instanceof Double || entry.getValue() instanceof Long || entry.getValue() instanceof Integer) {
-                            String convertedProperty = (property + "." + entry.getKey()).replace(".", "_");
+                            String convertedProperty = createUniqueGaugeName(event, property, entry.getKey());
                             Gauge gauge = gauges.get(convertedProperty);
                             if (gauge == null) {
                                 gauge = Gauge.build().name(convertedProperty).help(property + "." + entry.getKey()).register();
@@ -88,7 +104,7 @@ public class PrometheusServlet implements EventHandler {
                     }
                 }
                 if (event.getProperty(property) instanceof Double || event.getProperty(property) instanceof Long || event.getProperty(property) instanceof Integer) {
-                    String convertedProperty = property.replace(".", "_");
+                    String convertedProperty = createUniqueGaugeName(event, null, property);
                     Gauge gauge = gauges.get(convertedProperty);
                     if (gauge == null) {
                         gauge = Gauge.build().name(convertedProperty).help(property).register();
