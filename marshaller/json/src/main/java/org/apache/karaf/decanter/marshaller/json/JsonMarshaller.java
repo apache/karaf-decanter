@@ -19,13 +19,15 @@ package org.apache.karaf.decanter.marshaller.json;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TimeZone;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -48,14 +50,13 @@ import org.osgi.service.event.EventConstants;
 )
 public class JsonMarshaller implements Marshaller {
 
-    private SimpleDateFormat tsFormat;
+    private final static String TIMESTAMP_FORMAT_PROPERTY = "timestamp.format";
+    private final static String TIMESTAMP_ZONE_PROPERTY = "timestamp.zone";
     
     boolean replaceDotsByUnderscores = true;
-    
-    public JsonMarshaller() {
-        tsFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SSSX");
-        tsFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
+
+    private DateTimeFormatter timestampFormatter = DateTimeFormatter.ISO_DATE_TIME;
+    private ZoneId timestampZoneId = ZoneId.of("UTC");
 
     @Activate
     public void activate(ComponentContext componentContext) {
@@ -63,6 +64,47 @@ public class JsonMarshaller implements Marshaller {
     }
 
     public void activate(Dictionary<String, Object> config) {
+        if (config.get(TIMESTAMP_FORMAT_PROPERTY) != null) {
+            String timestampFormatterProp = (String) config.get(TIMESTAMP_FORMAT_PROPERTY);
+            if (timestampFormatterProp.equalsIgnoreCase("ISO_DATE_TIME")) {
+                timestampFormatter = DateTimeFormatter.ISO_DATE_TIME;
+            } else if (timestampFormatterProp.equalsIgnoreCase("BASIC_ISO_DATE")) {
+                timestampFormatter = DateTimeFormatter.BASIC_ISO_DATE;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_LOCAL_DATE")) {
+                timestampFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_OFFSET_DATE")) {
+                timestampFormatter = DateTimeFormatter.ISO_OFFSET_DATE;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_DATE")) {
+                timestampFormatter = DateTimeFormatter.ISO_DATE;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_LOCAL_TIME")) {
+                timestampFormatter = DateTimeFormatter.ISO_LOCAL_TIME;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_OFFSET_TIME")) {
+                timestampFormatter = DateTimeFormatter.ISO_OFFSET_TIME;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_TIME")) {
+                timestampFormatter = DateTimeFormatter.ISO_TIME;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_LOCAL_DATE_TIME")) {
+                timestampFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_OFFSET_DATE_TIME")) {
+                timestampFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_ZONED_DATE_TIME")) {
+                timestampFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_ORDINAL_DATE")) {
+                timestampFormatter = DateTimeFormatter.ISO_ORDINAL_DATE;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_WEEK_DATE")) {
+                timestampFormatter = DateTimeFormatter.ISO_WEEK_DATE;
+            } else if (timestampFormatterProp.equalsIgnoreCase("ISO_INSTANT")) {
+                timestampFormatter = DateTimeFormatter.ISO_INSTANT;
+            } else if (timestampFormatterProp.equalsIgnoreCase("RFC_1123_DATE_TIME")) {
+                timestampFormatter = DateTimeFormatter.RFC_1123_DATE_TIME;
+            } else {
+                timestampFormatter = DateTimeFormatter.ofPattern(timestampFormatterProp);
+            }
+        }
+
+        if (config.get(TIMESTAMP_ZONE_PROPERTY) != null) {
+            timestampZoneId = ZoneId.of((String) config.get(TIMESTAMP_ZONE_PROPERTY), ZoneId.SHORT_IDS);
+        }
+
         replaceDotsByUnderscores = (config.get("replaceDotsByUnderscores") != null) ? 
             Boolean.valueOf((String) config.get("replaceDotsByUnderscores")) : true;
     }
@@ -92,9 +134,9 @@ public class JsonMarshaller implements Marshaller {
     }
 
     private void addTimestamp(Event event, JsonObjectBuilder json) {
-        Long ts = (Long)event.getProperty(EventConstants.TIMESTAMP);
-        Date date = ts != null ? new Date(ts) : new Date();
-        json.add("@timestamp", tsFormat.format(date));
+        Long timestamp = (Long)event.getProperty(EventConstants.TIMESTAMP);
+        LocalDateTime date = (timestamp != null) ? LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), timestampZoneId) : LocalDateTime.now();
+        json.add("@timestamp", date.format(timestampFormatter));
     }
 
     @SuppressWarnings("unchecked")

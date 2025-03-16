@@ -50,9 +50,73 @@ public class TestJsonMarshaller {
        map.put("c", "d");
        String jsonSt = marshaller.marshal(new Event(EXPECTED_TOPIC, map));
        System.out.println(jsonSt);
+
        JsonReader reader = Json.createReader(new StringReader(jsonSt));
        JsonObject jsonO = reader.readObject();
-       Assert.assertEquals("Timestamp string", "2016-02-02T15:59:40,634Z",jsonO.getString("@timestamp"));
+       Assert.assertEquals("Timestamp string", "2016-02-02T15:59:40.634", jsonO.getString("@timestamp"));
+       long ts = jsonO.getJsonNumber(EventConstants.TIMESTAMP).longValue();
+       Assert.assertEquals("timestamp long", EXPECTED_TIMESTAMP, ts);
+       Assert.assertEquals("Topic", EXPECTED_TOPIC, jsonO.getString(EventConstants.EVENT_TOPIC.replace('.', '_')));
+   }
+
+   @Test
+   public void testCustomTimestampFormat() throws Exception {
+       JsonMarshaller marshaller = new JsonMarshaller();
+
+       Dictionary<String, Object> config = new Hashtable<>();
+       config.put("timestamp.format", "BASIC_ISO_DATE");
+       marshaller.activate(config);
+
+       Map<String, Object> map = new HashMap<>();
+       map.put(EventConstants.TIMESTAMP, EXPECTED_TIMESTAMP);
+       map.put("c", "d");
+       String jsonSt = marshaller.marshal(new Event(EXPECTED_TOPIC, map));
+
+       JsonReader reader = Json.createReader(new StringReader(jsonSt));
+       JsonObject jsonO = reader.readObject();
+       Assert.assertEquals("Timestamp string", "20160202", jsonO.getString("@timestamp"));
+       long ts = jsonO.getJsonNumber(EventConstants.TIMESTAMP).longValue();
+       Assert.assertEquals("timestamp long", EXPECTED_TIMESTAMP, ts);
+       Assert.assertEquals("Topic", EXPECTED_TOPIC, jsonO.getString(EventConstants.EVENT_TOPIC.replace('.', '_')));
+   }
+
+   @Test
+   public void testCustomTimestampFormatPattern() throws Exception {
+       JsonMarshaller marshaller = new JsonMarshaller();
+
+       Dictionary<String, Object> config = new Hashtable<>();
+       config.put("timestamp.format", "yyyy MM dd");
+       marshaller.activate(config);
+
+       Map<String, Object> map = new HashMap<>();
+       map.put(EventConstants.TIMESTAMP, EXPECTED_TIMESTAMP);
+       map.put("c", "d");
+       String jsonSt = marshaller.marshal(new Event(EXPECTED_TOPIC, map));
+
+       JsonReader reader = Json.createReader(new StringReader(jsonSt));
+       JsonObject jsonO = reader.readObject();
+       Assert.assertEquals("Timestamp string", "2016 02 02", jsonO.getString("@timestamp"));
+       long ts = jsonO.getJsonNumber(EventConstants.TIMESTAMP).longValue();
+       Assert.assertEquals("timestamp long", EXPECTED_TIMESTAMP, ts);
+       Assert.assertEquals("Topic", EXPECTED_TOPIC, jsonO.getString(EventConstants.EVENT_TOPIC.replace('.', '_')));
+   }
+
+   @Test
+   public void testCustomTimestampZone() throws Exception {
+       JsonMarshaller marshaller = new JsonMarshaller();
+
+       Dictionary<String, Object> config = new Hashtable<>();
+       config.put("timestamp.zone", "PST");
+       marshaller.activate(config);
+
+       Map<String, Object> map = new HashMap<>();
+       map.put(EventConstants.TIMESTAMP, EXPECTED_TIMESTAMP);
+       map.put("c", "d");
+       String jsonSt = marshaller.marshal(new Event(EXPECTED_TOPIC, map));
+
+       JsonReader reader = Json.createReader(new StringReader(jsonSt));
+       JsonObject jsonO = reader.readObject();
+       Assert.assertEquals("Timestamp string", "2016-02-02T07:59:40.634", jsonO.getString("@timestamp"));
        long ts = jsonO.getJsonNumber(EventConstants.TIMESTAMP).longValue();
        Assert.assertEquals("timestamp long", EXPECTED_TIMESTAMP, ts);
        Assert.assertEquals("Topic", EXPECTED_TOPIC, jsonO.getString(EventConstants.EVENT_TOPIC.replace('.', '_')));
@@ -122,7 +186,7 @@ public class TestJsonMarshaller {
 
        JsonReader reader = Json.createReader(new StringReader(jsonString));
        JsonObject jsonObject = reader.readObject();
-       Assert.assertEquals("Timestamp string", "2016-02-02T15:59:40,634Z", jsonObject.getString("@timestamp"));
+       Assert.assertEquals("Timestamp string", "2016-02-02T15:59:40.634", jsonObject.getString("@timestamp"));
        long ts = jsonObject.getJsonNumber(EventConstants.TIMESTAMP).longValue();
        Assert.assertEquals("timestamp long", EXPECTED_TIMESTAMP, ts);
 
