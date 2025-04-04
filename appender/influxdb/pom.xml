@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.influxdb</groupId>
             <artifactId>influxdb-java</artifactId>
-            <version>2.24</version>
+            <version>2.25</version>
         </dependency>
     </dependencies>
 
@@ -87,6 +87,7 @@
                             !org.influxdb.dto,
                             !org.influxdb.impl,
                             !org.influxdb.msgpack,
+                            !org.influxdb.querybuilder*,
                             !retrofit2,
                             !retrofit2.converter.moshi,
                             !retrofit2.http,
@@ -138,6 +139,7 @@
                             org.influxdb.impl,
                             org.influxdb.dto,
                             org.influxdb.msgpack,
+                            org.influxdb.querybuilder*,
                             retrofit2,
                             retrofit2.converter.moshi,
                             retrofit2.http,
