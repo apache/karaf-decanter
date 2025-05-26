@@ -34,7 +34,7 @@
     <name>Apache Karaf :: Decanter :: Appender :: REST</name>
 
     <properties>
-        <cxf.version>3.6.6</cxf.version>
+        <cxf.version>3.6.7</cxf.version>
     </properties>
 
     <dependencies>
