@@ -231,6 +231,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>scheduler</feature>
         <feature>activation</feature>
         <feature>jackson</feature>
+        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.18.2</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.redis/${project.version}</bundle>
     </feature>
 
@@ -397,6 +398,7 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-common</feature>
         <feature>jackson</feature>
         <feature>activation</feature>
+        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.18.2</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.redis/${project.version}</bundle>
     </feature>
     
