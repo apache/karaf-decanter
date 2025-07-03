@@ -34,7 +34,7 @@
     <name>Apache Karaf :: Decanter :: Alerting :: Service</name>
 
     <properties>
-        <lucene.version>9.12.1</lucene.version>
+        <lucene.version>9.12.2</lucene.version>
     </properties>
 
     <dependencies>
