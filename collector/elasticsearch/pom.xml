@@ -52,7 +52,7 @@
         <dependency>
             <groupId>co.elastic.clients</groupId>
             <artifactId>elasticsearch-java</artifactId>
-            <version>8.18.3</version>
+            <version>8.19.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter.collector</groupId>
