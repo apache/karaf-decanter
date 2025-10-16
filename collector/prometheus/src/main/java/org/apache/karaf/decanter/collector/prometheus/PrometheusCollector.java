@@ -83,14 +83,21 @@ public class PrometheusCollector implements Runnable {
                         data.put("type", type);
                         if (line.contains("{")) {
                             final String name = line.substring(0, line.indexOf("{"));
-                            String[] labels = line.substring(line.indexOf("{")+1, line.indexOf("}")).split(",");
+                            String[] labels = line.substring(line.indexOf("{")+1, line.lastIndexOf("}")).split(",");
                             Stream.of(labels).forEach(it -> {
-                                String labelName = it.substring(0, it.indexOf("=")).replace("\"", "");
-                                String labelValue = it.substring(it.indexOf("=")+1).replace("\"", "");
-                                data.put(labelName, labelValue);
+                                try {
+                                    // we don't want to store label without value
+                                    if (it.contains("=")) {
+                                        String labelName = it.substring(0, it.indexOf("=")).replace("\"", "");
+                                        String labelValue = it.substring(it.indexOf("=") + 1).replace("\"", "");
+                                        data.put(labelName, labelValue);
+                                    }
+                                } catch (Exception e) {
+                                    LOGGER.error("[collector-prometheus] error while parsing label {} :: {}",it, e.getMessage());
+                                }
                             });
 
-                            String value = line.substring(line.indexOf("}")+2);
+                            String value = line.substring(line.lastIndexOf("}")+2);
                             Double parseValue = Double.parseDouble(value);
                             data.put(name, parseValue);
                         } else {

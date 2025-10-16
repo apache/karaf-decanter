@@ -47,7 +47,7 @@ public class PrometheusCollectorTest {
         Assert.assertEquals("prometheus", dispatcher.postedEvents.get(1).getProperty("type"));
 
         Assert.assertEquals(1.0, dispatcher.postedEvents.get(2).getProperty("request_time_total_seconds"));
-        Assert.assertEquals("/send", dispatcher.postedEvents.get(2).getProperty("endpoint"));
+        Assert.assertEquals("/send/{id}/time", dispatcher.postedEvents.get(2).getProperty("endpoint"));
         Assert.assertEquals("prometheus", dispatcher.postedEvents.get(2).getProperty("type"));
 
         Assert.assertEquals(2.2561752E7, dispatcher.postedEvents.get(3).getProperty("memoryPool_usage_bytes"));
