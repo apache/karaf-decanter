@@ -6,7 +6,7 @@ Test1 0.0
 Test2 8.0
 # HELP request_time_total
 # TYPE request_time_total counter
-request_time_total_seconds{api="my-api",endpoint="/send",method="POST"} 1.0
+request_time_total_seconds{api="my-api",endpoint="/send/{id}/time",method="POST"} 1.0
 # HELP memoryPool_usage_bytes Current usage of the memory pool
 # TYPE memoryPool_usage_bytes gauge
 memoryPool_usage_bytes{name="Compressed Class Space"} 2.2561752E7
