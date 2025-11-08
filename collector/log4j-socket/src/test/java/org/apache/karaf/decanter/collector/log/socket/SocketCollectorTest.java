@@ -90,12 +90,40 @@ public class SocketCollectorTest {
     }
 
     @Test
-    @Ignore("Works fine with JDK11 but not with JDK8 after maven-surefire-plugin 2.22.2 update")
     public void testUnknownEvent() throws Exception {
         activate();
         sendEventOnSocket(new UnknownClass());
         waitUntilEventCountHandled(1);
         assertEquals("Event(s) should have been correctly handled", 0, eventAdmin.getPostEvents().size());
+    }
+
+    @Test
+    public void testDeepObject() throws Exception {
+        activate();
+        sendEventOnSocket(getMaliciousSerializableDictionaryDemo());
+        waitUntilEventCountHandled(1);
+        assertEquals(1, eventAdmin.getPostEvents().size());
+    }
+
+    public static Object getMaliciousSerializableDictionaryDemo() {
+        Dictionary hashtable = new Hashtable();
+        Dictionary s1 = hashtable;
+        Dictionary s2 = new
+                Hashtable();
+        for (int i = 0; i < 100; i++) {
+            Dictionary t1 = new Hashtable();
+            Dictionary t2 = new Hashtable();
+            t1.put("afdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdf",
+                    "afdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdf");
+            t2.put("test", "test112312test1123123test1123123test1123123test1123123test1123123test11231233");
+            s1.put(t1, t2);
+            s1.put(t2, t1);
+            s2.put(t2, t1);
+            s2.put(t1, t2);
+            s1 = t1;
+            s2 = t2;
+        }
+        return (Object) hashtable;
     }
 
     private static final class UnknownClass implements java.io.Serializable {

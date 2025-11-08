@@ -21,9 +21,9 @@ import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InvalidClassException;
+import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamClass;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -56,7 +56,9 @@ import org.slf4j.LoggerFactory;
 )
 public class SocketCollector implements Closeable, Runnable {
 
+    public static final String HOSTNAME = "hostname";
     public static final String PORT_NAME = "port";
+    public static final String BACKLOG = "backlog";
     public static final String WORKERS_NAME = "workers";
 
     @Reference
@@ -72,10 +74,13 @@ public class SocketCollector implements Closeable, Runnable {
     @Activate
     public void activate(ComponentContext context) throws IOException {
         this.properties = context.getProperties();
+        String hostname = getProperty(this.properties, HOSTNAME, "localhost");
         int port = Integer.parseInt(getProperty(this.properties, PORT_NAME, "4560"));
+        int backlog = Integer.parseInt(getProperty(this.properties, BACKLOG, "50"));
         int workers = Integer.parseInt(getProperty(this.properties, WORKERS_NAME, "10"));
-        LOGGER.info("Starting Log4j Socket collector on port {}", port);
-        this.serverSocket = new ServerSocket(port);
+        LOGGER.info("Starting Log4j Socket collector on {}:{}", hostname, port);
+        InetAddress host = InetAddress.getByName(hostname);
+        this.serverSocket = new ServerSocket(port, backlog, host);
         // adding 1 for serverSocket handling
         this.executor = Executors.newFixedThreadPool(workers + 1);
         this.executor.execute(this);
@@ -230,18 +235,40 @@ public class SocketCollector implements Closeable, Runnable {
 
         public LoggingEventObjectInputStream(InputStream is) throws IOException {
             super(is);
+            // JEP 290: Set ObjectInputFilter to filter incoming serialization data
+            setObjectInputFilter(createLoggingEventFilter());
         }
 
-        @Override
-        protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-            if (!isAllowedByDefault(desc.getName())) {
-                throw new InvalidClassException("Unauthorized deserialization attempt", desc.getName());
-            }
-            return super.resolveClass(desc);
+        /**
+         * Creates an ObjectInputFilter for JEP 290 that allows only the classes
+         * necessary for Log4j LoggingEvent deserialization.
+         * 
+         * Note: Based off the internals of LoggingEvent. Will need to be
+         * adjusted for Log4J 2
+         */
+        private static ObjectInputFilter createLoggingEventFilter() {
+            return new ObjectInputFilter() {
+                @Override
+                public Status checkInput(FilterInfo filterInfo) {
+                    Class<?> clazz = filterInfo.serialClass();
+                    if (clazz != null) {
+                        String className = clazz.getName();
+                        if (isAllowedByDefault(className)) {
+                            return Status.ALLOWED;
+                        } else {
+                            return Status.REJECTED;
+                        }
+                    }
+                    // Allow array depth and references checks
+                    long arrayLength = filterInfo.arrayLength();
+                    if (arrayLength >= 0 && arrayLength > Integer.MAX_VALUE) {
+                        return Status.REJECTED;
+                    }
+                    return Status.UNDECIDED;
+                }
+            };
         }
 
-        // Note: Based off the internals of LoggingEvent. Will need to be
-        // adjusted for Log4J 2
         private static boolean isAllowedByDefault(final String name) {
             return name.startsWith("java.lang.")
                 || name.startsWith("[Ljava.lang.")
