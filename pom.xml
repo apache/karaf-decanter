@@ -65,15 +65,14 @@
     </modules>
 
     <scm>
-        <connection>scm:git:https://gitbox.apache.org/repos/asf/karaf-decanter.git</connection>
-        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/karaf-decanter.git</developerConnection>
-        <url>https://gitbox.apache.org/repos/asf?p=karaf-decanter.git;a=summary</url>
-        <tag>decanter-2.11.0</tag>
+        <connection>scm:git:https://github.com/apache/karaf-decanter</connection>
+        <developerConnection>scm:git:https://github.com/apache/karaf-decanter</developerConnection>
+        <url>https://github.com/apache/karaf-decanter</url>
     </scm>
 
     <issueManagement>
-        <system>jira</system>
-        <url>https://issues.apache.org/jira/browse/KARAF</url>
+        <system>GitHub</system>
+        <url>https://github.com/apache/karaf-decanter/issues</url>
     </issueManagement>
 
     <mailingLists>
