@@ -18,6 +18,8 @@ package org.apache.karaf.decanter.collector.log.socket;
 
 import java.io.BufferedInputStream;
 import java.io.Closeable;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +29,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,6 +63,8 @@ public class SocketCollector implements Closeable, Runnable {
     public static final String PORT_NAME = "port";
     public static final String BACKLOG = "backlog";
     public static final String WORKERS_NAME = "workers";
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
 
     @Reference
     public EventAdmin dispatcher;
@@ -70,7 +75,6 @@ public class SocketCollector implements Closeable, Runnable {
     private ExecutorService executor;
     private Dictionary<String, Object> properties;
 
-    @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext context) throws IOException {
         this.properties = context.getProperties();
@@ -206,16 +210,26 @@ public class SocketCollector implements Closeable, Runnable {
         }
 
         public void run() {
-            try (ObjectInputStream ois = new LoggingEventObjectInputStream(new BufferedInputStream(clientSocket
-                .getInputStream()))) {
-                while (open) {
-                    try {
-                        Object event = ois.readObject();
-                        if (event instanceof LoggingEvent) {
-                            handleLog4j((LoggingEvent)event);
+            try {
+                InputStream socketInputStream = new BufferedInputStream(clientSocket.getInputStream());
+                
+                // Perform authentication if configured
+                if (!authenticate(socketInputStream)) {
+                    LOGGER.warn("Authentication failed for client at {}", clientSocket.getInetAddress());
+                    return;
+                }
+
+                // After successful authentication, proceed with normal log event processing
+                try (ObjectInputStream ois = new LoggingEventObjectInputStream(socketInputStream)) {
+                    while (open) {
+                        try {
+                            Object event = ois.readObject();
+                            if (event instanceof LoggingEvent) {
+                                handleLog4j((LoggingEvent)event);
+                            }
+                        } catch (ClassNotFoundException e) {
+                            LOGGER.warn("Unable to deserialize event from " + clientSocket.getInetAddress(), e);
                         }
-                    } catch (ClassNotFoundException e) {
-                        LOGGER.warn("Unable to deserialize event from " + clientSocket.getInetAddress(), e);
                     }
                 }
             } catch (EOFException e) {
@@ -228,6 +242,80 @@ public class SocketCollector implements Closeable, Runnable {
             } catch (IOException e) {
                 LOGGER.info("Error closing socket", e);
             }
+        }
+
+        /**
+         * Authenticates the client connection.
+         * Authentication protocol:
+         * 1. Client sends username length (int) followed by username (UTF-8 bytes)
+         * 2. Client sends password length (int) followed by password (UTF-8 bytes)
+         * 3. Server validates and sends acknowledgment: 1 (success) or 0 (failure)
+         * 
+         * @param inputStream the input stream to read authentication data from
+         * @return true if authentication succeeds or is not required, false otherwise
+         */
+        private boolean authenticate(InputStream inputStream) throws IOException {
+            String configuredUsername = getProperty(properties, USERNAME, null);
+            String configuredPassword = getProperty(properties, PASSWORD, null);
+
+            // If no authentication is configured, allow connection
+            if (configuredUsername == null && configuredPassword == null) {
+                return true;
+            }
+
+            // If only one is configured, require both
+            if (configuredUsername == null || configuredPassword == null) {
+                LOGGER.warn("Both username and password must be configured for authentication");
+                return false;
+            }
+
+            DataInputStream dis = new DataInputStream(inputStream);
+            DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
+            
+            try {
+                // Read username
+                int usernameLength = dis.readInt();
+                if (usernameLength < 0 || usernameLength > 1024) {
+                    LOGGER.warn("Invalid username length from {}", clientSocket.getInetAddress());
+                    dos.writeByte(0); // Send failure
+                    dos.flush();
+                    return false;
+                }
+                byte[] usernameBytes = new byte[usernameLength];
+                dis.readFully(usernameBytes);
+                String username = new String(usernameBytes, StandardCharsets.UTF_8);
+
+                // Read password
+                int passwordLength = dis.readInt();
+                if (passwordLength < 0 || passwordLength > 1024) {
+                    LOGGER.warn("Invalid password length from {}", clientSocket.getInetAddress());
+                    dos.writeByte(0); // Send failure
+                    dos.flush();
+                    return false;
+                }
+                byte[] passwordBytes = new byte[passwordLength];
+                dis.readFully(passwordBytes);
+                String password = new String(passwordBytes, StandardCharsets.UTF_8);
+
+                // Validate credentials
+                boolean authenticated = configuredUsername.equals(username) && configuredPassword.equals(password);
+                
+                // Send acknowledgment
+                dos.writeByte(authenticated ? 1 : 0);
+                dos.flush();
+
+                if (authenticated) {
+                    LOGGER.debug("Client authenticated successfully: {}", username);
+                } else {
+                    LOGGER.warn("Authentication failed for user '{}' from {}", username, clientSocket.getInetAddress());
+                }
+
+                return authenticated;
+            } catch (EOFException e) {
+                LOGGER.debug("Client disconnected during authentication");
+                return false;
+            }
+            // Note: We don't close dis/dos here as the underlying streams are still needed
         }
     }
 
@@ -273,7 +361,8 @@ public class SocketCollector implements Closeable, Runnable {
             return name.startsWith("java.lang.")
                 || name.startsWith("[Ljava.lang.")
                 || name.startsWith("org.apache.log4j.")
-                || name.equals("java.util.Hashtable");
+                || name.startsWith("java.util.Hashtable")
+                || name.startsWith("[Ljava.util.Map");
         }
     }
 }
