@@ -19,7 +19,6 @@ package org.apache.karaf.decanter.collector.log;
 import org.apache.log4j.Category;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Test;
-import org.ops4j.pax.logging.service.internal.spi.PaxLoggingEventImpl;
 import org.ops4j.pax.logging.spi.PaxLevel;
 import org.ops4j.pax.logging.spi.PaxLocationInfo;
 import org.ops4j.pax.logging.spi.PaxLoggingEvent;
