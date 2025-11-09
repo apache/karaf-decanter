@@ -230,8 +230,10 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
         <feature>decanter-common</feature>
         <feature>scheduler</feature>
         <feature>activation</feature>
-        <feature>jackson</feature>
-        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.18.2</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.20.0</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.20</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.20.0</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.20.0</bundle>
         <bundle>mvn:org.apache.karaf.decanter.collector/org.apache.karaf.decanter.collector.redis/${project.version}</bundle>
     </feature>
 
@@ -396,9 +398,11 @@ org.apache.felix.eventadmin.IgnoreTimeout=org.apache.karaf.decanter.
 
     <feature name="decanter-appender-redis-core" version="${project.version}" description="Karaf Decanter Redis Appender core">
         <feature>decanter-common</feature>
-        <feature>jackson</feature>
         <feature>activation</feature>
-        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.18.2</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.20.0</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.20</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.20.0</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.20.0</bundle>
         <bundle>mvn:org.apache.karaf.decanter.appender/org.apache.karaf.decanter.appender.redis/${project.version}</bundle>
     </feature>
     
