@@ -6,3 +6,4 @@ target
 *.i??
 elasticsearch/data
 derby.log
+.vscode
