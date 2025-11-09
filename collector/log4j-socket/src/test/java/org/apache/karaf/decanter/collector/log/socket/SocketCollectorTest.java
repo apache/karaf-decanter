@@ -18,10 +18,12 @@ package org.apache.karaf.decanter.collector.log.socket;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -37,7 +39,6 @@ import org.apache.log4j.spi.ThrowableInformation;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -90,12 +91,40 @@ public class SocketCollectorTest {
     }
 
     @Test
-    @Ignore("Works fine with JDK11 but not with JDK8 after maven-surefire-plugin 2.22.2 update")
     public void testUnknownEvent() throws Exception {
         activate();
         sendEventOnSocket(new UnknownClass());
         waitUntilEventCountHandled(1);
         assertEquals("Event(s) should have been correctly handled", 0, eventAdmin.getPostEvents().size());
+    }
+
+    @Test
+    public void testDeepObject() throws Exception {
+        activate();
+        sendEventOnSocket(getMaliciousSerializableDictionaryDemo());
+        waitUntilEventCountHandled(1);
+        assertEquals(0, eventAdmin.getPostEvents().size());
+    }
+
+    public static Object getMaliciousSerializableDictionaryDemo() {
+        Dictionary hashtable = new Hashtable();
+        Dictionary s1 = hashtable;
+        Dictionary s2 = new
+                Hashtable();
+        for (int i = 0; i < 100; i++) {
+            Dictionary t1 = new Hashtable();
+            Dictionary t2 = new Hashtable();
+            t1.put("afdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdf",
+                    "afdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdfafdsgasdgfasdgasdf");
+            t2.put("test", "test112312test1123123test1123123test1123123test1123123test1123123test11231233");
+            s1.put(t1, t2);
+            s1.put(t2, t1);
+            s2.put(t2, t1);
+            s2.put(t1, t2);
+            s1 = t1;
+            s2 = t2;
+        }
+        return (Object) hashtable;
     }
 
     private static final class UnknownClass implements java.io.Serializable {
@@ -136,6 +165,80 @@ public class SocketCollectorTest {
         assertEquals("Event(s) should have been correctly handled", 2, eventAdmin.getPostEvents().size());
     }
 
+    /**
+     * Test authentication with correct credentials
+     */
+    @Test
+    public void testAuthenticationSuccess() throws Exception {
+        componentContext.getProperties().put(SocketCollector.USERNAME, "testuser");
+        componentContext.getProperties().put(SocketCollector.PASSWORD, "testpass");
+        activate();
+        
+        sendAuthenticatedEventOnSocket(newLoggingEvent("Authenticated message"), "testuser", "testpass");
+        waitUntilEventCountHandled(1);
+        assertEquals("Event should have been handled after successful authentication", 1, eventAdmin.getPostEvents().size());
+    }
+
+    /**
+     * Test authentication with incorrect credentials
+     */
+    @Test
+    public void testAuthenticationFailure() throws Exception {
+        componentContext.getProperties().put(SocketCollector.USERNAME, "testuser");
+        componentContext.getProperties().put(SocketCollector.PASSWORD, "testpass");
+        activate();
+        
+        try {
+            sendAuthenticatedEventOnSocket(newLoggingEvent("Should not be processed"), "testuser", "wrongpass");
+            // If we get here, authentication didn't fail as expected
+            Assert.fail("Authentication should have failed with wrong password");
+        } catch (IOException e) {
+            // Expected - authentication failed
+            Assert.assertTrue("Exception should indicate authentication failure", 
+                e.getMessage() != null && e.getMessage().contains("Authentication failed"));
+        }
+        
+        // Wait a bit to ensure no events were processed
+        Thread.sleep(100);
+        assertEquals("No events should have been processed after authentication failure", 0, eventAdmin.getPostEvents().size());
+    }
+
+    /**
+     * Test that authentication is optional (backward compatibility)
+     */
+    @Test
+    public void testNoAuthentication() throws Exception {
+        // Don't set username/password
+        activate();
+        
+        // Should work without authentication
+        sendEventOnSocket(newLoggingEvent("No auth message"));
+        waitUntilEventCountHandled(1);
+        assertEquals("Event should have been handled without authentication", 1, eventAdmin.getPostEvents().size());
+    }
+
+    /**
+     * Test authentication with wrong username
+     */
+    @Test
+    public void testAuthenticationWrongUsername() throws Exception {
+        componentContext.getProperties().put(SocketCollector.USERNAME, "testuser");
+        componentContext.getProperties().put(SocketCollector.PASSWORD, "testpass");
+        activate();
+        
+        try {
+            sendAuthenticatedEventOnSocket(newLoggingEvent("Should not be processed"), "wronguser", "testpass");
+            Assert.fail("Authentication should have failed with wrong username");
+        } catch (IOException e) {
+            // Expected - authentication failed
+            Assert.assertTrue("Exception should indicate authentication failure", 
+                e.getMessage() != null && e.getMessage().contains("Authentication failed"));
+        }
+        
+        Thread.sleep(100);
+        assertEquals("No events should have been processed after authentication failure", 0, eventAdmin.getPostEvents().size());
+    }
+
     private void waitUntilEventCountHandled(int eventCount) throws InterruptedException {
         long timeout = 20000L;
         long start = System.currentTimeMillis();
@@ -166,6 +269,35 @@ public class SocketCollectorTest {
     private void sendEventOnSocket(Object event) throws IOException {
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress("localhost", port), 5000);
+            try (ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
+                out.writeObject(event);
+                out.flush();
+            }
+        }
+    }
+
+    private void sendAuthenticatedEventOnSocket(Object event, String username, String password) throws IOException {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress("localhost", port), 5000);
+            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+            
+            // Send authentication
+            byte[] usernameBytes = username.getBytes(StandardCharsets.UTF_8);
+            dos.writeInt(usernameBytes.length);
+            dos.write(usernameBytes);
+            
+            byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
+            dos.writeInt(passwordBytes.length);
+            dos.write(passwordBytes);
+            dos.flush();
+            
+            // Read authentication response
+            int response = socket.getInputStream().read();
+            if (response != 1) {
+                throw new IOException("Authentication failed, server returned: " + response);
+            }
+            
+            // Send event using ObjectOutputStream (it will write its header)
             try (ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
                 out.writeObject(event);
                 out.flush();
