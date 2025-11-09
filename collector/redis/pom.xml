@@ -94,6 +94,8 @@
                         <Export-Package>!*</Export-Package>
                         <Import-Package>
                             com.esotericsoftware.kryo*;resolution:=optional,
+                            !redis.clients*,
+                            !org.redisson*,
                             !com.github.benmanes.caffeine.cache,
                             !io.micrometer.core*,
                             !io.netty*,
@@ -138,10 +140,12 @@
                             io.protostuff*;resolution:=optional,
                             org.apache.commons.compress*;resolution:=optional,
                             org.apache.fury*;resolution:=optional,
+                            org.apache.fory*;resolution:=optional,
                             *
                         </Import-Package>
                         <Private-Package>
                             org.redisson*,
+                            redis.clients*,
                             com.github.benmanes.caffeine.cache,
                             io.micrometer.core*,
                             io.netty*,
@@ -150,7 +154,7 @@
                             org.xerial.snappy*,
                             reactor*,
                             jodd.*,
-														org.objenesis*,
+							org.objenesis*,
                             org.apache.karaf.decanter.collector.redis,
                             org.apache.karaf.decanter.collector.utils
                         </Private-Package>

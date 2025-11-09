@@ -73,6 +73,8 @@
                         <Export-Package>!*</Export-Package>
                         <Import-Package>
                             !com.github.benmanes.caffeine.cache,
+                            !redis.clients*,
+                            !org.redisson*,
                             !io.micrometer.core*,
                             !io.netty*,
                             !lzma*,
@@ -115,10 +117,12 @@
 							android*;resolution:=optional,
                             org.apache.fury*;resolution:=optional,
                             io.protostuff*;resolution:=optional,
+                            org.apache.fory*;resolution:=optional,
                             *
                         </Import-Package>
                         <Private-Package>
                             org.redisson*,
+                            redis.clients*,
                             com.github.benmanes.caffeine.cache,
                             io.micrometer.core*,
                             io.netty*,
