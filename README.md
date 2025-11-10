@@ -62,6 +62,8 @@ See user guide for the details of Decanter features.
 * `decanter-collector-camel`
 * `decanter-collector-configadmin`
 * `decanter-collector-dropwizard`
+* `decanter-collector-druid`
+* `decanter-collector-elasticsearch`
 * `decanter-collector-eventadmin`
 * `decanter-collector-file`
 * `decanter-collector-jdbc`
@@ -72,8 +74,8 @@ See user guide for the details of Decanter features.
 * `decanter-collector-log`
 * `decanter-collector-log4j-socket`
 * `decanter-collector-mqtt`
+* `decanter-collector-openstack`
 * `decanter-collector-oshi`
-* `decanter-collector-process`
 * `decanter-collector-prometheus`
 * `decanter-collector-redis`
 * `decanter-collector-rest`
@@ -95,12 +97,14 @@ See user guide for the details of Decanter features.
 * `decanter-appender-jms`
 * `decanter-appender-kafka`
 * `decanter-appender-log`
+* `decanter-appender-loki`
 * `decanter-appender-mongodb`
 * `decanter-appender-mqtt`
 * `decanter-appender-orientdb`
 * `decanter-appender-prometheus`
 * `decanter-appender-redis`
 * `decanter-appender-rest`
+* `decanter-appender-s3`
 * `decanter-appender-socket`
 * `decanter-appender-timescaledb`
 * `decanter-appender-websocket`
@@ -119,6 +123,5 @@ See user guide for the details of Decanter features.
 * `decanter-alerting-camel`
 
 Thanks for using Apache Karaf Decanter !
-
 
 **The Apache Karaf Team**
