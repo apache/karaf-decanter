@@ -200,3 +200,54 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+------------------------------------------------------------------------------
+
+This artifact bundles Elasticsearch Java Client.
+
+Project URL: https://www.elastic.co/docs/reference/elasticsearch/clients/java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles OpenTelemetry Java SDK.
+
+Project URL: https://github.com/open-telemetry/opentelemetry-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles Jakarta JSON API.
+
+Project URL: https://github.com/eclipse-ee4j/jsonp
+License: EPL 2.0 - https://www.eclipse.org/legal/epl-2.0
+
+------------------------------------------------------------------------------
+
+This artifact bundles Javax Annotation API.
+
+Project URL: https://github.com/jakartaee/common-annotations-api
+License: EPL 2.0 - https://www.eclipse.org/legal/epl-2.0
+
+------------------------------------------------------------------------------
+
+This artifact bundles Apache Commons Codec.
+
+Project URL: https://commons.apache.org/proper/commons-codec/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles Apache Commons Logging.
+
+Project URL: https://commons.apache.org/proper/commons-logging/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles Apache HTTP Component & Client.
+
+Project URL: https://hc.apache.org/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------

@@ -1,57 +1,62 @@
-Apache Karaf Decanter
-Copyright 2015-2023 The Apache Software Foundation
-
-I. Included Software
+Apache Karaf :: Decanter :: Appender :: S3
+Copyright 2025 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
-Licensed under the Apache License 2.0.
 
-This product includes software developed at
-Elastic (https://www.elastic.co/).
-Licensed under the Apache License 2.0.
+------------------------------------------------------------------------------
 
-This product includes software developed at
-OrientDB (http://orientdb.com).
-Licensed under the Apache License 2.0.
+This artifact bundles AWS Java SDK with the following in its NOTICE:
 
-II. Used Software
+| AWS SDK for Java
+| Copyright 2010-2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+| 
+| This product includes software developed by
+| Amazon Technologies, Inc (http://www.amazon.com/).
+| 
+| **********************
+| THIRD PARTY COMPONENTS
+| **********************
+| This software includes third party software subject to the following copyrights:
+| - XML parsing and utility functions from JetS3t - Copyright 2006-2009 James Murty.
+| - PKCS#1 PEM encoded private key parsing and utility functions from oauth.googlecode.com - Copyright 1998-2010 AOL Inc.
+| 
+| The licenses for these third party components are included in LICENSE.txt
 
-This product uses software developed at
-The OSGi Alliance (http://www.osgi.org/).
-Copyright (c) OSGi Alliance (2000, 2010).
-Licensed under the Apache License 2.0.
+------------------------------------------------------------------------------
 
-This product uses software developed at
-OPS4J (http://www.ops4j.org/).
-Licensed under the Apache License 2.0.
+This artifact bundles Apache Http Components with the following in its NOTICE:
 
-This product uses software developed at
-SLF4J (http://www.slf4j.org/).
-Licensed under the MIT License.
+| Apache HttpComponents Core
+| Copyright 2005-2024 The Apache Software Foundation
+| 
+| This product includes software developed at
+| The Apache Software Foundation (http://www.apache.org/).
 
-This product uses software developed at
-JUnit (http://www.junit.org/).
-Licensed under the Eclipse Public License 1.0.
+------------------------------------------------------------------------------
 
-This product uses software developed at
-Redis (http://www.redis.io).
-Licensed under the BSD license.
+This artifact bundles Apache Http Client with the following in its NOTICE:
 
-This product uses software developed at
-Dropwizard (http://www.dropwizard.io).
-Licensed under the Apache License 2.0.
+| Apache HttpComponents Client
+| Copyright 1999-2025 The Apache Software Foundation
+| 
+| This product includes software developed at
+| The Apache Software Foundation (http://www.apache.org/).
+| 
+| This product includes a copy of in https://publicsuffix.org/list/effective_tld_names.dat
+| in httpclient5/src/test/resources/org/publicsuffix/list/effective_tld_names.dat 
+| This Source Code Form is subject to the terms of the Mozilla Public
+| License, v. 2.0. If a copy of the MPL was not distributed with this
+| file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-This product uses software developed at
-searchbox.io (https://github.com/searchbox-io)
-Licensed under the Apache License 2.0.
+------------------------------------------------------------------------------
 
-This product uses software developed at
-MongoDB (https://www.mongodb.com/)
-Licensed under the Apache License 2.0.
+This artifact bundles Joda Time with the following in its NOTICE:
 
-III. License Summary
-- Apache License 2.0
-- MIT License
-- Eclipse Public License 1.0
-- BSD License
+| =============================================================================
+| = NOTICE file corresponding to section 4d of the Apache License Version 2.0 =
+| =============================================================================
+| This product includes software developed by
+| Joda.org (https://www.joda.org/).
+
+------------------------------------------------------------------------------

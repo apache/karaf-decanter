@@ -163,6 +163,7 @@
                         <configuration>
                             <target>
                                 <copy file="NOTICE" todir="target/maven-shared-archive-resources/META-INF" failonerror="false" overwrite="true" />
+                                <copy file="LICENSE" todir="target/maven-shared-archive-resources/META-INF" failonerror="false" overwrite="true" />
                             </target>
                         </configuration>
                     </execution>

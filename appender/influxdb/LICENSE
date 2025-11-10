@@ -200,3 +200,54 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+------------------------------------------------------------------------------
+
+This artifact bundles Squareup Moshi.
+
+Project URL: https://github.com/square/moshi
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles kotlin.
+
+Project URL: https://github.com/Kotlin
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles okhttp.
+
+Project URL: https://github.com/square/okhttp
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles okio.
+
+Project URL: https://github.com/square/okio
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles InfluxDB.
+
+Project URL: https://github.com/influxdata/influxdb
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles msgpack.
+
+Project URL: https://msgpack.org/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles retrofit.
+
+Project URL: https://github.com/square/retrofit
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
