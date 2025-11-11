@@ -70,7 +70,7 @@
                     <instructions>
                         <Export-Package>!*</Export-Package>
                         <Import-Package>
-                            org.apache.camel*;version="[2,4)",
+                            org.apache.camel*;version="[2,5)",
                             *
                         </Import-Package>
                         <Private-Package>

@@ -200,3 +200,40 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+------------------------------------------------------------------------------
+
+This artifact bundles AWS Java SDK.
+
+Project URL: https://github.com/aws/aws-sdk-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles Apache Commons Codec.
+
+Project URL: https://commons.apache.org/proper/commons-codec/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles Apache Http Component.
+
+Project URL: https://hc.apache.org/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles Apache Http Client.
+
+Project URL: https://hc.apache.org/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------
+
+This artifact bundles Joda Time.
+
+Project URL: https://www.joda.org/joda-time/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+------------------------------------------------------------------------------

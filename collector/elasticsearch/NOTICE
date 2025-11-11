@@ -1,57 +1,60 @@
-Apache Karaf Decanter
-Copyright 2015-2023 The Apache Software Foundation
-
-I. Included Software
+Apache Karaf :: Decanter :: Collector :: Elasticsearch
+Copyright 2025 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
-Licensed under the Apache License 2.0.
 
-This product includes software developed at
-Elastic (https://www.elastic.co/).
-Licensed under the Apache License 2.0.
+------------------------------------------------------------------------------
 
-This product includes software developed at
-OrientDB (http://orientdb.com).
-Licensed under the Apache License 2.0.
+This artifact bundles Elasticsearch Java Client with the following in its NOTICE:
 
-II. Used Software
+| Elasticsearch Java Client
+| Copyright 2021 Elasticsearch B.V.
 
-This product uses software developed at
-The OSGi Alliance (http://www.osgi.org/).
-Copyright (c) OSGi Alliance (2000, 2010).
-Licensed under the Apache License 2.0.
+------------------------------------------------------------------------------
 
-This product uses software developed at
-OPS4J (http://www.ops4j.org/).
-Licensed under the Apache License 2.0.
+This artifact bundles Apache Commons Codec with the following in its NOTICE:
 
-This product uses software developed at
-SLF4J (http://www.slf4j.org/).
-Licensed under the MIT License.
+| Apache Commons Codec
+| Copyright 2002-2025 The Apache Software Foundation
+| 
+| This product includes software developed at
+| The Apache Software Foundation (https://www.apache.org/).
 
-This product uses software developed at
-JUnit (http://www.junit.org/).
-Licensed under the Eclipse Public License 1.0.
+------------------------------------------------------------------------------
 
-This product uses software developed at
-Redis (http://www.redis.io).
-Licensed under the BSD license.
+This artifact bundles Apache Commons Logging with the following in its NOTICE:
 
-This product uses software developed at
-Dropwizard (http://www.dropwizard.io).
-Licensed under the Apache License 2.0.
+| Apache Commons Logging
+| Copyright 2001-2025 The Apache Software Foundation
+| 
+| This product includes software developed at
+| The Apache Software Foundation (https://www.apache.org/).
 
-This product uses software developed at
-searchbox.io (https://github.com/searchbox-io)
-Licensed under the Apache License 2.0.
+------------------------------------------------------------------------------
 
-This product uses software developed at
-MongoDB (https://www.mongodb.com/)
-Licensed under the Apache License 2.0.
+This artifact bundles Apache HTTP Component with the following in its NOTICE:
 
-III. License Summary
-- Apache License 2.0
-- MIT License
-- Eclipse Public License 1.0
-- BSD License
+| Apache HttpComponents Core
+| Copyright 2005-2024 The Apache Software Foundation
+| 
+| This product includes software developed at
+| The Apache Software Foundation (http://www.apache.org/).
+
+------------------------------------------------------------------------------
+
+This artifact bundles Apache HTTP Client with the following in its NOTICE:
+
+| Apache HttpComponents Client
+| Copyright 1999-2025 The Apache Software Foundation
+| 
+| This product includes software developed at
+| The Apache Software Foundation (http://www.apache.org/).
+| 
+| This product includes a copy of in https://publicsuffix.org/list/effective_tld_names.dat
+| in httpclient5/src/test/resources/org/publicsuffix/list/effective_tld_names.dat 
+| This Source Code Form is subject to the terms of the Mozilla Public
+| License, v. 2.0. If a copy of the MPL was not distributed with this
+| file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+------------------------------------------------------------------------------
