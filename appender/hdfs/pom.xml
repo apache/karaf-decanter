@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
-            <version>3.4.2</version>
+            <version>3.4.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.decanter</groupId>
@@ -129,6 +129,7 @@
                             !org.apache.commons.text*,
                             !org.apache.xml*,
                             !org.apache.zookeeper*,
+                            !org.jspecify.annotations,
                             !org.tukaani*,
                             !org.xerial.snappy*,
                             !okhttp3*,
@@ -209,6 +210,7 @@
                             org.apache.commons.text*,
                             org.apache.xml.resolver*,
                             org.apache.zookeeper*,
+                            org.jspecify.annotations,
                             org.tukaani*,
                             org.xerial.snappy*,
                             okhttp3*,
