@@ -35,7 +35,7 @@
     <name>Apache Karaf :: Decanter</name>
 
     <properties>
-        <maven.compiler.target>17</maven.compiler.target>
+        <javaVersion>17</javaVersion>
 
         <baseline>1.0.0</baseline>
         <baseline.skip>true</baseline.skip>
