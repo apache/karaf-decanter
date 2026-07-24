@@ -46,7 +46,7 @@ jobs:
       - name: Build
         run: mvn -U -B -e clean install -Prat -DskipTests
       - name: Save Maven Local Repository
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: ~/.m2/repository
           key: maven-local-repo-${{ github.run_id }}
@@ -70,7 +70,7 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - name: Restore Maven Local Repository
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: ~/.m2/repository
           key: maven-local-repo-${{ github.run_id }}
