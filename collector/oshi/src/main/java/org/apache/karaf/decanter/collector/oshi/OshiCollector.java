@@ -344,7 +344,7 @@ public class OshiCollector implements Runnable {
                         data.put("operatingSystem.process." + pid + ".path", process.getPath());
                         data.put("operatingSystem.process." + pid + ".priority", process.getPriority());
                         data.put("operatingSystem.process." + pid + ".processCpuLoadCumulative", process.getProcessCpuLoadCumulative());
-                        data.put("operatingSystem.process." + pid + ".residentSetSize", process.getResidentSetSize());
+                        data.put("operatingSystem.process." + pid + ".residentSetSize", process.getResidentMemory());
                         data.put("operatingSystem.process." + pid + ".startTime", process.getStartTime());
                         data.put("operatingSystem.process." + pid + ".state", process.getState());
                         data.put("operatingSystem.process." + pid + ".threadCount", process.getThreadCount());
