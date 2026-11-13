@@ -72,8 +72,7 @@ public class FileAppender implements EventHandler {
         if (EventFilter.match(event, config)) {
             try {
                 String marshalled = marshaller.marshal(event);
-                writer.write(marshalled);
-                writer.newLine();
+                writer.write(marshalled + System.lineSeparator());
                 writer.flush();
             } catch (Exception e) {
                 // nothing to do
