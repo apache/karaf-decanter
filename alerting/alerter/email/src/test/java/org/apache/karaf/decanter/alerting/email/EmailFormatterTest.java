@@ -17,13 +17,22 @@
 package org.apache.karaf.decanter.alerting.email;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.osgi.service.event.Event;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
 public class EmailFormatterTest {
+
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
     EmailFormatter formatter = new EmailFormatter();
 
@@ -60,13 +69,27 @@ public class EmailFormatterTest {
     }
 
     @Test
-    public void testSubjectEventDefinedTemplate() {
+    public void testSubjectEventDefinedTemplateIgnoredByDefault() {
         Map<String, Object> data = new HashMap<>();
         data.put("subject.template.location", this.getClass().getClassLoader().getResource("propertySubjectTemplate.vm").getPath());
         data.put("alertLevel", "SEVERE");
         data.put("alertAttribute", "TestAttribute");
+        data.put("alertPattern", "TestPattern");
         Event event = new Event("foo", data);
         String subject = formatter.formatSubject(null, event);
+        Assert.assertEquals("[SEVERE] Alert TestPattern", subject.trim());
+    }
+
+    @Test
+    public void testSubjectEventDefinedTemplateWhenAllowed() throws Exception {
+        String templatesDir = Paths.get(this.getClass().getClassLoader().getResource("propertySubjectTemplate.vm").toURI()).getParent().toString();
+        EmailFormatter optInFormatter = new EmailFormatter(templatesDir, true);
+        Map<String, Object> data = new HashMap<>();
+        data.put("subject.template.location", "propertySubjectTemplate.vm");
+        data.put("alertLevel", "SEVERE");
+        data.put("alertAttribute", "TestAttribute");
+        Event event = new Event("foo", data);
+        String subject = optInFormatter.formatSubject(null, event);
         Assert.assertEquals("Property defined TestAttribute with SEVERE", subject);
     }
 
@@ -94,15 +117,83 @@ public class EmailFormatterTest {
     }
 
     @Test
-    public void testBodyEventDefinedTemplate() {
+    public void testBodyEventDefinedTemplateIgnoredByDefault() {
         Map<String, Object> data = new HashMap<>();
         data.put("body.template.location", this.getClass().getClassLoader().getResource("propertyBodyTemplate.vm").getPath());
+        data.put("alertLevel", "SEVERE");
+        data.put("alertPattern", "TestPattern");
         data.put("test.name", "test");
         data.put("threadCount", 100);
         Event event = new Event("foo", data);
         String body = formatter.formatBody(null, event);
+        Assert.assertTrue(body.contains("SEVERE alert: condition TestPattern alert"));
+        Assert.assertFalse(body.contains("This is test using property defined template."));
+    }
+
+    @Test
+    public void testBodyEventDefinedTemplateWhenAllowed() throws Exception {
+        String templatesDir = Paths.get(this.getClass().getClassLoader().getResource("propertyBodyTemplate.vm").toURI()).getParent().toString();
+        EmailFormatter optInFormatter = new EmailFormatter(templatesDir, true);
+        Map<String, Object> data = new HashMap<>();
+        data.put("body.template.location", "propertyBodyTemplate.vm");
+        data.put("test.name", "test");
+        data.put("threadCount", 100);
+        Event event = new Event("foo", data);
+        String body = optInFormatter.formatBody(null, event);
         Assert.assertTrue(body.contains("This is test using property defined template."));
         Assert.assertTrue(body.contains("It seems to work fine for 100"));
+    }
+
+    @Test
+    public void testEventTemplateIgnoredWithoutTemplatesDirectory() {
+        EmailFormatter noDirFormatter = new EmailFormatter(null, true);
+        Map<String, Object> data = new HashMap<>();
+        data.put("subject.template.location", this.getClass().getClassLoader().getResource("propertySubjectTemplate.vm").getPath());
+        data.put("alertLevel", "SEVERE");
+        data.put("alertPattern", "TestPattern");
+        Event event = new Event("foo", data);
+        String subject = noDirFormatter.formatSubject(null, event);
+        Assert.assertEquals("[SEVERE] Alert TestPattern", subject.trim());
+    }
+
+    @Test
+    public void testEventTemplatePathTraversalRejected() throws Exception {
+        File templatesDir = tempFolder.newFolder("templates");
+        File outsideFile = tempFolder.newFile("secret.txt");
+        Files.write(outsideFile.toPath(), "SECRET_CONTENT".getBytes(StandardCharsets.UTF_8));
+
+        EmailFormatter optInFormatter = new EmailFormatter(templatesDir.getAbsolutePath(), true);
+
+        Map<String, Object> traversalData = new HashMap<>();
+        traversalData.put("body.template.location", "../secret.txt");
+        Event traversalEvent = new Event("foo", traversalData);
+        try {
+            optInFormatter.formatBody(null, traversalEvent);
+            Assert.fail("Expected IllegalArgumentException for path traversal");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertTrue(expected.getMessage().contains("escapes"));
+        }
+
+        Map<String, Object> absoluteData = new HashMap<>();
+        absoluteData.put("body.template.location", outsideFile.getAbsolutePath());
+        Event absoluteEvent = new Event("foo", absoluteData);
+        try {
+            optInFormatter.formatBody(null, absoluteEvent);
+            Assert.fail("Expected IllegalArgumentException for absolute path");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertTrue(expected.getMessage().contains("relative"));
+        }
+    }
+
+    @Test
+    public void testSecureUberspectorBlocksClassIntrospection() throws Exception {
+        File templateFile = tempFolder.newFile("uberspect.vm");
+        Files.write(templateFile.toPath(), "$event.getClass().forName('java.lang.String')".getBytes(StandardCharsets.UTF_8));
+        Map<String, Object> data = new HashMap<>();
+        data.put("foo", "bar");
+        Event event = new Event("foo", data);
+        String rendered = formatter.formatBody(templateFile.getAbsolutePath(), event);
+        Assert.assertEquals("$event.getClass().forName('java.lang.String')", rendered);
     }
 
 }
