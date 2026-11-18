@@ -49,6 +49,7 @@ public class EmailAlerter implements EventHandler {
     private String subjectTemplate = null;
     private String bodyTemplate = null;
     private String bodyType = null;
+    private boolean allowEventEmailProperties = false;
 
     private Properties properties;
 
@@ -60,20 +61,28 @@ public class EmailAlerter implements EventHandler {
     }
 
     protected void activate(Dictionary<String, Object> config) throws ConfigurationException {
-        from = (config.get("from") != null) ? config.get("from").toString() : null;
-        to = (config.get("to") != null) ? config.get("to").toString() : null;
-        subjectTemplate = (config.get("subject.template") != null) ? config.get("subject.template").toString() : null;
-        bodyTemplate = (config.get("body.template") != null) ? config.get("body.template").toString() : null;
-        bodyType = (config.get("body.type") != null) ? config.get("body.type").toString() : "text/plain";
-        cc = (config.get("cc") != null) ? config.get("cc").toString() : null;
-        bcc = (config.get("bcc")  != null) ? config.get("bcc").toString() : null;
+        from = getString(config, "from");
+        to = getString(config, "to");
+        subjectTemplate = getString(config, "subject.template");
+        bodyTemplate = getString(config, "body.template");
+        String configuredBodyType = getString(config, "body.type");
+        bodyType = (configuredBodyType != null) ? configuredBodyType : "text/plain";
+        cc = getString(config, "cc");
+        bcc = getString(config, "bcc");
+
+        allowEventEmailProperties = parseBoolean(config.get("allow.event.email.properties"), false);
+        boolean allowEventTemplateLocation = parseBoolean(config.get("allow.event.template.location"), false);
+        String templatesDirectory = getString(config, "templates.directory");
+        if (allowEventTemplateLocation && (templatesDirectory == null || templatesDirectory.trim().isEmpty())) {
+            LOGGER.warn("allow.event.template.location is enabled without templates.directory; event template overrides will be ignored");
+        }
 
         properties = new Properties();
-        properties.put("mail.smtp.host", config.get("host"));
-        properties.put("mail.smtp.port", config.get("port"));
-        properties.put("mail.smtp.auth", config.get("auth"));
-        properties.put("mail.smtp.starttls.enable", config.get("starttls"));
-        properties.put("mail.smtp.ssl.enable", config.get("ssl"));
+        putIfNotNull(properties, "mail.smtp.host", config.get("host"));
+        putIfNotNull(properties, "mail.smtp.port", config.get("port"));
+        putIfNotNull(properties, "mail.smtp.auth", config.get("auth"));
+        putIfNotNull(properties, "mail.smtp.starttls.enable", config.get("starttls"));
+        putIfNotNull(properties, "mail.smtp.ssl.enable", config.get("ssl"));
         String username = (String) config.get("username");
         String password = (String) config.get("password");
         if (username != null) {
@@ -83,7 +92,7 @@ public class EmailAlerter implements EventHandler {
             properties.put("mail.smtp.password", password);
         }
 
-        formatter = new EmailFormatter();
+        formatter = new EmailFormatter(templatesDirectory, allowEventTemplateLocation);
     }
 
     @Override
@@ -92,57 +101,92 @@ public class EmailAlerter implements EventHandler {
         MimeMessage message = new MimeMessage(session);
         try {
             // set from
-            if (event.getProperty("from") != null) {
-                message.setFrom(new InternetAddress(event.getProperty("from").toString()));
-            } else if (event.getProperty("alert.email.from") != null) {
-                message.setFrom(new InternetAddress(event.getProperty("alert.email.from").toString()));
-            } else if (from != null){
-                message.setFrom(from);
+            String resolvedFrom = resolveEventOrConfigured(event, "from", "alert.email.from", from);
+            if (resolvedFrom != null && !resolvedFrom.trim().isEmpty()) {
+                message.setFrom(new InternetAddress(validateHeaderValue("from", resolvedFrom)));
             } else {
                 message.setFrom("decanter@karaf.apache.org");
             }
             // set to
-            if (event.getProperty("to") != null) {
-                message.addRecipients(Message.RecipientType.TO, event.getProperty("to").toString());
-            } else if (event.getProperty("alert.email.to") != null) {
-                message.addRecipients(Message.RecipientType.TO, event.getProperty("alert.email.to").toString());
-            } else if (to != null) {
-                message.addRecipients(Message.RecipientType.TO, to);
+            String resolvedTo = resolveEventOrConfigured(event, "to", "alert.email.to", to);
+            if (resolvedTo != null && !resolvedTo.trim().isEmpty()) {
+                message.addRecipients(Message.RecipientType.TO, validateHeaderValue("to", resolvedTo));
             } else {
                 LOGGER.warn("to destination is not defined");
                 return;
             }
             // set cc
-            if (event.getProperty("cc") != null) {
-                message.addRecipients(Message.RecipientType.CC, event.getProperty("cc").toString());
-            } else if (event.getProperty("alert.email.cc") != null) {
-                message.addRecipients(Message.RecipientType.CC, event.getProperty("alert.email.cc").toString());
-            } else if (cc != null) {
-                message.addRecipients(Message.RecipientType.CC, cc);
+            String resolvedCc = resolveEventOrConfigured(event, "cc", "alert.email.cc", cc);
+            if (resolvedCc != null && !resolvedCc.trim().isEmpty()) {
+                message.addRecipients(Message.RecipientType.CC, validateHeaderValue("cc", resolvedCc));
             }
             // set bcc
-            if (event.getProperty("bcc") != null) {
-                message.addRecipients(Message.RecipientType.BCC, event.getProperty("bcc").toString());
-            } else if (event.getProperty("alert.email.bcc") != null) {
-                message.addRecipients(Message.RecipientType.BCC, event.getProperty("alert.email.bcc").toString());
-            } else if (bcc != null) {
-                message.addRecipients(Message.RecipientType.BCC, bcc);
+            String resolvedBcc = resolveEventOrConfigured(event, "bcc", "alert.email.bcc", bcc);
+            if (resolvedBcc != null && !resolvedBcc.trim().isEmpty()) {
+                message.addRecipients(Message.RecipientType.BCC, validateHeaderValue("bcc", resolvedBcc));
             }
             // set subject
-            message.setSubject(formatter.formatSubject(subjectTemplate, event));
+            String subject = formatter.formatSubject(subjectTemplate, event);
+            if (subject != null) {
+                subject = subject.replace("\r", " ").replace("\n", " ").trim();
+            }
+            message.setSubject(subject);
             // set body
             String contentType = bodyType;
-            contentType = (event.getProperty("body.type") != null) ? event.getProperty("body.type").toString() : contentType;
-            contentType = (event.getProperty("alert.email.body.type") != null) ? event.getProperty("alert.email.body.type").toString() : contentType;
-            message.setContent(formatter.formatBody(bodyTemplate, event), contentType);
-            // send email
-            if (properties.get("mail.smtp.user") != null) {
-                Transport.send(message, (String) properties.get("mail.smtp.user"), (String) properties.get("mail.smtp.password"));
-            } else {
-                Transport.send(message);
+            if (allowEventEmailProperties) {
+                contentType = resolveEventOrConfigured(event, "alert.email.body.type", "body.type", bodyType);
             }
+            contentType = validateHeaderValue("body.type", contentType);
+            message.setContent(formatter.formatBody(bodyTemplate, event), contentType);
+            message.saveChanges();
+            // send email
+            sendMessage(message);
         } catch (Exception e) {
             LOGGER.error("Can't send the alert e-mail", e);
+        }
+    }
+
+    protected void sendMessage(MimeMessage message) throws Exception {
+        if (properties.get("mail.smtp.user") != null) {
+            Transport.send(message, (String) properties.get("mail.smtp.user"), (String) properties.get("mail.smtp.password"));
+        } else {
+            Transport.send(message);
+        }
+    }
+
+    private String resolveEventOrConfigured(Event event, String primaryEventKey, String secondaryEventKey, String configuredValue) {
+        if (allowEventEmailProperties) {
+            Object primary = event.getProperty(primaryEventKey);
+            if (primary != null) {
+                return primary.toString();
+            }
+            Object secondary = event.getProperty(secondaryEventKey);
+            if (secondary != null) {
+                return secondary.toString();
+            }
+        }
+        return configuredValue;
+    }
+
+    private static String validateHeaderValue(String headerName, String value) {
+        if (value != null && (value.indexOf('\r') >= 0 || value.indexOf('\n') >= 0)) {
+            throw new IllegalArgumentException("Invalid CR/LF characters in email header: " + headerName);
+        }
+        return value;
+    }
+
+    private static String getString(Dictionary<String, Object> config, String key) {
+        Object value = config.get(key);
+        return (value != null) ? value.toString() : null;
+    }
+
+    private static boolean parseBoolean(Object value, boolean defaultValue) {
+        return (value != null) ? Boolean.parseBoolean(value.toString().trim()) : defaultValue;
+    }
+
+    private static void putIfNotNull(Properties target, String key, Object value) {
+        if (value != null) {
+            target.put(key, value);
         }
     }
 

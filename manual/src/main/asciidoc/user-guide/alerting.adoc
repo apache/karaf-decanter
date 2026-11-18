@@ -135,6 +135,9 @@ ssl=false
 #subject.template=/path/to/subjectTemplate.vm
 #body.template=/path/to/bodyTemplate.vm
 #body.type=text/plain
+#templates.directory=/path/to/templates
+#allow.event.email.properties=false
+#allow.event.template.location=false
 ----
 
 * the `from` property specifies the from e-mail address (for instance dev@karaf.apache.org)
@@ -149,18 +152,18 @@ ssl=false
 * the `subject.template` property allows you to provide your own Velocity (http://velocity.apache.org) template to create the subject of the message
 * the `body.template` property allows you to provide your own Velocity (http://velocity.apache.org) template to create and format the body of the message
 * the `body.type` property allows you to define the message content type, depending if you send HTML or plain text message.
+* the `templates.directory` property defines the base directory where Velocity templates are loaded from when using relative template paths or event-level template selection.
+* the `allow.event.email.properties` property (default `false`) controls whether event properties (`from`, `to`, `cc`, `bcc`, `body.type`, or `alert.email.*`) may override the configured e-mail properties. Enable only when all ingested events are trusted.
+* the `allow.event.template.location` property (default `false`) controls whether event properties (`subject.template.location` and `body.template.location`) may select templates relative to `templates.directory`. Enable only when `templates.directory` is configured and event sources are trusted.
 
 Optionally, you can add:
 
 * `cc` to add email carbon copy
 * `bcc` to add email blind carbon copy
 
-The email alerter is also able to use collected data properties.
+The email alerter is also able to use collected data properties inside the Velocity templates.
 
-For instance, `subject` can look like `This is my ${property}` where `${property}` is replaced by the `property` value.
-
-The email alerter is also able to use collected data properties for subject or body (including replacement).
-It looks for `body.template.location` and `subject.template.location` collected data properties.
+When `allow.event.template.location=true` and `templates.directory` is configured, it looks for `body.template.location` and `subject.template.location` event properties relative to `templates.directory`.
 
 For instance, a body Velocity template looks like this:
 
